@@ -1,0 +1,49 @@
+{
+  "name": "dataplat-ml-static",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run serve",
+    "start:test": "npm run serve:test",
+    "serve": "vue-cli-service serve --mode staging",
+    "serve:test": "vue-cli-service serve --mode test",
+    "build": "export NODE_ENV=production && vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "analyze": "export NODE_ENV=production && export IS_ANALYZE=true && vue-cli-service build"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "core-js": "^2.6.11",
+    "url-loader": "^2.2.0",
+    "vue": "2.5.22",
+    "vue-class-component": "^6.0.0",
+    "vue-property-decorator": "^7.0.0",
+    "vue-router": "3.0.7",
+    "vuex": "^3.0.1"
+  },
+  "devDependencies": {
+    "@types/mockjs": "^1.0.2",
+    "@vue/cli-plugin-babel": "^3.0.0",
+    "@vue/cli-plugin-typescript": "^3.0.0",
+    "@vue/cli-service": "^3.0.0",
+    "copy-webpack-plugin": "^4.5.4",
+    "html-webpack-plugin": "^3.2.0",
+    "lint-staged": "^7.2.2",
+    "mockjs": "^1.0.1-beta3",
+    "path-to-regexp": "^3.0.0",
+    "sass": "^1.23.3",
+    "sass-loader": "^7.0.1",
+    "typescript": "^3.1.3",
+    "vue-template-compiler": "2.5.22",
+    "webpack-bundle-analyzer": "^3.0.3"
+  },
+  "gitHooks": {
+    "pre-commit": "lint-staged"
+  },
+  "lint-staged": {
+    "src/*": [
+      "yarn lint",
+      "git add ."
+    ]
+  }
+}

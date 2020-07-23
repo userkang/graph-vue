@@ -1,0 +1,24 @@
+version: v1
+common:
+  tools:
+    gcc: 4.8.5
+    node: v12.0.0
+build:
+  run:
+    cmd:
+    - npm i npm -g --registry=http://r.npm.sankuai.com
+    - npm i yarn -g --registry=http://r.npm.sankuai.com
+    - yarn config set registry http://r.npm.sankuai.com
+    - yarn --registry=http://r.npm.sankuai.com
+    - export CONFIG_ENV=staging
+    - export NODE_ENV=staging
+    - yarn build
+
+  target:
+    distDir: ./dist
+    files:
+    - ./*
+deploy:
+  targetDir: /opt/meituan/www/mlp-graph
+  run:
+    workDir: /opt/meituan/www/mlp-graph

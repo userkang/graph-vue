@@ -1,0 +1,156 @@
+/**
+ *  flex弹性布局
+ */
+
+// flexible容器初始化
+@mixin flex() {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+// 内联flex容器
+@mixin inline-flex() {
+  display: -webkit-inline-box;
+  display: -webkit-inline-flex;
+  display: inline-flex;
+}
+// 伸缩流垂直方向
+@mixin flex-direction-column() {
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+  flex-direction: column;
+}
+// 主轴两端对齐
+@mixin flex-main-justify() {
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+  justify-content: space-between;
+}
+// 主轴元素均匀分布，两端保留子元素与子元素之间间距大小的一半
+@mixin flex-main-around() {
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-around;
+  justify-content: space-around;
+}
+// 主轴中间对齐
+@mixin flex-main-center() {
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+  justify-content: center;
+}
+// 主轴底部对齐
+@mixin flex-main-end() {
+  -webkit-box-pack: end;
+  -webkit-justify-content: flex-end;
+  justify-content: flex-end;
+}
+// 侧轴居中对齐
+@mixin flex-cross-center() {
+  -webkit-box-align: center;
+  -webkit-align-items: center;
+  align-items: center;
+}
+// 侧轴顶边对齐
+@mixin flex-cross-start() {
+  -webkit-box-align: start;
+  -webkit-align-items: flex-start;
+  align-items: flex-start;
+}
+// 侧轴底部对齐
+@mixin flex-cross-end() {
+  -webkit-box-align: end;
+  -webkit-align-items: flex-end;
+  align-items: flex-end;
+}
+// 侧轴基线对齐
+@mixin flex-cross-baseline() {
+  -webkit-box-align: baseline;
+  -webkit-align-items: baseline;
+  align-items: baseline;
+}
+// 给伸缩项目赋予自由伸缩的能力
+@mixin flex-item() {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+  flex: 1;
+  width: 0%;
+}
+@mixin flex-auto() {
+  -webkit-box-flex:1;
+  -webkit-flex:auto;
+  flex:auto;
+}
+
+/**
+ * @file 常用flex功能样式固化为样式类，节省代码量
+ * @depend lib/utilities.less
+ */
+
+// .flex flex容器默认水平流方向
+// .flecol flex容器垂直流方向
+// .flex-v-center 相对于外容器呈一行垂直居中，水平居左
+// .flexcol-h-center 相对外容器呈列垂直底部对齐，水平居中
+// .flexcol-v-center 相对外容器呈列垂直居中，水平居左
+// .flex-h-center 相对于外容器呈一行垂直顶部对齐，水平居中
+// .flex-justify-v-center 伸缩项目相对外容器呈一行垂直居中，水平两端对齐
+// .flex-h-justify 相对于外容器一行垂直顶部对齐，水平两端对齐
+// .flex-v-end 相对于外容器呈一行垂直底部对齐，水平居左
+// .flex-end-v-center 伸缩项目相对外容器呈一行垂直居中，水平居右
+// .flex-all-center 相对外容器呈一行垂直居中，水平居中
+// .flexcol-all-center 相对外容器呈列垂直居中，水平居中
+// .flexcol-justify-h-center 伸缩项目相对外容器呈列垂直两端对齐，水平居中
+// .flexcol-justify 伸缩项目相对外容器呈列垂直两端对齐，水平居左
+
+// flex容器默认水平流方向共同样式
+.flex,
+.flex-v-center,
+.flex-h-center,
+.flex-h-justify,
+.flex-v-end,
+.flex-justify-v-center,
+.flex-end-v-center,
+.flex-all-center {
+  @include flex();
+}
+// flex容器垂直流方向共同样式
+[class*='flexcol'] {
+  @include flex();
+  @include flex-direction-column();
+}
+
+.flex-v-center,
+.flex-justify-v-center,
+.flex-end-v-center,
+.flexcol-h-center,
+.flexcol-justify-h-center,
+.flex-all-center,
+.flexcol-all-center {
+  @include flex-cross-center();
+}
+
+.flex-h-center,
+.flexcol-v-center,
+.flex-all-center,
+.flexcol-all-center {
+  @include flex-main-center();
+}
+
+.flex-v-end {
+  @include flex-cross-end();
+}
+
+.flex-h-justify,
+.flex-justify-v-center,
+.flexcol-justify {
+  @include flex-main-justify();
+}
+
+.flex-end-v-center {
+  @include flex-main-end();
+}
+
+// 作用于伸缩项目，均分剩余空间
+.flex-item {
+  @include flex-item();
+}

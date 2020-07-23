@@ -1,0 +1,2 @@
+export const ML_GRAPH_LIST = 'ML_GRAPH_LIST'
+export const ML_CURRENT_GRAPH = 'ML_CURRENT_GRAPH'

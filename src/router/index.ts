@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import { Graph } from './comonents'
+import { Graph } from './components'
 
 Vue.use(Router)
 

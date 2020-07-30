@@ -5,7 +5,7 @@ import {
   NodeVoType,
   ParamTabVo,
   ParamVo
-} from '@/types/graph'
+} from '@/types/dag'
 
 export const componentListMock: ComponentCategoryVoType[] = [
   {

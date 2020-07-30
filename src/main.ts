@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import '../static/css/normalize.scss'
-import '../static/css/flex.scss'
-import '../static/css/variable.scss'
+import './assets/css/normalize.scss'
+// import './assets/css/flex.scss'
+import './assets/css/variable.scss'
 
 Vue.config.productionTip = false
 

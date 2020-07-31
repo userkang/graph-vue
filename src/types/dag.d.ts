@@ -7,6 +7,11 @@ declare interface IDagType {
   edges: IEdgeType[]
 }
 
+declare interface ITransform {
+  scale: number
+  translateX: number
+  translateY: number
+}
 
 declare interface INodeType {
   nodeId: number
@@ -19,7 +24,7 @@ declare interface INodeType {
   // 节点Y坐标
   posY: number
   // 节点是否被连接
-  linked: boolean
+  // linked: boolean
   // 节点输入槽位
   // inSlots: SlotVoType[]
   // // 结点输出槽位
@@ -34,9 +39,6 @@ declare interface IEdgeType {
   // 目标节点ID
   toNodeId: number
 }
-
-
-
 
 export interface NodeVoStatusType {
   nodeId: number

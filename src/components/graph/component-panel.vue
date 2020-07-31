@@ -1,36 +1,53 @@
 <template>
-  <section class="comp-panel">
+  <div class="comp-panel">
     <div class="title">组件</div>
-    <ComponentNav :componentList="graphComponentValue" />
-  </section>
+    <li
+      v-for="item in componentList"
+      :key="item.id"
+      ref="component"
+      class="component-item"
+      @dragstart="e => handleDragStart(e, item)"
+      @dragend="handleDragEnd"
+      draggable
+    >
+      <i class="iconfont iconzujian"></i>
+      <span>{{ item.componentName }}</span>
+    </li>
+  </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import ComponentNav from '@/components/graph/component-nav.vue'
-import { ComponentListStore } from '@/stores/graph/componentList'
-// import { HistoryListController } from '@/stores/graph/graphVisual/HistoryList'
+import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { ComponentListStore } from '@/stores/graph/component-list'
 
-@Component({
-  components: {
-    ComponentNav
-  }
-})
+@Component
 export default class ComponentPanel extends Vue {
-  private graphComponentState = ComponentListStore.state
-  private initX = 0
-  private initPanelWidth = 0
-  // private graphListState = HistoryListController.state
+  dragged!: HTMLLIElement
+  componentState = ComponentListStore.state
 
-  get graphComponentValue() {
-    return this.graphComponentState.list
+  get componentList() {
+    return this.componentState.list
   }
 
-  private createExperiment() {
-    return this.$emit('createExperiment')
+  handleDragStart(e: DragEvent, component: IComponentType) {
+    this.dragged = e.target as HTMLLIElement
+
+    // 添加拖动样式
+    this.dragged.classList.add('active')
+
+    const rect = this.dragged.getBoundingClientRect()
+    this.componentState.dragingInfo.component = component
+
+    // 保存鼠标距离组件左上角距离
+    this.componentState.dragingInfo.offsetX = e.clientX - rect.x
+    this.componentState.dragingInfo.offsetY = e.clientY - rect.y
   }
 
-  private async mounted() {
+  handleDragEnd(e: DragEvent) {
+    ;(e.target as HTMLElement).classList.remove('active')
+  }
+
+  async mounted() {
     await ComponentListStore.getComponentList()
   }
 }
@@ -39,7 +56,7 @@ export default class ComponentPanel extends Vue {
 <style lang="scss" scoped>
 .comp-panel {
   position: relative;
-  width: 200px;
+  width: 190px;
   height: 100%;
   box-sizing: border-box;
   background: $l1;
@@ -50,5 +67,27 @@ export default class ComponentPanel extends Vue {
   color: $d1;
   text-align: left;
   margin: 5px 10px;
+}
+.component-item {
+  display: flex;
+  height: 34px;
+  box-sizing: border-box;
+  color: $d4;
+  font-size: 12px;
+  padding-left: 40px;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+  .iconfont {
+    margin-right: 6px;
+  }
+  &:hover {
+    background: $l2;
+    color: $d2;
+  }
+}
+.active {
+  border: 1px dashed #606be1;
+  cursor: grabbing;
 }
 </style>

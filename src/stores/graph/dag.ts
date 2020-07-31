@@ -1,22 +1,30 @@
 import Base from '../base'
-import { IDagType } from '@/types/dag'
 import { dagMock } from '@/mock/dag'
+import { IDagType, ITransform } from '@/types/dag'
 
 interface IDagState {
-  value: IDagType
+  dag: IDagType
+  transfrom: ITransform
+  dagDom: HTMLElement
 }
 
 class Dag extends Base {
   public state: IDagState = {
-    value: {
+    dag: {
       dagId: 0,
       nodes: [],
       edges: []
-    }
+    },
+    transfrom: {
+      scale: 1,
+      translateX: 0,
+      translateY: 0
+    },
+    dagDom: {} as HTMLElement
   }
 
   public getDagContent() {
-    this.state.value = dagMock
+    this.state.dag = dagMock
   }
 }
 

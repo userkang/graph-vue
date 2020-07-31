@@ -5,9 +5,4 @@ declare interface IComponentType {
   componentName: string
   // 组件描述
   componentDesc: string
-  // 组件输入槽位数
-  inSlotNum: number
-  // 组件输出槽位数
-  outSlotNum: number
 }
-

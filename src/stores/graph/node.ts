@@ -1,12 +1,13 @@
 import { DagStore } from './dag'
+import { INodeType } from '@/types/dag'
 
 class Node {
   public state = {
     value: ''
   }
 
-  public AddNode() {
-    DagStore.state.value.nodes.push()
+  public addNode(item: INodeType) {
+    DagStore.state.dag.nodes.push(item)
   }
 }
 

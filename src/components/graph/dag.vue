@@ -163,7 +163,6 @@ export default class GraphContent extends Vue {
     this.moveY = y - this.startY
 
     if (this.isMouseDownNode) {
-      console.log(this.moveX, this.moveY)
       this.activeNode.forEach(item => {
         item.posX = item.posX + this.moveX
         item.posY = item.posY + this.moveY

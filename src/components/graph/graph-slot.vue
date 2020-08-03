@@ -4,10 +4,10 @@
     :class="{
       'enable-slot': isSlotEnableLink,
       'active-slot': isInOrOut === 'out',
-      'linked-slot': !isSlotEnableLink
+      'linked-slot': !isSlotEnableLink && isSlotLinked
     }"
     :r="isSlotEnableLink ? highlightCircleR : circleR"
-    :cx="calculateCircleX"
+    :cx="cx"
     :cy="cy"
     :data-id="`${node.id}`"
     :data-status="isSlotEnableLink ? 'enable' : 'disable'"
@@ -20,11 +20,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { INodeType } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
-// import {
-//   CreateLineController,
-//   WarningTipsController
-// } from '@/stores/workflow/graphVisual/LocalState'
-// import { GraphVisualStore } from '@/stores/workflow/graphVisual/GraphContent'
+import { DagStore } from '@/stores/graph/dag'
 
 @Component
 export default class GraphSlot extends Vue {
@@ -58,19 +54,41 @@ export default class GraphSlot extends Vue {
 
   circleR = 4
   highlightCircleR = 6
-  // private graphContentState = GraphVisualStore.state
   edgeState = EdgeStore.state
+  dagState = DagStore.state
 
-  get cy() {
-    return this.node.posY + this.rectHeight / 2
+  get cx() {
+    return this.node.posX + this.rectWidth / 2
   }
 
-  get canEditGraph() {
-    return (this.$store.state as any).isCurrentGraphCanBeEdit
+  get cy() {
+    return this.isInOrOut === 'in'
+      ? this.node.posY
+      : this.node.posY + this.rectHeight
+  }
+
+  get edges() {
+    return this.dagState.dag.edges
   }
 
   get isSlotActive() {
     return this.edgeState.isSlotActive
+  }
+
+  get isSlotLinked() {
+    if (this.isInOrOut === 'in') {
+      return this.edges
+        .map(item => {
+          return item.fromNodeId
+        })
+        .includes(this.node.nodeId)
+    } else {
+      return this.edges
+        .map(item => {
+          return item.toNodeId
+        })
+        .includes(this.node.nodeId)
+    }
   }
 
   get isSlotEnableLink() {
@@ -81,17 +99,11 @@ export default class GraphSlot extends Vue {
     )
   }
 
-  get calculateCircleX() {
-    return this.isInOrOut === 'in'
-      ? this.node.posX
-      : this.node.posX + this.rectWidth
-  }
-
-  private addLine(event: MouseEvent) {
+  addLine(event: MouseEvent) {
     // cannot remove canLinkEdge when slot type is in, as need to stop mouse down event propagation
     const canLinkEdge = this.isInOrOut === 'out'
     event.stopPropagation()
-    if (canLinkEdge && this.canEditGraph) {
+    if (canLinkEdge) {
       const el = event.target as SVGCircleElement
       const x = Number(el.getAttribute('cx'))
       const y = Number(el.getAttribute('cy'))
@@ -100,14 +112,10 @@ export default class GraphSlot extends Vue {
         type: 'line',
         x: event.clientX,
         y: event.clientY,
-        fromNodeId: this.node.id
+        fromNodeId: this.node.nodeId
       })
     }
   }
-
-  // private hideSlotName(event: MouseEvent) {
-  //   WarningTipsController.hide()
-  // }
 }
 </script>
 

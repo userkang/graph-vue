@@ -1,13 +1,12 @@
 <template>
-  <g>
+  <g @mousedown="handleNodeMouseDown">
     <rect
       ref="node"
       data-type="node"
       class="graph-node"
       :style="{
         stroke: isNodeActive ? '#606BE1' : '#DEDFEC',
-        fill: isNodeActive ? '#E3E6FF' : '#FFF',
-        cursor: isLocked && 'not-allowed'
+        fill: isNodeActive ? '#E3E6FF' : '#FFF'
       }"
       :width="rectWidth"
       :height="rectHeight"
@@ -16,55 +15,15 @@
       rx="2"
       ry="2"
     ></rect>
-    <!-- <image
-      :xlink:href="iconSrc"
-      :x="node.posX + modelIconXPosition"
-      :y="node.posY + modelIconYPosition"
-      :width="imgIconSize"
-      :height="imgIconSize"
-      style="pointer-events: none;"
-    /> -->
-    <!-- <text
-      data-type="node"
-      :x="node.posX + modelNameXPosition"
-      :y="node.posY + modelNameYPosition"
-      fill="#666666"
-      style="font-size: 13px;"
-      @mouseover.capture="showFullNodeName"
-      @mouseout.capture="hideFullNodeName"
-      @mousedown.capture="handleNodeMouseDown"
-      >{{ nodeName }}</text
-    > -->
-    <!-- <image
-      :xlink:href="statusIconSrc"
-      :x="node.posX + statusIconXPosition"
-      :y="node.posY + statusIconYPosition"
-      :width="imgIconSize"
-      :height="imgIconSize"
-      data-type="status"
-      @mouseover.capture="showWarningTips"
-      @mouseout.capture="hideWarningTips"
+    <foreignObject
+      :x="node.posX"
+      :y="node.posY"
+      :width="rectWidth"
+      :height="rectHeight"
     >
-      <animateTransform
-        v-if="node.status === 30"
-        attributeName="transform"
-        begin="0s"
-        dur="3s"
-        :from="
-          `0 ${node.posX + statusIconXPosition + imgIconSize / 2} ${node.posY +
-            10 +
-            imgIconSize / 2}`
-        "
-        :to="
-          `360 ${node.posX +
-            statusIconXPosition +
-            imgIconSize / 2} ${node.posY + 10 + imgIconSize / 2}`
-        "
-        type="rotate"
-        repeatCount="indefinite"
-      ></animateTransform>
-    </image> -->
-    <!-- <GraphSlot
+      <div class="node-content">{{ isNodeActive }}</div>
+    </foreignObject>
+    <GraphSlot
       :node="node"
       :fromNodeId="fromNodeId"
       isInOrOut="in"
@@ -78,32 +37,15 @@
       :rectWidth="rectWidth"
       :rectHeight="rectHeight"
       @mousedown="handleSlotMouseDown"
-    /> -->
+    />
   </g>
 </template>
 
-<style lang="scss" scoped>
-.graph-node {
-  stroke-width: 1;
-  cursor: pointer;
-  @keyframes rotate {
-    from {
-      transform: rotate(0);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-}
-text {
-  cursor: pointer;
-}
-</style>
-
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import { INodeType } from '../../types/dag'
 // import { AddEdgePositionType, NodeVoType } from '@/types/graph'
-// import GraphSlot from './GraphSlot.vue'
+import GraphSlot from '@/components/graph/graph-slot.vue'
 // import dataSource from '../../assets/dataSource.svg'
 // import mlx from '../../assets/mlx.svg'
 // import modelManage from '../../assets/modelManage.svg'
@@ -121,42 +63,29 @@ import { Vue, Component, Prop } from 'vue-property-decorator'
 
 @Component({
   components: {
-    // GraphSlot
+    GraphSlot
   }
 })
 export default class GraphNode extends Vue {
   @Prop({
     required: true
   })
-  private node!: Workflow.WorkflowNodeVo
+  node!: INodeType
 
   @Prop({
     required: true,
     type: Number
   })
-  private fromNodeId!: number
+  fromNodeId!: number
 
   @Prop({
     required: true,
     type: Boolean
   })
-  private isNodeActive!: boolean
+  isNodeActive!: boolean
 
-  @Prop({
-    required: true,
-    type: Boolean
-  })
-  private isLocked!: boolean
-
-  private rectWidth = 198
-  private rectHeight = 34
-  private imgIconSize = 14
-  private statusIconXPosition = 176
-  private statusIconYPosition = 10
-  private modelIconXPosition = 10
-  private modelIconYPosition = 10
-  private modelNameXPosition = 30
-  private modelNameYPosition = 22
+  rectWidth = 190
+  rectHeight = 34
 
   // get iconSrc() {
   //   switch (this.node.categoryType) {
@@ -220,20 +149,41 @@ export default class GraphNode extends Vue {
   //   WarningTipsController.hide()
   // }
 
-  // private handleNodeMouseDown(event: MouseEvent) {
-  //   this.hideFullNodeName()
-  //   event.stopPropagation()
-  //   if (event.button === 0) {
-  //     this.$emit('mousedown', {
-  //       type: 'node',
-  //       x: event.clientX,
-  //       y: event.clientY
-  //     })
-  //   }
-  // }
+  handleNodeMouseDown(e: MouseEvent) {
+    e.stopPropagation()
 
-  // private handleSlotMouseDown(value: AddEdgePositionType) {
-  //   this.$emit('mousedown', value)
-  // }
+    this.$emit('clickNode', e, this.node)
+  }
+
+  private handleSlotMouseDown(value: AddEdgePositionType) {
+    this.$emit('clickSlot', value)
+  }
 }
 </script>
+
+<style lang="scss" scoped>
+.graph-node {
+  stroke-width: 1;
+  cursor: pointer;
+  @keyframes rotate {
+    from {
+      transform: rotate(0);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+text {
+  cursor: pointer;
+}
+.node-content {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+}
+</style>

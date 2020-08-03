@@ -4,7 +4,7 @@
     :class="{
       'enable-slot': isSlotEnableLink,
       'active-slot': isInOrOut === 'out',
-      'linked-slot': !isSlotEnableLink && isSlotLinked
+      'linked-slot': !isSlotEnableLink
     }"
     :r="isSlotEnableLink ? highlightCircleR : circleR"
     :cx="calculateCircleX"
@@ -18,45 +18,48 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import {
-  CreateLineController,
-  WarningTipsController
-} from '@/stores/workflow/graphVisual/LocalState'
-import { GraphVisualStore } from '@/stores/workflow/graphVisual/GraphContent'
+import { INodeType } from '../../types/dag'
+import { EdgeStore } from '@/stores/graph/edge'
+// import {
+//   CreateLineController,
+//   WarningTipsController
+// } from '@/stores/workflow/graphVisual/LocalState'
+// import { GraphVisualStore } from '@/stores/workflow/graphVisual/GraphContent'
 
 @Component
 export default class GraphSlot extends Vue {
   @Prop({
     required: true
   })
-  private node!: Workflow.WorkflowNodeVo
+  node!: INodeType
 
   @Prop({
     required: true,
     type: Number
   })
-  private fromNodeId!: number
+  fromNodeId!: number
 
   @Prop({
     type: String
   })
-  private isInOrOut!: string
+  isInOrOut!: string
 
   @Prop({
     required: true,
     type: Number
   })
-  private rectWidth!: number
+  rectWidth!: number
 
   @Prop({
     required: true,
     type: Number
   })
-  private rectHeight!: number
+  rectHeight!: number
 
-  private circleR = 4
-  private highlightCircleR = 6
-  private graphContentState = GraphVisualStore.state
+  circleR = 4
+  highlightCircleR = 6
+  // private graphContentState = GraphVisualStore.state
+  edgeState = EdgeStore.state
 
   get cy() {
     return this.node.posY + this.rectHeight / 2
@@ -66,21 +69,13 @@ export default class GraphSlot extends Vue {
     return (this.$store.state as any).isCurrentGraphCanBeEdit
   }
 
-  get isSlotLinked() {
-    return this.linkedSlots.includes(this.node.id + this.isInOrOut)
-  }
-
   get isSlotActive() {
-    return this.graphContentState.isSlotActive
-  }
-
-  get linkedSlots() {
-    return this.graphContentState.linkedSlots
+    return this.edgeState.isSlotActive
   }
 
   get isSlotEnableLink() {
     return (
-      this.fromNodeId !== this.node.id &&
+      this.fromNodeId !== this.node.nodeId &&
       this.isInOrOut === 'in' &&
       this.isSlotActive
     )
@@ -100,7 +95,7 @@ export default class GraphSlot extends Vue {
       const el = event.target as SVGCircleElement
       const x = Number(el.getAttribute('cx'))
       const y = Number(el.getAttribute('cy'))
-      CreateLineController.add(x, y)
+      // CreateLineController.add(x, y)
       this.$emit('mousedown', {
         type: 'line',
         x: event.clientX,
@@ -110,21 +105,20 @@ export default class GraphSlot extends Vue {
     }
   }
 
-  private hideSlotName(event: MouseEvent) {
-    WarningTipsController.hide()
-  }
+  // private hideSlotName(event: MouseEvent) {
+  //   WarningTipsController.hide()
+  // }
 }
 </script>
 
 <style lang="scss" scoped>
-@import '../../../static/css/variable';
 .slot-style {
   stroke: #dddeeb;
   fill: #fff;
   stroke-width: 1;
   &.active-slot {
     &:hover {
-      stroke: $highlight-color;
+      stroke: $d2;
       stroke-width: 2;
     }
   }
@@ -135,8 +129,8 @@ export default class GraphSlot extends Vue {
   }
 
   &.linked-slot {
-    fill: $highlight-color;
-    stroke: $highlight-color;
+    fill: $d2;
+    stroke: $d2;
   }
 }
 </style>

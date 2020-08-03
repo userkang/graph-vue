@@ -23,17 +23,11 @@ declare interface INodeType {
   posX: number
   // 节点Y坐标
   posY: number
-  // 节点是否被连接
-  // linked: boolean
-  // 节点输入槽位
-  // inSlots: SlotVoType[]
-  // // 结点输出槽位
-  // outSlots: SlotVoType[]
 }
 
 declare interface IEdgeType {
   // 连线ID
-  edgeId: number
+  edgeId?: number
   // 源节点ID
   fromNodeId: number
   // 目标节点ID

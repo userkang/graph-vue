@@ -5,12 +5,13 @@
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       ref="graphContent"
-      @click.capture="handleClick"
-      @mousedown="setDragStart"
+      @click.capture="handleSvgClick"
+      @mousedown="handleSvgMouseDown"
       @mousemove.capture="handleMouseMove"
       @mouseup.capture="handleMouseUp"
       @contextmenu.capture="preventDefaultContext"
       @mousewheel="handleMouseWheel"
+      @dragover="handleDragOver"
       @drop="handleDrop"
       width="100%"
       height="100%"
@@ -22,12 +23,13 @@
       >
         <template>
           <GraphNode
-            v-for="item in nodes"
-            :key="item.nodeId"
+            v-for="(item, index) in nodes"
+            :key="index"
             :node="item"
-            :isNodeActive="isNodeActive(item.id)"
-            @mousedown="position => handleNodeClick(item, position)"
-            @dblclick.native="handleDoubleClick"
+            :fromNodeId="fromNodeId"
+            :isNodeActive="isNodeActive(item.nodeId)"
+            @clickNode="handleNodeClick"
+            @clickSlot="handleSlotClick"
           />
         </template>
 
@@ -45,18 +47,17 @@
           />
         </template> -->
 
-        <template>
-          <GraphEdge
-            v-for="item in edges"
-            :key="item.id"
-            :edge="item"
-            :isActiveEdge="activeEdgeId === item.id"
-            :refresh="isRefreshEdge"
-            @edgeClick="handleEdgeClick"
-            @delete="deleteLine"
-          />
-        </template>
-        <NewGraphEdge />
+        <!-- <GraphEdge
+          v-for="item in edges"
+          :key="item.id"
+          :edge="item"
+          :isActiveEdge="activeEdgeId === item.id"
+          :refresh="isRefreshEdge"
+          @edgeClick="handleEdgeClick"
+          @delete="deleteLine"
+        /> -->
+
+        <!-- <NewGraphEdge /> -->
       </g>
       <!-- <path
         id="zoom_area"
@@ -64,8 +65,6 @@
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       /> -->
     </svg>
-    <!-- <EmptyGraph v-if="workflowId === 0" /> -->
-    <!-- <ScalePanel @scaleChange="handleScaleChange" /> -->
   </div>
 </template>
 
@@ -75,6 +74,8 @@ import { DagStore } from '@/stores/graph/dag'
 import { ComponentListStore } from '@/stores/graph/component-list'
 import { NodeStore } from '@/stores/graph/node'
 import GraphNode from '@/components/graph/graph-node.vue'
+import { INodeType } from '../../types/dag'
+import { EdgeStore } from '@/stores/graph/edge'
 
 @Component({
   components: {
@@ -92,6 +93,22 @@ export default class GraphContent extends Vue {
   dagState = DagStore.state
   componentState = ComponentListStore.state
   svg!: HTMLElement
+  transform = {
+    scale: 1,
+    translateX: 0,
+    translateY: 0,
+    offsetX: 0,
+    offsetY: 0
+  }
+  // activeNode: INodeType[] = []
+  isMouseDownNode = false
+  isMouseDownSlot = false
+  isMouseDownSvg = false
+  startX = 0
+  startY = 0
+  moveX = 0
+  moveY = 0
+  fromNodeId = 0
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -101,17 +118,32 @@ export default class GraphContent extends Vue {
     return this.dagState.dag.edges
   }
 
-  get transform() {
-    return this.dagState.transfrom
-  }
-
   get dragingInfo() {
     return this.componentState.dragingInfo
   }
 
-  handleClick(event: MouseEvent) {
+  get activeNode() {
+    return this.dagState.activeNode
+  }
+
+  set activeNode(v: INodeType[]) {
+    this.dagState.activeNode = v
+  }
+
+  handleNodeClick(e: MouseEvent, node: INodeType) {
+    this.activeNode = [node]
+    this.isMouseDownNode = true
+    this.startX = e.clientX
+    this.startY = e.clientY
+  }
+
+  handleSlotClick(e: MouseEvent, node: INodeType) {
+    this.fromNodeId = node.nodeId
+  }
+
+  handleSvgClick(e: MouseEvent) {
     // event.stopPropagation();
-    if ((event.target as SVGElement).tagName === 'svg') {
+    if ((e.target as SVGElement).tagName === 'svg') {
       // MenuTipsController.hide()
       // ActiveGraphController.show()
       // this.activeEdgeId = 0
@@ -119,94 +151,66 @@ export default class GraphContent extends Vue {
     }
   }
 
-  setDragStart(event: MouseEvent) {
-    // this.isMouseDownFiredByDrag = true
+  handleSvgMouseDown(e: MouseEvent) {
+    this.isMouseDownSvg = true
     // this.moveX = event.clientX
     // this.moveY = event.clientY
   }
 
-  async handleMouseUp(event: MouseEvent) {
-    // event.stopPropagation()
-    // if (this.isMouseDownFiredByNode) {
-    //   this.isMouseDownFiredByNode = false
-    //   // polling when position changed really not fired by click event
-    //   this.posX = this.positionTransformX(event.clientX)
-    //   this.posY = this.positionTransformY(event.clientY)
-    //   const nodeId = this.activeNode.nodeId
-    //   if (
-    //     this.browserStartX !== event.clientX ||
-    //     this.browserStartY !== event.clientY
-    //   ) {
-    //     if (!this.isLocked) {
-    //       await UpdateNodePositionStore.request({
-    //         graphId: this.graphId,
-    //         nodeId,
-    //         x: this.posX - this.distanceX,
-    //         y: this.posY - this.distanceY
-    //       })
-    //     }
-    //   } else {
-    //     // if position not change, assert node click event happened, so show right param panel
-    //     const { componentName, componentDesc } = this.activeNode
-    //     ActiveNodeController.setState(nodeId, componentName, componentDesc)
-    //     await this.$store.commit('showRightTableFold')
-    //     ActiveGraphController.hide()
-    //     await NodeParamStore.request(nodeId, 0)
-    //   }
-    //   this.lastNodeId = nodeId
-    //   this.activeEdgeId = 0
-    // } else if (this.isMouseDownFiredByLine) {
-    //   if (!this.isLocked) {
-    //     this.isMouseDownFiredByLine = false
-    //     this.activeSlotType = ''
-    //     const el = (event as MouseEvent).target as SVGCircleElement
-    //     if (el.tagName === 'circle') {
-    //       const status = el.dataset.status
-    //       if (status === 'enable') {
-    //         const ids = (el.dataset.id as string).split('-')
-    //         const { 0: toNodeId, 1: toSlotId } = ids
-    //         if (this.fromSlotId !== Number(toSlotId)) {
-    //           await AddEdgeStore.request({
-    //             graphId: this.graphId,
-    //             fromNodeId: this.fromNodeId,
-    //             fromSlotId: this.fromSlotId,
-    //             toNodeId: Number(toNodeId),
-    //             toSlotId: Number(toSlotId)
-    //           })
-    //         }
-    //       }
-    //     }
-    //     CreateLineController.reset()
-    //   }
-    // } else if (this.isMouseDownFiredByDrag) {
-    //   this.translateX =
-    //     (event as MouseEvent).clientX - this.moveX + this.translateX
-    //   this.translateY =
-    //     (event as MouseEvent).clientY - this.moveY + this.translateY
-    //   this.isMouseDownFiredByDrag = false
-    // }
+  async handleMouseMove(e: MouseEvent) {
+    const { clientX: x, clientY: y } = e
+    this.moveX = x - this.startX
+    this.moveY = y - this.startY
+
+    if (this.isMouseDownNode) {
+      console.log(this.moveX, this.moveY)
+      this.activeNode.forEach(item => {
+        item.posX = item.posX + this.moveX
+        item.posY = item.posY + this.moveY
+      })
+    } else if (this.isMouseDownSlot) {
+      const posX = this.positionTransformX(x)
+      const posY = this.positionTransformY(y)
+      this.createNewLine(posX, posY)
+    } else if (this.isMouseDownSvg) {
+      this.transform.translateX = this.moveX + this.transform.translateX
+      this.transform.translateY = this.moveY + this.transform.translateY
+    }
+
+    this.startX = x
+    this.startY = y
   }
 
-  async handleMouseMove(event: MouseEvent) {
-    // event.stopPropagation()
-    // const posX = this.positionTransformX(event.clientX)
-    // const posY = this.positionTransformY(event.clientY)
-    // if (this.isMouseDownFiredByNode) {
-    //   this.posX = posX
-    //   this.posY = posY
-    //   await this.setNodePosition(
-    //     this.posX - this.distanceX,
-    //     this.posY - this.distanceY
-    //   )
-    // } else if (this.isMouseDownFiredByLine) {
-    //   this.createNewLine(posX, posY)
-    // } else if (this.isMouseDownFiredByDrag) {
-    //   const { clientX: endX, clientY: endY } = event
-    //   this.translateX = endX - this.moveX + this.translateX
-    //   this.translateY = endY - this.moveY + this.translateY
-    //   this.moveX = endX
-    //   this.moveY = endY
-    // }
+  async handleMouseUp(e: MouseEvent) {
+    const { clientX: x, clientY: y } = e
+    if (this.isMouseDownNode) {
+      this.isMouseDownNode = false
+
+      // 如果位置发生移动
+      if (this.moveX || this.moveY) {
+        await NodeStore.updateNodePosition(this.activeNode)
+      } else {
+        // 否则就是单纯的点击，这里写点击节点的处理逻辑，比如右侧参数面板
+      }
+    } else if (this.isMouseDownSlot) {
+      this.isMouseDownSlot = false
+      const el = (event as MouseEvent).target as SVGCircleElement
+      if (el.tagName === 'circle') {
+        if (status === 'enable') {
+          const status = el.dataset.status
+          if (status === 'enable') {
+            const toNodeId = el.dataset.id
+            await EdgeStore.addEdge({
+              fromNodeId: this.fromNodeId,
+              toNodeId: Number(toNodeId)
+            })
+          }
+        }
+      }
+      CreateLineController.reset()
+    } else if (this.isMouseDownSvg) {
+      this.isMouseDownSvg = false
+    }
   }
 
   preventDefaultContext(event: MouseEvent) {
@@ -224,37 +228,48 @@ export default class GraphContent extends Vue {
 
   async handleDrop(e: DragEvent) {
     e.preventDefault()
-    if ((e.target as SVGElement).id === 'graphContent') {
-      const { clientX: x, clientY: y } = e
-      const posX = 0 //this.positionTransformX(x) - this.dragingInfo.offsetX
-      const posY = 0 //this.positionTransformY(y) - this.dragingInfo.offsetY
-      console.log()
+    const { clientX: x, clientY: y } = e
+    const posX = this.positionTransformX(x) - this.dragingInfo.offsetX
+    const posY = this.positionTransformY(y) - this.dragingInfo.offsetY
 
-      NodeStore.addNode({
-        nodeId: this.dragingInfo.component.componentId,
-        nodeName: this.dragingInfo.component.componentName,
-        nodeDesc: this.dragingInfo.component.componentDesc,
-        posX: 0,
-        posY: 0
-      })
-      // const data = await AddNodeStore.request({
-      //   componentId: this.componentId,
-      //   workflowId: this.workflowId,
-      //   posX,
-      //   posY
-      // })
-      // ActiveNodeStore.setState(data)
-      // this.$emit('addNode')
-      // tslint:disable-next-line
+    // 这块参数可以只传 nodeId, 其余节点信息后端存有
+    NodeStore.addNode({
+      nodeId: this.dragingInfo.component.componentId,
+      nodeName: this.dragingInfo.component.componentName,
+      nodeDesc: this.dragingInfo.component.componentDesc,
+      posX,
+      posY
+    })
+  }
+
+  positionTransformX(originValue: number) {
+    const posX = originValue - this.svg.getBoundingClientRect().x
+    return (
+      (posX + this.transform.offsetX) / this.transform.scale -
+      this.transform.translateX
+    )
+  }
+
+  positionTransformY(originValue: number) {
+    const posY = originValue - this.svg.getBoundingClientRect().y
+    return (
+      (posY + this.transform.offsetY) / this.transform.scale -
+      this.transform.translateY
+    )
+  }
+
+  isNodeActive(id: number) {
+    for (const item of this.activeNode) {
+      if (item.nodeId === id) {
+        return true
+      }
     }
+
+    return false
   }
 
   mounted() {
     this.svg = this.$refs.graphContent as HTMLElement
-  }
-
-  beforeDestory() {
-    this.svg.removeEventListener('dragover', this.handleDragOver)
   }
 }
 </script>

@@ -1,11 +1,12 @@
 import Base from '../base'
 import { dagMock } from '@/mock/dag'
-import { IDagType, ITransform } from '@/types/dag'
+import { IDagType, ITransform, INodeType } from '@/types/dag'
 
 interface IDagState {
   dag: IDagType
   transfrom: ITransform
   dagDom: HTMLElement
+  activeNode: INodeType[]
 }
 
 class Dag extends Base {
@@ -20,7 +21,8 @@ class Dag extends Base {
       translateX: 0,
       translateY: 0
     },
-    dagDom: {} as HTMLElement
+    dagDom: {} as HTMLElement,
+    activeNode: []
   }
 
   public getDagContent() {

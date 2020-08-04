@@ -21,17 +21,23 @@
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`
         }"
       >
-        <template>
-          <GraphNode
-            v-for="(item, index) in nodes"
-            :key="index"
-            :node="item"
-            :fromNodeId="fromNodeId"
-            :isNodeActive="isNodeActive(item.nodeId)"
-            @clickNode="handleNodeClick"
-            @clickSlot="handleSlotClick"
-          />
-        </template>
+        <GraphEdge
+          v-for="item in edges"
+          :key="item.edgeId"
+          :edge="item"
+          :isActiveEdge="activeEdgeId === item.id"
+          @click.native="e => handleEdgeClick(item.edgeId)"
+          @delete="deleteLine"
+        />
+        <GraphNode
+          v-for="item in nodes"
+          :key="item.nodeId"
+          :node="item"
+          :fromNodeId="fromNodeId"
+          :isNodeActive="isNodeActive(item.nodeId)"
+          @clickNode="handleNodeClick"
+          @clickSlot="handleSlotClick"
+        />
 
         <!-- <template v-if="nodeGroups">
           <GraphGroup
@@ -47,17 +53,7 @@
           />
         </template> -->
 
-        <!-- <GraphEdge
-          v-for="item in edges"
-          :key="item.id"
-          :edge="item"
-          :isActiveEdge="activeEdgeId === item.id"
-          :refresh="isRefreshEdge"
-          @edgeClick="handleEdgeClick"
-          @delete="deleteLine"
-        /> -->
-
-        <!-- <NewGraphEdge /> -->
+        <NewGraphEdge />
       </g>
       <!-- <path
         id="zoom_area"
@@ -74,6 +70,8 @@ import { DagStore } from '@/stores/graph/dag'
 import { ComponentListStore } from '@/stores/graph/component-list'
 import { NodeStore } from '@/stores/graph/node'
 import GraphNode from '@/components/graph/graph-node.vue'
+import GraphEdge from '@/components/graph/graph-edge.vue'
+import NewGraphEdge from '@/components/graph/new-graph-edge.vue'
 import { INodeType } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
 
@@ -82,8 +80,8 @@ import { EdgeStore } from '@/stores/graph/edge'
     // EmptyGraph,
     // LoadingIcon,
     // ScalePanel,
-    // NewGraphEdge,
-    // GraphEdge,
+    NewGraphEdge,
+    GraphEdge,
     GraphNode
     // GraphGroupNode,
     // GraphGroup
@@ -109,6 +107,7 @@ export default class GraphContent extends Vue {
   moveX = 0
   moveY = 0
   fromNodeId = 0
+  activeEdgeId = 0
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -138,7 +137,19 @@ export default class GraphContent extends Vue {
   }
 
   handleSlotClick(e: MouseEvent, node: INodeType) {
+    this.isMouseDownSlot = true
     this.fromNodeId = node.nodeId
+  }
+
+  handleEdgeClick(edgeId: number) {
+    console.log(edgeId)
+    this.activeEdgeId = edgeId
+    this.activeNode = []
+  }
+
+  async deleteLine() {
+    await EdgeStore.deleteEdge(this.activeEdgeId)
+    this.activeEdgeId = 0
   }
 
   handleSvgClick(e: MouseEvent) {
@@ -164,16 +175,16 @@ export default class GraphContent extends Vue {
 
     if (this.isMouseDownNode) {
       this.activeNode.forEach(item => {
-        item.posX = item.posX + this.moveX
-        item.posY = item.posY + this.moveY
+        item.posX += this.moveX
+        item.posY += this.moveY
       })
     } else if (this.isMouseDownSlot) {
       const posX = this.positionTransformX(x)
       const posY = this.positionTransformY(y)
-      this.createNewLine(posX, posY)
+      EdgeStore.setNewLineMove(posX, posY)
     } else if (this.isMouseDownSvg) {
-      this.transform.translateX = this.moveX + this.transform.translateX
-      this.transform.translateY = this.moveY + this.transform.translateY
+      this.transform.translateX += this.moveX
+      this.transform.translateY += this.moveY
     }
 
     this.startX = x
@@ -193,31 +204,35 @@ export default class GraphContent extends Vue {
       }
     } else if (this.isMouseDownSlot) {
       this.isMouseDownSlot = false
-      const el = (event as MouseEvent).target as SVGCircleElement
+      const el = e.target as SVGCircleElement
       if (el.tagName === 'circle') {
+        const status = el.dataset.status
         if (status === 'enable') {
-          const status = el.dataset.status
-          if (status === 'enable') {
-            const toNodeId = el.dataset.id
-            await EdgeStore.addEdge({
-              fromNodeId: this.fromNodeId,
-              toNodeId: Number(toNodeId)
-            })
-          }
+          const toNodeId = el.dataset.id
+          await EdgeStore.addEdge({
+            fromNodeId: this.fromNodeId,
+            toNodeId: Number(toNodeId)
+          })
         }
       }
-      CreateLineController.reset()
+      EdgeStore.setResetLine()
     } else if (this.isMouseDownSvg) {
       this.isMouseDownSvg = false
     }
   }
 
-  preventDefaultContext(event: MouseEvent) {
-    event.preventDefault()
+  handleMouseWheel(e: WheelEvent) {
+    e.preventDefault()
+    if (e.deltaX) {
+      this.transform.translateX -= e.deltaX
+    }
+    if (e.deltaY) {
+      this.transform.translateY -= e.deltaY
+    }
   }
 
-  handleMouseWheel(event: WheelEvent) {
-    // this.handleScaleChange(event.deltaY > 0 ? 'shrink' : 'expand', 0.01)
+  preventDefaultContext(event: MouseEvent) {
+    event.preventDefault()
   }
 
   handleDragOver(event: DragEvent) {

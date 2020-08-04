@@ -27,7 +27,7 @@ declare interface INodeType {
 
 declare interface IEdgeType {
   // 连线ID
-  edgeId?: number
+  edgeId?: number | string
   // 源节点ID
   fromNodeId: number
   // 目标节点ID

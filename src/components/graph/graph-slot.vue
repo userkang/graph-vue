@@ -9,9 +9,8 @@
     :r="isSlotEnableLink ? highlightCircleR : circleR"
     :cx="cx"
     :cy="cy"
-    :data-id="`${node.id}`"
+    :data-id="`${node.nodeId}`"
     :data-status="isSlotEnableLink ? 'enable' : 'disable'"
-    :data-type="`${node.id}-${isInOrOut}`"
     @mousedown="addLine"
   ></circle>
 </template>
@@ -71,23 +70,35 @@ export default class GraphSlot extends Vue {
     return this.dagState.dag.edges
   }
 
-  get isSlotActive() {
-    return this.edgeState.isSlotActive
+  get isCreateLine() {
+    return this.edgeState.createLine.show
   }
 
   get isSlotLinked() {
     if (this.isInOrOut === 'in') {
       return this.edges
         .map(item => {
-          return item.fromNodeId
+          return item.toNodeId
         })
         .includes(this.node.nodeId)
     } else {
       return this.edges
         .map(item => {
-          return item.toNodeId
+          return item.fromNodeId
         })
         .includes(this.node.nodeId)
+    }
+  }
+
+  get isDirectLinked() {
+    if (this.isInOrOut === 'in') {
+      let linked = false
+      this.edges.forEach(item => {
+        linked =
+          item.fromNodeId === this.fromNodeId &&
+          item.toNodeId === this.node.nodeId
+      })
+      return linked
     }
   }
 
@@ -95,25 +106,19 @@ export default class GraphSlot extends Vue {
     return (
       this.fromNodeId !== this.node.nodeId &&
       this.isInOrOut === 'in' &&
-      this.isSlotActive
+      this.isCreateLine &&
+      !this.isDirectLinked
     )
   }
 
-  addLine(event: MouseEvent) {
-    // cannot remove canLinkEdge when slot type is in, as need to stop mouse down event propagation
+  addLine(e: MouseEvent) {
+    e.stopPropagation()
     const canLinkEdge = this.isInOrOut === 'out'
-    event.stopPropagation()
     if (canLinkEdge) {
-      const el = event.target as SVGCircleElement
-      const x = Number(el.getAttribute('cx'))
-      const y = Number(el.getAttribute('cy'))
-      // CreateLineController.add(x, y)
-      this.$emit('mousedown', {
-        type: 'line',
-        x: event.clientX,
-        y: event.clientY,
-        fromNodeId: this.node.nodeId
-      })
+      // 是初始化连线的起点和移动位置
+      EdgeStore.setNewLineStart(this.cx, this.cy)
+      EdgeStore.setNewLineMove(this.cx, this.cy)
+      this.$emit('mousedown', e)
     }
   }
 }

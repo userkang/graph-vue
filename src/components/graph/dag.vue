@@ -25,7 +25,7 @@
           :key="item.edgeId"
           :edge="item"
           :isActiveEdge="activeEdgeId === item.edgeId"
-          @click.native="e => handleEdgeClick(item.edgeId)"
+          @click.native="e => edgeClick(item.edgeId)"
           @delete="deleteLine"
         />
         <GraphNode
@@ -255,6 +255,23 @@ export default class GraphContent extends Vue {
     }
   }
 
+  async handleKeyUp(e: KeyboardEvent) {
+    e.stopPropagation()
+    const tagName = (e.target as HTMLBodyElement).tagName
+    if (tagName === 'BODY') {
+      if (['Delete', 'Backspace'].includes(e.key)) {
+        if (this.activeEdgeId) {
+          await EdgeStore.deleteEdge(this.activeEdgeId)
+          this.activeEdgeId = 0
+        }
+        if (this.selectedNode.length === 1) {
+          await NodeStore.deleteNode(this.selectedNode[0].nodeId)
+          this.selectedNode = []
+        }
+      }
+    }
+  }
+
   preventDefaultContext(event: MouseEvent) {
     event.preventDefault()
   }
@@ -316,6 +333,11 @@ export default class GraphContent extends Vue {
 
   mounted() {
     this.svg = this.$refs.graphContent as HTMLElement
+    document.addEventListener('keydown', this.handleKeyUp, true)
+  }
+
+  beforeDestroy() {
+    document.removeEventListener('keydown', this.handleKeyUp)
   }
 }
 </script>

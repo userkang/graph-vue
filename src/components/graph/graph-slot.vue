@@ -9,11 +9,9 @@
     :r="isSlotEnableLink ? highlightCircleR : circleR"
     :cx="cx"
     :cy="cy"
-    :data-id="`${node.nodeId}`"
-    :data-status="isSlotEnableLink ? 'enable' : 'disable'"
     @mousedown="addLine"
     @mouseup="mouseup"
-    @mouseenter="mouseenter"
+    @mouseover="mouseover"
     @mouseout="mouseout"
   ></circle>
 </template>
@@ -96,13 +94,14 @@ export default class GraphSlot extends Vue {
   get isDirectLinked() {
     if (this.isInOrOut === 'in') {
       let linked = false
-      this.edges.forEach(item => {
+      for (const item of this.edges) {
         linked =
           item.fromNodeId === this.fromNodeId &&
           item.toNodeId === this.node.nodeId
-
-        console.log(linked)
-      })
+        if (linked) {
+          break
+        }
+      }
       return linked
     }
   }
@@ -118,8 +117,7 @@ export default class GraphSlot extends Vue {
 
   addLine(e: MouseEvent) {
     e.stopPropagation()
-    const canLinkEdge = this.isInOrOut === 'out'
-    if (canLinkEdge) {
+    if (this.isInOrOut === 'out') {
       // 是初始化连线的起点和移动位置
       EdgeStore.setNewLineStart(this.cx, this.cy)
       EdgeStore.setNewLineMove(this.cx, this.cy)
@@ -128,20 +126,21 @@ export default class GraphSlot extends Vue {
   }
 
   mouseup(e: MouseEvent) {
-    console.log(333)
     e.stopPropagation()
     if (this.isSlotEnableLink) {
       this.$emit('mouseup', e)
     }
   }
 
-  mouseenter(e: MouseEvent) {
+  mouseover(e: MouseEvent) {
+    e.stopPropagation()
     if (this.isSlotEnableLink) {
       this.highlightCircleR = 8
     }
   }
 
   mouseout(e: MouseEvent) {
+    e.stopPropagation()
     if (this.isSlotEnableLink) {
       this.highlightCircleR = 6
     }

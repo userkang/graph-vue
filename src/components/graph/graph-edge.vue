@@ -75,19 +75,19 @@ export default class GraphEdge extends Vue {
 
 <style lang="scss" scoped>
 .edge-style {
-  stroke: #dedfec;
+  stroke: #d1d1d1;
   stroke-width: 2;
   stroke-linecap: round;
   &:hover {
     stroke: #4150f6;
-    stroke-width: 3;
+    stroke-width: 2.5;
     cursor: pointer;
   }
 }
 
 .edge-selected-style {
   stroke: #4150f6;
-  stroke-width: 3;
+  stroke-width: 2.5;
   cursor: pointer;
 }
 </style>

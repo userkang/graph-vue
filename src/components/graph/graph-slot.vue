@@ -12,6 +12,9 @@
     :data-id="`${node.nodeId}`"
     :data-status="isSlotEnableLink ? 'enable' : 'disable'"
     @mousedown="addLine"
+    @mouseup="mouseup"
+    @mouseenter="mouseenter"
+    @mouseout="mouseout"
   ></circle>
 </template>
 
@@ -97,6 +100,8 @@ export default class GraphSlot extends Vue {
         linked =
           item.fromNodeId === this.fromNodeId &&
           item.toNodeId === this.node.nodeId
+
+        console.log(linked)
       })
       return linked
     }
@@ -119,6 +124,26 @@ export default class GraphSlot extends Vue {
       EdgeStore.setNewLineStart(this.cx, this.cy)
       EdgeStore.setNewLineMove(this.cx, this.cy)
       this.$emit('mousedown', e)
+    }
+  }
+
+  mouseup(e: MouseEvent) {
+    console.log(333)
+    e.stopPropagation()
+    if (this.isSlotEnableLink) {
+      this.$emit('mouseup', e)
+    }
+  }
+
+  mouseenter(e: MouseEvent) {
+    if (this.isSlotEnableLink) {
+      this.highlightCircleR = 8
+    }
+  }
+
+  mouseout(e: MouseEvent) {
+    if (this.isSlotEnableLink) {
+      this.highlightCircleR = 6
     }
   }
 }

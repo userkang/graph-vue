@@ -5,10 +5,9 @@
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       ref="graphContent"
-      @click.capture="handleSvgClick"
-      @mousedown="handleSvgMouseDown"
+      @mousedown="svgMouseDown"
       @mousemove.capture="handleMouseMove"
-      @mouseup.capture="handleMouseUp"
+      @mouseup="svgMouseUp"
       @contextmenu.capture="preventDefaultContext"
       @mousewheel="handleMouseWheel"
       @dragover="handleDragOver"
@@ -25,7 +24,7 @@
           v-for="item in edges"
           :key="item.edgeId"
           :edge="item"
-          :isActiveEdge="activeEdgeId === item.id"
+          :isActiveEdge="activeEdgeId === item.edgeId"
           @click.native="e => handleEdgeClick(item.edgeId)"
           @delete="deleteLine"
         />
@@ -35,8 +34,9 @@
           :node="item"
           :fromNodeId="fromNodeId"
           :isNodeActive="isNodeActive(item.nodeId)"
-          @clickNode="handleNodeClick"
-          @clickSlot="handleSlotClick"
+          @mouseDownNode="mouseDownNode"
+          @mouseDownSlot="mouseDownSlot"
+          @mouseUpSlot="mouseUpSlot"
         />
 
         <!-- <template v-if="nodeGroups">
@@ -72,7 +72,7 @@ import { NodeStore } from '@/stores/graph/node'
 import GraphNode from '@/components/graph/graph-node.vue'
 import GraphEdge from '@/components/graph/graph-edge.vue'
 import NewGraphEdge from '@/components/graph/new-graph-edge.vue'
-import { INodeType } from '../../types/dag'
+import { INodeType, IEdgeType } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
 
 @Component({
@@ -90,7 +90,9 @@ import { EdgeStore } from '@/stores/graph/edge'
 export default class GraphContent extends Vue {
   dagState = DagStore.state
   componentState = ComponentListStore.state
+  // 画布文档对象
   svg!: HTMLElement
+  // 画布变换相关值
   transform = {
     scale: 1,
     translateX: 0,
@@ -98,15 +100,27 @@ export default class GraphContent extends Vue {
     offsetX: 0,
     offsetY: 0
   }
-  // activeNode: INodeType[] = []
+  // 当前拖动节点
+  activeNode!: INodeType
+  // 当前被选中节点
+  selectedNode: INodeType[] = []
+  // 移动的节点
+  moveNode: INodeType[] = []
   isMouseDownNode = false
   isMouseDownSlot = false
   isMouseDownSvg = false
+  // 移动前的坐标
+  originX = 0
+  originY = 0
+  // 移动时动态起始值
   startX = 0
   startY = 0
+  // 移动时动态距离值
   moveX = 0
   moveY = 0
+  // 连线起始节点
   fromNodeId = 0
+  // 当前选中连线
   activeEdgeId = 0
 
   get nodes() {
@@ -121,30 +135,44 @@ export default class GraphContent extends Vue {
     return this.componentState.dragingInfo
   }
 
-  get activeNode() {
-    return this.dagState.activeNode
-  }
-
-  set activeNode(v: INodeType[]) {
-    this.dagState.activeNode = v
-  }
-
-  handleNodeClick(e: MouseEvent, node: INodeType) {
-    this.activeNode = [node]
+  mouseDownNode(e: MouseEvent, node: INodeType) {
+    console.log('mouseDownNode')
+    this.activeNode = node
     this.isMouseDownNode = true
-    this.startX = e.clientX
-    this.startY = e.clientY
+    this.activeEdgeId = 0
+    this.startX = this.originX = e.x
+    this.startY = this.originY = e.y
+
+    // 判断当前正在移动节点是否被选中
+    this.checkActiveNodeIsSelected()
   }
 
-  handleSlotClick(e: MouseEvent, node: INodeType) {
+  mouseDownSlot(e: MouseEvent, node: INodeType) {
+    console.log('mouseDownSlot')
     this.isMouseDownSlot = true
     this.fromNodeId = node.nodeId
   }
 
-  handleEdgeClick(edgeId: number) {
-    console.log(edgeId)
+  async mouseUpSlot(e: MouseEvent, node: INodeType) {
+    console.log('mouseUpSlot')
+    this.isMouseDownSlot = false
+    // const el = e.target as SVGCircleElement
+    // if (el.tagName === 'circle') {
+    // const status = el.dataset.status
+    // if (status === 'enable') {
+    // const toNodeId = el.dataset.id
+    await EdgeStore.addEdge({
+      fromNodeId: this.fromNodeId,
+      toNodeId: node.nodeId
+    })
+    // }
+    // }
+    EdgeStore.setResetLine()
+  }
+
+  edgeClick(edgeId: number) {
     this.activeEdgeId = edgeId
-    this.activeNode = []
+    this.selectedNode = []
   }
 
   async deleteLine() {
@@ -152,29 +180,31 @@ export default class GraphContent extends Vue {
     this.activeEdgeId = 0
   }
 
-  handleSvgClick(e: MouseEvent) {
-    // event.stopPropagation();
-    if ((e.target as SVGElement).tagName === 'svg') {
-      // MenuTipsController.hide()
-      // ActiveGraphController.show()
-      // this.activeEdgeId = 0
-      // this.lastNodeId = 0
-    }
-  }
+  // svgClick(e: MouseEvent) {
+  //   console.log('svgClick')
+  //   // event.stopPropagation();
+  //   if ((e.target as SVGElement).tagName === 'svg') {
+  //     // MenuTipsController.hide()
+  //     // ActiveGraphController.show()
+  //     this.activeEdgeId = 0
+  //     this.selectedNode = []
+  //   }
+  // }
 
-  handleSvgMouseDown(e: MouseEvent) {
+  svgMouseDown(e: MouseEvent) {
+    console.log('handleSvgMouseDown')
     this.isMouseDownSvg = true
     // this.moveX = event.clientX
     // this.moveY = event.clientY
   }
 
   async handleMouseMove(e: MouseEvent) {
-    const { clientX: x, clientY: y } = e
+    const { x: x, y: y } = e
     this.moveX = x - this.startX
     this.moveY = y - this.startY
 
     if (this.isMouseDownNode) {
-      this.activeNode.forEach(item => {
+      this.moveNode.forEach(item => {
         item.posX += this.moveX
         item.posY += this.moveY
       })
@@ -191,33 +221,27 @@ export default class GraphContent extends Vue {
     this.startY = y
   }
 
-  async handleMouseUp(e: MouseEvent) {
+  async svgMouseUp(e: MouseEvent) {
+    console.log('svgMouseUp')
+    e.stopPropagation()
     const { clientX: x, clientY: y } = e
     if (this.isMouseDownNode) {
       this.isMouseDownNode = false
-
       // 如果位置发生移动
-      if (this.moveX || this.moveY) {
-        await NodeStore.updateNodePosition(this.activeNode)
+      if (x - this.originX || y - this.originY) {
+        const moveNode = [...this.selectedNode, this.activeNode]
+        await NodeStore.updateNodePosition(moveNode)
       } else {
-        // 否则就是单纯的点击，这里写点击节点的处理逻辑，比如右侧参数面板
+        // 否则就是单纯的点击操作
+        this.selectedNode = [this.activeNode]
       }
     } else if (this.isMouseDownSlot) {
       this.isMouseDownSlot = false
-      const el = e.target as SVGCircleElement
-      if (el.tagName === 'circle') {
-        const status = el.dataset.status
-        if (status === 'enable') {
-          const toNodeId = el.dataset.id
-          await EdgeStore.addEdge({
-            fromNodeId: this.fromNodeId,
-            toNodeId: Number(toNodeId)
-          })
-        }
-      }
       EdgeStore.setResetLine()
     } else if (this.isMouseDownSvg) {
       this.isMouseDownSvg = false
+      this.activeEdgeId = 0
+      this.selectedNode = []
     }
   }
 
@@ -272,8 +296,16 @@ export default class GraphContent extends Vue {
     )
   }
 
+  checkActiveNodeIsSelected() {
+    this.moveNode = [this.activeNode]
+    // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
+    if (this.isNodeActive(this.activeNode.nodeId)) {
+      this.moveNode = this.selectedNode
+    }
+  }
+
   isNodeActive(id: number) {
-    for (const item of this.activeNode) {
+    for (const item of this.selectedNode) {
       if (item.nodeId === id) {
         return true
       }

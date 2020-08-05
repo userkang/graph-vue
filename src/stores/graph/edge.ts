@@ -16,7 +16,6 @@ class Edge extends Base {
   public addEdge(item: IEdgeType) {
     // 生成唯一edgeId
     item.edgeId = JSON.stringify(item.fromNodeId + '' + item.toNodeId)
-    console.log(item.edgeId)
     DagStore.state.dag.edges.push(item)
   }
 

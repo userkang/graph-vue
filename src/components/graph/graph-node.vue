@@ -6,7 +6,7 @@
       class="graph-node"
       :style="{
         stroke: isNodeActive ? '#606BE1' : '#DEDFEC',
-        fill: isNodeActive ? '#E3E6FF' : '#FFF'
+        fill: isNodeActive ? 'rgba(220,223,245,0.8)' : 'rgba(252,252,251,0.8)'
       }"
       :width="rectWidth"
       :height="rectHeight"
@@ -21,7 +21,7 @@
       :width="rectWidth"
       :height="rectHeight"
     >
-      <div class="node-content">{{ isNodeActive }}</div>
+      <div class="node-content">{{ node.nodeName }}</div>
     </foreignObject>
     <GraphSlot
       :node="node"
@@ -29,6 +29,7 @@
       isInOrOut="in"
       :rectWidth="rectWidth"
       :rectHeight="rectHeight"
+      @mouseup="handleSlotMouseUp"
     />
     <GraphSlot
       :node="node"
@@ -74,11 +75,15 @@ export default class GraphNode extends Vue {
 
   handleNodeMouseDown(e: MouseEvent) {
     e.stopPropagation()
-    this.$emit('clickNode', e, this.node)
+    this.$emit('mouseDownNode', e, this.node)
   }
 
-  private handleSlotMouseDown(e: MouseEvent) {
-    this.$emit('clickSlot', e, this.node)
+  handleSlotMouseDown(e: MouseEvent) {
+    this.$emit('mouseDownSlot', e, this.node)
+  }
+
+  handleSlotMouseUp(e: MouseEvent) {
+    this.$emit('mouseUpSlot', e, this.node)
   }
 }
 </script>

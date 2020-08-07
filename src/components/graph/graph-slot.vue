@@ -11,8 +11,6 @@
     :cy="cy"
     @mousedown="addLine"
     @mouseup="mouseup"
-    @mouseover="mouseover"
-    @mouseout="mouseout"
   ></circle>
 </template>
 
@@ -123,20 +121,6 @@ export default class GraphSlot extends Vue {
       this.$emit('mouseup', e)
     }
   }
-
-  mouseover(e: MouseEvent) {
-    e.stopPropagation()
-    if (this.isSlotEnableLink) {
-      this.highlightCircleR = 8
-    }
-  }
-
-  mouseout(e: MouseEvent) {
-    e.stopPropagation()
-    if (this.isSlotEnableLink) {
-      this.highlightCircleR = 6
-    }
-  }
 }
 </script>
 
@@ -149,12 +133,17 @@ export default class GraphSlot extends Vue {
     &:hover {
       stroke: $d2;
       stroke-width: 2;
+      fill: #fff;
     }
   }
   &.enable-slot {
     stroke: rgba(96, 107, 225, 0.7);
     stroke-width: 4;
     fill: #fff;
+    &:hover {
+      stroke-width: 6;
+      fill: rgba(96, 107, 225);
+    }
   }
 
   &.linked-slot {

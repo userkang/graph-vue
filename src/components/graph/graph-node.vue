@@ -12,8 +12,8 @@
       :height="rectInfo.height"
       :x="node.posX"
       :y="node.posY"
-      rx="2"
-      ry="2"
+      rx="4"
+      ry="4"
     ></rect>
     <foreignObject
       :x="node.posX"

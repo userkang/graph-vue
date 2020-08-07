@@ -8,10 +8,11 @@
       @mousedown="svgMouseDown"
       @mousemove="handleMouseMove"
       @mouseup="svgMouseUp"
-      @contextmenu="preventDefaultContext"
-      @mousewheel="handleMouseWheel"
-      @dragover="handleDragOver"
+      @dragover="e => e.preventDefault()"
       @drop="handleDrop"
+      @contextmenu="e => e.preventDefault()"
+      @mousewheel="mouseWheel"
+      @mouseleave="mouseLeave"
       width="100%"
       height="100%"
     >
@@ -154,8 +155,9 @@ export default class GraphContent extends Vue {
 
   mouseDownNode(e: MouseEvent, node: INodeType) {
     console.log('mouseDownNode')
-    this.activeNode = node
     this.isMouseDownNode = true
+
+    this.activeNode = node
     this.activeEdgeId = 0
     this.startX = this.originX = e.x
     this.startY = this.originY = e.y
@@ -198,16 +200,15 @@ export default class GraphContent extends Vue {
   }
 
   svgMouseDown(e: MouseEvent) {
-    console.log('handleSvgMouseDown')
+    console.log('svgMouseDown')
     this.isMouseDownSvg = true
-    if (this.isSelecting) {
-      this.startX = this.originX = e.x
-      this.startY = this.originY = e.y
-    }
+
+    this.startX = this.originX = e.x
+    this.startY = this.originY = e.y
   }
 
   async handleMouseMove(e: MouseEvent) {
-    const { x: x, y: y } = e
+    const { x, y } = e
     this.moveX = x - this.startX
     this.moveY = y - this.startY
 
@@ -234,11 +235,13 @@ export default class GraphContent extends Vue {
   async svgMouseUp(e: MouseEvent) {
     console.log('svgMouseUp')
     e.stopPropagation()
-    const { clientX: x, clientY: y } = e
+    const { x, y } = e
+    // 鼠标是否发生位移
+    const isMove = x - this.originX || y - this.originY
+
     if (this.isMouseDownNode) {
       this.isMouseDownNode = false
-      // 如果位置发生移动
-      if (x - this.originX || y - this.originY) {
+      if (isMove) {
         const moveNode = [...this.selectedNode, this.activeNode]
         await NodeStore.updateNodePosition(moveNode)
       } else {
@@ -250,12 +253,19 @@ export default class GraphContent extends Vue {
       EdgeStore.setResetLine()
     } else if (this.isMouseDownSvg) {
       this.isMouseDownSvg = false
-      this.activeEdgeId = 0
-      this.selectedNode = []
+      if (!isMove) {
+        this.activeEdgeId = 0
+        this.selectedNode = []
+      }
     }
   }
 
-  handleMouseWheel(e: WheelEvent) {
+  mouseLeave(e: MouseEvent) {
+    // 当鼠标离开画布时，手动触发画布 mouseup 事件
+    this.svgMouseUp(e)
+  }
+
+  mouseWheel(e: WheelEvent) {
     e.preventDefault()
     if (e.deltaX) {
       this.transform.translateX -= e.deltaX
@@ -336,15 +346,6 @@ export default class GraphContent extends Vue {
         }
       }
     }
-  }
-
-  preventDefaultContext(event: MouseEvent) {
-    event.preventDefault()
-  }
-
-  handleDragOver(event: DragEvent) {
-    // 阻止默认动作以启用drop
-    event.preventDefault()
   }
 
   async handleDrop(e: DragEvent) {

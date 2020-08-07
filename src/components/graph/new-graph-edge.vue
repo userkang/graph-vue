@@ -5,6 +5,7 @@
     stroke-width="1.5"
     stroke="#555"
     fill="transparent"
+    class="new-edge"
   >
     <path :d="newEdgePath"></path>
   </g>
@@ -29,3 +30,9 @@ export default class NewGraphEdge extends Vue {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.new-edge {
+  pointer-events: none;
+}
+</style>

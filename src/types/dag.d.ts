@@ -238,11 +238,6 @@ export interface GraphVoType {
   updateTime: string
   // 实验对应的图信息
   dag: DagVoType
-  // 版本对应的调度任务信息
-  taskStatus: number
-  // 调度任务id
-  taskId: number
-  task: TaskVo
   execStatus: ExecStatusVoType
 }
 

@@ -30,7 +30,7 @@ export default class GraphEdge extends Vue {
   @Prop({
     required: true
   })
-  rectInfo: IRectInfo
+  rectInfo!: IRectInfo
 
   dagState = DagStore.state
   path = ''

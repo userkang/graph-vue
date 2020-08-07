@@ -27,35 +27,6 @@ export default class ToolBox extends Vue {
   handleChange(e: MouseEvent) {
     this.$emit('click', e)
   }
-
-  // handleScale(event: MouseEvent) {
-  //   const target = event.target as HTMLLIElement
-  //   this.$emit('scaleChange', target.id)
-  // }
-
-  // select(e: MouseEvent) {
-  //   e.stopPropagation()
-  //   this.graphVisualState.selecting = true
-  // }
-
-  // handleScaleChange(scaleType: string, radio = 0.1) {
-  //   if (scaleType === 'expand' && this.scale < 2) {
-  //     this.scale += radio
-  //   } else if (scaleType === 'shrink' && this.scale > 0.4) {
-  //     this.scale -= radio
-  //   } else if (scaleType === 'reset') {
-  //     this.scale = 1
-  //     this.scaleOffset.x = 0
-  //     this.scaleOffset.y = 0
-  //     this.translateX = 0
-  //     this.translateY = 0
-  //   }
-
-  //   this.scaleOffset.x =
-  //     (this.svg.getBoundingClientRect().width * (this.scale - 1)) / 2
-  //   this.scaleOffset.y =
-  //     (this.svg.getBoundingClientRect().height * (this.scale - 1)) / 2
-  // }
 }
 </script>
 

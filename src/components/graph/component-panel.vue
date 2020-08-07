@@ -70,7 +70,7 @@ export default class ComponentPanel extends Vue {
 }
 .component-item {
   display: flex;
-  height: 34px;
+  height: 35px;
   box-sizing: border-box;
   color: $d4;
   font-size: 12px;

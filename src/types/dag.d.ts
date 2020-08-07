@@ -11,6 +11,8 @@ declare interface ITransform {
   scale: number
   translateX: number
   translateY: number
+  offsetX: number
+  offsetY: number
 }
 
 declare interface INodeType {
@@ -32,6 +34,11 @@ declare interface IEdgeType {
   fromNodeId: number
   // 目标节点ID
   toNodeId: number
+}
+
+declare interface IRectInfo {
+  width: number
+  height: number
 }
 
 export interface NodeVoStatusType {

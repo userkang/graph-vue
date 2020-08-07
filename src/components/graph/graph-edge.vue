@@ -12,7 +12,7 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { calculateCurve } from '@/assets/js/utils'
-import { IEdgeType, INodeType } from '../../types/dag'
+import { IEdgeType, INodeType, IRectInfo } from '../../types/dag'
 import { DagStore } from '@/stores/graph/dag'
 
 @Component
@@ -27,10 +27,11 @@ export default class GraphEdge extends Vue {
   })
   isActiveEdge!: boolean
 
-  // @Prop({
-  //   type: Boolean
-  // })
-  // refresh!: boolean
+  @Prop({
+    required: true
+  })
+  rectInfo: IRectInfo
+
   dagState = DagStore.state
   path = ''
   calculateCurve = calculateCurve
@@ -56,15 +57,15 @@ export default class GraphEdge extends Vue {
   }
 
   get x1() {
-    return this.fromNode[0].posX + 95
+    return this.fromNode[0].posX + this.rectInfo.width / 2
   }
 
   get x2() {
-    return this.toNode[0].posX + 95
+    return this.toNode[0].posX + this.rectInfo.width / 2
   }
 
   get y1() {
-    return this.fromNode[0].posY + 34
+    return this.fromNode[0].posY + this.rectInfo.height
   }
 
   get y2() {

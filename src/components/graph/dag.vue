@@ -17,7 +17,8 @@
     >
       <g
         :style="{
-          transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`
+          transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
+          transformOrigin: `center`
         }"
       >
         <GraphEdge
@@ -25,6 +26,7 @@
           :key="item.edgeId"
           :edge="item"
           :isActiveEdge="activeEdgeId === item.edgeId"
+          :rectInfo="rectInfo"
           @click.native="e => edgeClick(item.edgeId)"
           @delete="deleteLine"
         />
@@ -33,6 +35,7 @@
           :key="item.nodeId"
           :node="item"
           :fromNodeId="fromNodeId"
+          :rectInfo="rectInfo"
           :isNodeActive="isNodeActive(item.nodeId)"
           @mouseDownNode="mouseDownNode"
           @mouseDownSlot="mouseDownSlot"
@@ -55,12 +58,12 @@
 
         <NewGraphEdge />
       </g>
-      <!-- <path
-        id="zoom_area"
-        :d="pathRect"
+      <path
+        :d="selectBoxPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
-      /> -->
+      />
     </svg>
+    <ToolBox @click="handleToolBox" :isSelecting="isSelecting" />
   </div>
 </template>
 
@@ -72,26 +75,37 @@ import { NodeStore } from '@/stores/graph/node'
 import GraphNode from '@/components/graph/graph-node.vue'
 import GraphEdge from '@/components/graph/graph-edge.vue'
 import NewGraphEdge from '@/components/graph/new-graph-edge.vue'
+import ToolBox from '@/components/graph/tool-box.vue'
 import { INodeType, IEdgeType } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
 
 @Component({
   components: {
-    // EmptyGraph,
-    // LoadingIcon,
-    // ScalePanel,
     NewGraphEdge,
     GraphEdge,
-    GraphNode
+    GraphNode,
+    ToolBox
     // GraphGroupNode,
     // GraphGroup
   }
 })
 export default class GraphContent extends Vue {
+  // 画布配置项
+  rectInfo = {
+    width: 190,
+    height: 35
+  }
+
   dagState = DagStore.state
   componentState = ComponentListStore.state
   // 画布文档对象
   svg!: HTMLElement
+  svgInfo = {
+    x: 0,
+    y: 0,
+    width: 0,
+    height: 0
+  }
   // 画布变换相关值
   transform = {
     scale: 1,
@@ -109,6 +123,7 @@ export default class GraphContent extends Vue {
   isMouseDownNode = false
   isMouseDownSlot = false
   isMouseDownSvg = false
+  isSelecting = false
   // 移动前的坐标
   originX = 0
   originY = 0
@@ -122,6 +137,8 @@ export default class GraphContent extends Vue {
   fromNodeId = 0
   // 当前选中连线
   activeEdgeId = 0
+  // 框选操作框路径
+  selectBoxPath = ''
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -180,22 +197,13 @@ export default class GraphContent extends Vue {
     this.activeEdgeId = 0
   }
 
-  // svgClick(e: MouseEvent) {
-  //   console.log('svgClick')
-  //   // event.stopPropagation();
-  //   if ((e.target as SVGElement).tagName === 'svg') {
-  //     // MenuTipsController.hide()
-  //     // ActiveGraphController.show()
-  //     this.activeEdgeId = 0
-  //     this.selectedNode = []
-  //   }
-  // }
-
   svgMouseDown(e: MouseEvent) {
     console.log('handleSvgMouseDown')
     this.isMouseDownSvg = true
-    // this.moveX = event.clientX
-    // this.moveY = event.clientY
+    if (this.isSelecting) {
+      this.startX = this.originX = e.x
+      this.startY = this.originY = e.y
+    }
   }
 
   async handleMouseMove(e: MouseEvent) {
@@ -205,16 +213,18 @@ export default class GraphContent extends Vue {
 
     if (this.isMouseDownNode) {
       this.moveNode.forEach(item => {
-        item.posX += this.moveX
-        item.posY += this.moveY
+        item.posX += this.moveX / this.transform.scale
+        item.posY += this.moveY / this.transform.scale
       })
     } else if (this.isMouseDownSlot) {
       const posX = this.positionTransformX(x)
       const posY = this.positionTransformY(y)
       EdgeStore.setNewLineMove(posX, posY)
+    } else if (this.isSelecting) {
+      // this.selectBoxPath =
     } else if (this.isMouseDownSvg) {
-      this.transform.translateX += this.moveX
-      this.transform.translateY += this.moveY
+      this.transform.translateX += this.moveX / this.transform.scale
+      this.transform.translateY += this.moveY / this.transform.scale
     }
 
     this.startX = x
@@ -253,6 +263,62 @@ export default class GraphContent extends Vue {
     if (e.deltaY) {
       this.transform.translateY -= e.deltaY
     }
+  }
+
+  handleToolBox(e: MouseEvent) {
+    const id = (e.target as HTMLElement).id
+    switch (id) {
+      case 'expand':
+        this.expand()
+        break
+      case 'shrink':
+        this.shrink()
+        break
+      case 'reset':
+        this.reset()
+        break
+      case 'select':
+        this.select()
+        break
+    }
+  }
+
+  expand() {
+    if (this.transform.scale < 2) {
+      this.transform.scale += 0.1
+      this.caculateOffset()
+    }
+  }
+
+  shrink() {
+    if (this.transform.scale > 0.4) {
+      this.transform.scale -= 0.1
+      this.caculateOffset()
+    }
+  }
+
+  select() {
+    this.isSelecting = !this.isSelecting
+    if (this.isSelecting) {
+      this.svg.style.cursor = 'crosshair'
+    } else {
+      this.svg.style.cursor = ''
+    }
+  }
+
+  reset() {
+    this.transform.scale = 1
+    this.transform.translateX = 0
+    this.transform.translateY = 0
+    this.transform.offsetX = 0
+    this.transform.offsetY = 0
+  }
+
+  caculateOffset() {
+    this.transform.offsetX =
+      (this.svgInfo.width * (this.transform.scale - 1)) / 2
+    this.transform.offsetY =
+      (this.svgInfo.height * (this.transform.scale - 1)) / 2
   }
 
   async handleKeyUp(e: KeyboardEvent) {
@@ -298,7 +364,7 @@ export default class GraphContent extends Vue {
   }
 
   positionTransformX(originValue: number) {
-    const posX = originValue - this.svg.getBoundingClientRect().x
+    const posX = originValue - this.svgInfo.x
     return (
       (posX + this.transform.offsetX) / this.transform.scale -
       this.transform.translateX
@@ -306,7 +372,7 @@ export default class GraphContent extends Vue {
   }
 
   positionTransformY(originValue: number) {
-    const posY = originValue - this.svg.getBoundingClientRect().y
+    const posY = originValue - this.svgInfo.y
     return (
       (posY + this.transform.offsetY) / this.transform.scale -
       this.transform.translateY
@@ -331,13 +397,26 @@ export default class GraphContent extends Vue {
     return false
   }
 
+  handleResize() {
+    const bounding = this.svg.getBoundingClientRect()
+    this.svgInfo = {
+      x: bounding.x,
+      y: bounding.y,
+      width: bounding.width,
+      height: bounding.height
+    }
+  }
+
   mounted() {
     this.svg = this.$refs.graphContent as HTMLElement
+    this.handleResize()
     document.addEventListener('keydown', this.handleKeyUp, true)
+    window.addEventListener('resize', this.handleResize, true)
   }
 
   beforeDestroy() {
     document.removeEventListener('keydown', this.handleKeyUp)
+    window.removeEventListener('resize', this.handleResize)
   }
 }
 </script>

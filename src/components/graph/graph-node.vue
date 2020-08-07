@@ -8,8 +8,8 @@
         stroke: isNodeActive ? '#606BE1' : '#DEDFEC',
         fill: isNodeActive ? 'rgba(220,223,245,0.8)' : 'rgba(252,252,251,0.8)'
       }"
-      :width="rectWidth"
-      :height="rectHeight"
+      :width="rectInfo.width"
+      :height="rectInfo.height"
       :x="node.posX"
       :y="node.posY"
       rx="2"
@@ -18,8 +18,8 @@
     <foreignObject
       :x="node.posX"
       :y="node.posY"
-      :width="rectWidth"
-      :height="rectHeight"
+      :width="rectInfo.width"
+      :height="rectInfo.height"
     >
       <div class="node-content">{{ node.nodeName }}</div>
     </foreignObject>
@@ -27,16 +27,14 @@
       :node="node"
       :fromNodeId="fromNodeId"
       isInOrOut="in"
-      :rectWidth="rectWidth"
-      :rectHeight="rectHeight"
+      :rectInfo="rectInfo"
       @mouseup="handleSlotMouseUp"
     />
     <GraphSlot
       :node="node"
       :fromNodeId="fromNodeId"
       isInOrOut="out"
-      :rectWidth="rectWidth"
-      :rectHeight="rectHeight"
+      :rectInfo="rectInfo"
       @mousedown="handleSlotMouseDown"
     />
   </g>
@@ -44,7 +42,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INodeType } from '../../types/dag'
+import { INodeType, IRectInfo } from '../../types/dag'
 import GraphSlot from '@/components/graph/graph-slot.vue'
 
 @Component({
@@ -70,8 +68,10 @@ export default class GraphNode extends Vue {
   })
   isNodeActive!: boolean
 
-  rectWidth = 190
-  rectHeight = 34
+  @Prop({
+    required: true
+  })
+  rectInfo!: IRectInfo
 
   handleNodeMouseDown(e: MouseEvent) {
     e.stopPropagation()
@@ -100,9 +100,6 @@ export default class GraphNode extends Vue {
       transform: rotate(360deg);
     }
   }
-}
-text {
-  cursor: pointer;
 }
 .node-content {
   height: 100%;

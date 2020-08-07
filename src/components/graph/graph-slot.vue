@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INodeType } from '../../types/dag'
+import { INodeType, IRectInfo } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
 import { DagStore } from '@/stores/graph/dag'
 
@@ -41,16 +41,9 @@ export default class GraphSlot extends Vue {
   isInOrOut!: string
 
   @Prop({
-    required: true,
-    type: Number
+    required: true
   })
-  rectWidth!: number
-
-  @Prop({
-    required: true,
-    type: Number
-  })
-  rectHeight!: number
+  rectInfo!: IRectInfo
 
   circleR = 4
   highlightCircleR = 6
@@ -58,13 +51,13 @@ export default class GraphSlot extends Vue {
   dagState = DagStore.state
 
   get cx() {
-    return this.node.posX + this.rectWidth / 2
+    return this.node.posX + this.rectInfo.width / 2
   }
 
   get cy() {
     return this.isInOrOut === 'in'
       ? this.node.posY
-      : this.node.posY + this.rectHeight
+      : this.node.posY + this.rectInfo.height
   }
 
   get edges() {
@@ -126,7 +119,6 @@ export default class GraphSlot extends Vue {
   }
 
   mouseup(e: MouseEvent) {
-    e.stopPropagation()
     if (this.isSlotEnableLink) {
       this.$emit('mouseup', e)
     }

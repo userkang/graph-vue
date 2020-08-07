@@ -80,6 +80,11 @@ import NewGraphEdge from '@/components/graph/new-graph-edge.vue'
 import ToolBox from '@/components/graph/tool-box.vue'
 import { INodeType, IEdgeType } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
+import {
+  isFullScreen,
+  requestFullScreen,
+  cancelFullScreen
+} from '@/assets/js/utils'
 
 @Component({
   components: {
@@ -144,7 +149,6 @@ export default class GraphContent extends Vue {
   // 框选操作框路径
   selectBoxPath = ''
   showSelectingBox = false
-
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -358,6 +362,9 @@ export default class GraphContent extends Vue {
       case 'select':
         this.select()
         break
+      case 'fullscreen':
+        this.fullscreen()
+        break
     }
   }
 
@@ -385,6 +392,14 @@ export default class GraphContent extends Vue {
     this.transform.translateY = 0
     this.transform.offsetX = 0
     this.transform.offsetY = 0
+  }
+
+  fullscreen() {
+    if (isFullScreen()) {
+      cancelFullScreen()
+    } else {
+      requestFullScreen(document.documentElement)
+    }
   }
 
   caculateOffset() {

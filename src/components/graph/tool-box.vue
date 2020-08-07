@@ -1,24 +1,24 @@
 <template>
   <div class="scale-panel" @click="handleChange">
-    <li id="expand">+</li>
-    <li id="shrink">-</li>
+    <li id="expand" class="iconfont iconfangdasuoxiao_X"></li>
+    <li id="shrink" class="iconfont iconfangdasuoxiao_Y"></li>
     <li id="reset" class="iconfont iconhuiguiyuanwei-"></li>
     <li
       id="select"
       :class="{ select: isSelecting }"
       class="iconfont iconkuangxuan"
     ></li>
+    <li id="fullscreen" class="iconfont iconquanping1"></li>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { ITransform } from '../../types/dag'
 
 @Component
 export default class ToolBox extends Vue {
   @Prop({
-    required: true
+    required: false
   })
   isSelecting!: boolean
 
@@ -31,21 +31,20 @@ export default class ToolBox extends Vue {
 <style lang="scss" scoped>
 .scale-panel {
   position: absolute;
+  display: flex;
   right: 10px;
   top: 10px;
-  display: flex;
   background: #f7f9ff;
   border: 1px solid #e8ecfa;
   color: #8a94c2;
   font-weight: 600;
-  width: 130px;
   font-size: 18px;
   & > li {
     display: flex;
     height: 30px;
+    width: 30px;
     align-items: center;
     justify-content: center;
-    flex: 1;
     border-right: 1px solid #e8ecfa;
     cursor: pointer;
     &:last-child {

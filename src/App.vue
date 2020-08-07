@@ -12,5 +12,5 @@ export default class App extends Vue {}
 </script>
 
 <style lang="scss">
-@import url('//at.alicdn.com/t/font_1805014_qst1gnzsqar.css');
+@import url('//at.alicdn.com/t/font_1805014_g1z16o6yd98.css');
 </style>

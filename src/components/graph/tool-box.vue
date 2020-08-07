@@ -2,14 +2,12 @@
   <div class="scale-panel" @click="handleChange">
     <li id="expand">+</li>
     <li id="shrink">-</li>
-    <li id="reset" class="iconfont icon-huiguiyuanwei">归</li>
+    <li id="reset" class="iconfont iconhuiguiyuanwei-"></li>
     <li
       id="select"
       :class="{ select: isSelecting }"
-      class="iconfont icon-kuangxuan"
-    >
-      选
-    </li>
+      class="iconfont iconkuangxuan"
+    ></li>
   </div>
 </template>
 

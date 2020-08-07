@@ -60,6 +60,7 @@
         <NewGraphEdge />
       </g>
       <path
+        v-show="showSelectingBox"
         :d="selectBoxPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
@@ -94,7 +95,9 @@ export default class GraphContent extends Vue {
   // 画布配置项
   rectInfo = {
     width: 190,
-    height: 35
+    height: 35,
+    rx: 2,
+    ry: 2
   }
 
   dagState = DagStore.state
@@ -140,6 +143,8 @@ export default class GraphContent extends Vue {
   activeEdgeId = 0
   // 框选操作框路径
   selectBoxPath = ''
+  showSelectingBox = false
+
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -175,17 +180,10 @@ export default class GraphContent extends Vue {
   async mouseUpSlot(e: MouseEvent, node: INodeType) {
     console.log('mouseUpSlot')
     this.isMouseDownSlot = false
-    // const el = e.target as SVGCircleElement
-    // if (el.tagName === 'circle') {
-    // const status = el.dataset.status
-    // if (status === 'enable') {
-    // const toNodeId = el.dataset.id
     await EdgeStore.addEdge({
       fromNodeId: this.fromNodeId,
       toNodeId: node.nodeId
     })
-    // }
-    // }
     EdgeStore.setResetLine()
   }
 
@@ -201,10 +199,15 @@ export default class GraphContent extends Vue {
 
   svgMouseDown(e: MouseEvent) {
     console.log('svgMouseDown')
-    this.isMouseDownSvg = true
 
-    this.startX = this.originX = e.x
-    this.startY = this.originY = e.y
+    this.originX = e.x
+    this.originY = e.y
+
+    if (this.isSelecting) {
+      this.showSelectingBox = true
+    } else {
+      this.isMouseDownSvg = true
+    }
   }
 
   async handleMouseMove(e: MouseEvent) {
@@ -221,8 +224,14 @@ export default class GraphContent extends Vue {
       const posX = this.positionTransformX(x)
       const posY = this.positionTransformY(y)
       EdgeStore.setNewLineMove(posX, posY)
-    } else if (this.isSelecting) {
-      // this.selectBoxPath =
+    } else if (this.isSelecting && this.showSelectingBox) {
+      const startX = this.originX - this.svgInfo.x
+      const startY = this.originY - this.svgInfo.y
+      const endX = x - this.svgInfo.x
+      const endY = y - this.svgInfo.y
+
+      this.selectBoxPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
+      this.checkSelected(this.originX, this.originY, x, y)
     } else if (this.isMouseDownSvg) {
       this.transform.translateX += this.moveX / this.transform.scale
       this.transform.translateY += this.moveY / this.transform.scale
@@ -251,12 +260,71 @@ export default class GraphContent extends Vue {
     } else if (this.isMouseDownSlot) {
       this.isMouseDownSlot = false
       EdgeStore.setResetLine()
+    } else if (this.isSelecting && this.showSelectingBox) {
+      this.isSelecting = false
+      this.showSelectingBox = false
+      this.selectBoxPath = ''
     } else if (this.isMouseDownSvg) {
       this.isMouseDownSvg = false
       if (!isMove) {
         this.activeEdgeId = 0
         this.selectedNode = []
       }
+    }
+  }
+
+  checkSelected(startX: number, startY: number, endX: number, endY: number) {
+    // 处理不同方向框选的情况
+    // 从左上->右下，不要交换
+    const range = {
+      startX,
+      startY,
+      endX,
+      endY
+    }
+    // 左下->右上
+    if (endX > startX && endY < startY) {
+      range.startY = endY
+      range.endY = startY
+    }
+    // 右上->左下
+    if (endX < startX && endY > startY) {
+      range.startX = endX
+      range.endX = startX
+    }
+    // 右下->左上
+    if (endX < startX && endY < startY) {
+      range.startX = endX
+      range.startY = endY
+      range.endX = startX
+      range.endY = startY
+    }
+
+    this.selectedNode = this.nodes.filter(item => {
+      return this.checkNodeRange(item, range)
+    })
+  }
+
+  checkNodeRange(
+    item: INodeType,
+    range: { startX: number; startY: number; endX: number; endY: number }
+  ) {
+    if (
+      item.posY + this.rectInfo.height <
+      this.positionTransformY(range.startY)
+    ) {
+      return false
+    } else if (item.posY > this.positionTransformY(range.endY)) {
+      return false
+    } else if (
+      item.posX + this.rectInfo.width <
+      this.positionTransformX(range.startX)
+    ) {
+      return false
+    } else if (item.posX > this.positionTransformX(range.endX)) {
+      return false
+    } else {
+      return true
     }
   }
 
@@ -309,11 +377,6 @@ export default class GraphContent extends Vue {
 
   select() {
     this.isSelecting = !this.isSelecting
-    if (this.isSelecting) {
-      this.svg.style.cursor = 'crosshair'
-    } else {
-      this.svg.style.cursor = ''
-    }
   }
 
   reset() {

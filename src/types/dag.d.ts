@@ -39,7 +39,14 @@ declare interface IEdgeType {
 declare interface IRectInfo {
   width: number
   height: number
+  rx: number
+  ry: number
 }
+
+
+
+
+
 
 export interface NodeVoStatusType {
   nodeId: number

@@ -16,7 +16,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INodeType, IRectInfo } from '../../types/dag'
 import { EdgeStore } from '@/stores/graph/edge'
 import { DagStore } from '@/stores/graph/dag'
 

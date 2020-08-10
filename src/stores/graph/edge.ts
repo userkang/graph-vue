@@ -1,6 +1,5 @@
 import Base from '../base'
 import { DagStore } from './dag'
-import { IEdgeType } from '@/types/dag'
 
 class Edge extends Base {
   public state = {

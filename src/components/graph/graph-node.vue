@@ -1,12 +1,12 @@
 <template>
-  <g @mousedown="handleNodeMouseDown">
+  <g @mousedown="handleNodeMouseDown" @contextmenu.capture="showMenuTips">
     <rect
       ref="node"
       data-type="node"
       class="graph-node"
       :style="{
-        stroke: isNodeActive ? '#606BE1' : '#DEDFEC',
-        fill: isNodeActive ? 'rgba(220,223,245,0.8)' : 'rgba(252,252,251,0.8)'
+        stroke: isNodeSelected ? '#606BE1' : '#DEDFEC',
+        fill: isNodeSelected ? 'rgba(220,223,245,0.8)' : 'rgba(252,252,251,0.8)'
       }"
       :width="rectInfo.width"
       :height="rectInfo.height"
@@ -42,7 +42,6 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INodeType, IRectInfo } from '../../types/dag'
 import GraphSlot from '@/components/graph/graph-slot.vue'
 
 @Component({
@@ -66,7 +65,7 @@ export default class GraphNode extends Vue {
     required: true,
     type: Boolean
   })
-  isNodeActive!: boolean
+  isNodeSelected!: boolean
 
   @Prop({
     required: true
@@ -75,7 +74,9 @@ export default class GraphNode extends Vue {
 
   handleNodeMouseDown(e: MouseEvent) {
     e.stopPropagation()
-    this.$emit('mouseDownNode', e, this.node)
+    if (e.button === 0) {
+      this.$emit('mouseDownNode', e, this.node)
+    }
   }
 
   handleSlotMouseDown(e: MouseEvent) {
@@ -84,6 +85,18 @@ export default class GraphNode extends Vue {
 
   handleSlotMouseUp(e: MouseEvent) {
     this.$emit('mouseUpSlot', e, this.node)
+  }
+
+  showMenuTips(e: MouseEvent) {
+    e.preventDefault()
+    e.stopPropagation()
+    this.$emit('contextMenu', {
+      show: true,
+      x: e.x,
+      y: e.y,
+      data: this.node.nodeId,
+      type: 'node'
+    })
   }
 }
 </script>

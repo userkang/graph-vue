@@ -6,7 +6,7 @@
       xmlns:xlink="http://www.w3.org/1999/xlink"
       ref="graphContent"
       @mousedown="svgMouseDown"
-      @mousemove="handleMouseMove"
+      @mousemove="mouseMove"
       @mouseup="svgMouseUp"
       @dragover="e => e.preventDefault()"
       @drop="handleDrop"
@@ -30,6 +30,7 @@
           :rectInfo="rectInfo"
           @click.native="e => edgeClick(item.edgeId)"
           @delete="deleteLine"
+          @contextMenu="showMenuTips"
         />
         <GraphNode
           v-for="item in nodes"
@@ -37,10 +38,11 @@
           :node="item"
           :fromNodeId="fromNodeId"
           :rectInfo="rectInfo"
-          :isNodeActive="isNodeActive(item.nodeId)"
+          :isNodeSelected="isNodeSelected(item.nodeId)"
           @mouseDownNode="mouseDownNode"
           @mouseDownSlot="mouseDownSlot"
           @mouseUpSlot="mouseUpSlot"
+          @contextMenu="showMenuTips"
         />
 
         <!-- <template v-if="nodeGroups">
@@ -66,6 +68,7 @@
       />
     </svg>
     <ToolBox @click="handleToolBox" :isSelecting="isSelecting" />
+    <MenuTips :menu="menu" />
   </div>
 </template>
 
@@ -78,7 +81,7 @@ import GraphNode from '@/components/graph/graph-node.vue'
 import GraphEdge from '@/components/graph/graph-edge.vue'
 import NewGraphEdge from '@/components/graph/new-graph-edge.vue'
 import ToolBox from '@/components/graph/tool-box.vue'
-import { INodeType, IEdgeType } from '../../types/dag'
+import MenuTips from '@/components/graph/menu-tips.vue'
 import { EdgeStore } from '@/stores/graph/edge'
 import {
   isFullScreen,
@@ -91,7 +94,8 @@ import {
     NewGraphEdge,
     GraphEdge,
     GraphNode,
-    ToolBox
+    ToolBox,
+    MenuTips
     // GraphGroupNode,
     // GraphGroup
   }
@@ -149,6 +153,8 @@ export default class GraphContent extends Vue {
   // 框选操作框路径
   selectBoxPath = ''
   showSelectingBox = false
+  // 右键菜单
+  menu: IMenu = { show: false, x: 0, y: 0, data: 0, type: 'node' }
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -214,7 +220,7 @@ export default class GraphContent extends Vue {
     }
   }
 
-  async handleMouseMove(e: MouseEvent) {
+  async mouseMove(e: MouseEvent) {
     const { x, y } = e
     this.moveX = x - this.startX
     this.moveY = y - this.startY
@@ -409,6 +415,10 @@ export default class GraphContent extends Vue {
       (this.svgInfo.height * (this.transform.scale - 1)) / 2
   }
 
+  showMenuTips(data: IMenu) {
+    this.menu = data
+  }
+
   async handleKeyUp(e: KeyboardEvent) {
     e.stopPropagation()
     const tagName = (e.target as HTMLBodyElement).tagName
@@ -461,12 +471,12 @@ export default class GraphContent extends Vue {
   checkActiveNodeIsSelected() {
     this.moveNode = [this.activeNode]
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
-    if (this.isNodeActive(this.activeNode.nodeId)) {
+    if (this.isNodeSelected(this.activeNode.nodeId)) {
       this.moveNode = this.selectedNode
     }
   }
 
-  isNodeActive(id: number) {
+  isNodeSelected(id: number) {
     for (const item of this.selectedNode) {
       if (item.nodeId === id) {
         return true

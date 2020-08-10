@@ -1,6 +1,5 @@
 import Base from '../base'
 import { DagStore } from './dag'
-import { INodeType } from '@/types/dag'
 
 let nodeId = 0
 class Node extends Base {

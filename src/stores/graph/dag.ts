@@ -1,6 +1,5 @@
 import Base from '../base'
 import { dagMock } from '@/mock/dag'
-import { IDagType } from '@/types/dag'
 
 interface IDagState {
   dag: IDagType

@@ -4,12 +4,9 @@
   "private": true,
   "scripts": {
     "start": "npm run serve",
-    "start:test": "npm run serve:test",
-    "serve": "vue-cli-service serve --mode staging",
-    "serve:test": "vue-cli-service serve --mode test",
+    "serve": "vue-cli-service serve",
     "build": "export NODE_ENV=production && vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "analyze": "export NODE_ENV=production && export IS_ANALYZE=true && vue-cli-service build",
     "test": "echo test"
   },
   "dependencies": {

@@ -1,9 +1,7 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const path = require('path')
-const env = process.env.CONFIG_ENV || 'local'
 
-const config = require('./config')[env]
 const htmlPath = path.resolve(__dirname, './public/index.html')
 
 // Talos 线上构建会注入 PUBLIC_URL 环境变量
@@ -26,9 +24,7 @@ module.exports = {
         filename: 'index.html',
         template: htmlPath,
         inject: true,
-        apiDomain: config.apiDomain,
-        env: config.env,
-        publicPath: config.publicPath,
+        publicPath: '',
         minify: {
           removeComments: true,
           collapseWhitespace: true,

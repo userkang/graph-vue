@@ -1,0 +1,46 @@
+#!/usr/bin/env node
+
+const path = require('path')
+const { spawn } = require('child_process')
+const cwd = path.resolve(__dirname, '../')
+
+// 1. check PUBLIC_URL
+const publicUrl = process.env.PUBLIC_URL
+if (!publicUrl) {
+  if (process.env.CI === 'true') {
+    console.error('缺失环境变量 PUBLIC_URL，请检查')
+    process.exit(1)
+  } else {
+    console.warn(
+      '缺失环境变量 PUBLIC_URL 可能是本地构建，可执行 PUBLIC_URL=//awp-assets.sankuai.com/key/slug/ yarn build 模拟 Talos 线上构建，详情请查看 `http://docs.sankuai.com/doc/hfe/delivery/quickStart/go/`'
+    )
+  }
+}
+
+// 2. 数据准备
+// 额外参数
+const extraArgv = process.argv.slice(2)
+// 获取 Talos 发布环境 target 默认按照 production 构建
+const env = process.env.AWP_DEPLOY_ENV || 'production'
+// 调整 mode，对应 .env.${production,staging,testxx}
+const mode =
+  process.env.VUE_CLI_MODE ||
+  (env === 'newtest' || env.startsWith('test0') ? 'testxx' : env)
+
+// 3. 显示将要执行的命令
+console.log(
+  `running: vue-cli-service build --mode ${mode} ${extraArgv.join(' ')}`
+)
+
+// 4. 执行命令，并透传其他 build 参数
+const buildService = spawn(
+  'vue-cli-service',
+  ['build', '--mode', mode, ...extraArgv],
+  { cwd, stdio: 'inherit' }
+)
+
+// 5. 执行并输出结果
+buildService.on('close', code => {
+  console.log(`[ talos build ${mode} ${code === 0 ? 'success' : 'fail'} ]`)
+  process.exit(code)
+})

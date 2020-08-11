@@ -6,11 +6,12 @@ const env = process.env.CONFIG_ENV || 'local'
 const config = require('./config')[env]
 const htmlPath = path.resolve(__dirname, './public/index.html')
 
-const PROXY_ORIGIN = process.env.VUE_APP_PROXY_ORIGIN
+// Talos 线上构建会注入 PUBLIC_URL 环境变量
+const { PUBLIC_URL } = process.env
 
 module.exports = {
-  outputDir: path.resolve(__dirname, './dist'),
-  publicPath: config.publicPath,
+  outputDir: path.resolve(__dirname, './build'),
+  publicPath: process.env.NODE_ENV === 'production' ? PUBLIC_URL : '/',
   css: {
     loaderOptions: {
       sass: {

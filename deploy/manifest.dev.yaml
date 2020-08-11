@@ -19,6 +19,6 @@ build:
     files:
     - ./*
 deploy:
-  targetDir: /opt/meituan/www/dataplat-machine-learning
+  targetDir: /opt/meituan/www/mlp-graph
   run:
-    workDir: /opt/meituan/www/dataplat-machine-learning
+    workDir: /opt/meituan/www/mlp-graph

@@ -10,6 +10,7 @@
     ></li>
     <li id="fullscreen" class="iconfont iconquanping1"></li>
     <li id="layout" class="iconfont iconfullscreen"></li>
+    <li id="fit" class="iconfont iconfullscreen"></li>
   </div>
 </template>
 

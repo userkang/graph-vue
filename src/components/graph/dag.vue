@@ -17,6 +17,8 @@
       height="100%"
     >
       <g
+        id="ddd"
+        ref="transformDom"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
           transformOrigin: `center`
@@ -114,6 +116,8 @@ export default class GraphContent extends Vue {
   componentState = ComponentListStore.state
   // 画布文档对象
   svg!: HTMLElement
+  // 画布下的缩放文档对象
+  transformDom!: HTMLElement
   svgInfo = {
     x: 0,
     y: 0,
@@ -377,6 +381,9 @@ export default class GraphContent extends Vue {
       case 'layout':
         this.layout()
         break
+      case 'fit':
+        this.fit()
+        break
     }
   }
 
@@ -402,8 +409,10 @@ export default class GraphContent extends Vue {
     this.transform.scale = 1
     this.transform.translateX = 0
     this.transform.translateY = 0
+
     this.transform.offsetX = 0
     this.transform.offsetY = 0
+    // this.fit()
   }
 
   fullscreen() {
@@ -415,10 +424,62 @@ export default class GraphContent extends Vue {
   }
 
   layout() {
-    dagre.layout(this.graph)
-    this.graph.nodes().forEach((v: any) => {
-      console.log('Node ' + v + ': ' + JSON.stringify(this.graph.node(v)))
+    this.nodes.forEach(item => {
+      this.graph.setNode(item.nodeId, {
+        label: item.nodeName,
+        width: this.rectInfo.width,
+        height: this.rectInfo.height
+      })
     })
+
+    this.edges.forEach(item => {
+      this.graph.setEdge(item.fromNodeId, item.toNodeId)
+    })
+
+    dagre.layout(this.graph)
+    this.graph.nodes().forEach((v: string) => {
+      this.nodes.forEach(item => {
+        if (String(item.nodeId) === v) {
+          const { x, y } = this.graph.node(v)
+          item.posX = x
+          item.posY = y
+        }
+      })
+    })
+
+    // this.reset()
+
+    NodeStore.updateNodePosition(this.nodes)
+  }
+
+  fit() {
+    // 变换group的信息
+    const transformInfo = this.transformDom.getBoundingClientRect()
+
+    if (
+      transformInfo.width === this.svgInfo.width ||
+      transformInfo.height === this.svgInfo.height
+    ) {
+      return
+    }
+
+    // 变换group与画布左方和上方的距离
+    const transformLeft = transformInfo.x - this.svgInfo.x
+    const transformTop = transformInfo.y - this.svgInfo.y
+
+    if (
+      transformInfo.width - this.svgInfo.width >
+      transformInfo.height - this.svgInfo.height
+    ) {
+      this.transform.scale = this.svgInfo.width / transformInfo.width
+    } else {
+      this.transform.scale = this.svgInfo.height / transformInfo.height
+    }
+
+    this.transform.translateX +=
+      (this.svgInfo.width - transformInfo.width) / 2 - transformLeft
+    this.transform.translateY -=
+      (this.svgInfo.height - transformInfo.height) / 2 - transformTop
   }
 
   caculateOffset() {
@@ -463,13 +524,6 @@ export default class GraphContent extends Vue {
       posX,
       posY
     })
-
-    this.graph.setNode(this.dragingInfo.component.componentId, {
-      label: this.dragingInfo.component.componentName,
-      width: this.rectInfo.width,
-      height: this.rectInfo.height
-    })
-    console.log(this.graph.nodes())
   }
 
   positionTransformX(originValue: number) {
@@ -516,8 +570,9 @@ export default class GraphContent extends Vue {
     }
   }
 
-  created() {
+  initDagre() {
     this.graph = new dagre.graphlib.Graph()
+    console.log(this.svgInfo.width, this.svgInfo.height)
     this.graph.setGraph({
       width: this.svgInfo.width,
       height: this.svgInfo.height
@@ -529,7 +584,9 @@ export default class GraphContent extends Vue {
 
   mounted() {
     this.svg = this.$refs.graphContent as HTMLElement
+    this.transformDom = this.$refs.transformDom as HTMLElement
     this.handleResize()
+    this.initDagre()
     document.addEventListener('keydown', this.handleKeyUp, true)
     window.addEventListener('resize', this.handleResize, true)
   }

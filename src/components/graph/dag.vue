@@ -88,6 +88,7 @@ import {
   requestFullScreen,
   cancelFullScreen
 } from '@/assets/js/utils'
+import dagre from 'dagre'
 
 @Component({
   components: {
@@ -155,6 +156,8 @@ export default class GraphContent extends Vue {
   showSelectingBox = false
   // 右键菜单
   menu: IMenu = { show: false, x: 0, y: 0, data: 0, type: 'node' }
+  // dagre 实例
+  graph: any = null
 
   get nodes() {
     return this.dagState.dag.nodes
@@ -371,6 +374,9 @@ export default class GraphContent extends Vue {
       case 'fullscreen':
         this.fullscreen()
         break
+      case 'layout':
+        this.layout()
+        break
     }
   }
 
@@ -406,6 +412,13 @@ export default class GraphContent extends Vue {
     } else {
       requestFullScreen(document.documentElement)
     }
+  }
+
+  layout() {
+    dagre.layout(this.graph)
+    this.graph.nodes().forEach((v: any) => {
+      console.log('Node ' + v + ': ' + JSON.stringify(this.graph.node(v)))
+    })
   }
 
   caculateOffset() {
@@ -450,6 +463,13 @@ export default class GraphContent extends Vue {
       posX,
       posY
     })
+
+    this.graph.setNode(this.dragingInfo.component.componentId, {
+      label: this.dragingInfo.component.componentName,
+      width: this.rectInfo.width,
+      height: this.rectInfo.height
+    })
+    console.log(this.graph.nodes())
   }
 
   positionTransformX(originValue: number) {
@@ -494,6 +514,17 @@ export default class GraphContent extends Vue {
       width: bounding.width,
       height: bounding.height
     }
+  }
+
+  created() {
+    this.graph = new dagre.graphlib.Graph()
+    this.graph.setGraph({
+      width: this.svgInfo.width,
+      height: this.svgInfo.height
+    })
+    this.graph.setDefaultEdgeLabel(() => {
+      return {}
+    })
   }
 
   mounted() {

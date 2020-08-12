@@ -2281,7 +2281,7 @@ copy-descriptor@^0.1.0:
   resolved "https://registry.yarnpkg.com/copy-descriptor/-/copy-descriptor-0.1.1.tgz#676f6eb3c39997c2ee1ac3a924fd6124748f578d"
   integrity sha1-Z29us8OZl8LuGsOpJP1hJHSPV40=
 
-copy-webpack-plugin@^4.5.4, copy-webpack-plugin@^4.6.0:
+copy-webpack-plugin@^4.6.0:
   version "4.6.0"
   resolved "https://registry.yarnpkg.com/copy-webpack-plugin/-/copy-webpack-plugin-4.6.0.tgz#e7f40dd8a68477d405dd1b7a854aae324b158bae"
   integrity sha512-Y+SQCF+0NoWQryez2zXn5J5knmr9z/9qSQt7fbL78u83rxmigOy8X5+BFn8CFSuX+nKT8gpYwJX68ekqtQt6ZA==
@@ -2572,6 +2572,14 @@ cyclist@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/cyclist/-/cyclist-1.0.1.tgz#596e9698fd0c80e12038c2b82d6eb1b35b6224d9"
   integrity sha1-WW6WmP0MgOEgOMK4LW6xs1tiJNk=
+
+dagre@0.8.5:
+  version "0.8.5"
+  resolved "http://r.npm.sankuai.com/dagre/download/dagre-0.8.5.tgz#ba30b0055dac12b6c1fcc247817442777d06afee"
+  integrity sha1-ujCwBV2sErbB/MJHgXRCd30Gr+4=
+  dependencies:
+    graphlib "^2.1.8"
+    lodash "^4.17.15"
 
 dashdash@^1.12.0:
   version "1.14.1"
@@ -3644,6 +3652,13 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   version "4.2.4"
   resolved "https://registry.yarnpkg.com/graceful-fs/-/graceful-fs-4.2.4.tgz#2256bde14d3632958c465ebc96dc467ca07a29fb"
   integrity sha512-WjKPNJF79dtJAVniUlGGWHYGz2jWxT6VhN/4m1NdkbZ2nOsEF+cI1Edgql5zCRhs/VsQYRvrXctxktVXZUkixw==
+
+graphlib@^2.1.8:
+  version "2.1.8"
+  resolved "http://r.npm.sankuai.com/graphlib/download/graphlib-2.1.8.tgz#5761d414737870084c92ec7b5dbcb0592c9d35da"
+  integrity sha1-V2HUFHN4cAhMkux7XbywWSydNdo=
+  dependencies:
+    lodash "^4.17.15"
 
 gzip-size@^5.0.0:
   version "5.1.1"

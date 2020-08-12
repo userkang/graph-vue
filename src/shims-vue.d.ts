@@ -3,12 +3,7 @@ declare module '*.vue' {
   export default Vue
 }
 
-declare module 'clipboard' {
-  const clipboard: any
-  export default clipboard
-}
-
-declare module 'vuedraggable' {
+declare module 'dagre' {
   const vuedraggable: any
   export default vuedraggable
 }

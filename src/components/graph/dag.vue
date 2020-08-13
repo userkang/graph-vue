@@ -21,7 +21,7 @@
         ref="transformDom"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
-          transformOrigin: `center`
+          transformOrigin: 'center'
         }"
       >
         <GraphEdge
@@ -395,7 +395,7 @@ export default class GraphContent extends Vue {
   }
 
   shrink() {
-    if (this.transform.scale > 0.4) {
+    if (this.transform.scale > 0.5) {
       this.transform.scale -= 0.1
       this.caculateOffset()
     }
@@ -407,12 +407,25 @@ export default class GraphContent extends Vue {
 
   reset() {
     this.transform.scale = 1
-    this.transform.translateX = 0
-    this.transform.translateY = 0
-
     this.transform.offsetX = 0
     this.transform.offsetY = 0
-    // this.fit()
+    this.$nextTick(() => {
+      const transformInfo = this.transformDom.getBoundingClientRect()
+      // 变换group与画布左方和上方的距离
+      const transformLeft = transformInfo.x - this.svgInfo.x
+      const transformTop = transformInfo.y - this.svgInfo.y
+      const translateX =
+        this.transform.translateX -
+        transformLeft +
+        (this.svgInfo.width - transformInfo.width) / 2
+      const translateY =
+        this.transform.translateY -
+        transformTop +
+        (this.svgInfo.height - transformInfo.height) / 2
+
+      this.transform.translateX = translateX
+      this.transform.translateY = translateY
+    })
   }
 
   fullscreen() {
@@ -441,18 +454,19 @@ export default class GraphContent extends Vue {
       this.nodes.forEach(item => {
         if (String(item.nodeId) === v) {
           const { x, y } = this.graph.node(v)
-          item.posX = x
-          item.posY = y
+          // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
+          item.posX = x - this.rectInfo.width / 2
+          item.posY = y - this.rectInfo.height / 2
         }
       })
     })
-
-    // this.reset()
-
     NodeStore.updateNodePosition(this.nodes)
+
+    this.reset()
   }
 
   fit() {
+    this.reset()
     // 变换group的信息
     const transformInfo = this.transformDom.getBoundingClientRect()
 
@@ -463,23 +477,26 @@ export default class GraphContent extends Vue {
       return
     }
 
-    // 变换group与画布左方和上方的距离
-    const transformLeft = transformInfo.x - this.svgInfo.x
-    const transformTop = transformInfo.y - this.svgInfo.y
+    let scale = 1
 
     if (
       transformInfo.width - this.svgInfo.width >
       transformInfo.height - this.svgInfo.height
     ) {
-      this.transform.scale = this.svgInfo.width / transformInfo.width
+      scale = this.svgInfo.width / transformInfo.width
     } else {
-      this.transform.scale = this.svgInfo.height / transformInfo.height
+      scale = this.svgInfo.height / transformInfo.height
+    }
+    if (scale > 2) {
+      scale = 2
     }
 
-    this.transform.translateX +=
-      (this.svgInfo.width - transformInfo.width) / 2 - transformLeft
-    this.transform.translateY -=
-      (this.svgInfo.height - transformInfo.height) / 2 - transformTop
+    if (scale < 0.5) {
+      scale = 0.5
+    }
+
+    this.transform.scale = scale
+    this.caculateOffset()
   }
 
   caculateOffset() {

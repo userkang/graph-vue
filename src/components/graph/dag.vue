@@ -406,26 +406,29 @@ export default class GraphContent extends Vue {
   }
 
   reset() {
-    this.transform.scale = 1
-    this.transform.offsetX = 0
-    this.transform.offsetY = 0
-    this.$nextTick(() => {
+    setTimeout(() => {
       const transformInfo = this.transformDom.getBoundingClientRect()
       // 变换group与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
-      const transformTop = transformInfo.y - this.svgInfo.y
+      // const transformTop = transformInfo.y - this.svgInfo.y
       const translateX =
-        this.transform.translateX -
+        (this.svgInfo.width - transformInfo.width) / 2 -
         transformLeft +
-        (this.svgInfo.width - transformInfo.width) / 2
-      const translateY =
-        this.transform.translateY -
-        transformTop +
-        (this.svgInfo.height - transformInfo.height) / 2
+        this.transform.translateX +
+        this.transform.offsetX
+      // const translateY =
+      //   (this.svgInfo.height - transformInfo.height) / 2 -
+      //   transformTop +
+      //   this.transform.translateY +
+      //   this.transform.offsetY
 
       this.transform.translateX = translateX
-      this.transform.translateY = translateY
-    })
+      // this.transform.translateY = translateY
+    }, 0)
+
+    // this.transform.scale = 1
+    // this.transform.offsetX = 0
+    // this.transform.offsetY = 0
   }
 
   fullscreen() {
@@ -467,36 +470,26 @@ export default class GraphContent extends Vue {
 
   fit() {
     this.reset()
-    // 变换group的信息
-    const transformInfo = this.transformDom.getBoundingClientRect()
 
-    if (
-      transformInfo.width === this.svgInfo.width ||
-      transformInfo.height === this.svgInfo.height
-    ) {
-      return
-    }
+    setTimeout(() => {
+      // 变换group的信息
+      const transformInfo = this.transformDom.getBoundingClientRect()
 
-    let scale = 1
+      const vScale = this.svgInfo.width / transformInfo.width
+      const hScale = this.svgInfo.height / transformInfo.height
+      let scale = vScale < hScale ? vScale : hScale
 
-    if (
-      transformInfo.width - this.svgInfo.width >
-      transformInfo.height - this.svgInfo.height
-    ) {
-      scale = this.svgInfo.width / transformInfo.width
-    } else {
-      scale = this.svgInfo.height / transformInfo.height
-    }
-    if (scale > 2) {
-      scale = 2
-    }
+      if (scale > 2) {
+        scale = 2
+      }
 
-    if (scale < 0.5) {
-      scale = 0.5
-    }
+      if (scale < 0.5) {
+        scale = 0.5
+      }
 
-    this.transform.scale = scale
-    this.caculateOffset()
+      this.transform.scale = scale
+      this.caculateOffset()
+    }, 0)
   }
 
   caculateOffset() {
@@ -585,11 +578,11 @@ export default class GraphContent extends Vue {
       width: bounding.width,
       height: bounding.height
     }
+    this.initDagre()
   }
 
   initDagre() {
     this.graph = new dagre.graphlib.Graph()
-    console.log(this.svgInfo.width, this.svgInfo.height)
     this.graph.setGraph({
       width: this.svgInfo.width,
       height: this.svgInfo.height
@@ -603,7 +596,6 @@ export default class GraphContent extends Vue {
     this.svg = this.$refs.graphContent as HTMLElement
     this.transformDom = this.$refs.transformDom as HTMLElement
     this.handleResize()
-    this.initDagre()
     document.addEventListener('keydown', this.handleKeyUp, true)
     window.addEventListener('resize', this.handleResize, true)
   }

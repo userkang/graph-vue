@@ -1,16 +1,17 @@
 <template>
   <div class="scale-panel" @click="handleChange">
-    <li id="expand" class="iconfont iconfangdasuoxiao_X"></li>
-    <li id="shrink" class="iconfont iconfangdasuoxiao_Y"></li>
-    <li id="reset" class="iconfont iconhuiguiyuanwei-"></li>
+    <li title="放大" id="expand" class="iconfont iconfangdasuoxiao_X"></li>
+    <li title="缩小" id="shrink" class="iconfont iconfangdasuoxiao_Y"></li>
+    <li title="实际尺寸" id="reset" class="iconfont iconshijichicun"></li>
     <li
+      title="框选"
       id="select"
       :class="{ select: isSelecting }"
       class="iconfont iconkuangxuan"
     ></li>
-    <li id="fullscreen" class="iconfont iconquanping1"></li>
-    <li id="layout" class="iconfont iconzidongpaiban"></li>
-    <li id="fit" class="iconfont iconshipeihuabu"></li>
+    <li title="全屏" id="fullscreen" class="iconfont iconquanping2"></li>
+    <li title="自动布局" id="layout" class="iconfont iconzidongpaiban"></li>
+    <li title="适应画布" id="fit" class="iconfont iconshiyinghuabu"></li>
   </div>
 </template>
 

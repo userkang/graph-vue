@@ -406,29 +406,9 @@ export default class GraphContent extends Vue {
   }
 
   reset() {
-    setTimeout(() => {
-      const transformInfo = this.transformDom.getBoundingClientRect()
-      // 变换group与画布左方和上方的距离
-      const transformLeft = transformInfo.x - this.svgInfo.x
-      // const transformTop = transformInfo.y - this.svgInfo.y
-      const translateX =
-        (this.svgInfo.width - transformInfo.width) / 2 -
-        transformLeft +
-        this.transform.translateX +
-        this.transform.offsetX
-      // const translateY =
-      //   (this.svgInfo.height - transformInfo.height) / 2 -
-      //   transformTop +
-      //   this.transform.translateY +
-      //   this.transform.offsetY
-
-      this.transform.translateX = translateX
-      // this.transform.translateY = translateY
-    }, 0)
-
-    // this.transform.scale = 1
-    // this.transform.offsetX = 0
-    // this.transform.offsetY = 0
+    this.transform.scale = 1
+    this.transform.offsetX = 0
+    this.transform.offsetY = 0
   }
 
   fullscreen() {
@@ -465,31 +445,54 @@ export default class GraphContent extends Vue {
     })
     NodeStore.updateNodePosition(this.nodes)
 
-    this.reset()
+    this.translateToCenter()
   }
 
+  // 让g的宽和高适应画布
   fit() {
-    this.reset()
+    // 变换group的信息
+    const transformInfo = this.transformDom.getBoundingClientRect()
 
+    const vScale =
+      (this.svgInfo.width / transformInfo.width) * this.transform.scale
+    const hScale =
+      (this.svgInfo.height / transformInfo.height) * this.transform.scale
+    let scale = vScale < hScale ? vScale : hScale
+
+    if (scale > 2) {
+      scale = 2
+    }
+
+    if (scale < 0.5) {
+      scale = 0.5
+    }
+
+    this.transform.scale = scale
+    this.caculateOffset()
+
+    this.translateToCenter()
+  }
+
+  // 将g移动到画布中心区域
+  translateToCenter() {
     setTimeout(() => {
-      // 变换group的信息
+      // 这里需要到下一个周期获取g变换后的位置信息
       const transformInfo = this.transformDom.getBoundingClientRect()
 
-      const vScale = this.svgInfo.width / transformInfo.width
-      const hScale = this.svgInfo.height / transformInfo.height
-      let scale = vScale < hScale ? vScale : hScale
+      // 变换g与画布左方和上方的距离
+      const transformLeft = transformInfo.x - this.svgInfo.x
+      const transformTop = transformInfo.y - this.svgInfo.y
 
-      if (scale > 2) {
-        scale = 2
-      }
+      const translateX =
+        ((this.svgInfo.width - transformInfo.width) / 2 - transformLeft) /
+        this.transform.scale
+      const translateY =
+        ((this.svgInfo.height - transformInfo.height) / 2 - transformTop) /
+        this.transform.scale
 
-      if (scale < 0.5) {
-        scale = 0.5
-      }
-
-      this.transform.scale = scale
-      this.caculateOffset()
-    }, 0)
+      this.transform.translateX += translateX
+      this.transform.translateY += translateY
+    })
   }
 
   caculateOffset() {

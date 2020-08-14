@@ -58,7 +58,7 @@ export default class MenuTips extends Vue {
 
       // 如果超过下边界，需要往上修正菜单的 y 值
       if (this.menu.y + menuHeight > clientHeight) {
-        this.menu.y = clientHeight - menuHeight - 5
+        this.menu.y -= menuHeight
       }
     })
   }

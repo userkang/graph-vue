@@ -17,7 +17,6 @@
       height="100%"
     >
       <g
-        id="ddd"
         ref="transformDom"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,

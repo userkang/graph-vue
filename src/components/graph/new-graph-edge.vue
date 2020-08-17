@@ -34,5 +34,6 @@ export default class NewGraphEdge extends Vue {
 <style lang="scss" scoped>
 .new-edge {
   pointer-events: none;
+  stroke-dasharray: 5;
 }
 </style>

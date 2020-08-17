@@ -174,6 +174,59 @@ export default class GraphContent extends Vue {
     return this.componentState.dragingInfo
   }
 
+  getCanTranslateDirection() {
+    const enum Direction {
+      UP = 'UP',
+      DOWN = 'DOWN',
+      LEFT = 'LEFT',
+      RIGHT = 'RIGHT'
+    }
+    const directions = [
+      Direction.UP,
+      Direction.DOWN,
+      Direction.LEFT,
+      Direction.RIGHT
+    ]
+    const $el_svg = this.$refs.graphContent as SVGElement
+    const $el_g = this.$refs.transformDom as SVGElement
+    const {
+      height: svg_h,
+      width: svg_w,
+      x: svg_x,
+      y: svg_y
+    } = $el_svg.getBoundingClientRect()
+    const {
+      height: g_h,
+      width: g_w,
+      x: g_x,
+      y: g_y
+    } = $el_g.getBoundingClientRect()
+    // bottom right
+    const br = [g_x + g_w, g_y + g_h]
+    // 1. 左边线快要淹没到右边了
+    if (g_x + 0.5 * g_w >= svg_x + svg_w) {
+      removeAction(Direction.RIGHT)
+    }
+    // 2. 右边线快要淹没到左边了
+    if (br[0] - 0.5 * g_w <= svg_x) {
+      removeAction(Direction.LEFT)
+    }
+    // 3. 下边的线快要淹没到上边了
+    if (br[1] - 0.5 * g_h <= svg_y) {
+      removeAction(Direction.UP)
+    }
+    // 4. 上边的线快要淹没到下边了
+    if (g_y + 0.5 * g_h >= svg_y + svg_h) {
+      removeAction(Direction.DOWN)
+    }
+
+    function removeAction(direction: Direction) {
+      const index = directions.findIndex(item => item === direction)
+      directions.splice(index, 1)
+    }
+    return directions
+  }
+
   mouseDownNode(e: MouseEvent, node: INodeType) {
     console.log('mouseDownNode')
     this.isMouseDownNode = true
@@ -214,7 +267,7 @@ export default class GraphContent extends Vue {
   }
 
   svgMouseDown(e: MouseEvent) {
-    console.log('svgMouseDown')
+    // console.log('svgMouseDown')
 
     this.originX = e.x
     this.originY = e.y
@@ -249,6 +302,7 @@ export default class GraphContent extends Vue {
       this.selectBoxPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
       this.checkSelected(this.originX, this.originY, x, y)
     } else if (this.isMouseDownSvg) {
+
       this.transform.translateX += this.moveX / this.transform.scale
       this.transform.translateY += this.moveY / this.transform.scale
     }
@@ -258,7 +312,7 @@ export default class GraphContent extends Vue {
   }
 
   async svgMouseUp(e: MouseEvent) {
-    console.log('svgMouseUp')
+    // console.log('svgMouseUp')
     e.stopPropagation()
     const { x, y } = e
     // 鼠标是否发生位移
@@ -360,6 +414,8 @@ export default class GraphContent extends Vue {
   }
 
   handleToolBox(e: MouseEvent) {
+    this.getCanTranslateDirection()
+    return
     const id = (e.target as HTMLElement).id
     switch (id) {
       case 'expand':

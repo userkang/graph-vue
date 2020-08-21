@@ -29,11 +29,11 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { NodeStore } from '@/stores/graph/node'
-import { EdgeStore } from '../../stores/graph/edge'
+import { NodeStore } from '@/stores/node'
+import { EdgeStore } from '@/stores/edge'
 
 @Component
-export default class MenuTips extends Vue {
+export default class Menu extends Vue {
   @Prop({
     required: true
   })

@@ -1,4 +1,4 @@
-import Base from '../base'
+import Base from './base'
 import { DagStore } from './dag'
 
 let nodeId = 0

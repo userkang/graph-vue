@@ -13,11 +13,11 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { EdgeStore } from '@/stores/graph/edge'
+import { EdgeStore } from '@/stores/edge'
 import { calculateCurve } from '@/assets/js/utils'
 
 @Component
-export default class NewGraphEdge extends Vue {
+export default class NewEdge extends Vue {
   private edgeState = EdgeStore.state
 
   get createLineValue() {

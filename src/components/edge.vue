@@ -17,31 +17,36 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { calculateCurve } from '@/assets/js/utils'
-import { DagStore } from '@/stores/graph/dag'
+import { DagStore } from '@/stores/dag'
 
 @Component
-export default class GraphEdge extends Vue {
+export default class Edge extends Vue {
   @Prop({
     required: true
   })
   edge!: IEdgeType
 
   @Prop({
-    type: Boolean
-  })
-  isActiveEdge!: boolean
-
-  @Prop({
     required: true
   })
-  rectInfo!: IRectInfo
+  graph: any
 
   dagState = DagStore.state
   path = ''
   calculateCurve = calculateCurve
 
+  get activeEdgeId() {
+    return this.graph.eventController.activeEdgeId
+  }
+
   get lineClassName() {
-    return this.isActiveEdge ? 'edge-selected-style' : 'edge-style'
+    return this.activeEdgeId === this.edge.edgeId
+      ? 'edge-selected-style'
+      : 'edge-style'
+  }
+
+  get rectInfo() {
+    return this.graph.viewController.rectInfo
   }
 
   get nodes() {

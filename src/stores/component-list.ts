@@ -1,4 +1,4 @@
-import Base from '../base'
+import Base from './base'
 import { componentListMock, componentMock } from '@/mock/component-list'
 
 interface IComponentListState {

@@ -23,18 +23,16 @@
     >
       <div class="node-content">{{ node.nodeName }}</div>
     </foreignObject>
-    <GraphSlot
+    <LinkSlot
       :node="node"
-      :fromNodeId="fromNodeId"
+      :graph="graph"
       isInOrOut="in"
-      :rectInfo="rectInfo"
       @mouseup="handleSlotMouseUp"
     />
-    <GraphSlot
+    <LinkSlot
       :node="node"
-      :fromNodeId="fromNodeId"
+      :graph="graph"
       isInOrOut="out"
-      :rectInfo="rectInfo"
       @mousedown="handleSlotMouseDown"
     />
   </g>
@@ -42,35 +40,31 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import GraphSlot from '@/components/graph/graph-slot.vue'
+import LinkSlot from '@/components/link-slot.vue'
 
 @Component({
   components: {
-    GraphSlot
+    LinkSlot
   }
 })
-export default class GraphNode extends Vue {
+export default class Node extends Vue {
   @Prop({
     required: true
   })
   node!: INodeType
 
   @Prop({
-    required: true,
-    type: Number
-  })
-  fromNodeId!: number
-
-  @Prop({
-    required: true,
-    type: Boolean
-  })
-  isNodeSelected!: boolean
-
-  @Prop({
     required: true
   })
-  rectInfo!: IRectInfo
+  graph: any
+
+  get rectInfo() {
+    return this.graph.viewController.rectInfo
+  }
+
+  get isNodeSelected() {
+    return this.graph.eventController.isNodeSelected(this.node.nodeId)
+  }
 
   handleNodeMouseDown(e: MouseEvent) {
     e.stopPropagation()

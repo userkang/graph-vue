@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ComponentListStore } from '@/stores/graph/component-list'
+import { ComponentListStore } from '@/stores/component-list'
 
 @Component
 export default class ComponentPanel extends Vue {

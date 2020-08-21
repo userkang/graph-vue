@@ -1,16 +1,16 @@
 <template>
-  <div class="graph-wrap">
+  <div class="main-wrap">
     <ComponentPanel class="component-panel" />
     <div class="main-center-wrap">
-      <Dag />
+      <Graph />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import ComponentPanel from '@/components/graph/component-panel.vue'
-import Dag from '@/components/graph/dag.vue'
+import ComponentPanel from '@/components/component-panel.vue'
+import Graph from '@/components/graph.vue'
 
 interface CopyReturnValue {
   graphId: number
@@ -19,15 +19,15 @@ interface CopyReturnValue {
 
 @Component({
   components: {
-    Dag,
+    Graph,
     ComponentPanel
   }
 })
-export default class Graph extends Vue {}
+export default class GraphEditor extends Vue {}
 </script>
 
 <style lang="scss" scoped>
-.graph-wrap {
+.main-wrap {
   position: relative;
   width: 100%;
   height: 100vh;

@@ -16,31 +16,33 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { EdgeStore } from '@/stores/graph/edge'
-import { DagStore } from '@/stores/graph/dag'
+import { EdgeStore } from '@/stores/edge'
+import { DagStore } from '@/stores/dag'
 
 @Component
-export default class GraphSlot extends Vue {
+export default class LinkSlot extends Vue {
   @Prop({
     required: true
   })
   node!: INodeType
 
   @Prop({
-    required: true,
-    type: Number
+    required: true
   })
-  fromNodeId!: number
+  graph: any
 
   @Prop({
     type: String
   })
   isInOrOut!: string
 
-  @Prop({
-    required: true
-  })
-  rectInfo!: IRectInfo
+  get fromNodeId() {
+    return this.graph.eventController.fromNodeId
+  }
+
+  get rectInfo() {
+    return this.graph.viewController.rectInfo
+  }
 
   circleR = 4
   highlightCircleR = 6

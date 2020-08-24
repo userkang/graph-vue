@@ -1,8 +1,7 @@
-import { EdgeStore } from '@/stores/edge'
-import { NodeStore } from '@/stores/node'
+import Graph from './graph'
 
 export default class EventController {
-  private graph: any
+  private graph: Graph
 
   isMouseDownNode = false
   isMouseDownSlot = false
@@ -32,12 +31,20 @@ export default class EventController {
   selectBoxPath = ''
   showSelectingBox = false
 
-  constructor(graph: any) {
+  constructor(graph: Graph) {
     this.graph = graph
+    this.initEvent()
+  }
+
+  initEvent() {
+    window.addEventListener(
+      'resize',
+      this.graph.viewController.resize.bind(this.graph.viewController)
+    )
+    document.addEventListener('keydown', this.handleKeyUp.bind(this))
   }
 
   mouseDownNode(e: MouseEvent, node: INodeType) {
-    console.log('mouseDownNode')
     this.isMouseDownNode = true
 
     this.activeNode = node
@@ -50,19 +57,17 @@ export default class EventController {
   }
 
   mouseDownSlot(e: MouseEvent, node: INodeType) {
-    console.log('mouseDownSlot')
     this.isMouseDownSlot = true
     this.fromNodeId = node.nodeId
   }
 
   async mouseUpSlot(e: MouseEvent, node: INodeType) {
-    console.log('mouseUpSlot')
     this.isMouseDownSlot = false
-    await EdgeStore.addEdge({
+    await this.graph.edgeController.addEdge({
       fromNodeId: this.fromNodeId,
       toNodeId: node.nodeId
     })
-    EdgeStore.setResetLine()
+    this.graph.edgeController.setResetEdge()
   }
 
   edgeClick(edgeId: number) {
@@ -71,7 +76,7 @@ export default class EventController {
   }
 
   async deleteLine() {
-    await EdgeStore.deleteEdge(this.activeEdgeId)
+    await this.graph.edgeController.deleteEdge(this.activeEdgeId)
     this.activeEdgeId = 0
   }
 
@@ -102,7 +107,7 @@ export default class EventController {
     } else if (this.isMouseDownSlot) {
       const posX = viewController.positionTransformX(x)
       const posY = viewController.positionTransformY(y)
-      EdgeStore.setNewLineMove(posX, posY)
+      this.graph.edgeController.setNewEdgeMove(posX, posY)
     } else if (this.isSelecting && this.showSelectingBox) {
       const startX = this.originX - viewController.svgInfo.x
       const startY = this.originY - viewController.svgInfo.y
@@ -132,14 +137,15 @@ export default class EventController {
       this.isMouseDownNode = false
       if (isMove) {
         const moveNode = [...this.selectedNode, this.activeNode]
-        await NodeStore.updateNodePosition(moveNode)
+        // await NodeStore.updateNodePosition(moveNode)
+        // afterMoveNode()
       } else {
         // 否则就是单纯的点击操作
         this.selectedNode = [this.activeNode]
       }
     } else if (this.isMouseDownSlot) {
       this.isMouseDownSlot = false
-      EdgeStore.setResetLine()
+      this.graph.edgeController.setResetEdge()
     } else if (this.isSelecting && this.showSelectingBox) {
       this.isSelecting = false
       this.showSelectingBox = false
@@ -175,11 +181,14 @@ export default class EventController {
     if (tagName === 'BODY') {
       if (['Delete', 'Backspace'].includes(e.key)) {
         if (this.activeEdgeId) {
-          await EdgeStore.deleteEdge(this.activeEdgeId)
+          await this.graph.edgeController.deleteEdge(this.activeEdgeId)
           this.activeEdgeId = 0
         }
+        console.log(this)
         if (this.selectedNode.length === 1) {
-          await NodeStore.deleteNode(this.selectedNode[0].nodeId)
+          await this.graph.nodeController.deleteNode(
+            this.selectedNode[0].nodeId
+          )
           this.selectedNode = []
         }
       }
@@ -284,9 +293,14 @@ export default class EventController {
       case 'layout':
         graph.layoutController.execute()
         break
-      case 'fit':
-        graph.viewController.fit()
+      case 'fitView':
+        graph.viewController.fitView()
         break
     }
+  }
+
+  destroy() {
+    window.removeEventListener('resize', this.graph.viewController.resize)
+    document.removeEventListener('keydown', this.handleKeyUp)
   }
 }

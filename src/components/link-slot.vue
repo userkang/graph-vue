@@ -17,7 +17,6 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { EdgeStore } from '@/stores/edge'
-import { DagStore } from '@/stores/dag'
 
 @Component
 export default class LinkSlot extends Vue {
@@ -47,7 +46,6 @@ export default class LinkSlot extends Vue {
   circleR = 4
   highlightCircleR = 6
   edgeState = EdgeStore.state
-  dagState = DagStore.state
 
   get cx() {
     return this.node.posX + this.rectInfo.width / 2
@@ -60,7 +58,7 @@ export default class LinkSlot extends Vue {
   }
 
   get edges() {
-    return this.dagState.dag.edges
+    return this.graph.edges
   }
 
   get isCreateLine() {

@@ -1,5 +1,5 @@
 export const dagMock: IDagType = {
-  dagId: 0,
+  graphId: 0,
   nodes: [],
   edges: []
 }

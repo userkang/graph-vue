@@ -1,4 +1,3 @@
-import Base from './base'
 import { componentListMock, componentMock } from '@/mock/component-list'
 
 interface IComponentListState {
@@ -10,7 +9,7 @@ interface IComponentListState {
   }
 }
 
-class ComponentList extends Base {
+class ComponentList {
   public state: IComponentListState = {
     list: [],
     dragingInfo: {

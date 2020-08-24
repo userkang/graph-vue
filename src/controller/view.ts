@@ -3,9 +3,10 @@ import {
   requestFullScreen,
   cancelFullScreen
 } from '@/assets/js/utils'
+import Graph from './graph'
 
 export default class ViewController {
-  graph: any = null
+  graph: Graph
 
   // 画布宽高信息
   private svgInfo = {
@@ -31,7 +32,7 @@ export default class ViewController {
     offsetY: 0
   }
 
-  constructor(graph: any) {
+  constructor(graph: Graph) {
     this.graph = graph
   }
 
@@ -69,10 +70,12 @@ export default class ViewController {
   }
 
   // 让g的宽和高适应画布
-  fit() {
+  fitView() {
     const { graph } = this
     // 变换group的信息
-    const transformInfo = graph.transformDom.getBoundingClientRect()
+    const transformInfo = this.graph.$container
+      .querySelector('g')
+      .getBoundingClientRect()
 
     const vScale =
       (this.svgInfo.width / transformInfo.width) * this.transform.scale
@@ -106,7 +109,9 @@ export default class ViewController {
     setTimeout(() => {
       // 这里需要到下一个周期获取g变换后的位置信息
       console.log(this.graph)
-      const transformInfo = this.graph.transformDom.getBoundingClientRect()
+      const transformInfo = this.graph.$container
+        .querySelector('g')
+        .getBoundingClientRect()
 
       // 变换g与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
@@ -136,14 +141,24 @@ export default class ViewController {
   }
 
   positionTransformY(originValue: number) {
-    const { graph } = this
-    const viewController = graph.viewController
-    const posY = originValue - viewController.svgInfo.y
+    const posY = originValue - this.svgInfo.y
     return (
-      (posY + viewController.transform.offsetY) /
-        viewController.transform.scale -
-      viewController.transform.translateY
+      (posY + this.transform.offsetY) / this.transform.scale -
+      this.transform.translateY
     )
+  }
+
+  public resize() {
+    const bounding = this.graph.$container.getBoundingClientRect()
+
+    this.svgInfo = {
+      x: bounding.x,
+      y: bounding.y,
+      width: bounding.width,
+      height: bounding.height
+    }
+    console.log(this.svgInfo)
+    this.graph.layoutController.init()
   }
 
   getCanTranslateDirection() {

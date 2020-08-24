@@ -17,7 +17,6 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { calculateCurve } from '@/assets/js/utils'
-import { DagStore } from '@/stores/dag'
 
 @Component
 export default class Edge extends Vue {
@@ -31,7 +30,6 @@ export default class Edge extends Vue {
   })
   graph: any
 
-  dagState = DagStore.state
   path = ''
   calculateCurve = calculateCurve
 
@@ -50,7 +48,7 @@ export default class Edge extends Vue {
   }
 
   get nodes() {
-    return this.dagState.dag.nodes
+    return this.graph.nodes
   }
 
   get fromNode(): INodeType[] {
@@ -84,13 +82,7 @@ export default class Edge extends Vue {
   showMenuTips(e: MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
-    this.$emit('contextMenu', {
-      show: true,
-      x: e.x,
-      y: e.y,
-      data: this.edge.edgeId,
-      type: 'edge'
-    })
+    this.$emit('contextMenu', e, 'edge', this.edge)
   }
 }
 </script>

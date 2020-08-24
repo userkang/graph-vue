@@ -1,63 +1,58 @@
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
-import { NodeStore } from '@/stores/node'
+import MenuController from './menu'
+import NodeController from './node'
+import EdgeController from './edge'
 
 export default class Graph {
   private config: { [key: string]: any }
 
-  private svgDom!: HTMLElement
+  private $container!: SVGElement
 
-  private transformDom!: HTMLElement
+  public viewController: any
+  public layoutController: any
+  public eventController: any
+  public menuController: any
+  public nodeController: any
+  public edgeController: any
 
-  private viewController: any
-  private layoutController: any
-  private eventController: any
-
-  nodes!: INodeType[]
-  edges!: IEdgeType[]
+  public nodes!: INodeType[]
+  public edges!: IEdgeType[]
 
   constructor(config: any) {
     this.init()
+    this.$container = config.container
     this.config = config
-    this.svgDom = config.containerDom
-    this.transformDom = config.gDom
     this.nodes = config.data.nodes
     this.edges = config.data.edges
     this.viewController.rectInfo = config.rectInfo
+    this.viewController.resize()
   }
 
   private init() {
-    this.layoutController = new LayoutController(this)
-    this.eventController = new EventController(this)
     this.viewController = new ViewController(this)
-  }
-
-  public resize() {
-    const bounding = this.svgDom.getBoundingClientRect()
-    this.viewController.svgInfo = {
-      x: bounding.x,
-      y: bounding.y,
-      width: bounding.width,
-      height: bounding.height
-    }
-    this.layoutController.init()
+    this.layoutController = new LayoutController(this)
+    this.nodeController = new NodeController(this)
+    this.edgeController = new EdgeController(this)
+    this.eventController = new EventController(this)
+    this.menuController = new MenuController(this)
   }
 
   public addNode(item: INodeType) {
     item.posX = this.viewController.positionTransformX(item.posX)
-    item.posY = this.viewController.positionTransformX(item.posY)
-    console.log(item)
-    NodeStore.addNode(item)
+    item.posY = this.viewController.positionTransformY(item.posY)
+    this.nodeController.addNode(item)
   }
 
   /**
    * 销毁
    */
   public destroy() {
+    this.eventController.destroy()
+
     this.eventController = null
     this.viewController = null
     this.layoutController = null
-    window.removeEventListener('resize', this.resize)
   }
 }

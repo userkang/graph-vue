@@ -1,6 +1,6 @@
-declare interface IDagType {
+declare interface IGraphDataType {
   // DAG图ID
-  dagId: number
+  graphId: number
   // 实验节点信息
   nodes: INodeType[]
   // 实验连线信息
@@ -47,6 +47,13 @@ declare interface IMenu {
   show: boolean
   x: number
   y: number
-  data: number
   type: string
+  item?: INodeType | IEdgeType
+}
+
+declare interface INodeStyle {
+  width: number
+  height: number
+  rx: number
+  ry: number
 }

@@ -1,10 +1,10 @@
 <template>
-  <div class="graph-content-wrap" v-if="graph">
+  <div class="graph-content-wrap">
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
-      ref="graphContent"
+      ref="graph"
       @mousedown="svgMouseDown"
       @mousemove="mouseMove"
       @mouseup="svgMouseUp"
@@ -30,7 +30,7 @@
           :graph="graph"
           @click.native="e => edgeClick(item.edgeId)"
           @delete="deleteLine"
-          @contextMenu="showMenuTips"
+          @contextMenu="showMenu"
         />
         <Node
           v-for="item in nodes"
@@ -40,7 +40,7 @@
           @mouseDownNode="mouseDownNode"
           @mouseDownSlot="mouseDownSlot"
           @mouseUpSlot="mouseUpSlot"
-          @contextMenu="showMenuTips"
+          @contextMenu="showMenu"
         />
 
         <!-- <template v-if="nodeGroups">
@@ -65,22 +65,19 @@
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
     </svg>
-    <ToolBox @click="handleToolBox" :isSelecting="isSelecting" />
-    <Menu :menu="menu" />
+    <slot />
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Watch } from 'vue-property-decorator'
-import { DagStore } from '@/stores/dag'
+import { Vue, Component, Prop } from 'vue-property-decorator'
+import GraphStore from '@/stores/graph'
 import { ComponentListStore } from '@/stores/component-list'
-import { NodeStore } from '@/stores/node'
 import Node from '@/components/node.vue'
 import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
-import { EdgeStore } from '@/stores/edge'
 
 import Graph from '@/controller/graph'
 
@@ -96,19 +93,36 @@ import Graph from '@/controller/graph'
   }
 })
 export default class GraphContent extends Vue {
-  dagState = DagStore.state
+  @Prop({
+    required: true
+  })
+  data!: IGraphDataType
+
+  @Prop({
+    default: () => {
+      return {
+        width: 190,
+        height: 35,
+        rx: 2,
+        ry: 2
+      }
+    }
+  })
+  nodeStyle!: INodeStyle
+
   componentState = ComponentListStore.state
-  // 右键菜单
-  menu: IMenu = { show: false, x: 0, y: 0, data: 0, type: 'node' }
+
   // 画布实例
-  graph: any = null
+  graph!: Graph
+
+  nodeId = 0
 
   get nodes() {
-    return this.dagState.dag.nodes
+    return this.graph.nodes
   }
 
   get edges() {
-    return this.dagState.dag.edges
+    return this.graph.edges
   }
 
   get dragingInfo() {
@@ -116,32 +130,36 @@ export default class GraphContent extends Vue {
   }
 
   get transform() {
-    return this.graph.viewController.transform
+    if (this.graph) {
+      return this.graph.viewController.transform
+    } else {
+      return {
+        scale: 1,
+        translateX: 0,
+        translateY: 0
+      }
+    }
   }
 
   get showSelectingBox() {
-    return this.graph.eventController.showSelectingBox
+    if (this.graph) {
+      return this.graph.eventController.showSelectingBox
+    } else {
+      return false
+    }
   }
 
   get selectBoxPath() {
-    return this.graph.eventController.selectBoxPath
-  }
-
-  get isSelecting() {
-    return this.graph.eventController.isSelecting
-  }
-
-  get activeEdgeId() {
-    return this.graph.eventController.activeEdgeId
+    if (this.graph) {
+      return this.graph.eventController.selectBoxPath
+    }
   }
 
   mouseDownNode(e: MouseEvent, node: INodeType) {
-    console.log(e.currentTarget)
     this.graph.eventController.mouseDownNode(e, node)
   }
 
   mouseDownSlot(e: MouseEvent, node: INodeType) {
-    console.log(e.currentTarget)
     this.graph.eventController.mouseDownSlot(e, node)
   }
 
@@ -183,23 +201,24 @@ export default class GraphContent extends Vue {
     this.graph.eventController.handleToolBox(e)
   }
 
-  showMenuTips(data: IMenu) {
-    this.menu = data
-  }
-
-  handleKeyUp(e: KeyboardEvent) {
-    this.graph.eventController.handleKeyUp(e)
+  showMenu(e: MouseEvent, type: string, item: IEdgeType) {
+    this.graph.menuController.showMenu({
+      x: e.x,
+      y: e.y,
+      type,
+      item
+    })
   }
 
   handleDrop(e: DragEvent) {
     e.preventDefault()
     const { clientX: x, clientY: y } = e
-    const posX = x - this.dragingInfo.offsetX
-    const posY = y - this.dragingInfo.offsetY
+    const posX = x - this.dragingInfo.offsetX * this.transform.scale
+    const posY = y - this.dragingInfo.offsetY * this.transform.scale
 
     // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
-      nodeId: this.dragingInfo.component.componentId,
+      nodeId: this.nodeId++,
       nodeName: this.dragingInfo.component.componentName,
       nodeDesc: this.dragingInfo.component.componentDesc,
       posX,
@@ -209,29 +228,18 @@ export default class GraphContent extends Vue {
 
   initGraph() {
     this.graph = new Graph({
-      containerDom: this.$refs.graphContent as HTMLElement,
-      gDom: this.$refs.transformDom as HTMLElement,
-      rectInfo: {
-        width: 190,
-        height: 35,
-        rx: 2,
-        ry: 2
-      },
-      data: {
-        nodes: this.nodes,
-        edges: this.edges
-      }
+      container: this.$refs.graph as SVGElement,
+      rectInfo: this.nodeStyle,
+      data: this.data
     })
   }
 
   mounted() {
-    document.addEventListener('keydown', this.handleKeyUp, true)
     this.initGraph()
   }
 
   beforeDestroy() {
     this.graph.destroy()
-    document.removeEventListener('keydown', this.handleKeyUp)
   }
 }
 </script>

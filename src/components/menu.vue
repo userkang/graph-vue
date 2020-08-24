@@ -1,5 +1,5 @@
 <template>
-  <div ref="menubox" v-show="menu.show">
+  <div v-if="graph" v-show="menu.show">
     <div
       @click="menu.show = false"
       class="menu-mask"
@@ -9,44 +9,30 @@
       ref="menu"
       class="menu-tips"
       :style="{ top: menu.y + 2 + 'px', left: menu.x + 2 + 'px' }"
+      @click="clickMenu"
     >
-      <template v-if="menu.type === 'node'">
-        <li @click="deleteNode">
-          删除
-        </li>
-        <li>
-          复制
-        </li>
-      </template>
-      <template v-else>
-        <li @click="deleteLine">
-          删除
-        </li>
-      </template>
+      <slot />
     </ul>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { NodeStore } from '@/stores/node'
-import { EdgeStore } from '@/stores/edge'
 
 @Component
 export default class Menu extends Vue {
-  @Prop({
-    required: true
-  })
-  menu!: IMenu
-
-  async deleteNode() {
-    await NodeStore.deleteNode(this.menu.data)
-    this.menu.show = false
+  get graph() {
+    return (this.$parent as any).graph
   }
 
-  async deleteLine() {
-    await EdgeStore.deleteEdge(this.menu.data)
-    this.menu.show = false
+  get menu() {
+    if (this.graph) {
+      return this.graph.menuController.menu
+    }
+  }
+
+  clickMenu(e: MouseEvent) {
+    this.$emit('click', e, this.graph.menuController.menu)
   }
 
   @Watch('menu.y')

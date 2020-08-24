@@ -84,13 +84,7 @@ export default class Node extends Vue {
   showMenuTips(e: MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
-    this.$emit('contextMenu', {
-      show: true,
-      x: e.x,
-      y: e.y,
-      data: this.node.nodeId,
-      type: 'node'
-    })
+    this.$emit('contextMenu', e, 'node', this.node)
   }
 }
 </script>

@@ -6,35 +6,34 @@ import NodeController from './node'
 import EdgeController from './edge'
 
 export default class Graph {
-  private config: { [key: string]: any }
+  public config: { [key: string]: any }
 
-  public viewController!: ViewController | any
-  public layoutController!: LayoutController | any
-  public eventController!: EventController | any
-  public menuController!: MenuController | any
-  public nodeController!: NodeController | any
-  public edgeController!: EdgeController | any
+  public viewController!: ViewController
+  public layoutController!: LayoutController
+  public eventController!: EventController
+  public menuController!: MenuController
+  public nodeController!: NodeController
+  public edgeController!: EdgeController
 
   public nodes!: INodeType[]
   public edges!: IEdgeType[]
 
   constructor(config: any) {
-    this.init()
-
     this.config = config
     this.nodes = config.data.nodes
-    this.edges = config.data.edges
-    this.viewController.$container = config.container
-    this.viewController.rectInfo = config.rectInfo
-    this.viewController.resize()
+    this.edges = config.data.edges.map((item: IEdgeType) => {
+      item.edgeId = item.fromNodeId + '' + item.toNodeId
+      return item
+    })
+    this.initController()
   }
 
-  private init() {
+  private initController() {
     this.viewController = new ViewController(this)
     this.layoutController = new LayoutController(this)
+    this.eventController = new EventController(this)
     this.nodeController = new NodeController(this)
     this.edgeController = new EdgeController(this)
-    this.eventController = new EventController(this)
     this.menuController = new MenuController(this)
   }
 
@@ -50,8 +49,11 @@ export default class Graph {
   public destroy() {
     this.eventController.destroy()
 
-    this.eventController = null
-    this.viewController = null
-    this.layoutController = null
+    delete this.eventController
+    delete this.viewController
+    delete this.layoutController
+    delete this.nodeController
+    delete this.edgeController
+    delete this.menuController
   }
 }

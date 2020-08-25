@@ -26,11 +26,7 @@ export default class ToolBox extends Vue {
   }
 
   get isSelecting() {
-    if (this.graph) {
-      return this.graph.eventController.isSelecting
-    } else {
-      return false
-    }
+    return this.graph.eventController.isSelecting
   }
 
   handleChange(e: MouseEvent) {

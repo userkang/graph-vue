@@ -11,7 +11,7 @@ export default class ViewController {
   public $container!: SVGElement
 
   // 画布宽高信息
-  private svgInfo = {
+  public svgInfo = {
     x: 0,
     y: 0,
     width: 0,
@@ -36,7 +36,10 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
+    this.$container = graph.config.container
+    this.rectInfo = graph.config.rectInfo
     this.translateToCenter()
+    this.resize()
   }
 
   expand() {
@@ -125,9 +128,17 @@ export default class ViewController {
         ((this.svgInfo.height - transformInfo.height) / 2 - transformTop) /
         this.transform.scale
 
-      this.transform.translateX += translateX
-      this.transform.translateY += translateY
+      this.translate(translateX, translateY)
     })
+  }
+
+  translate(x: number, y: number) {
+    if (this.judgeBoundary(x, y)) {
+      return
+    }
+
+    this.transform.translateX += x
+    this.transform.translateY += y
   }
 
   positionTransformX(originValue: number) {
@@ -157,56 +168,29 @@ export default class ViewController {
     }
   }
 
-  getCanTranslateDirection() {
-    const enum Direction {
-      UP = 'UP',
-      DOWN = 'DOWN',
-      LEFT = 'LEFT',
-      RIGHT = 'RIGHT'
+  judgeBoundary(x: number, y: number) {
+    const transformInfo = (this.$container.querySelector(
+      'g'
+    ) as SVGElement).getBoundingClientRect()
+
+    const { height: gHeight, width: gWidth, x: gX, y: gY } = transformInfo
+    //  右边界
+    if (gX + 0.5 * gWidth >= this.svgInfo.x + this.svgInfo.width && x > 0) {
+      return true
     }
-    const directions = [
-      Direction.UP,
-      Direction.DOWN,
-      Direction.LEFT,
-      Direction.RIGHT
-    ]
-    const $el_svg = this.graph.svgDom
-    const $el_g = this.graph.transformDom
-    const {
-      height: svg_h,
-      width: svg_w,
-      x: svg_x,
-      y: svg_y
-    } = $el_svg.getBoundingClientRect()
-    const {
-      height: g_h,
-      width: g_w,
-      x: g_x,
-      y: g_y
-    } = $el_g.getBoundingClientRect()
-    // bottom right
-    const br = [g_x + g_w, g_y + g_h]
-    // 1. 左边线快要淹没到右边了
-    if (g_x + 0.5 * g_w >= svg_x + svg_w) {
-      removeAction(Direction.RIGHT)
+    // 2. 左边界
+    if (gX + gWidth - 0.5 * gWidth <= this.svgInfo.x && x < 0) {
+      return true
     }
-    // 2. 右边线快要淹没到左边了
-    if (br[0] - 0.5 * g_w <= svg_x) {
-      removeAction(Direction.LEFT)
+    // 3. 下边界
+    if (gY + gHeight - 0.5 * gHeight <= this.svgInfo.y && y < 0) {
+      return true
     }
-    // 3. 下边的线快要淹没到上边了
-    if (br[1] - 0.5 * g_h <= svg_y) {
-      removeAction(Direction.UP)
-    }
-    // 4. 上边的线快要淹没到下边了
-    if (g_y + 0.5 * g_h >= svg_y + svg_h) {
-      removeAction(Direction.DOWN)
+    // 4. 上边界
+    if (gY + 0.5 * gHeight >= this.svgInfo.y + this.svgInfo.height && y > 0) {
+      return true
     }
 
-    function removeAction(direction: Direction) {
-      const index = directions.findIndex(item => item === direction)
-      directions.splice(index, 1)
-    }
-    return directions
+    return false
   }
 }

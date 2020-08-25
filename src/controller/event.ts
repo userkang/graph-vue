@@ -44,6 +44,17 @@ export default class EventController {
     document.addEventListener('keydown', this.handleKeyUp.bind(this))
   }
 
+  svgMouseDown(e: MouseEvent) {
+    this.originX = e.x
+    this.originY = e.y
+
+    if (this.isSelecting) {
+      this.showSelectingBox = true
+    } else {
+      this.isMouseDownSvg = true
+    }
+  }
+
   mouseDownNode(e: MouseEvent, node: INodeType) {
     this.isMouseDownNode = true
 
@@ -78,18 +89,6 @@ export default class EventController {
   async deleteLine() {
     await this.graph.edgeController.deleteEdge(this.activeEdgeId)
     this.activeEdgeId = 0
-  }
-
-  svgMouseDown(e: MouseEvent) {
-    // console.log('svgMouseDown')
-    this.originX = e.x
-    this.originY = e.y
-
-    if (this.isSelecting) {
-      this.showSelectingBox = true
-    } else {
-      this.isMouseDownSvg = true
-    }
   }
 
   async mouseMove(e: MouseEvent) {
@@ -167,12 +166,15 @@ export default class EventController {
   mouseWheel(e: WheelEvent) {
     const viewController = this.graph.viewController
     e.preventDefault()
-    if (e.deltaX) {
-      viewController.transform.translateX -= e.deltaX
-    }
-    if (e.deltaY) {
-      viewController.transform.translateY -= e.deltaY
-    }
+
+    viewController.translate(-e.deltaX, -e.deltaY)
+
+    // if (e.deltaX) {
+    //   viewController.transform.translateX -= e.deltaX
+    // }
+    // if (e.deltaY) {
+    //   viewController.transform.translateY -= e.deltaY
+    // }
   }
 
   async handleKeyUp(e: KeyboardEvent) {
@@ -268,34 +270,6 @@ export default class EventController {
       return false
     } else {
       return true
-    }
-  }
-
-  handleToolBox(e: MouseEvent) {
-    const { graph } = this
-    const id = (e.target as HTMLElement).id
-    switch (id) {
-      case 'expand':
-        graph.viewController.expand()
-        break
-      case 'shrink':
-        graph.viewController.shrink()
-        break
-      case 'reset':
-        graph.viewController.reset()
-        break
-      case 'select':
-        graph.viewController.select()
-        break
-      case 'fullscreen':
-        graph.viewController.fullscreen()
-        break
-      case 'layout':
-        graph.layoutController.execute()
-        break
-      case 'fitView':
-        graph.viewController.fitView()
-        break
     }
   }
 

@@ -59,7 +59,6 @@
         <NewEdge />
       </g>
       <path
-        v-show="showSelectingBox"
         :d="selectBoxPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
@@ -104,8 +103,6 @@ export default class GraphContent extends Vue {
 
   graph: any = null
 
-  nodeId = 0
-
   get nodes() {
     return this.graph.nodes
   }
@@ -120,14 +117,6 @@ export default class GraphContent extends Vue {
 
   get transform() {
     return this.graph.viewController.transform
-  }
-
-  get showSelectingBox() {
-    if (this.graph) {
-      return this.graph.eventController.showSelectingBox
-    } else {
-      return false
-    }
   }
 
   get selectBoxPath() {
@@ -157,7 +146,6 @@ export default class GraphContent extends Vue {
   }
 
   svgMouseDown(e: MouseEvent) {
-    console.log(e.currentTarget)
     this.graph.eventController.svgMouseDown(e)
   }
 
@@ -178,10 +166,6 @@ export default class GraphContent extends Vue {
     this.graph.eventController.mouseWheel(e)
   }
 
-  handleToolBox(e: MouseEvent) {
-    this.graph.eventController.handleToolBox(e)
-  }
-
   showMenu(e: MouseEvent, type: string, item: IEdgeType) {
     this.graph.menuController.showMenu({
       x: e.x,
@@ -199,7 +183,7 @@ export default class GraphContent extends Vue {
 
     // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
-      nodeId: this.nodeId++,
+      nodeId: posX + '' + posY,
       nodeName: this.dragingInfo.component.componentName,
       nodeDesc: this.dragingInfo.component.componentDesc,
       posX,
@@ -207,16 +191,13 @@ export default class GraphContent extends Vue {
     })
   }
 
-  initGraph() {
+  mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as SVGElement,
       rectInfo: this.nodeStyle,
-      data: this.data
+      data: this.data,
+      drection: this.$attrs.drection
     })
-  }
-
-  mounted() {
-    this.initGraph()
   }
 
   beforeDestroy() {

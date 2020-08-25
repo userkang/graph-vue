@@ -8,24 +8,23 @@ import EdgeController from './edge'
 export default class Graph {
   private config: { [key: string]: any }
 
-  private $container!: SVGElement
-
-  public viewController: any
-  public layoutController: any
-  public eventController: any
-  public menuController: any
-  public nodeController: any
-  public edgeController: any
+  public viewController!: ViewController | any
+  public layoutController!: LayoutController | any
+  public eventController!: EventController | any
+  public menuController!: MenuController | any
+  public nodeController!: NodeController | any
+  public edgeController!: EdgeController | any
 
   public nodes!: INodeType[]
   public edges!: IEdgeType[]
 
   constructor(config: any) {
     this.init()
-    this.$container = config.container
+
     this.config = config
     this.nodes = config.data.nodes
     this.edges = config.data.edges
+    this.viewController.$container = config.container
     this.viewController.rectInfo = config.rectInfo
     this.viewController.resize()
   }

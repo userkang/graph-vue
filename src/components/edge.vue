@@ -17,6 +17,8 @@
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { calculateCurve } from '@/assets/js/utils'
+import GraphContent from './graph.vue'
+import Graph from '@/controller/graph'
 
 @Component
 export default class Edge extends Vue {
@@ -25,13 +27,12 @@ export default class Edge extends Vue {
   })
   edge!: IEdgeType
 
-  @Prop({
-    required: true
-  })
-  graph: any
-
   path = ''
   calculateCurve = calculateCurve
+
+  get graph(): Graph {
+    return (this.$parent as GraphContent).graph
+  }
 
   get activeEdgeId() {
     return this.graph.eventController.activeEdgeId
@@ -51,7 +52,7 @@ export default class Edge extends Vue {
     return this.graph.nodes
   }
 
-  get fromNode(): INodeType[] {
+  get fromNode() {
     return this.nodes.filter(item => {
       return item.nodeId === this.edge.fromNodeId
     })

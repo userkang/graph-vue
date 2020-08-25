@@ -1,11 +1,11 @@
 import dagre from 'dagre'
-import { NodeStore } from '@/stores/node'
+import Graph from './graph'
 
 export default class LayoutController {
-  graph: any = null
+  graph: Graph
   layout: any = null
 
-  constructor(graph: any) {
+  constructor(graph: Graph) {
     this.graph = graph
     this.init()
   }
@@ -49,7 +49,7 @@ export default class LayoutController {
         }
       })
     })
-    NodeStore.updateNodePosition(graph.nodes)
+    // NodeStore.updateNodePosition(graph.nodes)
 
     viewController.translateToCenter()
   }

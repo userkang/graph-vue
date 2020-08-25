@@ -16,7 +16,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { EdgeStore } from '@/stores/edge'
+import GraphContent from './graph.vue'
 
 @Component
 export default class LinkSlot extends Vue {
@@ -26,14 +26,13 @@ export default class LinkSlot extends Vue {
   node!: INodeType
 
   @Prop({
-    required: true
-  })
-  graph: any
-
-  @Prop({
     type: String
   })
   isInOrOut!: string
+
+  get graph() {
+    return (this.$parent as GraphContent).graph
+  }
 
   get fromNodeId() {
     return this.graph.eventController.fromNodeId
@@ -45,7 +44,6 @@ export default class LinkSlot extends Vue {
 
   circleR = 4
   highlightCircleR = 6
-  edgeState = EdgeStore.state
 
   get cx() {
     return this.node.posX + this.rectInfo.width / 2
@@ -57,12 +55,12 @@ export default class LinkSlot extends Vue {
       : this.node.posY + this.rectInfo.height
   }
 
-  get edges() {
+  get edges(): IEdgeType[] {
     return this.graph.edges
   }
 
   get isCreateLine() {
-    return this.edgeState.createLine.show
+    return this.graph.edgeController.createEdge.show
   }
 
   get isSlotLinked() {
@@ -109,8 +107,8 @@ export default class LinkSlot extends Vue {
     e.stopPropagation()
     if (this.isInOrOut === 'out') {
       // 是初始化连线的起点和移动位置
-      EdgeStore.setNewLineStart(this.cx, this.cy)
-      EdgeStore.setNewLineMove(this.cx, this.cy)
+      this.graph.edgeController.setNewEdgeStart(this.cx, this.cy)
+      this.graph.edgeController.setNewEdgeMove(this.cx, this.cy)
       this.$emit('mousedown', e)
     }
   }

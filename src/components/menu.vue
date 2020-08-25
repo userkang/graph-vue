@@ -18,11 +18,12 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import GraphContent from './graph.vue'
 
 @Component
 export default class Menu extends Vue {
   get graph() {
-    return (this.$parent as any).graph
+    return (this.$parent as GraphContent).graph
   }
 
   get menu() {

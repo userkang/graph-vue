@@ -41,6 +41,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import LinkSlot from '@/components/link-slot.vue'
+import GraphContent from './graph.vue'
 
 @Component({
   components: {
@@ -53,10 +54,9 @@ export default class Node extends Vue {
   })
   node!: INodeType
 
-  @Prop({
-    required: true
-  })
-  graph: any
+  get graph() {
+    return (this.$parent as GraphContent).graph
+  }
 
   get rectInfo() {
     return this.graph.viewController.rectInfo

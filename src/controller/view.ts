@@ -8,6 +8,8 @@ import Graph from './graph'
 export default class ViewController {
   graph: Graph
 
+  public $container!: SVGElement
+
   // 画布宽高信息
   private svgInfo = {
     x: 0,
@@ -16,7 +18,7 @@ export default class ViewController {
     height: 0
   }
 
-  rectInfo = {
+  public rectInfo = {
     width: 190,
     height: 35,
     rx: 2,
@@ -24,7 +26,7 @@ export default class ViewController {
   }
 
   // 画布变换相关值
-  transform = {
+  public transform = {
     scale: 1,
     translateX: 0,
     translateY: 0,
@@ -34,6 +36,7 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
+    this.translateToCenter()
   }
 
   expand() {
@@ -61,7 +64,7 @@ export default class ViewController {
     this.transform.offsetY = 0
   }
 
-  fullscreen() {
+  fullScreen() {
     if (isFullScreen()) {
       cancelFullScreen()
     } else {
@@ -71,11 +74,10 @@ export default class ViewController {
 
   // 让g的宽和高适应画布
   fitView() {
-    const { graph } = this
     // 变换group的信息
-    const transformInfo = this.graph.$container
-      .querySelector('g')
-      .getBoundingClientRect()
+    const transformInfo = (this.$container.querySelector(
+      'g'
+    ) as SVGElement).getBoundingClientRect()
 
     const vScale =
       (this.svgInfo.width / transformInfo.width) * this.transform.scale
@@ -108,10 +110,9 @@ export default class ViewController {
   translateToCenter() {
     setTimeout(() => {
       // 这里需要到下一个周期获取g变换后的位置信息
-      console.log(this.graph)
-      const transformInfo = this.graph.$container
-        .querySelector('g')
-        .getBoundingClientRect()
+      const transformInfo = (this.$container.querySelector(
+        'g'
+      ) as SVGElement).getBoundingClientRect()
 
       // 变换g与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
@@ -130,13 +131,10 @@ export default class ViewController {
   }
 
   positionTransformX(originValue: number) {
-    const { graph } = this
-    const viewController = graph.viewController
-    const posX = originValue - viewController.svgInfo.x
+    const posX = originValue - this.svgInfo.x
     return (
-      (posX + viewController.transform.offsetX) /
-        viewController.transform.scale -
-      viewController.transform.translateX
+      (posX + this.transform.offsetX) / this.transform.scale -
+      this.transform.translateX
     )
   }
 
@@ -149,7 +147,7 @@ export default class ViewController {
   }
 
   public resize() {
-    const bounding = this.graph.$container.getBoundingClientRect()
+    const bounding = this.$container.getBoundingClientRect()
 
     this.svgInfo = {
       x: bounding.x,
@@ -157,8 +155,6 @@ export default class ViewController {
       width: bounding.width,
       height: bounding.height
     }
-    console.log(this.svgInfo)
-    this.graph.layoutController.init()
   }
 
   getCanTranslateDirection() {

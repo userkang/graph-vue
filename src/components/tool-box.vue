@@ -9,7 +9,7 @@
       :class="{ select: isSelecting }"
       class="iconfont iconkuangxuan"
     ></li>
-    <li title="全屏" id="fullscreen" class="iconfont iconquanping2"></li>
+    <li title="全屏" id="fullScreen" class="iconfont iconquanping2"></li>
     <li title="自动布局" id="layout" class="iconfont iconzidongpaiban"></li>
     <li title="适应画布" id="fitView" class="iconfont iconshiyinghuabu"></li>
   </div>
@@ -17,19 +17,20 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
+import GraphContent from './graph.vue'
 
 @Component
 export default class ToolBox extends Vue {
+  get graph() {
+    return (this.$parent as GraphContent).graph
+  }
+
   get isSelecting() {
     if (this.graph) {
       return this.graph.eventController.isSelecting
     } else {
       return false
     }
-  }
-
-  get graph() {
-    return (this.$parent as any).graph
   }
 
   handleChange(e: MouseEvent) {
@@ -48,14 +49,14 @@ export default class ToolBox extends Vue {
       case 'select':
         graph.viewController.select()
         break
-      case 'fullscreen':
-        graph.viewController.fullscreen()
+      case 'fullScreen':
+        graph.viewController.fullScreen()
         break
       case 'layout':
         graph.layoutController.execute()
         break
-      case 'fit':
-        graph.viewController.fit()
+      case 'fitView':
+        graph.viewController.fitView()
         break
     }
   }
@@ -79,7 +80,6 @@ export default class ToolBox extends Vue {
     width: 30px;
     align-items: center;
     justify-content: center;
-    border-right: 1px solid #e8ecfa;
     cursor: pointer;
     &:last-child {
       border-right: none;

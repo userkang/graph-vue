@@ -13,15 +13,19 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
-import { EdgeStore } from '@/stores/edge'
 import { calculateCurve } from '@/assets/js/utils'
+import GraphContent from './graph.vue'
 
 @Component
 export default class NewEdge extends Vue {
-  private edgeState = EdgeStore.state
+  get graph() {
+    return (this.$parent as GraphContent).graph
+  }
 
   get createLineValue() {
-    return this.edgeState.createLine
+    if (this.graph) {
+      return this.graph.edgeController.createEdge
+    }
   }
 
   get newEdgePath() {

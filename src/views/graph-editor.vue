@@ -2,7 +2,7 @@
   <div class="main-wrap">
     <ComponentPanel class="component-panel" />
     <div class="main-center-wrap">
-      <Graph ref="graphRef" :data="data" :nodeStyle="nodeStyle">
+      <Graph ref="graphRef" :data="data" :nodeStyle="nodeStyle" drection="h">
         <ToolBox />
         <Menu @click="clickMenu">
           <li id="delete">删除</li>
@@ -35,7 +35,7 @@ interface CopyReturnValue {
   }
 })
 export default class GraphEditor extends Vue {
-  graphState = GraphStore.state
+  data!: IGraphDataType
 
   nodeStyle = {
     width: 190,
@@ -44,22 +44,13 @@ export default class GraphEditor extends Vue {
     ry: 2
   }
 
-  get graph() {
-    return (this.$refs.graphRef as any).graph
-  }
-
-  get data() {
-    return this.graphState.graph
-  }
-
   clickMenu(e: MouseEvent, menu: IMenu) {
-    console.log(this.graphState)
-    console.log((e.target as HTMLElement).id)
+    console.log((e.target as HTMLElement).id, menu)
     menu.show = false
   }
 
   created() {
-    GraphStore.getData()
+    this.data = GraphStore.getData()
   }
 }
 </script>

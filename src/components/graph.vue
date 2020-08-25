@@ -4,7 +4,7 @@
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
-      ref="graph"
+      ref="svg"
       @mousedown="svgMouseDown"
       @mousemove="mouseMove"
       @mouseup="svgMouseUp"
@@ -17,6 +17,7 @@
       height="100%"
     >
       <g
+        v-if="graph"
         ref="transformDom"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
@@ -27,7 +28,6 @@
           v-for="item in edges"
           :key="item.edgeId"
           :edge="item"
-          :graph="graph"
           @click.native="e => edgeClick(item.edgeId)"
           @delete="deleteLine"
           @contextMenu="showMenu"
@@ -36,7 +36,6 @@
           v-for="item in nodes"
           :key="item.nodeId"
           :node="item"
-          :graph="graph"
           @mouseDownNode="mouseDownNode"
           @mouseDownSlot="mouseDownSlot"
           @mouseUpSlot="mouseUpSlot"
@@ -98,22 +97,12 @@ export default class GraphContent extends Vue {
   })
   data!: IGraphDataType
 
-  @Prop({
-    default: () => {
-      return {
-        width: 190,
-        height: 35,
-        rx: 2,
-        ry: 2
-      }
-    }
-  })
+  @Prop()
   nodeStyle!: INodeStyle
 
   componentState = ComponentListStore.state
 
-  // 画布实例
-  graph!: Graph
+  graph: any = null
 
   nodeId = 0
 
@@ -130,15 +119,7 @@ export default class GraphContent extends Vue {
   }
 
   get transform() {
-    if (this.graph) {
-      return this.graph.viewController.transform
-    } else {
-      return {
-        scale: 1,
-        translateX: 0,
-        translateY: 0
-      }
-    }
+    return this.graph.viewController.transform
   }
 
   get showSelectingBox() {
@@ -228,7 +209,7 @@ export default class GraphContent extends Vue {
 
   initGraph() {
     this.graph = new Graph({
-      container: this.$refs.graph as SVGElement,
+      container: this.$refs.svg as SVGElement,
       rectInfo: this.nodeStyle,
       data: this.data
     })

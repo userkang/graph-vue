@@ -197,7 +197,8 @@ export default class GraphContent extends Vue {
       rectInfo: this.nodeStyle,
       data: this.data,
       drection: this.$attrs.drection
-    })
+    });
+    // (window as any).ddd = this.graph
   }
 
   beforeDestroy() {

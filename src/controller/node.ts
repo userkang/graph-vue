@@ -9,6 +9,7 @@ export default class NodeController {
 
   addNode(item: INodeType) {
     this.graph.nodes.push(item)
+    this.graph.immutableController.addNode()
   }
 
   deleteNode(id: number) {

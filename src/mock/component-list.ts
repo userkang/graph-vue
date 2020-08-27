@@ -1,17 +1,22 @@
 export const componentListMock: IComponentType[] = [
   {
     componentId: 1,
-    componentName: '拖动我',
+    componentName: '1',
     componentDesc: '演示组件一'
   },
   {
     componentId: 2,
-    componentName: '到右侧',
+    componentName: '2',
     componentDesc: '演示组件二'
   },
   {
     componentId: 3,
-    componentName: '组件三',
+    componentName: '3',
+    componentDesc: '演示组件三'
+  },
+  {
+    componentId: 4,
+    componentName: '4',
     componentDesc: '演示组件三'
   },
 ]

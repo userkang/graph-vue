@@ -19,6 +19,7 @@ export default class EdgeController {
     // 生成唯一edgeId
     item.edgeId = JSON.stringify(item.fromNodeId + '' + item.toNodeId)
     this.graph.edges.push(item)
+    this.graph.immutableController.addEdge()
   }
 
   public setNewEdgeStart(fromX: number, fromY: number) {

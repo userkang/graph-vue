@@ -2,62 +2,58 @@ import Graph from './graph'
 
 export default class Immutable {
   private graph: Graph
-  private initialStates: {
-    nodes: INodeType[],
-    edges: IEdgeType[]
-  } = {
+
+  private initialStates: IDataItem = {
     nodes: [],
     edges: []
   }
-  private states: Array<{
-    nodes: INodeType[],
-    edges: IEdgeType[]
-  }> = []
 
-  private historyIndex = 0
+  private undoStack: IDataItem[] = []
+
+  private redoStack: IDataItem[] = []
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.initialStates.nodes = JSON.parse(JSON.stringify(graph.nodes))
-    this.initialStates.edges = JSON.parse(JSON.stringify(graph.edges))
+    const data = JSON.parse(
+      JSON.stringify({
+        nodes: graph.nodes,
+        edges: graph.edges
+      })
+    )
+    this.initialStates.nodes = data.nodes
+    this.initialStates.edges = data.edges
     console.log(this.initialStates)
   }
 
-  private push() {
-    if (this.historyIndex < this.states.length - 1) {
-      this.states.length = this.historyIndex + 1
-    }
-    this.states.push({
-      nodes: JSON.parse(JSON.stringify(this.graph.nodes)),
-      edges: JSON.parse(JSON.stringify(this.graph.edges))
-    })
-    this.historyIndex = this.states.length - 1
-    console.log(this.states.map(item => item.nodes.map(el => el.nodeName).join('-')))
-  }
-
-  addEdge() {
-    this.push()
-  }
-
-  addNode() {
-    this.push()
+  public push(data: IDataItem) {
+    this.undoStack.push(JSON.parse(JSON.stringify(data)))
   }
 
   undo() {
-    console.log(this.historyIndex, 'undo')
-    if (this.historyIndex <= 0) {
-      this.historyIndex = -1
-      return this.initialStates
+    const redoItem = this.undoStack.pop()
+    if (redoItem) {
+      this.redoStack.push(redoItem)
     }
-    return this.states[--this.historyIndex]
+    console.log(JSON.stringify(this.initialStates))
+    if (!this.undoStack.length) {
+      this.graph.nodes = this.initialStates.nodes
+      this.graph.edges = this.initialStates.edges
+      return
+    }
+    this.graph.nodes = this.undoStack[this.undoStack.length - 1].nodes
+    this.graph.edges = this.undoStack[this.undoStack.length - 1].edges
   }
 
   redo() {
-    console.log(this.historyIndex, 'redo')
-    if (this.historyIndex >= this.states.length - 1) {
+    if (!this.redoStack.length) {
       return
     }
-    return this.states[++this.historyIndex]
+    const redoItem = this.redoStack.pop()
+    if (redoItem) {
+      this.push(redoItem)
+    }
+    this.graph.nodes = redoItem!.nodes
+    this.graph.edges = redoItem!.edges
   }
 
   // restore() {

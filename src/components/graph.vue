@@ -103,13 +103,16 @@ export default class GraphContent extends Vue {
 
   graph: any = null
 
-  get nodes() {
-    return this.graph.nodes
-  }
+  nodes: INodeType[] = []
+  edges: IEdgeType[] = []
 
-  get edges() {
-    return this.graph.edges
-  }
+  // get nodes() {
+  //   return this.graph.getNodes()
+  // }
+
+  // get edges() {
+  //   return this.graph.edges
+  // }
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -197,8 +200,7 @@ export default class GraphContent extends Vue {
       rectInfo: this.nodeStyle,
       data: this.data,
       drection: this.$attrs.drection
-    });
-    // (window as any).ddd = this.graph
+    })
   }
 
   beforeDestroy() {

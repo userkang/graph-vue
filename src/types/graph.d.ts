@@ -57,3 +57,8 @@ declare interface INodeStyle {
   rx: number
   ry: number
 }
+
+declare interface IDataItem {
+  nodes: INodeType[]
+  edges: IEdgeType[]
+}

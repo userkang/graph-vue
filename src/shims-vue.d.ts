@@ -4,8 +4,8 @@ declare module '*.vue' {
 }
 
 declare module 'dagre' {
-  const vuedraggable: any
-  export default vuedraggable
+  const dagre: any
+  export default dagre
 }
 
 declare module '*.svg' {

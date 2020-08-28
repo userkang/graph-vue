@@ -21,7 +21,7 @@ export default class Graph {
   public edges!: IEdgeType[]
 
   constructor(config: any) {
-    (window as any).ddd = this
+    ;(window as any).ddd = this
     this.config = config
     this.nodes = config.data.nodes
     this.edges = config.data.edges.map((item: IEdgeType) => {
@@ -47,18 +47,22 @@ export default class Graph {
     this.nodeController.addNode(item)
   }
 
+
+  // 加载数据
+  data(data: IDataItem[]) {
+    this.config.data = data
+  }
+
   undo() {
-    const data = this.immutableController.undo()
-    this.nodes = data.nodes
-    this.edges = data.edges
+    this.immutableController.undo()
   }
 
   redo() {
-    const data = this.immutableController.redo()
-    if (data) {
-      this.nodes = data.nodes
-      this.edges = data.edges
-    }
+    this.immutableController.redo()
+  }
+
+  getNodes() {
+    return JSON.parse(JSON.stringify(this.nodes))
   }
 
   /**

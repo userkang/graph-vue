@@ -77,9 +77,6 @@ export default class ToolBox extends Vue {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    &:last-child {
-      border-right: none;
-    }
     &:hover {
       background: $l2;
     }

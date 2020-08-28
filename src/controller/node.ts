@@ -8,8 +8,11 @@ export default class NodeController {
   }
 
   addNode(item: INodeType) {
-    this.graph.nodes.push(item)
-    this.graph.immutableController.addNode()
+    this.graph.nodes.push(JSON.parse(JSON.stringify(item)))
+    this.graph.immutableController.push({
+      nodes: this.graph.nodes,
+      edges: this.graph.edges
+    })
   }
 
   deleteNode(id: number) {

@@ -103,16 +103,16 @@ export default class GraphContent extends Vue {
 
   graph: any = null
 
-  nodes: INodeType[] = []
-  edges: IEdgeType[] = []
+  // nodes: INodeType[] = []
+  // edges: IEdgeType[] = []
 
-  // get nodes() {
-  //   return this.graph.getNodes()
-  // }
+  get nodes() {
+    return this.graph.getNodes()
+  }
 
-  // get edges() {
-  //   return this.graph.edges
-  // }
+  get edges() {
+    return this.graph.getEdges()
+  }
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -126,6 +126,18 @@ export default class GraphContent extends Vue {
     if (this.graph) {
       return this.graph.eventController.selectBoxPath
     }
+  }
+
+  svgMouseDown(e: MouseEvent) {
+    this.graph.eventController.svgMouseDown(e)
+  }
+
+  mouseMove(e: MouseEvent) {
+    this.graph.eventController.mouseMove(e)
+  }
+
+  svgMouseUp(e: MouseEvent) {
+    this.graph.eventController.svgMouseUp(e)
   }
 
   mouseDownNode(e: MouseEvent, node: INodeType) {
@@ -146,18 +158,6 @@ export default class GraphContent extends Vue {
 
   deleteLine() {
     this.graph.eventController.deleteLine()
-  }
-
-  svgMouseDown(e: MouseEvent) {
-    this.graph.eventController.svgMouseDown(e)
-  }
-
-  mouseMove(e: MouseEvent) {
-    this.graph.eventController.mouseMove(e)
-  }
-
-  svgMouseUp(e: MouseEvent) {
-    this.graph.eventController.svgMouseUp(e)
   }
 
   mouseLeave(e: MouseEvent) {
@@ -198,9 +198,9 @@ export default class GraphContent extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as SVGElement,
       rectInfo: this.nodeStyle,
-      data: this.data,
       drection: this.$attrs.drection
     })
+    this.graph.data(this.data)
   }
 
   beforeDestroy() {

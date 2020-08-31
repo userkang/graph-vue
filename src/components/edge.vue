@@ -6,6 +6,7 @@
     @contextmenu.capture="showMenuTips"
   >
     <path
+      @click="clickEdge"
       :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
       :data-id="edge.edgeId"
       fill="none"
@@ -78,6 +79,10 @@ export default class Edge extends Vue {
 
   get y2() {
     return this.toNode[0].posY
+  }
+
+  clickEdge(e: MouseEvent) {
+    console.log(e)
   }
 
   showMenuTips(e: MouseEvent) {

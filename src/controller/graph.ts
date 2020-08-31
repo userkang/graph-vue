@@ -17,17 +17,12 @@ export default class Graph {
   public edgeController!: EdgeController
   public immutableController!: ImmutableController
 
-  public nodes!: INodeType[]
-  public edges!: IEdgeType[]
+  public nodes: INodeType[] = []
+  public edges: IEdgeType[] = []
 
   constructor(config: any) {
     ;(window as any).ddd = this
     this.config = config
-    this.nodes = config.data.nodes
-    this.edges = config.data.edges.map((item: IEdgeType) => {
-      item.edgeId = item.fromNodeId + '' + item.toNodeId
-      return item
-    })
     this.initController()
   }
 
@@ -47,10 +42,23 @@ export default class Graph {
     this.nodeController.addNode(item)
   }
 
-
   // 加载数据
-  data(data: IDataItem[]) {
-    this.config.data = data
+  data(data: IDataItem) {
+    this.nodes = JSON.parse(JSON.stringify(data.nodes))
+    this.edges = JSON.parse(JSON.stringify(data.edges)).map(
+      (item: IEdgeType) => {
+        item.edgeId = item.fromNodeId + '' + item.toNodeId
+        return item
+      }
+    )
+  }
+
+  getNodes() {
+    return this.nodes
+  }
+
+  getEdges() {
+    return this.edges
   }
 
   undo() {
@@ -59,10 +67,6 @@ export default class Graph {
 
   redo() {
     this.immutableController.redo()
-  }
-
-  getNodes() {
-    return JSON.parse(JSON.stringify(this.nodes))
   }
 
   /**

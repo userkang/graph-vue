@@ -186,7 +186,6 @@ export default class EventController {
           await this.graph.edgeController.deleteEdge(this.activeEdgeId)
           this.activeEdgeId = 0
         }
-        console.log(this)
         if (this.selectedNode.length === 1) {
           await this.graph.nodeController.deleteNode(
             this.selectedNode[0].nodeId
@@ -217,29 +216,12 @@ export default class EventController {
 
   checkSelected(startX: number, startY: number, endX: number, endY: number) {
     // 处理不同方向框选的情况
-    // 从左上->右下，不要交换
+    // 将不同方向的框选框都格式化为从左上->右下
     const range = {
-      startX,
-      startY,
-      endX,
-      endY
-    }
-    // 左下->右上
-    if (endX > startX && endY < startY) {
-      range.startY = endY
-      range.endY = startY
-    }
-    // 右上->左下
-    if (endX < startX && endY > startY) {
-      range.startX = endX
-      range.endX = startX
-    }
-    // 右下->左上
-    if (endX < startX && endY < startY) {
-      range.startX = endX
-      range.startY = endY
-      range.endX = startX
-      range.endY = startY
+      startX: Math.min(startX, endX),
+      startY: Math.min(startY, endY),
+      endX: Math.max(startX, endX),
+      endY: Math.max(startY, endY)
     }
 
     this.selectedNode = this.graph.nodes.filter(item => {

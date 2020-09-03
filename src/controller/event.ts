@@ -1,4 +1,5 @@
 import Graph from './graph'
+import DragSvg from '@/behavior/drag-svg'
 
 export default class EventController {
   private graph: Graph
@@ -37,6 +38,8 @@ export default class EventController {
   }
 
   initEvent() {
+    const dragSvg = new DragSvg(this.graph)
+
     window.addEventListener(
       'resize',
       this.graph.viewController.resize.bind(this.graph.viewController)

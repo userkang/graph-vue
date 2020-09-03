@@ -1,14 +1,13 @@
 <template>
-  <g
+  <path
     v-show="createLineValue.show"
     stroke-linecap="round"
     stroke-width="1.5"
     stroke="#555"
     fill="transparent"
     class="new-edge"
-  >
-    <path :d="newEdgePath"></path>
-  </g>
+    :d="newEdgePath"
+  ></path>
 </template>
 
 <script lang="ts">

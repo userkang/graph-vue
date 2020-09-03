@@ -25,11 +25,11 @@
         }"
       >
         <Edge
+          data-type="edge"
           v-for="item in edges"
           :key="item.edgeId"
           :edge="item"
           @click.native="e => edgeClick(item.edgeId)"
-          @delete="deleteLine"
           @contextMenu="showMenu"
         />
         <Node
@@ -129,40 +129,36 @@ export default class GraphContent extends Vue {
   }
 
   svgMouseDown(e: MouseEvent) {
-    this.graph.eventController.svgMouseDown(e)
+    // this.graph.eventController.svgMouseDown(e)
   }
 
   mouseMove(e: MouseEvent) {
-    this.graph.eventController.mouseMove(e)
+    // this.graph.eventController.mouseMove(e)
   }
 
   svgMouseUp(e: MouseEvent) {
-    this.graph.eventController.svgMouseUp(e)
+    // this.graph.eventController.svgMouseUp(e)
   }
 
   mouseDownNode(e: MouseEvent, node: INodeType) {
-    this.graph.eventController.mouseDownNode(e, node)
+    // this.graph.eventController.mouseDownNode(e, node)
   }
 
   mouseDownSlot(e: MouseEvent, node: INodeType) {
-    this.graph.eventController.mouseDownSlot(e, node)
+    // this.graph.eventController.mouseDownSlot(e, node)
   }
 
   mouseUpSlot(e: MouseEvent, node: INodeType) {
-    this.graph.eventController.mouseUpSlot(e, node)
+    // this.graph.eventController.mouseUpSlot(e, node)
   }
 
   edgeClick(edgeId: number) {
-    this.graph.eventController.edgeClick(edgeId)
-  }
-
-  deleteLine() {
-    this.graph.eventController.deleteLine()
+    // this.graph.eventController.edgeClick(edgeId)
   }
 
   mouseLeave(e: MouseEvent) {
     // 当鼠标离开画布时，手动触发画布 mouseup 事件
-    this.graph.eventController.mouseLeave(e)
+    // this.graph.eventController.mouseLeave(e)
   }
 
   mouseWheel(e: WheelEvent) {

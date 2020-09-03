@@ -1,18 +1,13 @@
 <template>
-  <g
+  <path
     stroke-width="2"
-    stroke="#000"
+    @click="clickEdge"
+    :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
+    :data-id="edge.edgeId"
     fill="transparent"
+    :class="lineClassName"
     @contextmenu.capture="showMenuTips"
-  >
-    <path
-      @click="clickEdge"
-      :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
-      :data-id="edge.edgeId"
-      fill="none"
-      :class="lineClassName"
-    ></path>
-  </g>
+  ></path>
 </template>
 
 <script lang="ts">

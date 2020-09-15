@@ -1,8 +1,10 @@
 import Graph from '@/controller/graph'
+import { addEventListener } from '@/assets/js/dom'
 
 export default class DragSvg {
   graph: Graph
   $svg: HTMLElement
+  event: { [key: string]: any } = []
 
   // 移动前的坐标
   originX = 0
@@ -22,20 +24,30 @@ export default class DragSvg {
   constructor(graph: Graph) {
     this.graph = graph
     this.$svg = graph.config.container
-
     this.init()
   }
 
   init() {
-    this.$svg.addEventListener('mousedown', this.mouseDown.bind(this))
-    this.$svg.addEventListener('mousemove', this.mouseMove.bind(this))
-    this.$svg.addEventListener('mouseup', this.mouseUp.bind(this))
+    this.event.push(
+      addEventListener(this.$svg, 'mousedown', this.mouseDown.bind(this))
+    )
+    this.event.push(
+      addEventListener(this.$svg, 'mousemove', this.mouseMove.bind(this))
+    )
+    this.event.push(
+      addEventListener(this.$svg, 'mouseup', this.mouseUp.bind(this))
+    )
+    this.event.push(
+      addEventListener(this.$svg, 'mouseleave', this.mouseUp.bind(this))
+    )
   }
 
   mouseDown(e: MouseEvent) {
     this.originX = e.x
     this.originY = e.y
-    this.isMouseDownSvg = true
+    if (e.target === this.$svg) {
+      this.isMouseDownSvg = true
+    }
   }
 
   mouseMove(e: MouseEvent) {
@@ -44,12 +56,11 @@ export default class DragSvg {
     if (this.isMouseDownSvg) {
       this.moveX = x - this.startX
       this.moveY = y - this.startY
-      const viewController = this.graph.viewController
 
-      viewController.transform.translateX +=
-        this.moveX / viewController.transform.scale
-      viewController.transform.translateY +=
-        this.moveY / viewController.transform.scale
+      const dx = this.moveX / this.graph.getZoom()
+      const dy = this.moveY / this.graph.getZoom()
+
+      this.graph.translate(dx, dy)
 
       this.startX = x
       this.startY = y
@@ -77,8 +88,9 @@ export default class DragSvg {
     // }
   }
 
-  mouseLeave(e: MouseEvent) {
-    // 当鼠标离开画布时，手动触发画布 mouseup 事件
-    this.mouseUp(e)
+  destroy() {
+    this.event.forEach((item: any) => {
+      item.remove()
+    })
   }
 }

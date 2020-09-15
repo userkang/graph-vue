@@ -42,6 +42,14 @@ export default class Graph {
     this.nodeController.addNode(item)
   }
 
+  public getZoom() {
+    return this.viewController.transform.scale
+  }
+
+  public translate(x: number, y: number) {
+    this.viewController.translate(x, y)
+  }
+
   // 加载数据
   data(data: IDataItem) {
     this.nodes = JSON.parse(JSON.stringify(data.nodes))

@@ -1,5 +1,6 @@
 import Graph from './graph'
 import DragSvg from '@/behavior/drag-svg'
+import DragNode from '@/behavior/drag-node'
 
 export default class EventController {
   private graph: Graph
@@ -39,6 +40,7 @@ export default class EventController {
 
   initEvent() {
     const dragSvg = new DragSvg(this.graph)
+    const dragNode = new DragNode(this.graph)
 
     window.addEventListener(
       'resize',

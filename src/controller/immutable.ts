@@ -22,7 +22,6 @@ export default class Immutable {
     )
     this.initialStates.nodes = data.nodes
     this.initialStates.edges = data.edges
-    console.log(this.initialStates)
   }
 
   public push(data: IDataItem) {

@@ -26,6 +26,7 @@
       >
         <Edge
           data-type="edge"
+          :data-item="JSON.stringify(item)"
           v-for="item in edges"
           :key="item.edgeId"
           :edge="item"

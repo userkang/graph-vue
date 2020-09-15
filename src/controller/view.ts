@@ -178,15 +178,15 @@ export default class ViewController {
     if (gX + 0.5 * gWidth >= this.svgInfo.x + this.svgInfo.width && x > 0) {
       return true
     }
-    // 2. 左边界
+    // 左边界
     if (gX + gWidth - 0.5 * gWidth <= this.svgInfo.x && x < 0) {
       return true
     }
-    // 3. 下边界
+    // 下边界
     if (gY + gHeight - 0.5 * gHeight <= this.svgInfo.y && y < 0) {
       return true
     }
-    // 4. 上边界
+    // 上边界
     if (gY + 0.5 * gHeight >= this.svgInfo.y + this.svgInfo.height && y > 0) {
       return true
     }

@@ -2,7 +2,6 @@
   <g @mousedown="handleNodeMouseDown" @contextmenu.capture="showMenuTips">
     <rect
       ref="node"
-      data-type="node"
       class="graph-node"
       :style="{
         stroke: isNodeSelected ? '#606BE1' : '#DEDFEC',
@@ -20,18 +19,18 @@
       :y="node.posY"
       :width="rectInfo.width"
       :height="rectInfo.height"
+      data-type="node"
+      :data-item="JSON.stringify(node)"
     >
       <div class="node-content">{{ node.nodeName }}</div>
     </foreignObject>
     <LinkSlot
       :node="node"
-      :graph="graph"
       isInOrOut="in"
       @mouseup="handleSlotMouseUp"
     />
     <LinkSlot
       :node="node"
-      :graph="graph"
       isInOrOut="out"
       @mousedown="handleSlotMouseDown"
     />
@@ -67,7 +66,7 @@ export default class Node extends Vue {
   }
 
   handleNodeMouseDown(e: MouseEvent) {
-    e.stopPropagation()
+    // e.stopPropagation()
     if (e.button === 0) {
       this.$emit('mouseDownNode', e, this.node)
     }

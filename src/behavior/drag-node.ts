@@ -28,20 +28,19 @@ export default class DragNode {
   constructor(graph: Graph) {
     this.graph = graph
     this.$svg = graph.config.container
-    window.s = this
     this.init()
   }
 
   init() {
-    this.event.push(
-      addEventListener(this.$svg, 'mousedown', this.mouseDown.bind(this))
-    )
-    this.event.push(
-      addEventListener(this.$svg, 'mousemove', this.mouseMove.bind(this))
-    )
-    this.event.push(
-      addEventListener(this.$svg, 'mouseup', this.mouseUp.bind(this))
-    )
+    // this.event.push(
+    //   addEventListener(this.$svg, 'mousedown', this.mouseDown.bind(this))
+    // )
+    // this.event.push(
+    //   addEventListener(this.$svg, 'mousemove', this.mouseMove.bind(this))
+    // )
+    // this.event.push(
+    //   addEventListener(this.$svg, 'mouseup', this.mouseUp.bind(this))
+    // )
   }
 
   mouseDown(e: MouseEvent) {
@@ -49,10 +48,11 @@ export default class DragNode {
       this.isMouseDownNode = true
       this.startX = this.originX = e.x
       this.startY = this.originY = e.y
-      this.activeNode = getItem(e)
-      // this.graph.nodes.filter(item => {
-      //   return getItem(e).nodeId === item.nodeId
-      // })[0]
+      // this.activeNode = getItem(e)
+
+      this.activeNode = this.graph.nodes.filter(item => {
+        return getItem(e).nodeId === item.nodeId
+      })[0]
 
       console.log(this.activeNode)
 

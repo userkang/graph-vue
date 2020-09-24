@@ -1,5 +1,5 @@
 <template>
-  <g @mousedown="handleNodeMouseDown" @contextmenu.capture="showMenuTips">
+  <g @mousedown="handleNodeMouseDown">
     <rect
       ref="node"
       class="graph-node"

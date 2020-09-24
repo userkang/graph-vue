@@ -1,9 +1,33 @@
 import Graph from './graph'
+import { addEventListener, isTarget, getItem } from '@/assets/js/dom'
 import DragSvg from '@/behavior/drag-svg'
 import DragNode from '@/behavior/drag-node'
 
+const EVENTS = [
+  'mousedown',
+  'mouseup',
+  'dblclick',
+  'contextmenu',
+  'mouseenter',
+  'mouseout',
+  'mouseover',
+  'mousemove',
+  'mouseleave',
+  'drag',
+  'dragover',
+  'dragout',
+  'drop'
+]
+
+const EXTENDEVENTS = ['keyup', 'keydown', 'wheel']
+
 export default class EventController {
   private graph: Graph
+
+  $svg: HTMLElement
+  eventQueue: { [key: string]: any } = []
+  preItemType = 'svg'
+  currentItemType = 'svg'
 
   isMouseDownNode = false
   isMouseDownSlot = false
@@ -35,138 +59,202 @@ export default class EventController {
 
   constructor(graph: Graph) {
     this.graph = graph
+    this.$svg = graph.config.container
+    this.initBehavior()
     this.initEvent()
   }
 
   initEvent() {
+    EVENTS.forEach(eventType => {
+      this.eventQueue.push(
+        addEventListener(this.$svg, eventType, this.handleMouseEvent.bind(this))
+      )
+    })
+
+    EXTENDEVENTS.forEach(eventType => {
+      this.eventQueue.push(
+        addEventListener(
+          window as any,
+          eventType,
+          this.handleExtendEvents.bind(this)
+        )
+      )
+    })
+  }
+
+  initBehavior() {
     const dragSvg = new DragSvg(this.graph)
     const dragNode = new DragNode(this.graph)
-
-    window.addEventListener(
-      'resize',
-      this.graph.viewController.resize.bind(this.graph.viewController)
-    )
-    document.addEventListener('keydown', this.handleKeyUp.bind(this))
   }
 
-  svgMouseDown(e: MouseEvent) {
-    this.originX = e.x
-    this.originY = e.y
+  handleMouseEvent(e: MouseEvent) {
+    const eventType = e.type
 
-    if (this.isSelecting) {
-      this.showSelectingBox = true
-    } else {
-      this.isMouseDownSvg = true
-    }
-  }
-
-  mouseDownNode(e: MouseEvent, node: INodeType) {
-    this.isMouseDownNode = true
-
-    this.activeNode = node
-    this.activeEdgeId = 0
-    this.startX = this.originX = e.x
-    this.startY = this.originY = e.y
-
-    // 判断当前正在移动节点是否被选中
-    this.checkActiveNodeIsSelected()
-  }
-
-  mouseDownSlot(e: MouseEvent, node: INodeType) {
-    this.isMouseDownSlot = true
-    this.fromNodeId = node.nodeId
-  }
-
-  async mouseUpSlot(e: MouseEvent, node: INodeType) {
-    this.isMouseDownSlot = false
-    await this.graph.edgeController.addEdge({
-      fromNodeId: this.fromNodeId,
-      toNodeId: node.nodeId
-    })
-    this.graph.edgeController.setResetEdge()
-  }
-
-  edgeClick(edgeId: number) {
-    this.activeEdgeId = edgeId
-    this.selectedNode = []
-  }
-
-  async deleteLine() {
-    await this.graph.edgeController.deleteEdge(this.activeEdgeId)
-    this.activeEdgeId = 0
-  }
-
-  async mouseMove(e: MouseEvent) {
-    const { graph } = this
-    const viewController = graph.viewController
-    const { x, y } = e
-    this.moveX = x - this.startX
-    this.moveY = y - this.startY
-
-    if (this.isMouseDownNode) {
-      this.moveNode.forEach(item => {
-        item.posX += this.moveX / viewController.transform.scale
-        item.posY += this.moveY / viewController.transform.scale
-      })
-    } else if (this.isMouseDownSlot) {
-      const posX = viewController.positionTransformX(x)
-      const posY = viewController.positionTransformY(y)
-      this.graph.edgeController.setNewEdgeMove(posX, posY)
-    } else if (this.isSelecting && this.showSelectingBox) {
-      const startX = this.originX - viewController.svgInfo.x
-      const startY = this.originY - viewController.svgInfo.y
-      const endX = x - viewController.svgInfo.x
-      const endY = y - viewController.svgInfo.y
-
-      this.selectBoxPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
-      this.checkSelected(this.originX, this.originY, x, y)
-    } else if (this.isMouseDownSvg) {
-      viewController.transform.translateX +=
-        this.moveX / viewController.transform.scale
-      viewController.transform.translateY +=
-        this.moveY / viewController.transform.scale
+    if (eventType === 'mousedown') {
+      this.originX = e.x
+      this.originY = e.y
     }
 
-    this.startX = x
-    this.startY = y
-  }
+    if (eventType === 'mousemove') {
+      this.handleMouseMove(e)
+    }
 
-  async svgMouseUp(e: MouseEvent) {
-    e.stopPropagation()
-    const { x, y } = e
-    // 鼠标是否发生位移
-    const isMove = x - this.originX || y - this.originY
-
-    if (this.isMouseDownNode) {
-      this.isMouseDownNode = false
-      if (isMove) {
-        const moveNode = [...this.selectedNode, this.activeNode]
-        // await NodeStore.updateNodePosition(moveNode)
-        // afterMoveNode()
-      } else {
-        // 否则就是单纯的点击操作
-        this.selectedNode = [this.activeNode]
-      }
-    } else if (this.isMouseDownSlot) {
-      this.isMouseDownSlot = false
-      this.graph.edgeController.setResetEdge()
-    } else if (this.isSelecting && this.showSelectingBox) {
-      this.isSelecting = false
-      this.showSelectingBox = false
-      this.selectBoxPath = ''
-    } else if (this.isMouseDownSvg) {
-      this.isMouseDownSvg = false
+    if (eventType === 'mouseup') {
+      const isMove = e.x - this.originX || e.y - this.originY
       if (!isMove) {
-        this.activeEdgeId = 0
-        this.selectedNode = []
+        this.emitMouseEvent(e, 'click')
       }
+    }
+
+    this.emitMouseEvent(e, eventType)
+  }
+
+  emitMouseEvent(e: MouseEvent, eventType: string) {
+    this.graph.emit(eventType, e)
+
+    if (e.target === this.$svg) {
+      this.currentItemType = 'svg'
+      this.graph.emit(`svg.${eventType}`, e)
+    }
+
+    if (isTarget(e, 'node')) {
+      this.currentItemType = 'node'
+      const item = getItem(e)
+      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
     }
   }
 
-  mouseLeave(e: MouseEvent) {
-    // 当鼠标离开画布时，手动触发画布 mouseup 事件
-    this.svgMouseUp(e)
+  handleExtendEvents(e: MouseEvent) {
+    this.graph.emit(e.type, e)
   }
+
+  handleMouseMove(e: MouseEvent) {
+    if (this.preItemType !== this.currentItemType) {
+      this.graph.emit(`${this.preItemType}.mouseleave`)
+      this.graph.emit(`${this.currentItemType}.mouseenter`)
+    }
+
+    this.preItemType = this.currentItemType
+  }
+
+  // svgMouseDown(e: MouseEvent) {
+  //   this.originX = e.x
+  //   this.originY = e.y
+
+  //   if (this.isSelecting) {
+  //     this.showSelectingBox = true
+  //   } else {
+  //     this.isMouseDownSvg = true
+  //   }
+  // }
+
+  // mouseDownNode(e: MouseEvent, node: INodeType) {
+  //   this.isMouseDownNode = true
+
+  //   this.activeNode = node
+  //   this.activeEdgeId = 0
+  //   this.startX = this.originX = e.x
+  //   this.startY = this.originY = e.y
+
+  //   // 判断当前正在移动节点是否被选中
+  //   this.checkActiveNodeIsSelected()
+  // }
+
+  // mouseDownSlot(e: MouseEvent, node: INodeType) {
+  //   this.isMouseDownSlot = true
+  //   this.fromNodeId = node.nodeId
+  // }
+
+  // async mouseUpSlot(e: MouseEvent, node: INodeType) {
+  //   this.isMouseDownSlot = false
+  //   await this.graph.edgeController.addEdge({
+  //     fromNodeId: this.fromNodeId,
+  //     toNodeId: node.nodeId
+  //   })
+  //   this.graph.edgeController.setResetEdge()
+  // }
+
+  // edgeClick(edgeId: number) {
+  //   this.activeEdgeId = edgeId
+  //   this.selectedNode = []
+  // }
+
+  // async deleteLine() {
+  //   await this.graph.edgeController.deleteEdge(this.activeEdgeId)
+  //   this.activeEdgeId = 0
+  // }
+
+  // async mouseMove(e: MouseEvent) {
+  //   const { graph } = this
+  //   const viewController = graph.viewController
+  //   const { x, y } = e
+  //   this.moveX = x - this.startX
+  //   this.moveY = y - this.startY
+
+  //   if (this.isMouseDownNode) {
+  //     this.moveNode.forEach(item => {
+  //       item.posX += this.moveX / viewController.transform.scale
+  //       item.posY += this.moveY / viewController.transform.scale
+  //     })
+  //   } else if (this.isMouseDownSlot) {
+  //     const posX = viewController.positionTransformX(x)
+  //     const posY = viewController.positionTransformY(y)
+  //     this.graph.edgeController.setNewEdgeMove(posX, posY)
+  //   } else if (this.isSelecting && this.showSelectingBox) {
+  //     const startX = this.originX - viewController.svgInfo.x
+  //     const startY = this.originY - viewController.svgInfo.y
+  //     const endX = x - viewController.svgInfo.x
+  //     const endY = y - viewController.svgInfo.y
+
+  //     this.selectBoxPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
+  //     this.checkSelected(this.originX, this.originY, x, y)
+  //   } else if (this.isMouseDownSvg) {
+  //     viewController.transform.translateX +=
+  //       this.moveX / viewController.transform.scale
+  //     viewController.transform.translateY +=
+  //       this.moveY / viewController.transform.scale
+  //   }
+
+  //   this.startX = x
+  //   this.startY = y
+  // }
+
+  // async svgMouseUp(e: MouseEvent) {
+  //   e.stopPropagation()
+  //   const { x, y } = e
+  //   // 鼠标是否发生位移
+  //   const isMove = x - this.originX || y - this.originY
+
+  //   if (this.isMouseDownNode) {
+  //     this.isMouseDownNode = false
+  //     if (isMove) {
+  //       const moveNode = [...this.selectedNode, this.activeNode]
+  //       // await NodeStore.updateNodePosition(moveNode)
+  //       // afterMoveNode()
+  //     } else {
+  //       // 否则就是单纯的点击操作
+  //       this.selectedNode = [this.activeNode]
+  //     }
+  //   } else if (this.isMouseDownSlot) {
+  //     this.isMouseDownSlot = false
+  //     this.graph.edgeController.setResetEdge()
+  //   } else if (this.isSelecting && this.showSelectingBox) {
+  //     this.isSelecting = false
+  //     this.showSelectingBox = false
+  //     this.selectBoxPath = ''
+  //   } else if (this.isMouseDownSvg) {
+  //     this.isMouseDownSvg = false
+  //     if (!isMove) {
+  //       this.activeEdgeId = 0
+  //       this.selectedNode = []
+  //     }
+  //   }
+  // }
+
+  // mouseLeave(e: MouseEvent) {
+  //   // 当鼠标离开画布时，手动触发画布 mouseup 事件
+  //   this.svgMouseUp(e)
+  // }
 
   mouseWheel(e: WheelEvent) {
     const viewController = this.graph.viewController
@@ -261,7 +349,10 @@ export default class EventController {
   }
 
   destroy() {
-    window.removeEventListener('resize', this.graph.viewController.resize)
-    document.removeEventListener('keydown', this.handleKeyUp)
+    this.eventQueue.forEach((item: any) => {
+      item.remove()
+    })
+
+    this.graph.off()
   }
 }

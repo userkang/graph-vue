@@ -14,7 +14,7 @@ export const isTarget = (e: MouseEvent, type: string) => {
 }
 
 export const addEventListener = (
-  target: HTMLElement,
+  target: HTMLElement | Window,
   eventType: string,
   callback: any
 ) => {

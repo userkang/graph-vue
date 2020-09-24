@@ -163,16 +163,16 @@ export default class GraphContent extends Vue {
   }
 
   mouseWheel(e: WheelEvent) {
-    this.graph.eventController.mouseWheel(e)
+    // this.graph.eventController.mouseWheel(e)
   }
 
   showMenu(e: MouseEvent, type: string, item: IEdgeType) {
-    this.graph.menuController.showMenu({
-      x: e.x,
-      y: e.y,
-      type,
-      item
-    })
+    // this.graph.menuController.showMenu({
+    //   x: e.x,
+    //   y: e.y,
+    //   type,
+    //   item
+    // })
   }
 
   handleDrop(e: DragEvent) {

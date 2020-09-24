@@ -1,3 +1,4 @@
+import EventEmitter from '@/assets/js/event-emitter'
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
@@ -6,7 +7,7 @@ import NodeController from './node'
 import EdgeController from './edge'
 import ImmutableController from './immutable'
 
-export default class Graph {
+export default class Graph extends EventEmitter {
   public config: { [key: string]: any }
 
   public viewController!: ViewController
@@ -21,7 +22,7 @@ export default class Graph {
   public edges: IEdgeType[] = []
 
   constructor(config: any) {
-    ;(window as any).ddd = this
+    super()
     this.config = config
     this.initController()
   }

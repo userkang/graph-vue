@@ -208,6 +208,7 @@ export default class GraphContent extends Vue {
 
 <style lang="scss" scoped>
 .graph-content-wrap {
+  background: url('../assets/imgs/grid.svg') no-repeat center rgba(0, 10, 40, 0.9);
   position: relative;
   width: 100%;
   height: 100%;

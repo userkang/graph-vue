@@ -51,6 +51,12 @@ export default class Graph extends EventEmitter {
     this.viewController.translate(x, y)
   }
 
+  public findNode(id: number) {
+    return this.nodes.filter(item => {
+      return id === item.nodeId
+    })[0]
+  }
+
   // 加载数据
   data(data: IDataItem) {
     this.nodes = JSON.parse(JSON.stringify(data.nodes))

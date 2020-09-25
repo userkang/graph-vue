@@ -18,9 +18,9 @@ export default class DragSvg {
 
   init() {
     this.graph.on('svg.mousedown', this.mouseDown.bind(this))
-    this.graph.on('svg.mousemove', this.mouseMove.bind(this))
-    this.graph.on('svg.mouseup', this.mouseUp.bind(this))
-    this.graph.on('svg.mouseleave', this.mouseUp.bind(this))
+    this.graph.on('mousemove', this.mouseMove.bind(this))
+    this.graph.on('mouseup', this.mouseUp.bind(this))
+    this.graph.on('mouseleave', this.mouseUp.bind(this))
   }
 
   mouseDown(e: MouseEvent) {

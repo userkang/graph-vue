@@ -3,14 +3,9 @@ import { addEventListener, isTarget, getItem } from '@/assets/js/dom'
 
 export default class DragNode {
   graph: Graph
-  $svg: HTMLElement
   event: { [key: string]: any } = []
+  isMoving = false
 
-  // 移动前的坐标
-  originX = 0
-  originY = 0
-
-  isMouseDownNode = false
   // 当前拖动节点
   activeNode!: INodeType
   // 当前被选中节点
@@ -27,43 +22,28 @@ export default class DragNode {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$svg = graph.config.container
     this.init()
   }
 
   init() {
-    // this.event.push(
-    //   addEventListener(this.$svg, 'mousedown', this.mouseDown.bind(this))
-    // )
-    // this.event.push(
-    //   addEventListener(this.$svg, 'mousemove', this.mouseMove.bind(this))
-    // )
-    // this.event.push(
-    //   addEventListener(this.$svg, 'mouseup', this.mouseUp.bind(this))
-    // )
+    this.graph.on('node.mousedown', this.mouseDown.bind(this))
+    this.graph.on('mousemove', this.mouseMove.bind(this))
+    this.graph.on('mouseup', this.mouseUp.bind(this))
+    this.graph.on('mouseleave', this.mouseUp.bind(this))
   }
 
-  mouseDown(e: MouseEvent) {
-    if (isTarget(e, 'node')) {
-      this.isMouseDownNode = true
-      this.startX = this.originX = e.x
-      this.startY = this.originY = e.y
-      // this.activeNode = getItem(e)
+  mouseDown(e: MouseEvent, item: INodeType) {
+    this.isMoving = true
 
-      this.activeNode = this.graph.nodes.filter(item => {
-        return getItem(e).nodeId === item.nodeId
-      })[0]
+    this.activeNode = this.graph.findNode(item.nodeId)
 
-      console.log(this.activeNode)
-
-      this.checkActiveNodeIsSelected()
-    }
+    this.checkActiveNodeIsSelected()
   }
 
   mouseMove(e: MouseEvent) {
     const { x, y } = e
 
-    if (this.isMouseDownNode) {
+    if (this.isMoving) {
       this.moveX = x - this.startX
       this.moveY = y - this.startY
 
@@ -71,10 +51,6 @@ export default class DragNode {
         item.posX += this.moveX / this.graph.getZoom()
         item.posY += this.moveY / this.graph.getZoom()
       })
-      console.log(this.moveNode)
-
-      this.startX = x
-      this.startY = y
     }
 
     this.startX = x
@@ -82,11 +58,7 @@ export default class DragNode {
   }
 
   mouseUp(e: MouseEvent) {
-    if (!this.isMouseDownNode) {
-      return
-    }
-
-    this.isMouseDownNode = false
+    this.isMoving = false
   }
 
   checkActiveNodeIsSelected() {
@@ -105,11 +77,5 @@ export default class DragNode {
     }
 
     return false
-  }
-
-  destroy() {
-    this.event.forEach((item: any) => {
-      item.remove()
-    })
   }
 }

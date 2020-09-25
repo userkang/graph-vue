@@ -1,5 +1,4 @@
 import Graph from '@/controller/graph'
-import { addEventListener, isTarget, getItem } from '@/assets/js/dom'
 
 export default class DragNode {
   graph: Graph
@@ -34,6 +33,8 @@ export default class DragNode {
 
   mouseDown(e: MouseEvent, item: INodeType) {
     this.isMoving = true
+    this.startX = e.x
+    this.startY = e.y
 
     this.activeNode = this.graph.findNode(item.nodeId)
 

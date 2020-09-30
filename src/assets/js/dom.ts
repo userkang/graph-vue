@@ -20,7 +20,10 @@ export const addEventListener = (
 ) => {
   if (target) {
     if (typeof target.addEventListener === 'function') {
-      target.addEventListener(eventType, callback, false)
+      target.addEventListener(eventType, callback, {
+        passive: false,
+        capture: false
+      })
       return {
         remove: () => {
           target.removeEventListener(eventType, callback, false)

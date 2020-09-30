@@ -188,7 +188,14 @@ export default class GraphContent extends Vue {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
       },
-      behavior: ['drag-svg', 'drag-node', 'click-select', 'create-edge']
+      behavior: [
+        'drag-svg',
+        'drag-node',
+        'click-select',
+        'create-edge',
+        'wheel-move',
+        'wheel-zoom'
+      ]
     })
     this.graph.data(this.data)
 

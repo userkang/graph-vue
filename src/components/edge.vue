@@ -1,13 +1,14 @@
 <template>
-  <path
-    stroke-width="2"
-    @click="clickEdge"
-    :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
-    :data-id="edge.edgeId"
-    fill="transparent"
-    :class="lineClassName"
-    @contextmenu.capture="showMenuTips"
-  ></path>
+  <g data-type="edge" :data-item="JSON.stringify(edge)">
+    <path
+      stroke-width="2"
+      :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
+      :data-id="edge.edgeId"
+      fill="transparent"
+      :class="lineClassName"
+      @contextmenu.capture="showMenuTips"
+    ></path>
+  </g>
 </template>
 
 <script lang="ts">
@@ -25,13 +26,20 @@ export default class Edge extends Vue {
 
   path = ''
   calculateCurve = calculateCurve
+  fromNode!: INodeType
+  toNode!: INodeType
+  x1 = 0
+  x2 = 0
+  y1 = 0
+  y2 = 0
+  activeEdgeId = 0
 
   get graph(): Graph {
     return (this.$parent as GraphContent).graph
   }
 
-  get activeEdgeId() {
-    return this.graph.eventController.activeEdgeId
+  get nodeInfo() {
+    return (this.$parent as GraphContent).nodeInfo
   }
 
   get lineClassName() {
@@ -40,50 +48,35 @@ export default class Edge extends Vue {
       : 'edge-style'
   }
 
-  get rectInfo() {
-    return this.graph.viewController.rectInfo
-  }
-
-  get nodes() {
-    return this.graph.nodes
-  }
-
-  get fromNode() {
-    return this.nodes.filter(item => {
-      return item.nodeId === this.edge.fromNodeId
-    })
-  }
-
-  get toNode() {
-    return this.nodes.filter(item => {
-      return item.nodeId === this.edge.toNodeId
-    })
-  }
-
-  get x1() {
-    return this.fromNode[0].posX + this.rectInfo.width / 2
-  }
-
-  get x2() {
-    return this.toNode[0].posX + this.rectInfo.width / 2
-  }
-
-  get y1() {
-    return this.fromNode[0].posY + this.rectInfo.height
-  }
-
-  get y2() {
-    return this.toNode[0].posY
-  }
-
-  clickEdge(e: MouseEvent) {
-    console.log(e)
-  }
-
   showMenuTips(e: MouseEvent) {
     e.preventDefault()
     e.stopPropagation()
     this.$emit('contextMenu', e, 'edge', this.edge)
+  }
+
+  changePosition() {
+    this.fromNode = this.graph.findNode(this.edge.fromNodeId)
+    this.toNode = this.graph.findNode(this.edge.toNodeId)
+    this.x1 = this.fromNode.posX + this.nodeInfo.width / 2
+    this.x2 = this.toNode.posX + this.nodeInfo.width / 2
+    this.y1 = this.fromNode.posY + this.nodeInfo.height
+    this.y2 = this.toNode.posY
+  }
+
+  mounted() {
+    this.changePosition()
+
+    this.graph.on('dragingnode', () => {
+      this.changePosition()
+    })
+
+    this.graph.on('afteraddedge', () => {
+      this.changePosition()
+    })
+
+    this.graph.on('edgeselectchange', (item: IEdgeType) => {
+      this.activeEdgeId = item.edgeId as number
+    })
   }
 }
 </script>

@@ -18,15 +18,12 @@
     >
       <g
         v-if="graph"
-        ref="transformDom"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
           transformOrigin: 'center'
         }"
       >
         <Edge
-          data-type="edge"
-          :data-item="JSON.stringify(item)"
           v-for="item in edges"
           :key="item.edgeId"
           :edge="item"
@@ -37,9 +34,7 @@
           v-for="item in nodes"
           :key="item.nodeId"
           :node="item"
-          @mouseDownNode="mouseDownNode"
-          @mouseDownSlot="mouseDownSlot"
-          @mouseUpSlot="mouseUpSlot"
+          :selectedNodes="selectedNodes"
           @contextMenu="showMenu"
         />
 
@@ -60,7 +55,7 @@
         <NewEdge />
       </g>
       <path
-        :d="selectBoxPath"
+        :d="brushPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
     </svg>
@@ -104,29 +99,23 @@ export default class GraphContent extends Vue {
 
   graph: any = null
 
-  // nodes: INodeType[] = []
-  // edges: IEdgeType[] = []
-
-  get nodes() {
-    return this.graph.getNodes()
+  nodeInfo = {
+    width: 190,
+    height: 35
   }
 
-  get edges() {
-    return this.graph.getEdges()
+  nodes: INodeType[] = []
+  edges: IEdgeType[] = []
+  selectedNodes: INodeType[] = []
+  transform = {
+    scale: 1,
+    translateX: 0,
+    translateY: 0
   }
+  brushPath = ''
 
   get dragingInfo() {
     return this.componentState.dragingInfo
-  }
-
-  get transform() {
-    return this.graph.viewController.transform
-  }
-
-  get selectBoxPath() {
-    if (this.graph) {
-      return this.graph.eventController.selectBoxPath
-    }
   }
 
   svgMouseDown(e: MouseEvent) {
@@ -178,8 +167,8 @@ export default class GraphContent extends Vue {
   handleDrop(e: DragEvent) {
     e.preventDefault()
     const { clientX: x, clientY: y } = e
-    const posX = x - this.dragingInfo.offsetX * this.transform.scale
-    const posY = y - this.dragingInfo.offsetY * this.transform.scale
+    const posX = x - this.dragingInfo.offsetX * this.graph.getZoom()
+    const posY = y - this.dragingInfo.offsetY * this.graph.getZoom()
 
     // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
@@ -194,10 +183,52 @@ export default class GraphContent extends Vue {
   mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as SVGElement,
-      rectInfo: this.nodeStyle,
-      drection: this.$attrs.drection
+      drection: this.$attrs.drection,
+      nodeInfo: {
+        width: this.nodeInfo.width,
+        height: this.nodeInfo.height
+      },
+      behavior: ['drag-svg', 'drag-node', 'click-select', 'create-edge']
     })
     this.graph.data(this.data)
+
+    this.initCustomHooks()
+  }
+
+  initCustomHooks() {
+    const hooks = [
+      'afteraddnode',
+      'nodeselectchange',
+      'aftertranslate',
+      'afterzoom',
+      'afteraddedge'
+    ]
+    hooks.forEach(hook => {
+      this.graph.on(hook, (this as any)[hook])
+    })
+  }
+
+  afteraddnode(item: INodeType) {
+    this.nodes = this.graph.getNodes()
+    console.log('afteraddnode', item)
+  }
+
+  afteraddedge(item: IEdgeType) {
+    this.edges = this.graph.getEdges()
+    console.log('afteraddedge', item)
+  }
+
+  nodeselectchange(nodes: INodeType[]) {
+    this.selectedNodes = nodes
+  }
+
+  aftertranslate(x: number, y: number) {
+    this.transform.translateX = x
+    this.transform.translateY = y
+  }
+
+  afterzoom(zoom: number) {
+    this.transform.scale = zoom
   }
 
   beforeDestroy() {
@@ -208,7 +239,8 @@ export default class GraphContent extends Vue {
 
 <style lang="scss" scoped>
 .graph-content-wrap {
-  background: url('../assets/imgs/grid.svg') no-repeat center rgba(0, 10, 40, 0.9);
+  // background: url('../assets/imgs/grid.svg') no-repeat center
+  //   rgba(0, 10, 40, 0.9);
   position: relative;
   width: 100%;
   height: 100%;

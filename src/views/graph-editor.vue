@@ -45,7 +45,6 @@ export default class GraphEditor extends Vue {
   }
 
   clickMenu(e: MouseEvent, menu: IMenu) {
-    console.log((e.target as HTMLElement).id, menu)
     menu.show = false
   }
 

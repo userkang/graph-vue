@@ -1,16 +1,16 @@
 <template>
   <circle
+    data-type="slot"
+    :data-item="item"
     class="slot-style"
     :class="{
-      'enable-slot': isSlotEnableLink,
+      'enable-slot': slotEnableLink,
       'active-slot': isInOrOut === 'out',
-      'linked-slot': !isSlotEnableLink && isSlotLinked
+      'linked-slot': !slotEnableLink && isSlotLinked
     }"
-    :r="isSlotEnableLink ? highlightCircleR : circleR"
+    :r="slotEnableLink ? highlightCircleR : circleR"
     :cx="cx"
     :cy="cy"
-    @mousedown="addLine"
-    @mouseup="mouseup"
   ></circle>
 </template>
 
@@ -30,59 +30,64 @@ export default class LinkSlot extends Vue {
   })
   isInOrOut!: string
 
+  fromNodeId = 0
+  directLinked = false
+  slotEnableLink = false
+  addingEdge = false
+
   get graph() {
     return (this.$parent as GraphContent).graph
   }
 
-  get fromNodeId() {
-    return this.graph.eventController.fromNodeId
+  get nodeInfo() {
+    return (this.$parent as GraphContent).nodeInfo
   }
 
-  get rectInfo() {
-    return this.graph.viewController.rectInfo
+  get item() {
+    return JSON.stringify({
+      node: this.node,
+      isInOrOut: this.isInOrOut,
+      posX: this.cx,
+      posY: this.cy,
+      enableLink: this.slotEnableLink
+    })
   }
 
   circleR = 4
   highlightCircleR = 6
 
   get cx() {
-    return this.node.posX + this.rectInfo.width / 2
+    return this.node.posX + this.nodeInfo.width / 2
   }
 
   get cy() {
     return this.isInOrOut === 'in'
       ? this.node.posY
-      : this.node.posY + this.rectInfo.height
-  }
-
-  get edges(): IEdgeType[] {
-    return this.graph.edges
-  }
-
-  get isCreateLine() {
-    return this.graph.edgeController.createEdge.show
+      : this.node.posY + this.nodeInfo.height
   }
 
   get isSlotLinked() {
     if (this.isInOrOut === 'in') {
-      return this.edges
-        .map(item => {
+      return this.graph
+        .getEdges()
+        .map((item: any) => {
           return item.toNodeId
         })
         .includes(this.node.nodeId)
     } else {
-      return this.edges
-        .map(item => {
+      return this.graph
+        .getEdges()
+        .map((item: any) => {
           return item.fromNodeId
         })
         .includes(this.node.nodeId)
     }
   }
 
-  get isDirectLinked() {
+  isDirectLinked() {
     if (this.isInOrOut === 'in') {
       let linked = false
-      for (const item of this.edges) {
+      for (const item of this.graph.getEdges()) {
         linked =
           item.fromNodeId === this.fromNodeId &&
           item.toNodeId === this.node.nodeId
@@ -94,29 +99,25 @@ export default class LinkSlot extends Vue {
     }
   }
 
-  get isSlotEnableLink() {
+  isSlotEnableLink() {
     return (
       this.fromNodeId !== this.node.nodeId &&
       this.isInOrOut === 'in' &&
-      this.isCreateLine &&
-      !this.isDirectLinked
+      this.addingEdge &&
+      !this.directLinked
     )
   }
 
-  addLine(e: MouseEvent) {
-    e.stopPropagation()
-    if (this.isInOrOut === 'out') {
-      // 是初始化连线的起点和移动位置
-      this.graph.edgeController.setNewEdgeStart(this.cx, this.cy)
-      this.graph.edgeController.setNewEdgeMove(this.cx, this.cy)
-      this.$emit('mousedown', e)
-    }
-  }
+  mounted() {
+    this.graph.on('fromNodeIdChange', (id: number) => {
+      this.fromNodeId = id
+      this.directLinked = this.isDirectLinked() as boolean
+    })
 
-  mouseup(e: MouseEvent) {
-    if (this.isSlotEnableLink) {
-      this.$emit('mouseup', e)
-    }
+    this.graph.on('addingEdge', (createEdge: any) => {
+      this.addingEdge = createEdge.show
+      this.slotEnableLink = this.isSlotEnableLink()
+    })
   }
 }
 </script>

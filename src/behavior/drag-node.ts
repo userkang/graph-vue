@@ -51,6 +51,7 @@ export default class DragNode {
       this.moveNode.forEach(item => {
         item.posX += this.moveX / this.graph.getZoom()
         item.posY += this.moveY / this.graph.getZoom()
+        this.graph.emit('dragingnode')
       })
     }
 
@@ -64,6 +65,7 @@ export default class DragNode {
 
   checkActiveNodeIsSelected() {
     this.moveNode = [this.activeNode]
+    this.selectedNode = this.graph.getNodeState('select')
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
     if (this.isNodeSelected(this.activeNode.nodeId)) {
       this.moveNode = this.selectedNode

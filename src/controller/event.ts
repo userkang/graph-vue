@@ -1,7 +1,6 @@
 import Graph from './graph'
 import { addEventListener, isTarget, getItem } from '@/assets/js/dom'
-import DragSvg from '@/behavior/drag-svg'
-import DragNode from '@/behavior/drag-node'
+import behaviors from '@/behavior'
 
 const EVENTS = [
   'mousedown',
@@ -28,6 +27,7 @@ export default class EventController {
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
   currentItemType = 'svg'
+  behaveInstance: any = {}
 
   isMouseDownNode = false
   isMouseDownSlot = false
@@ -80,11 +80,29 @@ export default class EventController {
         )
       )
     })
+
+    this.eventQueue.push(
+      addEventListener(
+        window as any,
+        'resize',
+        this.graph.resize.bind(this.graph)
+      )
+    )
   }
 
   initBehavior() {
-    const dragSvg = new DragSvg(this.graph)
-    const dragNode = new DragNode(this.graph)
+    const behavior = this.graph.config.behavior
+    if (behavior) {
+      behavior.forEach((item: string) => {
+        const func = behaviors[item]
+        if (func && !this.behaveInstance[item]) {
+          const behave = new func(this.graph)
+          if (behave) {
+            this.behaveInstance[item] = behave
+          }
+        }
+      })
+    }
   }
 
   handleMouseEvent(e: MouseEvent) {
@@ -100,8 +118,8 @@ export default class EventController {
     }
 
     if (eventType === 'mouseup') {
-      const isMove = e.x - this.originX || e.y - this.originY
-      if (!isMove) {
+      const moved = e.x - this.originX || e.y - this.originY
+      if (!moved) {
         this.emitMouseEvent(e, 'click')
       }
     }
@@ -119,6 +137,18 @@ export default class EventController {
 
     if (isTarget(e, 'node')) {
       this.currentItemType = 'node'
+      const item = getItem(e)
+      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
+    }
+
+    if (isTarget(e, 'edge')) {
+      this.currentItemType = 'edge'
+      const item = getItem(e)
+      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
+    }
+
+    if (isTarget(e, 'slot')) {
+      this.currentItemType = 'slot'
       const item = getItem(e)
       this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
     }
@@ -330,14 +360,14 @@ export default class EventController {
     const viewController = graph.viewController
 
     if (
-      item.posY + viewController.rectInfo.height <
+      item.posY + viewController.nodeInfo.height <
       viewController.positionTransformY(range.startY)
     ) {
       return false
     } else if (item.posY > viewController.positionTransformY(range.endY)) {
       return false
     } else if (
-      item.posX + viewController.rectInfo.width <
+      item.posX + viewController.nodeInfo.width <
       viewController.positionTransformX(range.startX)
     ) {
       return false

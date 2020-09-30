@@ -4,13 +4,6 @@ export default class ClickSelect {
   graph: Graph
   event: { [key: string]: any } = []
 
-  // 当前拖动节点
-  activeNode!: INodeType
-  // 当前被选中节点
-  selectedNode: INodeType[] = []
-  // 移动的节点
-  moveNode: INodeType[] = []
-
   constructor(graph: Graph) {
     this.graph = graph
     this.init()
@@ -23,10 +16,26 @@ export default class ClickSelect {
   }
 
   clickNode(e: MouseEvent, item: INodeType) {
-    this.activeNode = this.graph.findNode(item.nodeId)
+    this.resetSelect()
+    const selectNodes = [this.graph.findNode(item.nodeId)]
+    this.graph.setNodeState('select', selectNodes)
+    this.graph.emit('nodeselectchange', selectNodes)
   }
 
-  clickEdge(e: MouseEvent, item: IEdgeType) {}
+  clickEdge(e: MouseEvent, item: IEdgeType) {
+    this.resetSelect()
+    this.graph.setEdgeState('select', item)
+    this.graph.emit('edgeselectchange', item)
+  }
 
-  clickSvg(e: MouseEvent) {}
+  clickSvg(e: MouseEvent) {
+    this.resetSelect()
+  }
+
+  resetSelect() {
+    this.graph.setNodeState('select', [])
+    this.graph.setEdgeState('select', [])
+    this.graph.emit('nodeselectchange', [])
+    this.graph.emit('edgeselectchange', [])
+  }
 }

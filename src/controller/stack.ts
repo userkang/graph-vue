@@ -1,6 +1,6 @@
 import Graph from './graph'
 
-export default class Immutable {
+export default class Stack {
   private graph: Graph
 
   private initialStates: IDataItem = {

@@ -6,7 +6,11 @@ export default class EventEmitter {
       this._events[evt] = []
     }
     this._events[evt].push(callback)
-    return this
+    return {
+      remove: () => {
+        this.off(evt, callback)
+      }
+    }
   }
 
   emit(evt: string, ...args: any) {

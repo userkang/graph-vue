@@ -28,8 +28,8 @@ export default class LayoutController {
     graph.nodes.forEach(item => {
       this.layout.setNode(item.nodeId, {
         label: item.nodeName,
-        width: viewController.rectInfo.width,
-        height: viewController.rectInfo.height
+        width: viewController.nodeInfo.width,
+        height: viewController.nodeInfo.height
       })
     })
 
@@ -44,8 +44,8 @@ export default class LayoutController {
         if (String(item.nodeId) === v) {
           const { x, y } = this.layout.node(v)
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-          item.posX = x - viewController.rectInfo.width / 2
-          item.posY = y - viewController.rectInfo.height / 2
+          item.posX = x - 80
+          item.posY = y - 80
         }
       })
     })

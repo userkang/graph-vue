@@ -18,11 +18,9 @@ export default class ViewController {
     height: 0
   }
 
-  public rectInfo = {
+  public nodeInfo = {
     width: 190,
-    height: 35,
-    rx: 2,
-    ry: 2
+    height: 35
   }
 
   // 画布变换相关值
@@ -37,21 +35,21 @@ export default class ViewController {
   constructor(graph: Graph) {
     this.graph = graph
     this.$container = graph.config.container
-    this.rectInfo = graph.config.rectInfo
+    this.nodeInfo = graph.config.nodeInfo
     this.translateToCenter()
     this.resize()
   }
 
   expand() {
     if (this.transform.scale < 2) {
-      this.transform.scale += 0.1
+      this.graph.zoom(this.transform.scale + 0.1)
       this.caculateOffset()
     }
   }
 
   shrink() {
     if (this.transform.scale > 0.5) {
-      this.transform.scale -= 0.1
+      this.graph.zoom(this.transform.scale - 0.1)
       this.caculateOffset()
     }
   }
@@ -62,7 +60,7 @@ export default class ViewController {
   }
 
   reset() {
-    this.transform.scale = 1
+    this.graph.zoom(1)
     this.transform.offsetX = 0
     this.transform.offsetY = 0
   }
@@ -96,7 +94,7 @@ export default class ViewController {
       scale = 0.5
     }
 
-    this.transform.scale = scale
+    this.graph.zoom(scale)
     this.caculateOffset()
 
     this.translateToCenter()
@@ -128,7 +126,7 @@ export default class ViewController {
         ((this.svgInfo.height - transformInfo.height) / 2 - transformTop) /
         this.transform.scale
 
-      this.translate(translateX, translateY)
+      this.graph.translate(translateX, translateY)
     })
   }
 
@@ -157,7 +155,7 @@ export default class ViewController {
     )
   }
 
-  public resize() {
+  resize() {
     const bounding = this.$container.getBoundingClientRect()
 
     this.svgInfo = {

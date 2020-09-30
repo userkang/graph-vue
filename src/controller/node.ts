@@ -3,16 +3,19 @@ import Graph from './graph'
 export default class NodeController {
   graph: Graph
 
+  // 当前被选中节点
+  select: INodeType[] = []
+
   constructor(graph: Graph) {
     this.graph = graph
   }
 
   addNode(item: INodeType) {
     this.graph.nodes.push(JSON.parse(JSON.stringify(item)))
-    this.graph.immutableController.push({
-      nodes: this.graph.nodes,
-      edges: this.graph.edges
-    })
+    // this.graph.immutableController.push({
+    //   nodes: this.graph.nodes,
+    //   edges: this.graph.edges
+    // })
   }
 
   deleteNode(id: number) {

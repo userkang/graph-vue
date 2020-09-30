@@ -1,39 +1,27 @@
 <template>
-  <g @mousedown="handleNodeMouseDown">
-    <rect
-      ref="node"
-      class="graph-node"
-      :style="{
-        stroke: isNodeSelected ? '#606BE1' : '#DEDFEC',
-        fill: isNodeSelected ? 'rgba(220,223,245,0.8)' : 'rgba(252,252,251,0.8)'
-      }"
-      :width="rectInfo.width"
-      :height="rectInfo.height"
-      :x="node.posX"
-      :y="node.posY"
-      :rx="rectInfo.rx"
-      :ry="rectInfo.ry"
-    ></rect>
+  <g>
     <foreignObject
       :x="node.posX"
       :y="node.posY"
-      :width="rectInfo.width"
-      :height="rectInfo.height"
+      :width="nodeInfo.width"
+      :height="nodeInfo.height"
       data-type="node"
       :data-item="JSON.stringify(node)"
     >
-      <div class="node-content">{{ node.nodeName }}</div>
+      <div
+        class="graph-node"
+        :style="{
+          'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',
+          background: isNodeSelected
+            ? 'rgba(220,223,245,0.9)'
+            : 'rgba(252,252,251,0.9)'
+        }"
+      >
+        {{ node.nodeName }}
+      </div>
     </foreignObject>
-    <LinkSlot
-      :node="node"
-      isInOrOut="in"
-      @mouseup="handleSlotMouseUp"
-    />
-    <LinkSlot
-      :node="node"
-      isInOrOut="out"
-      @mousedown="handleSlotMouseDown"
-    />
+    <LinkSlot :node="node" isInOrOut="in" />
+    <LinkSlot :node="node" isInOrOut="out" />
   </g>
 </template>
 
@@ -53,31 +41,29 @@ export default class Node extends Vue {
   })
   node!: INodeType
 
+  @Prop()
+  selectedNodes!: INodeType[]
+
+  get nodeInfo() {
+    return (this.$parent as GraphContent).nodeInfo
+  }
+
   get graph() {
     return (this.$parent as GraphContent).graph
   }
 
-  get rectInfo() {
-    return this.graph.viewController.rectInfo
-  }
-
   get isNodeSelected() {
-    return this.graph.eventController.isNodeSelected(this.node.nodeId)
+    return this.nodeSelected(this.node.nodeId)
   }
 
-  handleNodeMouseDown(e: MouseEvent) {
-    // e.stopPropagation()
-    if (e.button === 0) {
-      this.$emit('mouseDownNode', e, this.node)
+  nodeSelected(id: number) {
+    for (const item of this.selectedNodes) {
+      if (item.nodeId === id) {
+        return true
+      }
     }
-  }
 
-  handleSlotMouseDown(e: MouseEvent) {
-    this.$emit('mouseDownSlot', e, this.node)
-  }
-
-  handleSlotMouseUp(e: MouseEvent) {
-    this.$emit('mouseUpSlot', e, this.node)
+    return false
   }
 
   showMenuTips(e: MouseEvent) {
@@ -90,24 +76,16 @@ export default class Node extends Vue {
 
 <style lang="scss" scoped>
 .graph-node {
-  stroke-width: 1;
-  cursor: pointer;
-  @keyframes rotate {
-    from {
-      transform: rotate(0);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-}
-.node-content {
   height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 12px;
   color: #666;
+  border-width: 1px;
+  border-style: solid;
+  border-radius: 2px;
+  box-sizing: border-box;
   cursor: pointer;
 }
 </style>

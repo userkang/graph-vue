@@ -74,6 +74,10 @@ export default class Edge extends Vue {
       this.changePosition()
     })
 
+    this.graph.on('afterlayout', () => {
+      this.changePosition()
+    })
+
     this.graph.on('edgeselectchange', (item: IEdgeType) => {
       this.activeEdgeId = item.edgeId as number
     })

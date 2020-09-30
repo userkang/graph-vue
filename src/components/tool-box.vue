@@ -49,7 +49,7 @@ export default class ToolBox extends Vue {
         graph.viewController.fullScreen()
         break
       case 'layout':
-        graph.layoutController.execute()
+        graph.layout()
         break
       case 'fitView':
         graph.viewController.fitView()

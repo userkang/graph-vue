@@ -74,6 +74,11 @@ export default class Graph extends EventEmitter {
     this.emit('afterzoom', value)
   }
 
+  public layout() {
+    this.layoutController.layout()
+    this.emit('afterlayout')
+  }
+
   public translate(x: number, y: number) {
     this.viewController.translate(x, y)
     this.emit(

@@ -3,7 +3,7 @@ import Graph from './graph'
 
 export default class LayoutController {
   graph: Graph
-  layout: any = null
+  dagre: any = null
 
   constructor(graph: Graph) {
     this.graph = graph
@@ -11,22 +11,22 @@ export default class LayoutController {
   }
 
   init() {
-    this.layout = new dagre.graphlib.Graph()
-    this.layout.setGraph({
+    this.dagre = new dagre.graphlib.Graph()
+    this.dagre.setGraph({
       width: 0,
       height: 0
     })
-    this.layout.setDefaultEdgeLabel(() => {
+    this.dagre.setDefaultEdgeLabel(() => {
       return {}
     })
   }
 
-  execute() {
+  layout() {
     const { graph } = this
     const viewController = graph.viewController
 
     graph.nodes.forEach(item => {
-      this.layout.setNode(item.nodeId, {
+      this.dagre.setNode(item.nodeId, {
         label: item.nodeName,
         width: viewController.nodeInfo.width,
         height: viewController.nodeInfo.height
@@ -34,15 +34,15 @@ export default class LayoutController {
     })
 
     graph.edges.forEach(item => {
-      this.layout.setEdge(item.fromNodeId, item.toNodeId)
+      this.dagre.setEdge(item.fromNodeId, item.toNodeId)
     })
 
-    dagre.layout(this.layout)
+    dagre.layout(this.dagre)
 
-    this.layout.nodes().forEach((v: string) => {
+    this.dagre.nodes().forEach((v: string) => {
       graph.nodes.forEach(item => {
         if (String(item.nodeId) === v) {
-          const { x, y } = this.layout.node(v)
+          const { x, y } = this.dagre.node(v)
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
           item.posX = x - 80
           item.posY = y - 80

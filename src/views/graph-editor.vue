@@ -2,12 +2,7 @@
   <div class="main-wrap">
     <ComponentPanel class="component-panel" />
     <div class="main-center-wrap">
-      <Graph ref="graphRef" :data="data" :nodeStyle="nodeStyle" drection="h">
-        <ToolBox />
-        <Menu @click="clickMenu">
-          <li id="delete">删除</li>
-        </Menu>
-      </Graph>
+      <Graph ref="graphRef" :data="data" />
     </div>
   </div>
 </template>
@@ -16,8 +11,6 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import Graph from '@/components/graph.vue'
-import ToolBox from '@/components/tool-box.vue'
-import Menu from '@/components/menu.vue'
 
 import GraphStore from '@/stores/graph'
 
@@ -29,24 +22,11 @@ interface CopyReturnValue {
 @Component({
   components: {
     Graph,
-    ComponentPanel,
-    ToolBox,
-    Menu
+    ComponentPanel
   }
 })
 export default class GraphEditor extends Vue {
   data!: IGraphDataType
-
-  nodeStyle = {
-    width: 190,
-    height: 35,
-    rx: 2,
-    ry: 2
-  }
-
-  clickMenu(e: MouseEvent, menu: IMenu) {
-    menu.show = false
-  }
 
   created() {
     this.data = GraphStore.getData()

@@ -13,16 +13,10 @@ export default class WheelMove {
   }
 
   onWheel(e: WheelEvent) {
-    if (e.ctrlKey) {
+    if (!e.ctrlKey) {
       e.preventDefault()
-      let ratio = this.graph.getZoom()
-
-      if ((e as any).wheelDelta > 0) {
-        ratio = ratio + ratio * 0.05
-      } else {
-        ratio = ratio - ratio * 0.05
-      }
-      this.graph.zoom(ratio)
+      const ratio = this.graph.getZoom()
+      this.graph.translate(-e.deltaX / ratio, -e.deltaY / ratio)
     }
   }
 }

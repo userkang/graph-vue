@@ -20,6 +20,7 @@ export default class Graph extends EventEmitter {
 
   public nodes: INodeType[] = []
   public edges: IEdgeType[] = []
+  public brushing = false
 
   constructor(config: any) {
     super()
@@ -37,9 +38,14 @@ export default class Graph extends EventEmitter {
     this.stackController = new StackController(this)
   }
 
+  public getPointByClient(originX: number, originY: number) {
+    return this.viewController.getPointByClient(originX, originY)
+  }
+
   public addNode(item: INodeType) {
-    item.posX = this.viewController.positionTransformX(item.posX)
-    item.posY = this.viewController.positionTransformY(item.posY)
+    const point = this.getPointByClient(item.posX, item.posY)
+    item.posX = point.x
+    item.posY = point.y
     this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
   }
@@ -70,8 +76,13 @@ export default class Graph extends EventEmitter {
   }
 
   public zoom(value: number) {
-    this.viewController.transform.scale = value
-    this.emit('afterzoom', value)
+    const zoom = this.getZoom()
+    if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
+      this.viewController.transform.scale = value
+
+      this.viewController.caculateOffset()
+      this.emit('afterzoom', value)
+    }
   }
 
   public layout() {
@@ -97,7 +108,7 @@ export default class Graph extends EventEmitter {
   public findEdge(id: number) {
     return this.edges.filter(item => {
       return id === item.edgeId
-    })
+    })[0]
   }
 
   // 加载数据
@@ -111,12 +122,35 @@ export default class Graph extends EventEmitter {
     )
   }
 
+  setMode(mode: string) {
+    this.mode = mode
+    // this.eventController.destroy()
+    this.eventController.initEvent()
+    this.eventController.initBehavior()
+  }
+
+  getNodeWidth() {
+    return this.viewController.nodeInfo.width
+  }
+
+  getNodeHeight() {
+    return this.viewController.nodeInfo.height
+  }
+
   getNodes() {
     return this.nodes
   }
 
   getEdges() {
     return this.edges
+  }
+
+  getBrushing() {
+    return this.brushing
+  }
+
+  setBrushing(value: boolean) {
+    this.brushing = value
   }
 
   undo() {

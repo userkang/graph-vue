@@ -5,37 +5,25 @@
       xmlns="http://www.w3.org/2000/svg"
       xmlns:xlink="http://www.w3.org/1999/xlink"
       ref="svg"
-      @mousedown="svgMouseDown"
-      @mousemove="mouseMove"
-      @mouseup="svgMouseUp"
       @dragover="e => e.preventDefault()"
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
-      @mousewheel="mouseWheel"
-      @mouseleave="mouseLeave"
       width="100%"
       height="100%"
     >
       <g
-        v-if="graph"
         :style="{
           transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
           transformOrigin: 'center'
         }"
+        v-if="graph"
       >
-        <Edge
-          v-for="item in edges"
-          :key="item.edgeId"
-          :edge="item"
-          @click.native="e => edgeClick(item.edgeId)"
-          @contextMenu="showMenu"
-        />
+        <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
         <Node
           v-for="item in nodes"
           :key="item.nodeId"
           :node="item"
           :selectedNodes="selectedNodes"
-          @contextMenu="showMenu"
         />
 
         <!-- <template v-if="nodeGroups">
@@ -59,7 +47,11 @@
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
     </svg>
-    <slot />
+
+    <ToolBox :isBrushing="isBrushing" />
+    <!-- <Menu>
+        <li id="delete">删除</li>
+      </Menu> -->
   </div>
 </template>
 
@@ -112,56 +104,11 @@ export default class GraphContent extends Vue {
     translateX: 0,
     translateY: 0
   }
+  isBrushing = false
   brushPath = ''
 
   get dragingInfo() {
     return this.componentState.dragingInfo
-  }
-
-  svgMouseDown(e: MouseEvent) {
-    // this.graph.eventController.svgMouseDown(e)
-  }
-
-  mouseMove(e: MouseEvent) {
-    // this.graph.eventController.mouseMove(e)
-  }
-
-  svgMouseUp(e: MouseEvent) {
-    // this.graph.eventController.svgMouseUp(e)
-  }
-
-  mouseDownNode(e: MouseEvent, node: INodeType) {
-    // this.graph.eventController.mouseDownNode(e, node)
-  }
-
-  mouseDownSlot(e: MouseEvent, node: INodeType) {
-    // this.graph.eventController.mouseDownSlot(e, node)
-  }
-
-  mouseUpSlot(e: MouseEvent, node: INodeType) {
-    // this.graph.eventController.mouseUpSlot(e, node)
-  }
-
-  edgeClick(edgeId: number) {
-    // this.graph.eventController.edgeClick(edgeId)
-  }
-
-  mouseLeave(e: MouseEvent) {
-    // 当鼠标离开画布时，手动触发画布 mouseup 事件
-    // this.graph.eventController.mouseLeave(e)
-  }
-
-  mouseWheel(e: WheelEvent) {
-    // this.graph.eventController.mouseWheel(e)
-  }
-
-  showMenu(e: MouseEvent, type: string, item: IEdgeType) {
-    // this.graph.menuController.showMenu({
-    //   x: e.x,
-    //   y: e.y,
-    //   type,
-    //   item
-    // })
   }
 
   handleDrop(e: DragEvent) {
@@ -172,7 +119,7 @@ export default class GraphContent extends Vue {
 
     // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
-      nodeId: posX + '' + posY,
+      nodeId: Number(posX + '' + posY),
       nodeName: this.dragingInfo.component.componentName,
       nodeDesc: this.dragingInfo.component.componentDesc,
       posX,
@@ -188,15 +135,17 @@ export default class GraphContent extends Vue {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
       },
-      behavior: [
+      action: [
         'drag-svg',
         'drag-node',
         'click-select',
         'create-edge',
         'wheel-move',
-        'wheel-zoom'
+        'wheel-zoom',
+        'brush-select'
       ]
     })
+    console.log('graph')
     this.graph.data(this.data)
 
     this.initCustomHooks()
@@ -208,11 +157,24 @@ export default class GraphContent extends Vue {
       'nodeselectchange',
       'aftertranslate',
       'afterzoom',
-      'afteraddedge'
+      'afteraddedge',
+      'brushing',
+      'mouseup'
     ]
     hooks.forEach(hook => {
       this.graph.on(hook, (this as any)[hook])
     })
+  }
+
+  brushing(path: string) {
+    this.brushPath = path
+  }
+
+  mouseup() {
+    if (this.graph.getBrushing()) {
+      this.graph.setBrushing(false)
+      this.isBrushing = false
+    }
   }
 
   afteraddnode(item: INodeType) {

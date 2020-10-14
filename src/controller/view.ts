@@ -41,17 +41,11 @@ export default class ViewController {
   }
 
   expand() {
-    if (this.transform.scale < 2) {
-      this.graph.zoom(this.transform.scale + 0.1)
-      this.caculateOffset()
-    }
+    this.graph.zoom(this.transform.scale + 0.1)
   }
 
   shrink() {
-    if (this.transform.scale > 0.5) {
-      this.graph.zoom(this.transform.scale - 0.1)
-      this.caculateOffset()
-    }
+    this.graph.zoom(this.transform.scale - 0.1)
   }
 
   select() {
@@ -95,7 +89,6 @@ export default class ViewController {
     }
 
     this.graph.zoom(scale)
-    this.caculateOffset()
 
     this.translateToCenter()
   }
@@ -139,20 +132,16 @@ export default class ViewController {
     this.transform.translateY += y
   }
 
-  positionTransformX(originValue: number) {
-    const posX = originValue - this.svgInfo.x
-    return (
+  getPointByClient(originX: number, originY: number) {
+    const posX = originX - this.svgInfo.x
+    const posY = originY - this.svgInfo.y
+    const x =
       (posX + this.transform.offsetX) / this.transform.scale -
       this.transform.translateX
-    )
-  }
-
-  positionTransformY(originValue: number) {
-    const posY = originValue - this.svgInfo.y
-    return (
+    const y =
       (posY + this.transform.offsetY) / this.transform.scale -
       this.transform.translateY
-    )
+    return { x, y }
   }
 
   resize() {

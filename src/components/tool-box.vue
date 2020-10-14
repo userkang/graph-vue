@@ -6,7 +6,7 @@
     <li
       title="框选"
       id="select"
-      :class="{ select: isSelecting }"
+      :class="{ select: isBrushing }"
       class="iconfont iconkuangxuan"
     ></li>
     <li title="全屏" id="fullScreen" class="iconfont iconquanping2"></li>
@@ -21,12 +21,11 @@ import GraphContent from './graph.vue'
 
 @Component
 export default class ToolBox extends Vue {
+  @Prop()
+  isBrushing = false
+
   get graph() {
     return (this.$parent as GraphContent).graph
-  }
-
-  get isSelecting() {
-    return this.graph.eventController.isSelecting
   }
 
   handleChange(e: MouseEvent) {
@@ -43,7 +42,7 @@ export default class ToolBox extends Vue {
         graph.viewController.reset()
         break
       case 'select':
-        graph.viewController.select()
+        this.brushSelect()
         break
       case 'fullScreen':
         graph.viewController.fullScreen()
@@ -55,6 +54,10 @@ export default class ToolBox extends Vue {
         graph.viewController.fitView()
         break
     }
+  }
+
+  brushSelect() {
+    this.graph.setBrushing(true)
   }
 }
 </script>

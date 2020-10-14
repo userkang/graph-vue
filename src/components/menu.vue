@@ -49,6 +49,13 @@ export default class Menu extends Vue {
       }
     })
   }
+
+  mounted() {
+    console.log('tool')
+    this.graph.on('mouseup', (e: MouseEvent) => {
+      console.log(3)
+    })
+  }
 }
 </script>
 

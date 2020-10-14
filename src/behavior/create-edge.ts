@@ -38,9 +38,8 @@ export default class CreateEdge {
     if (!this.createEdge.show) {
       return
     }
-    const posX = this.graph.viewController.positionTransformX(e.x)
-    const posY = this.graph.viewController.positionTransformY(e.y)
-    this.setNewEdgeMove(posX, posY)
+    const { x, y } = this.graph.getPointByClient(e.x, e.y)
+    this.setNewEdgeMove(x, y)
     this.graph.emit('addingEdge', this.createEdge)
   }
 

@@ -40,30 +40,14 @@ export default class ViewController {
     this.resize()
   }
 
-  expand() {
-    this.graph.zoom(this.transform.scale + 0.1)
-  }
-
-  shrink() {
-    this.graph.zoom(this.transform.scale - 0.1)
-  }
-
-  select() {
-    const { graph } = this
-    graph.eventController.isSelecting = !graph.eventController.isSelecting
-  }
-
-  reset() {
-    this.graph.zoom(1)
-    this.transform.offsetX = 0
-    this.transform.offsetY = 0
-  }
-
-  fullScreen() {
+  fullScreen(el?: HTMLElement) {
     if (isFullScreen()) {
       cancelFullScreen()
     } else {
-      requestFullScreen(document.documentElement)
+      if (!el) {
+        el = this.$container.parentNode as HTMLElement
+      }
+      requestFullScreen(el)
     }
   }
 

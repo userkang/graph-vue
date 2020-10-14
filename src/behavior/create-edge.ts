@@ -30,7 +30,6 @@ export default class CreateEdge {
       this.setNewEdgeStart(item.posX, item.posY)
       this.setNewEdgeMove(item.posX, item.posY)
       this.fromNodeId = item.node.nodeId
-      this.graph.emit('fromNodeIdChange', this.fromNodeId)
     }
   }
 

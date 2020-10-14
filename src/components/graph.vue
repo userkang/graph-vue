@@ -48,7 +48,14 @@
       />
     </svg>
 
-    <ToolBox :isBrushing="isBrushing" />
+    <ToolBox
+      :isBrushing="isBrushing"
+      @clickBrush="
+        value => {
+          this.isBrushing = value
+        }
+      "
+    />
     <!-- <Menu>
         <li id="delete">删除</li>
       </Menu> -->
@@ -215,6 +222,7 @@ export default class GraphContent extends Vue {
   height: 100%;
   overflow: hidden;
   user-select: none;
+  background: #fff;
   .loading-wrap {
     position: absolute;
     width: 100%;

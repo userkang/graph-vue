@@ -122,13 +122,6 @@ export default class Graph extends EventEmitter {
     )
   }
 
-  setMode(mode: string) {
-    this.mode = mode
-    // this.eventController.destroy()
-    this.eventController.initEvent()
-    this.eventController.initBehavior()
-  }
-
   getNodeWidth() {
     return this.viewController.nodeInfo.width
   }
@@ -163,6 +156,14 @@ export default class Graph extends EventEmitter {
 
   resize() {
     this.viewController.resize()
+  }
+
+  fitView() {
+    this.viewController.fitView()
+  }
+
+  fullScreen(el?: HTMLElement) {
+    this.viewController.fullScreen(el)
   }
 
   /**

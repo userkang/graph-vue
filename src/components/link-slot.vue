@@ -109,8 +109,8 @@ export default class LinkSlot extends Vue {
   }
 
   mounted() {
-    this.graph.on('fromNodeIdChange', (id: number) => {
-      this.fromNodeId = id
+    this.graph.on('slot.mousedown', (e: MouseEvent, item: any) => {
+      this.fromNodeId = item.node.nodeId
       this.directLinked = this.isDirectLinked() as boolean
     })
 

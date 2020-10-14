@@ -21,7 +21,9 @@ export default class BrushSelect {
   onMouseDown(e: MouseEvent) {
     this.originX = e.x
     this.originY = e.y
-    this.moving = true
+    if (this.graph.getBrushing()) {
+      this.moving = true
+    }
   }
 
   onMouseMove(e: MouseEvent) {

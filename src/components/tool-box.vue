@@ -33,31 +33,44 @@ export default class ToolBox extends Vue {
     const id = (e.target as HTMLElement).id
     switch (id) {
       case 'expand':
-        graph.viewController.expand()
+        this.expand()
         break
       case 'shrink':
-        graph.viewController.shrink()
+        this.shrink()
         break
       case 'reset':
-        graph.viewController.reset()
+        this.reset()
         break
       case 'select':
         this.brushSelect()
         break
       case 'fullScreen':
-        graph.viewController.fullScreen()
+        this.graph.fullScreen()
         break
       case 'layout':
         graph.layout()
         break
       case 'fitView':
-        graph.viewController.fitView()
+        this.graph.fitView()
         break
     }
   }
 
+  expand() {
+    this.graph.zoom(this.graph.getZoom() + 0.1)
+  }
+
+  shrink() {
+    this.graph.zoom(this.graph.getZoom() - 0.1)
+  }
+
+  reset() {
+    this.graph.zoom(1)
+  }
+
   brushSelect() {
-    this.graph.setBrushing(true)
+    this.graph.setBrushing(!this.graph.getBrushing())
+    this.$emit('clickBrush', this.graph.getBrushing())
   }
 }
 </script>

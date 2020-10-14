@@ -1,5 +1,5 @@
 <template>
-  <div v-if="graph" v-show="menu.show">
+  <div v-show="menu.show">
     <div
       @click="menu.show = false"
       class="menu-mask"
@@ -47,13 +47,6 @@ export default class Menu extends Vue {
       if (this.menu.y + menuHeight > clientHeight) {
         this.menu.y -= menuHeight
       }
-    })
-  }
-
-  mounted() {
-    console.log('tool')
-    this.graph.on('mouseup', (e: MouseEvent) => {
-      console.log(3)
     })
   }
 }

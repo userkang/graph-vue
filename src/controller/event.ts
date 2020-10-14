@@ -18,6 +18,8 @@ const EVENTS = [
   'drop'
 ]
 
+const MOVE_DEVIATION = 2
+
 const EXTENDEVENTS = ['keyup', 'keydown', 'wheel']
 
 export default class EventController {
@@ -94,8 +96,14 @@ export default class EventController {
     }
 
     if (eventType === 'mouseup') {
-      const moved = e.x - this.originX || e.y - this.originY
-      if (!moved) {
+      const moveX = e.x - this.originX
+      const moveY = e.y - this.originY
+      // 没有移动，并且是左键点击
+      if (
+        Math.abs(moveX) < MOVE_DEVIATION &&
+        Math.abs(moveY) < MOVE_DEVIATION &&
+        e.button === 0
+      ) {
         this.emitMouseEvent(e, 'click')
       }
     }

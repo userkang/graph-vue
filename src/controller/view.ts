@@ -128,6 +128,54 @@ export default class ViewController {
     return { x, y }
   }
 
+  setSlotPoint(node: INodeType) {
+    const drection = this.graph.config.drection
+    interface ISlot {
+      x: number
+      y: number
+      status: string
+    }
+    let inSlot!: ISlot
+    let outSlot!: ISlot
+    if (drection === 'TB') {
+      inSlot = {
+        x: node.posX + this.nodeInfo.width / 2,
+        y: node.posY,
+        status: node.inSlot && node.inSlot.status ? node.inSlot.status : ''
+      }
+      outSlot = {
+        x: node.posX + this.nodeInfo.width / 2,
+        y: node.posY + this.nodeInfo.height,
+        status: node.outSlot && node.outSlot.status ? node.outSlot.status : ''
+      }
+    } else {
+      inSlot = {
+        x: node.posX,
+        y: node.posY + this.nodeInfo.height / 2,
+        status: node.inSlot && node.inSlot.status ? node.inSlot.status : ''
+      }
+      outSlot = {
+        x: node.posX + this.nodeInfo.width,
+        y: node.posY + this.nodeInfo.height / 2,
+        status: node.outSlot && node.outSlot.status ? node.outSlot.status : ''
+      }
+    }
+
+    node.inSlot = inSlot
+    node.outSlot = outSlot
+
+    this.graph.edges.forEach(item => {
+      if (item.fromNodeId === node.nodeId) {
+        item.source.x = outSlot.x
+        item.source.y = outSlot.y
+      }
+      if (item.toNodeId === node.nodeId) {
+        item.target.x = inSlot.x
+        item.target.y = inSlot.y
+      }
+    })
+  }
+
   resize() {
     const bounding = this.$container.getBoundingClientRect()
 

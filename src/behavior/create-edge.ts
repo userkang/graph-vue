@@ -4,12 +4,16 @@ export default class CreateEdge {
   graph: Graph
   event: { [key: string]: any } = []
   fromNodeId = 0
+  isMoveing = false
   createEdge = {
-    show: false,
-    fromX: 0,
-    fromY: 0,
-    toX: 0,
-    toY: 0
+    source: {
+      x: 0,
+      y: 0
+    },
+    target: {
+      x: 0,
+      y: 0
+    }
   }
 
   constructor(graph: Graph) {
@@ -18,23 +22,23 @@ export default class CreateEdge {
   }
 
   init() {
-    this.graph.on('slot.mousedown', this.slotMouseDown.bind(this))
+    this.graph.on('outslot.mousedown', this.slotMouseDown.bind(this))
     this.graph.on('mousemove', this.mouseMove.bind(this))
-    this.graph.on('slot.mouseup', this.slotMouseUp.bind(this))
+    this.graph.on('inslot.mouseup', this.slotMouseUp.bind(this))
     this.graph.on('mouseup', this.mouseUp.bind(this))
   }
 
-  slotMouseDown(e: MouseEvent, item: any) {
-    if (item.isInOrOut === 'out') {
-      // 初始化连线的起点和移动位置
-      this.setNewEdgeStart(item.posX, item.posY)
-      this.setNewEdgeMove(item.posX, item.posY)
-      this.fromNodeId = item.node.nodeId
-    }
+  slotMouseDown(e: MouseEvent, node: INodeType) {
+    // 初始化连线的起点和移动位置
+    const { x, y } = node.outSlot
+    this.setNewEdgeStart(x, y)
+    this.setNewEdgeMove(x, y)
+    this.fromNodeId = node.nodeId
+    this.setEnableSlot(node)
   }
 
   mouseMove(e: MouseEvent) {
-    if (!this.createEdge.show) {
+    if (!this.isMoveing) {
       return
     }
     const { x, y } = this.graph.getPointByClient(e.x, e.y)
@@ -42,48 +46,75 @@ export default class CreateEdge {
     this.graph.emit('addingEdge', this.createEdge)
   }
 
-  slotMouseUp(e: MouseEvent, item: any) {
-    if (item.enableLink) {
+  slotMouseUp(e: MouseEvent, node: INodeType) {
+    e.stopPropagation()
+    if (node.inSlot.status === 'enable') {
       this.graph.addEdge({
         fromNodeId: this.fromNodeId,
-        toNodeId: item.node.nodeId
+        toNodeId: node.nodeId,
+        source: this.createEdge.source,
+        target: {
+          x: node.inSlot.x,
+          y: node.inSlot.y
+        }
       })
+
+      // this.graph.findNode(this.fromNodeId).outSlot.status = 'linked'
+      // this.graph.findNode(node.nodeId).inSlot.status = 'linked'
     }
+
     this.setResetEdge()
     this.graph.emit('addingEdge', this.createEdge)
   }
 
   mouseUp() {
-    if (this.createEdge.show) {
+    if (this.isMoveing) {
       this.setResetEdge()
       this.graph.emit('addingEdge', this.createEdge)
     }
   }
 
-  setNewEdgeStart(fromX: number, fromY: number) {
-    this.createEdge = {
-      ...this.createEdge,
-      fromX,
-      fromY,
-      show: true
+  setEnableSlot(node: INodeType) {
+    const nodes = this.graph.getNodes()
+    nodes.forEach(item => {
+      if (item.nodeId !== this.fromNodeId && !this.isDirectLinked(item)) {
+        item.inSlot.status = 'enable'
+      }
+    })
+  }
+
+  isDirectLinked(node: INodeType) {
+    let linked = false
+    for (const item of this.graph.getEdges()) {
+      linked =
+        item.fromNodeId === this.fromNodeId && item.toNodeId === node.nodeId
+      if (linked) {
+        break
+      }
     }
+    return linked
+  }
+
+  setNewEdgeStart(fromX: number, fromY: number) {
+    this.isMoveing = true
+    this.createEdge.source.x = fromX
+    this.createEdge.source.y = fromY
   }
 
   setNewEdgeMove(toX: number, toY: number) {
-    this.createEdge = {
-      ...this.createEdge,
-      toX,
-      toY
-    }
+    this.createEdge.target.x = toX
+    this.createEdge.target.y = toY
   }
 
   setResetEdge() {
-    this.createEdge = {
-      show: false,
-      fromX: 0,
-      fromY: 0,
-      toX: 0,
-      toY: 0
-    }
+    this.isMoveing = false
+    this.createEdge.source = { x: 0, y: 0 }
+    this.createEdge.target = { x: 0, y: 0 }
+    const nodes = this.graph.getNodes()
+    nodes.forEach(item => {
+      if (item.inSlot.status === 'enable') {
+        item.inSlot.status = ''
+      }
+    })
   }
 }

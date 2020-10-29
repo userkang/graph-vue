@@ -38,7 +38,6 @@ export default class BrushSelect {
     const endY = e.y - viewController.svgInfo.y
 
     const selectPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
-    console.log(selectPath)
     this.graph.emit('brushing', selectPath)
     this.checkSelected(this.originX, this.originY, e.x, e.y)
   }

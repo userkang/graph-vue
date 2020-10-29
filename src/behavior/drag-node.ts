@@ -52,6 +52,7 @@ export default class DragNode {
         item.posX += this.moveX / this.graph.getZoom()
         item.posY += this.moveY / this.graph.getZoom()
         this.graph.emit('dragingnode')
+        this.graph.setSlotPoint(item)
       })
     }
 

@@ -1,16 +1,17 @@
 <template>
   <circle
-    data-type="slot"
+    :data-type="`${isInOrOut}slot`"
     :data-item="item"
     class="slot-style"
     :class="{
       'enable-slot': slotEnableLink,
       'active-slot': isInOrOut === 'out',
-      'linked-slot': !slotEnableLink && isSlotLinked
+      'linked-slot': slotLinked
     }"
     :r="slotEnableLink ? highlightCircleR : circleR"
-    :cx="cx"
-    :cy="cy"
+    :transform="
+      `translate(${node[isInOrOut + 'Slot'].x}, ${node[isInOrOut + 'Slot'].y})`
+    "
   ></circle>
 </template>
 
@@ -30,41 +31,16 @@ export default class LinkSlot extends Vue {
   })
   isInOrOut!: string
 
-  fromNodeId = 0
-  directLinked = false
-  slotEnableLink = false
-  addingEdge = false
-
   get graph() {
     return (this.$parent as GraphContent).graph
   }
 
-  get nodeInfo() {
-    return (this.$parent as GraphContent).nodeInfo
-  }
-
   get item() {
-    return JSON.stringify({
-      node: this.node,
-      isInOrOut: this.isInOrOut,
-      posX: this.cx,
-      posY: this.cy,
-      enableLink: this.slotEnableLink
-    })
+    return JSON.stringify(this.node)
   }
 
   circleR = 4
   highlightCircleR = 6
-
-  get cx() {
-    return this.node.posX + this.nodeInfo.width / 2
-  }
-
-  get cy() {
-    return this.isInOrOut === 'in'
-      ? this.node.posY
-      : this.node.posY + this.nodeInfo.height
-  }
 
   get isSlotLinked() {
     if (this.isInOrOut === 'in') {
@@ -84,40 +60,12 @@ export default class LinkSlot extends Vue {
     }
   }
 
-  isDirectLinked() {
-    if (this.isInOrOut === 'in') {
-      let linked = false
-      for (const item of this.graph.getEdges()) {
-        linked =
-          item.fromNodeId === this.fromNodeId &&
-          item.toNodeId === this.node.nodeId
-        if (linked) {
-          break
-        }
-      }
-      return linked
-    }
+  get slotEnableLink() {
+    return (this.node as any)[this.isInOrOut + 'Slot'].status === 'enable'
   }
 
-  isSlotEnableLink() {
-    return (
-      this.fromNodeId !== this.node.nodeId &&
-      this.isInOrOut === 'in' &&
-      this.addingEdge &&
-      !this.directLinked
-    )
-  }
-
-  mounted() {
-    this.graph.on('slot.mousedown', (e: MouseEvent, item: any) => {
-      this.fromNodeId = item.node.nodeId
-      this.directLinked = this.isDirectLinked() as boolean
-    })
-
-    this.graph.on('addingEdge', (createEdge: any) => {
-      this.addingEdge = createEdge.show
-      this.slotEnableLink = this.isSlotEnableLink()
-    })
+  get slotLinked() {
+    return (this.node as any)[this.isInOrOut + 'Slot'].status === 'linked'
   }
 }
 </script>

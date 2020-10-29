@@ -11,11 +11,8 @@ export default class NodeController {
   }
 
   addNode(item: INodeType) {
+    this.graph.setSlotPoint(item)
     this.graph.nodes.push(JSON.parse(JSON.stringify(item)))
-    // this.graph.immutableController.push({
-    //   nodes: this.graph.nodes,
-    //   edges: this.graph.edges
-    // })
   }
 
   deleteNode(id: number) {
@@ -28,11 +25,10 @@ export default class NodeController {
     // 与节点相关的边也需要删除
     const edges = this.graph.edges
 
-    for (let i = 0; i < edges.length; i++) {
-      if (edges[i].fromNodeId === id || edges[i].toNodeId === id) {
-        edges.splice(i, 1)
-        i--
+    edges.forEach(item => {
+      if (item.fromNodeId === id || item.toNodeId === id) {
+        this.graph.deleteEdge(item.edgeId as number)
       }
-    }
+    })
   }
 }

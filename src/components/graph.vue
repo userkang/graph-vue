@@ -23,6 +23,7 @@
           v-for="item in nodes"
           :key="item.nodeId"
           :node="item"
+          :nodeInfo="nodeInfo"
           :selectedNodes="selectedNodes"
         />
 
@@ -40,7 +41,7 @@
           />
         </template> -->
 
-        <NewEdge />
+        <NewEdge :path="newEdgePath" />
       </g>
       <path
         :d="brushPath"
@@ -56,9 +57,7 @@
         }
       "
     />
-    <!-- <Menu>
-        <li id="delete">删除</li>
-      </Menu> -->
+    <Menu ref="menu"></Menu>
   </div>
 </template>
 
@@ -71,6 +70,7 @@ import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
+import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@/controller/graph'
 
@@ -113,6 +113,7 @@ export default class GraphContent extends Vue {
   }
   isBrushing = false
   brushPath = ''
+  newEdgePath = ''
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -137,7 +138,7 @@ export default class GraphContent extends Vue {
   mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as SVGElement,
-      drection: this.$attrs.drection,
+      drection: 'LR',
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
@@ -149,10 +150,11 @@ export default class GraphContent extends Vue {
         'create-edge',
         'wheel-move',
         'wheel-zoom',
-        'brush-select'
+        'brush-select',
+        'right-click'
       ]
     })
-    console.log('graph')
+
     this.graph.data(this.data)
 
     this.initCustomHooks()
@@ -166,7 +168,11 @@ export default class GraphContent extends Vue {
       'afterzoom',
       'afteraddedge',
       'brushing',
-      'mouseup'
+      'mouseup',
+      'showmenu',
+      'afterremovenode',
+      'afterremoveedge',
+      'addingEdge'
     ]
     hooks.forEach(hook => {
       this.graph.on(hook, (this as any)[hook])
@@ -184,14 +190,27 @@ export default class GraphContent extends Vue {
     }
   }
 
+  addingEdge(createEdge: any) {
+    this.nodes = this.graph.getNodes()
+    const { source, target } = createEdge
+    this.newEdgePath = calculateCurve(source.x, source.y, target.x, target.y)
+  }
+
   afteraddnode(item: INodeType) {
     this.nodes = this.graph.getNodes()
-    console.log('afteraddnode', item)
   }
 
   afteraddedge(item: IEdgeType) {
     this.edges = this.graph.getEdges()
-    console.log('afteraddedge', item)
+  }
+
+  afterremovenode() {
+    this.nodes = this.graph.getNodes()
+    this.edges = this.graph.getEdges()
+  }
+
+  afterremoveedge() {
+    this.edges = this.graph.getEdges()
   }
 
   nodeselectchange(nodes: INodeType[]) {
@@ -210,19 +229,21 @@ export default class GraphContent extends Vue {
   beforeDestroy() {
     this.graph.destroy()
   }
+
+  showmenu(menu: IMenu) {
+    ;(this.$refs.menu as Menu).showMenu(menu)
+  }
 }
 </script>
 
 <style lang="scss" scoped>
 .graph-content-wrap {
-  // background: url('../assets/imgs/grid.svg') no-repeat center
-  //   rgba(0, 10, 40, 0.9);
+  background: url('../assets/imgs/grid.svg') no-repeat center rgba(20, 40, 60);
   position: relative;
   width: 100%;
   height: 100%;
   overflow: hidden;
   user-select: none;
-  background: #fff;
   .loading-wrap {
     position: absolute;
     width: 100%;

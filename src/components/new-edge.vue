@@ -2,34 +2,24 @@
   <path
     stroke-linecap="round"
     stroke-width="1.5"
-    stroke="#555"
+    stroke="#d1d1d1"
     fill="transparent"
     class="new-edge"
-    :d="newEdgePath"
+    :d="path"
   ></path>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
-import { calculateCurve } from '@/assets/js/utils'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
 
 @Component
 export default class NewEdge extends Vue {
-  createEdge = null
-  newEdgePath = ''
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
-  }
-
-  mounted() {
-    this.graph.on('addingEdge', (createEdge: any) => {
-      this.createEdge = createEdge
-      const { fromX, fromY, toX, toY } = createEdge
-      this.newEdgePath = calculateCurve(fromX, fromY, toX, toY)
-    })
-  }
+  @Prop({
+    required: true,
+    default: ''
+  })
+  path = ''
 }
 </script>
 

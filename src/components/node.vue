@@ -1,8 +1,7 @@
 <template>
   <g>
     <foreignObject
-      :x="node.posX"
-      :y="node.posY"
+      :transform="`translate(${node.posX}, ${node.posY})`"
       :width="nodeInfo.width"
       :height="nodeInfo.height"
       data-type="node"
@@ -13,7 +12,7 @@
         :style="{
           'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',
           background: isNodeSelected
-            ? 'rgba(220,223,245,0.9)'
+            ? 'rgba(185,200,245,0.9)'
             : 'rgba(252,252,251,0.9)'
         }"
       >
@@ -42,11 +41,10 @@ export default class Node extends Vue {
   node!: INodeType
 
   @Prop()
-  selectedNodes!: INodeType[]
+  nodeInfo!: { width: number; height: number }
 
-  get nodeInfo() {
-    return (this.$parent as GraphContent).nodeInfo
-  }
+  @Prop()
+  selectedNodes!: INodeType[]
 
   get graph() {
     return (this.$parent as GraphContent).graph

@@ -45,5 +45,5 @@ export const getItem = (e: MouseEvent) => {
     target = target.parentNode as HTMLElement
   }
 
-  return false
+  return {}
 }

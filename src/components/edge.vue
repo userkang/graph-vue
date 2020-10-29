@@ -2,11 +2,17 @@
   <g data-type="edge" :data-item="JSON.stringify(edge)">
     <path
       stroke-width="2"
-      :d="calculateCurve(this.x1, this.y1, this.x2, this.y2)"
+      :d="
+        calculateCurve(
+          edge.source.x,
+          edge.source.y,
+          edge.target.x,
+          edge.target.y
+        )
+      "
       :data-id="edge.edgeId"
       fill="transparent"
       :class="lineClassName"
-      @contextmenu.capture="showMenuTips"
     ></path>
   </g>
 </template>
@@ -38,45 +44,37 @@ export default class Edge extends Vue {
     return (this.$parent as GraphContent).graph
   }
 
-  get nodeInfo() {
-    return (this.$parent as GraphContent).nodeInfo
-  }
-
   get lineClassName() {
     return this.activeEdgeId === this.edge.edgeId
       ? 'edge-selected-style'
       : 'edge-style'
   }
 
-  showMenuTips(e: MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    this.$emit('contextMenu', e, 'edge', this.edge)
-  }
-
-  changePosition() {
-    this.fromNode = this.graph.findNode(this.edge.fromNodeId)
-    this.toNode = this.graph.findNode(this.edge.toNodeId)
-    this.x1 = this.fromNode.posX + this.nodeInfo.width / 2
-    this.x2 = this.toNode.posX + this.nodeInfo.width / 2
-    this.y1 = this.fromNode.posY + this.nodeInfo.height
-    this.y2 = this.toNode.posY
-  }
+  // changePosition() {
+  //   this.fromNode = this.graph.findNode(this.edge.fromNodeId)
+  //   this.toNode = this.graph.findNode(this.edge.toNodeId)
+  //   const fromNodeSlots = this.graph.getSlotPoint(this.fromNode)
+  //   const toNodeSlots = this.graph.getSlotPoint(this.toNode)
+  //   this.x1 = fromNodeSlots['out'][0]
+  //   this.x2 = toNodeSlots['in'][0]
+  //   this.y1 = fromNodeSlots['out'][1]
+  //   this.y2 = toNodeSlots['in'][1]
+  // }
 
   mounted() {
-    this.changePosition()
+    // this.changePosition()
 
-    this.graph.on('dragingnode', () => {
-      this.changePosition()
-    })
+    // this.graph.on('dragingnode', () => {
+    //   this.changePosition()
+    // })
 
-    this.graph.on('afteraddedge', () => {
-      this.changePosition()
-    })
+    // this.graph.on('afteraddedge', () => {
+    //   this.changePosition()
+    // })
 
-    this.graph.on('afterlayout', () => {
-      this.changePosition()
-    })
+    // this.graph.on('afterlayout', () => {
+    //   this.changePosition()
+    // })
 
     this.graph.on('edgeselectchange', (item: IEdgeType) => {
       this.activeEdgeId = item.edgeId as number

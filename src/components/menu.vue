@@ -11,7 +11,9 @@
       :style="{ top: menu.y + 2 + 'px', left: menu.x + 2 + 'px' }"
       @click="clickMenu"
     >
-      <slot />
+      <template v-if="menu.type !== 'svg'">
+        <li id="delete">删除</li>
+      </template>
     </ul>
   </div>
 </template>
@@ -22,23 +24,37 @@ import GraphContent from './graph.vue'
 
 @Component
 export default class Menu extends Vue {
+  menu: IMenu = {
+    show: false,
+    x: 0,
+    y: 0,
+    type: ''
+  }
+
   get graph() {
     return (this.$parent as GraphContent).graph
   }
 
-  get menu() {
-    if (this.graph) {
-      return this.graph.menuController.menu
+  clickMenu(e: MouseEvent) {
+    if ((e.target as HTMLElement).id === 'delete') {
+      this.handleDelete()
     }
   }
 
-  clickMenu(e: MouseEvent) {
-    this.$emit('click', e, this.graph.menuController.menu)
+  handleDelete() {
+    if (this.menu.type === 'node') {
+      this.graph.deleteNode((this.menu.item as INodeType).nodeId)
+    }
+
+    if (this.menu.type === 'edge') {
+      this.graph.deleteEdge((this.menu.item as IEdgeType).edgeId)
+    }
+
+    this.menu.show = false
   }
 
-  @Watch('menu.y')
   handleMenuY() {
-    this.$nextTick(() => {
+    setTimeout(() => {
       const menuHeight = (this.$refs
         .menu as HTMLElement).getBoundingClientRect().height
       const clientHeight = document.body.clientHeight
@@ -48,6 +64,15 @@ export default class Menu extends Vue {
         this.menu.y -= menuHeight
       }
     })
+  }
+
+  showMenu(menu: IMenu) {
+    if (menu.type === 'svg') {
+      return
+    }
+
+    this.menu = menu
+    this.handleMenuY()
   }
 }
 </script>

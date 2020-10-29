@@ -25,6 +25,16 @@ declare interface INodeType {
   posX: number
   // 节点Y坐标
   posY: number
+  inSlot: {
+    x: number
+    y: number
+    status: string
+  }
+  outSlot: {
+    x: number
+    y: number
+    status: string
+  }
 }
 
 declare interface IEdgeType {
@@ -34,6 +44,14 @@ declare interface IEdgeType {
   fromNodeId: number
   // 目标节点ID
   toNodeId: number
+  source: {
+    x: number
+    y: number
+  }
+  target: {
+    x: number
+    y: number
+  }
 }
 
 declare interface IRectInfo {

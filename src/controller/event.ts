@@ -112,30 +112,26 @@ export default class EventController {
   }
 
   emitMouseEvent(e: MouseEvent, eventType: string) {
-    this.graph.emit(eventType, e)
-
     if (e.target === this.$svg) {
       this.currentItemType = 'svg'
       this.graph.emit(`svg.${eventType}`, e)
     }
 
-    if (isTarget(e, 'node')) {
-      this.currentItemType = 'node'
-      const item = getItem(e)
-      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
-    }
+    const targetTypes = this.$svg.querySelectorAll('[data-type]')
+    const typeSet: Set<string> = new Set()
+    Array.from(targetTypes).forEach(item => {
+      typeSet.add((item as HTMLElement).dataset.type as string)
+    })
 
-    if (isTarget(e, 'edge')) {
-      this.currentItemType = 'edge'
-      const item = getItem(e)
-      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
-    }
+    typeSet.forEach(type => {
+      if (isTarget(e, type)) {
+        this.currentItemType = type
+        const item = getItem(e)
+        this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
+      }
+    })
 
-    if (isTarget(e, 'slot')) {
-      this.currentItemType = 'slot'
-      const item = getItem(e)
-      this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
-    }
+    this.graph.emit(eventType, e)
   }
 
   handleExtendEvents(e: MouseEvent) {

@@ -55,6 +55,18 @@ export default class Graph extends EventEmitter {
     this.emit('afteraddedge', item)
   }
 
+  deleteNode(id: number) {
+    const item = this.findNode(id)
+    this.nodeController.deleteNode(id)
+    this.emit('afterremovenode', item)
+  }
+
+  deleteEdge(id: number) {
+    const item = this.findEdge(id)
+    this.edgeController.deleteEdge(id)
+    this.emit('afterremoveedge', item)
+  }
+
   public setNodeState(state: string, value: any) {
     this.nodeController[state] = value
   }
@@ -128,6 +140,10 @@ export default class Graph extends EventEmitter {
 
   getNodeHeight() {
     return this.viewController.nodeInfo.height
+  }
+
+  setSlotPoint(item: INodeType) {
+    return this.viewController.setSlotPoint(item)
   }
 
   getNodes() {

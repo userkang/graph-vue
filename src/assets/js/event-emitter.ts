@@ -1,15 +1,20 @@
 export default class EventEmitter {
   _events: any = {}
 
-  on(evt: string, callback: (...args: any) => void) {
-    if (!this._events[evt]) {
-      this._events[evt] = []
-    }
-    this._events[evt].push(callback)
-    return {
-      remove: () => {
-        this.off(evt, callback)
+  on(evt: string | [], callback: (...args: any) => void) {
+    const bind = (e: string) => {
+      if (!this._events[e]) {
+        this._events[e] = []
       }
+      this._events[e].push(callback)
+    }
+
+    if (Array.isArray(evt)) {
+      evt.forEach(item => {
+        bind(item)
+      })
+    } else {
+      bind(evt)
     }
   }
 

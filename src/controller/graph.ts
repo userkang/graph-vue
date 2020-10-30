@@ -63,7 +63,18 @@ export default class Graph extends EventEmitter {
 
   deleteEdge(id: number) {
     const item = this.findEdge(id)
+    const fromNode = this.findNode(item.fromNodeId)
+    const toNode = this.findNode(item.toNodeId)
+
     this.edgeController.deleteEdge(id)
+
+    if (fromNode) {
+      fromNode.outSlot.status = ''
+    }
+    if (toNode) {
+      toNode.inSlot.status = ''
+    }
+
     this.emit('afterremoveedge', item)
   }
 

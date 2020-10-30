@@ -16,19 +16,19 @@ export default class NodeController {
   }
 
   deleteNode(id: number) {
-    const nodes = this.graph.nodes
+    const nodes = this.graph.getNodes()
     nodes.splice(
       nodes.findIndex(item => item.nodeId === id),
       1
     )
 
     // 与节点相关的边也需要删除
-    const edges = this.graph.edges
+    const edges = this.graph.getEdges()
 
-    edges.forEach(item => {
-      if (item.fromNodeId === id || item.toNodeId === id) {
-        this.graph.deleteEdge(item.edgeId as number)
+    for (let i = edges.length - 1; i >= 0; i--) {
+      if (edges[i].fromNodeId === id || edges[i].toNodeId === id) {
+        this.graph.deleteEdge(edges[i].edgeId as number)
       }
-    })
+    }
   }
 }

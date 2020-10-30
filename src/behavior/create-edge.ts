@@ -58,11 +58,9 @@ export default class CreateEdge {
           y: node.inSlot.y
         }
       })
-
-      // this.graph.findNode(this.fromNodeId).outSlot.status = 'linked'
-      // this.graph.findNode(node.nodeId).inSlot.status = 'linked'
     }
 
+    this.setLinkedSlot()
     this.setResetEdge()
     this.graph.emit('addingEdge', this.createEdge)
   }
@@ -80,6 +78,22 @@ export default class CreateEdge {
       if (item.nodeId !== this.fromNodeId && !this.isDirectLinked(item)) {
         item.inSlot.status = 'enable'
       }
+    })
+  }
+
+  setLinkedSlot() {
+    const nodes = this.graph.getNodes()
+    const edges = this.graph.getEdges()
+
+    edges.forEach(edge => {
+      nodes.forEach(node => {
+        if (node.nodeId === edge.fromNodeId) {
+          node.outSlot.status = 'linked'
+        }
+        if (node.nodeId === edge.toNodeId) {
+          node.inSlot.status = 'linked'
+        }
+      })
     })
   }
 

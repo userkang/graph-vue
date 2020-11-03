@@ -7,8 +7,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "webpack --config webpack.config.js --mode production",
-    "release": "tsc && yarn build && npm version patch"
+    "build": "tsc && webpack --config webpack.config.js --mode production",
+    "release": "yarn build && npm version patch",
+    "pub": "mnpm publish"
   },
   "dependencies": {
     "dagre": "0.8.5"

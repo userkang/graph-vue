@@ -4,7 +4,7 @@ const resolve = require('path').resolve
 
 module.exports = {
   entry: {
-    core: './src/controller/graph.ts'
+    core: './src/index.ts'
   },
   output: {
     filename: '[name].min.js',
@@ -31,9 +31,6 @@ module.exports = {
       }
     ]
   },
-  plugins: [
-    new webpack.NoEmitOnErrorsPlugin(),
-    new webpack.optimize.AggressiveMergingPlugin()
-  ],
+  plugins: [new webpack.optimize.AggressiveMergingPlugin()],
   devtool: 'source-map'
 }

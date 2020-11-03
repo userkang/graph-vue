@@ -1,4 +1,4 @@
-import Graph from './graph'
+import Graph from '../controller/graph'
 
 export default class EdgeController {
   graph: Graph

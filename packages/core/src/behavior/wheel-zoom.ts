@@ -1,4 +1,4 @@
-import Graph from '@/controller/graph'
+import Graph from '../controller/graph'
 
 export default class WheelZoom {
   graph: Graph

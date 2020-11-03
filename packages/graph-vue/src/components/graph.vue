@@ -72,7 +72,7 @@ import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
-import Graph from '@/controller/graph'
+import Graph from '@datafe/graph-core'
 
 @Component({
   components: {

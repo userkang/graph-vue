@@ -1,10 +1,6 @@
 {
-  "name": "mlp-graph",
+  "name": "graph-vue",
   "version": "0.1.0",
-  "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
   "scripts": {
     "start": "npm run serve",
     "serve": "vue-cli-service serve",
@@ -13,6 +9,7 @@
     "test": "echo test"
   },
   "dependencies": {
+    "@datafe/graph-core": "^0.1.12",
     "axios": "^0.18.0",
     "core-js": "^2.6.11",
     "url-loader": "^2.2.0",

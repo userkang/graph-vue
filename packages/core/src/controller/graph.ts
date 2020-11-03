@@ -1,4 +1,4 @@
-import EventEmitter from '@/util/event-emitter'
+import EventEmitter from '../util/event-emitter'
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'

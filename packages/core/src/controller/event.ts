@@ -1,6 +1,6 @@
 import Graph from './graph'
-import { addEventListener, isTarget, getItem } from '@/util/dom'
-import behaviors from '@/behavior'
+import { addEventListener, isTarget, getItem } from '../util/dom'
+import behaviors from '../behavior'
 
 const EVENTS = [
   'mousedown',

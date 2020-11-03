@@ -21,7 +21,6 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { calculateCurve } from '@/assets/js/utils'
 import GraphContent from './graph.vue'
-import Graph from '@/controller/graph'
 
 @Component
 export default class Edge extends Vue {
@@ -40,7 +39,7 @@ export default class Edge extends Vue {
   y2 = 0
   activeEdgeId = 0
 
-  get graph(): Graph {
+  get graph() {
     return (this.$parent as GraphContent).graph
   }
 

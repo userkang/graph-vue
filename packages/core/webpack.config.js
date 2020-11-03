@@ -4,7 +4,7 @@ const resolve = require('path').resolve
 
 module.exports = {
   entry: {
-    graphCore: './src/controller/graph.ts'
+    core: './src/controller/graph.ts'
   },
   output: {
     filename: '[name].min.js',
@@ -20,17 +20,6 @@ module.exports = {
   },
   module: {
     rules: [
-      {
-        test: /\.js$/,
-        include: /node_modules/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            // babelrc: true,
-            presets: ['@babel/preset-env']
-          }
-        }
-      },
       {
         test: /\.ts$/,
         use: {

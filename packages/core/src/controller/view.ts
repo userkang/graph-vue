@@ -2,7 +2,7 @@ import {
   isFullScreen,
   requestFullScreen,
   cancelFullScreen
-} from '@/util/utils'
+} from '../util/utils'
 import Graph from './graph'
 
 export default class ViewController {

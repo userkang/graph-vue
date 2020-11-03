@@ -1,4 +1,4 @@
-import Graph from '@/controller/graph'
+import Graph from '../controller/graph'
 
 export default class DragNode {
   graph: Graph
@@ -61,6 +61,10 @@ export default class DragNode {
   }
 
   mouseUp(e: MouseEvent) {
+    console.log(232)
+    if (this.isMoving) {
+      this.graph.emit('afterdragnode', this.moveNode)
+    }
     this.isMoving = false
   }
 

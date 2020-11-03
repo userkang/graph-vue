@@ -6,6 +6,7 @@ const htmlPath = path.resolve(__dirname, './public/index.html')
 
 // Talos 线上构建会注入 PUBLIC_URL 环境变量
 const { PUBLIC_URL } = process.env
+console.log(__dirname, process.cwd())
 
 module.exports = {
   outputDir: path.resolve(__dirname, './build'),
@@ -19,6 +20,11 @@ module.exports = {
     }
   },
   configureWebpack: {
+    resolve: {
+      alias: {
+        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+      }
+    },
     plugins: [
       new HtmlWebpackPlugin({
         filename: 'index.html',

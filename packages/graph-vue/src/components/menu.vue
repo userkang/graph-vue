@@ -47,7 +47,7 @@ export default class Menu extends Vue {
     }
 
     if (this.menu.type === 'edge') {
-      this.graph.deleteEdge((this.menu.item as IEdgeType).edgeId)
+      this.graph.deleteEdge((this.menu.item as IEdgeType).edgeId as any)
     }
 
     this.menu.show = false

@@ -96,7 +96,7 @@ export default class GraphContent extends Vue {
 
   componentState = ComponentListStore.state
 
-  graph: any = null
+  graph: Graph = {} as any
 
   nodeInfo = {
     width: 190,
@@ -132,7 +132,7 @@ export default class GraphContent extends Vue {
       nodeDesc: this.dragingInfo.component.componentDesc,
       posX,
       posY
-    })
+    } as any)
   }
 
   mounted() {
@@ -154,7 +154,6 @@ export default class GraphContent extends Vue {
         'right-click'
       ]
     })
-
     this.graph.data(this.data)
 
     this.initCustomHooks()
@@ -231,7 +230,7 @@ export default class GraphContent extends Vue {
   }
 
   showmenu(menu: IMenu) {
-    ;(this.$refs.menu as Menu).showMenu(menu)
+    ;((this.$refs.menu as Menu) as any).showMenu(menu)
   }
 }
 </script>

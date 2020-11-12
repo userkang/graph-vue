@@ -2,29 +2,23 @@ import EventEmitter from '../util/event-emitter'
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
-import MenuController from './menu'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
 
 export default class Graph extends EventEmitter {
-  public config: { [key: string]: any }
+  public cfg: { [key: string]: any }
 
-  public viewController!: ViewController
-  public layoutController!: LayoutController
-  public eventController!: EventController
-  public menuController!: MenuController
-  public nodeController!: NodeController & { [key: string]: any }
-  public edgeController!: EdgeController & { [key: string]: any }
-  public stackController!: StackController
-
-  public nodes: INodeType[] = []
-  public edges: IEdgeType[] = []
-  public brushing = false
+  public viewController: ViewController
+  public layoutController: LayoutController
+  public eventController: EventController
+  public nodeController: NodeController & { [key: string]: any }
+  public edgeController: EdgeController & { [key: string]: any }
+  public stackController: StackController
 
   constructor(config: any) {
     super()
-    this.config = config
+    this.cfg = Object.assign({}, this.getDefaultCfg(), config)
     this.initController()
   }
 
@@ -34,64 +28,68 @@ export default class Graph extends EventEmitter {
     this.eventController = new EventController(this)
     this.nodeController = new NodeController(this)
     this.edgeController = new EdgeController(this)
-    this.menuController = new MenuController(this)
     this.stackController = new StackController(this)
+  }
+
+  public getDefaultCfg() {
+    return {
+      container: undefined,
+      drection: 'TB',
+      nodes: [],
+      edges: [],
+      action: []
+    }
   }
 
   public getPointByClient(originX: number, originY: number) {
     return this.viewController.getPointByClient(originX, originY)
   }
 
-  public addNode(item: INodeType) {
-    const point = this.getPointByClient(item.posX, item.posY)
-    item.posX = point.x
-    item.posY = point.y
+  public set<T = any>(key: string | object, val?: T): Graph {
+    if (Object.prototype.toString.call(key) === '[object Object]') {
+      this.cfg = { ...this.cfg, ...(key as object) }
+    } else {
+      this.cfg[key as string] = val
+    }
+    return this
+  }
+
+  public get(key: string) {
+    return this.cfg[key]
+  }
+
+  public addNode(item: INodeModel) {
     this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
   }
 
-  public addEdge(item: IEdgeType) {
+  public addEdge(item: IEdgeModel) {
     this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
   }
 
-  deleteNode(id: number) {
-    const item = this.findNode(id)
-    this.nodeController.deleteNode(id)
-    this.emit('afterremovenode', item)
+  public getSvgInfo() {
+    return this.viewController.svgInfo
   }
 
-  deleteEdge(id: number) {
-    const item = this.findEdge(id)
-    const fromNode = this.findNode(item.fromNodeId)
-    const toNode = this.findNode(item.toNodeId)
+  deleteNode(id: string) {
+    const node = this.findNode(id)
+    // node.set('edges', [])
+    this.nodeController.deleteNode(id)
+    this.emit('afterremovenode', node)
+  }
+
+  deleteEdge(id: string) {
+    const edge = this.findEdge(id)
+    edge.fromSlot.clearState('linked')
+    edge.toSlot.clearState('linked')
+
+    edge.fromNode.deleteEdge(id)
+    edge.toNode.deleteEdge(id)
 
     this.edgeController.deleteEdge(id)
 
-    if (fromNode) {
-      fromNode.outSlot.status = ''
-    }
-    if (toNode) {
-      toNode.inSlot.status = ''
-    }
-
-    this.emit('afterremoveedge', item)
-  }
-
-  public setNodeState(state: string, value: any) {
-    this.nodeController[state] = value
-  }
-
-  public getNodeState(state: string) {
-    return this.nodeController[state]
-  }
-
-  public setEdgeState(state: string, value: any) {
-    this.edgeController[state] = value
-  }
-
-  public getEdgeState(state: string) {
-    return this.edgeController[state]
+    this.emit('afterremoveedge', edge)
   }
 
   public getZoom() {
@@ -122,55 +120,62 @@ export default class Graph extends EventEmitter {
     )
   }
 
-  public findNode(id: number) {
-    return this.nodes.filter(item => {
-      return id === item.nodeId
-    })[0]
+  public findNode(id: string) {
+    return this.getNodes().find(item => {
+      return id === item.id
+    })
   }
 
-  public findEdge(id: number) {
-    return this.edges.filter(item => {
-      return id === item.edgeId
-    })[0]
+  public findEdge(id: string) {
+    return this.getEdges().find(item => {
+      return id === item.id
+    })
+  }
+
+  public findSlot(id: string) {
+    const nodes = this.getNodes()
+    for (let i = 0; i < nodes.length; i++) {
+      const slot = nodes[i].slots.find(slot => {
+        return slot.id === id
+      })
+      if (slot) {
+        return slot
+      }
+    }
   }
 
   // 加载数据
-  data(data: IDataItem) {
-    this.nodes = JSON.parse(JSON.stringify(data.nodes))
-    this.edges = JSON.parse(JSON.stringify(data.edges)).map(
-      (item: IEdgeType) => {
-        item.edgeId = item.fromNodeId + '' + item.toNodeId
-        return item
-      }
-    )
+  data(data: IDataModel) {
+    // TODO 判断有没有坐标，没有的话需要先格式化
+
+    data.nodes.forEach(node => {
+      this.nodeController.addNode(node)
+    })
+    data.edges.forEach(edge => {
+      this.edgeController.addEdge(edge)
+    })
+
+    this.emit('refreshgraph')
   }
 
-  getNodeWidth() {
-    return this.viewController.nodeInfo.width
-  }
-
-  getNodeHeight() {
-    return this.viewController.nodeInfo.height
-  }
-
-  setSlotPoint(item: INodeType) {
-    return this.viewController.setSlotPoint(item)
+  getNodeInfo() {
+    return this.viewController.nodeInfo
   }
 
   getNodes() {
-    return this.nodes
+    return this.get('nodes')
   }
 
   getEdges() {
-    return this.edges
+    return this.get('edges')
   }
 
   getBrushing() {
-    return this.brushing
+    return this.get('brushing')
   }
 
   setBrushing(value: boolean) {
-    this.brushing = value
+    this.set('brushing', value)
   }
 
   undo() {
@@ -189,6 +194,10 @@ export default class Graph extends EventEmitter {
     this.viewController.fitView()
   }
 
+  fitCenter() {
+    this.viewController.translateToCenter()
+  }
+
   fullScreen(el?: HTMLElement) {
     this.viewController.fullScreen(el)
   }
@@ -204,7 +213,6 @@ export default class Graph extends EventEmitter {
     delete this.layoutController
     delete this.nodeController
     delete this.edgeController
-    delete this.menuController
     delete this.stackController
   }
 }

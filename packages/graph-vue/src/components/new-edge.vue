@@ -6,20 +6,35 @@
     fill="transparent"
     class="new-edge"
     :d="path"
+    v-if="path"
   ></path>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
+import { calculateCurve } from '@/assets/js/utils'
 
 @Component
 export default class NewEdge extends Vue {
-  @Prop({
-    required: true,
-    default: ''
-  })
   path = ''
+
+  get graph() {
+    return (this.$parent as GraphContent).graph
+  }
+
+  mounted() {
+    this.graph.on('addingedge', this.handlePath)
+  }
+
+  handlePath(createEdge: any) {
+    if (!createEdge) {
+      this.path = ''
+    } else {
+      const { fromPoint, toPoint } = createEdge
+      this.path = calculateCurve(fromPoint.x, fromPoint.y, toPoint.x, toPoint.y)
+    }
+  }
 }
 </script>
 

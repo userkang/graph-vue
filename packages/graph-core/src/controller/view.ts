@@ -34,9 +34,9 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$container = graph.config.container
-    this.nodeInfo = graph.config.nodeInfo
-    this.translateToCenter()
+    this.$container = graph.cfg.container
+    this.nodeInfo = graph.cfg.nodeInfo
+    // this.translateToCenter()
     this.resize()
   }
 
@@ -54,9 +54,8 @@ export default class ViewController {
   // 让g的宽和高适应画布
   fitView() {
     // 变换group的信息
-    const transformInfo = (this.$container.querySelector(
-      'g'
-    ) as SVGElement).getBoundingClientRect()
+    const box = this.getGroupBox()
+    const transformInfo = box.getBoundingClientRect()
 
     const vScale =
       (this.svgInfo.width / transformInfo.width) * this.transform.scale
@@ -88,9 +87,9 @@ export default class ViewController {
   translateToCenter() {
     setTimeout(() => {
       // 这里需要到下一个周期获取g变换后的位置信息
-      const transformInfo = (this.$container.querySelector(
-        'g'
-      ) as SVGElement).getBoundingClientRect()
+      const box = this.getGroupBox()
+      const transformInfo = box.getBoundingClientRect()
+      box.style.transition = 'transform 0.5s'
 
       // 变换g与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
@@ -104,6 +103,10 @@ export default class ViewController {
         this.transform.scale
 
       this.graph.translate(translateX, translateY)
+
+      setTimeout(() => {
+        box.style.transition = ''
+      }, 500)
     })
   }
 
@@ -114,6 +117,10 @@ export default class ViewController {
 
     this.transform.translateX += x
     this.transform.translateY += y
+  }
+
+  getGroupBox() {
+    return this.$container.querySelector('g') as SVGElement
   }
 
   getPointByClient(originX: number, originY: number) {
@@ -128,54 +135,6 @@ export default class ViewController {
     return { x, y }
   }
 
-  setSlotPoint(node: INodeType) {
-    const drection = this.graph.config.drection
-    interface ISlot {
-      x: number
-      y: number
-      status: string
-    }
-    let inSlot!: ISlot
-    let outSlot!: ISlot
-    if (drection === 'TB') {
-      inSlot = {
-        x: node.posX + this.nodeInfo.width / 2,
-        y: node.posY,
-        status: node.inSlot && node.inSlot.status ? node.inSlot.status : ''
-      }
-      outSlot = {
-        x: node.posX + this.nodeInfo.width / 2,
-        y: node.posY + this.nodeInfo.height,
-        status: node.outSlot && node.outSlot.status ? node.outSlot.status : ''
-      }
-    } else {
-      inSlot = {
-        x: node.posX,
-        y: node.posY + this.nodeInfo.height / 2,
-        status: node.inSlot && node.inSlot.status ? node.inSlot.status : ''
-      }
-      outSlot = {
-        x: node.posX + this.nodeInfo.width,
-        y: node.posY + this.nodeInfo.height / 2,
-        status: node.outSlot && node.outSlot.status ? node.outSlot.status : ''
-      }
-    }
-
-    node.inSlot = inSlot
-    node.outSlot = outSlot
-
-    this.graph.edges.forEach(item => {
-      if (item.fromNodeId === node.nodeId) {
-        item.source.x = outSlot.x
-        item.source.y = outSlot.y
-      }
-      if (item.toNodeId === node.nodeId) {
-        item.target.x = inSlot.x
-        item.target.y = inSlot.y
-      }
-    })
-  }
-
   resize() {
     const bounding = this.$container.getBoundingClientRect()
 
@@ -188,9 +147,7 @@ export default class ViewController {
   }
 
   judgeBoundary(x: number, y: number) {
-    const transformInfo = (this.$container.querySelector(
-      'g'
-    ) as SVGElement).getBoundingClientRect()
+    const transformInfo = this.getGroupBox().getBoundingClientRect()
 
     const { height: gHeight, width: gWidth, x: gX, y: gY } = transformInfo
     //  右边界

@@ -1,33 +1,35 @@
 import Graph from './graph'
+import Node from '../item/node'
 
 export default class NodeController {
   graph: Graph
-
-  // 当前被选中节点
-  select: INodeType[] = []
 
   constructor(graph: Graph) {
     this.graph = graph
   }
 
-  addNode(item: INodeType) {
-    this.graph.setSlotPoint(item)
-    this.graph.nodes.push(JSON.parse(JSON.stringify(item)))
+  addNode(item: INodeModel) {
+    const { width, height } = this.graph.getNodeInfo()
+    const node = new Node(item, {
+      width,
+      height,
+      drection: this.graph.get('drection')
+    })
+    this.graph.getNodes().push(node)
   }
 
-  deleteNode(id: number) {
+  deleteNode(id: string) {
     const nodes = this.graph.getNodes()
     nodes.splice(
-      nodes.findIndex(item => item.nodeId === id),
+      nodes.findIndex(item => item.id === id),
       1
     )
 
     // 与节点相关的边也需要删除
     const edges = this.graph.getEdges()
-
     for (let i = edges.length - 1; i >= 0; i--) {
-      if (edges[i].fromNodeId === id || edges[i].toNodeId === id) {
-        this.graph.deleteEdge(edges[i].edgeId as number)
+      if (edges[i].fromNode.id === id || edges[i].toNode.id === id) {
+        this.graph.deleteEdge(edges[i].id)
       }
     }
   }

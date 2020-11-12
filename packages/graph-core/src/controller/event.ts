@@ -1,5 +1,5 @@
 import Graph from './graph'
-import { addEventListener, isTarget, getItem } from '../util/dom'
+import { addEventListener, isTarget, getItemId } from '../util/dom'
 import behaviors from '../behavior'
 
 const EVENTS = [
@@ -37,7 +37,7 @@ export default class EventController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$svg = graph.config.container
+    this.$svg = graph.cfg.container
     this.initBehavior()
     this.initEvent()
   }
@@ -69,7 +69,7 @@ export default class EventController {
   }
 
   initBehavior() {
-    const action = this.graph.config.action
+    const action = this.graph.cfg.action
     if (action) {
       action.forEach((item: string) => {
         const func = behaviors[item]
@@ -126,8 +126,8 @@ export default class EventController {
     typeSet.forEach(type => {
       if (isTarget(e, type)) {
         this.currentItemType = type
-        const item = getItem(e)
-        this.graph.emit(`${this.currentItemType}.${eventType}`, e, item)
+        const id = getItemId(e)
+        this.graph.emit(`${this.currentItemType}.${eventType}`, e, id)
       }
     })
 

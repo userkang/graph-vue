@@ -33,13 +33,13 @@ export const addEventListener = (
   }
 }
 
-export const getItem = (e: MouseEvent) => {
+export const getItemId = (e: MouseEvent) => {
   let target = e.target as HTMLElement
   const currentTarget = e.currentTarget
 
   while (target !== currentTarget) {
-    if (target.dataset.item) {
-      return JSON.parse(target.dataset.item)
+    if (target.dataset.id) {
+      return target.dataset.id
     }
 
     target = target.parentNode as HTMLElement

@@ -28,7 +28,8 @@ export default class Menu extends Vue {
     show: false,
     x: 0,
     y: 0,
-    type: ''
+    type: '',
+    item: undefined
   }
 
   get graph() {
@@ -43,16 +44,18 @@ export default class Menu extends Vue {
 
   handleDelete() {
     if (this.menu.type === 'node') {
-      this.graph.deleteNode((this.menu.item as INodeType).nodeId)
+      console.log(this.menu.item)
+      this.graph.deleteNode((this.menu.item as any).id)
     }
 
     if (this.menu.type === 'edge') {
-      this.graph.deleteEdge((this.menu.item as IEdgeType).edgeId as any)
+      this.graph.deleteEdge((this.menu.item as any).id)
     }
 
     this.menu.show = false
   }
 
+  @Watch('menu.y')
   handleMenuY() {
     setTimeout(() => {
       const menuHeight = (this.$refs
@@ -66,13 +69,31 @@ export default class Menu extends Vue {
     })
   }
 
-  showMenu(menu: IMenu) {
-    if (menu.type === 'svg') {
-      return
+  showNodeMenu(e: MouseEvent, id: string) {
+    const node = this.graph.findNode(id)
+    this.menu = {
+      show: true,
+      type: 'node',
+      x: e.x,
+      y: e.y,
+      item: node
     }
+  }
 
-    this.menu = menu
-    this.handleMenuY()
+  showEdgeMenu(e: MouseEvent, id: string) {
+    const edge = this.graph.findEdge(id)
+    this.menu = {
+      show: true,
+      type: 'edge',
+      x: e.x,
+      y: e.y,
+      item: edge
+    }
+  }
+
+  mounted() {
+    this.graph.on('node.contextmenu', this.showNodeMenu)
+    this.graph.on('edge.contextmenu', this.showEdgeMenu)
   }
 }
 </script>

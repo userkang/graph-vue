@@ -44,3 +44,13 @@ export const isFullScreen = () => {
     !doc.msFullscreenElement
   )
 }
+
+const map = {}
+export const uniqueId = prefix => {
+  if (!map[prefix]) {
+    map[prefix] = 1
+  } else {
+    map[prefix] += 1
+  }
+  return prefix + map[prefix]
+}

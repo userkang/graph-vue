@@ -1,17 +1,22 @@
 import Graph from '../controller/graph'
+import Node from '../item/node'
 
+const MOVE_DEVIATION = 2
 export default class DragNode {
   graph: Graph
   event: { [key: string]: any } = []
   isMoving = false
 
   // 当前拖动节点
-  activeNode!: INodeType
+  activeNode!: Node
   // 当前被选中节点
-  selectedNode: INodeType[] = []
+  selectedNode: Node[] = []
   // 移动的节点
-  moveNode: INodeType[] = []
+  moveNode: Node[] = []
 
+  // 移动前初始值
+  originX = 0
+  originY = 0
   // 移动时动态起始值
   startX = 0
   startY = 0
@@ -31,12 +36,12 @@ export default class DragNode {
     this.graph.on('mouseleave', this.mouseUp.bind(this))
   }
 
-  mouseDown(e: MouseEvent, item: INodeType) {
+  mouseDown(e: MouseEvent, id: string) {
     this.isMoving = true
-    this.startX = e.x
-    this.startY = e.y
+    this.originX = this.startX = e.x
+    this.originY = this.startY = e.y
 
-    this.activeNode = this.graph.findNode(item.nodeId)
+    this.activeNode = this.graph.findNode(id)
 
     this.checkActiveNodeIsSelected()
   }
@@ -49,10 +54,10 @@ export default class DragNode {
       this.moveY = y - this.startY
 
       this.moveNode.forEach(item => {
-        item.posX += this.moveX / this.graph.getZoom()
-        item.posY += this.moveY / this.graph.getZoom()
+        const x = item.x + this.moveX / this.graph.getZoom()
+        const y = item.y + this.moveY / this.graph.getZoom()
+        item.updatePosition(x, y)
         this.graph.emit('dragingnode')
-        this.graph.setSlotPoint(item)
       })
     }
 
@@ -61,7 +66,17 @@ export default class DragNode {
   }
 
   mouseUp(e: MouseEvent) {
-    if (this.isMoving) {
+    const moveX = e.x - this.originX
+    const moveY = e.y - this.originY
+
+    const hasMove = !(
+      Math.abs(moveX) < MOVE_DEVIATION &&
+      Math.abs(moveY) < MOVE_DEVIATION &&
+      e.button === 0
+    )
+
+    // 没有移动的情况下，不触发 afterdragnode 事件
+    if (this.isMoving && hasMove) {
       this.graph.emit('afterdragnode', this.moveNode)
     }
     this.isMoving = false
@@ -69,20 +84,13 @@ export default class DragNode {
 
   checkActiveNodeIsSelected() {
     this.moveNode = [this.activeNode]
-    this.selectedNode = this.graph.getNodeState('select')
+    const nodes = this.graph.getNodes()
+    this.selectedNode = nodes.filter(node => {
+      return node.hasState('selected')
+    })
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
-    if (this.isNodeSelected(this.activeNode.nodeId)) {
+    if (this.activeNode.hasState('selected')) {
       this.moveNode = this.selectedNode
     }
-  }
-
-  isNodeSelected(id: number) {
-    for (const item of this.selectedNode) {
-      if (item.nodeId === id) {
-        return true
-      }
-    }
-
-    return false
   }
 }

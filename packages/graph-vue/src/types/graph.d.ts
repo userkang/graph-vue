@@ -1,6 +1,6 @@
 declare interface IGraphDataType {
   // DAG图ID
-  graphId: number
+  graphId?: number
   // 实验节点信息
   nodes: INodeType[]
   // 实验连线信息
@@ -15,26 +15,20 @@ declare interface ITransform {
   offsetY: number
 }
 
+declare interface ISlot {
+  slotId: number
+  type: ''
+}
+
 declare interface INodeType {
   nodeId: number
   // 组件名称
   nodeName: string
-  // 组件描述
-  nodeDesc: string
   // 节点X坐标
-  posX: number
+  x: number
   // 节点Y坐标
-  posY: number
-  inSlot: {
-    x: number
-    y: number
-    status: string
-  }
-  outSlot: {
-    x: number
-    y: number
-    status: string
-  }
+  y: number
+  slots?: []
 }
 
 declare interface IEdgeType {
@@ -44,14 +38,6 @@ declare interface IEdgeType {
   fromNodeId: number
   // 目标节点ID
   toNodeId: number
-  source: {
-    x: number
-    y: number
-  }
-  target: {
-    x: number
-    y: number
-  }
 }
 
 declare interface IRectInfo {
@@ -66,7 +52,7 @@ declare interface IMenu {
   x: number
   y: number
   type: string
-  item?: INodeType | IEdgeType
+  item?: { [key: string]: unknown }
 }
 
 declare interface INodeStyle {

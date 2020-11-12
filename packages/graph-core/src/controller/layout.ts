@@ -11,9 +11,7 @@ export default class LayoutController {
   }
 
   init() {
-    const rankdir = this.graph.config.drection
-      ? this.graph.config.drection
-      : 'TB'
+    const rankdir = this.graph.cfg.drection ? this.graph.cfg.drection : 'TB'
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
@@ -28,36 +26,40 @@ export default class LayoutController {
 
   layout() {
     const { graph } = this
-    const viewController = graph.viewController
+    const { width, height } = this.graph.getNodeInfo()
+    const nodes = graph.getNodes()
+    const edges = graph.getEdges()
 
-    graph.nodes.forEach(item => {
-      this.dagre.setNode(item.nodeId, {
-        label: item.nodeName,
-        width: viewController.nodeInfo.width,
-        height: viewController.nodeInfo.height
+    nodes.forEach(item => {
+      this.dagre.setNode(item.id, {
+        label: '',
+        width,
+        height
       })
     })
 
-    graph.edges.forEach(item => {
-      this.dagre.setEdge(item.fromNodeId, item.toNodeId)
+    edges.forEach(item => {
+      this.dagre.setEdge(item.fromNode.id, item.toNode.id)
     })
 
     dagre.layout(this.dagre)
 
+    const group = this.dagre.graph()
+    const svgInfo = this.graph.getSvgInfo()
+
     this.dagre.nodes().forEach((v: string) => {
       const nodes = this.graph.getNodes()
       nodes.forEach(item => {
-        if (String(item.nodeId) === v) {
+        if (item.id === v) {
           const { x, y } = this.dagre.node(v)
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-          item.posX = x - 80
-          item.posY = y - 80
-          this.graph.setSlotPoint(item)
+          const posX = x - (width + group.width - svgInfo.width) / 2
+          const posY = y - (height + group.height - svgInfo.height) / 2
+          item.updatePosition(posX, posY)
         }
       })
     })
-    // NodeStore.updateNodePosition(graph.nodes)
 
-    viewController.translateToCenter()
+    this.graph.fitCenter()
   }
 }

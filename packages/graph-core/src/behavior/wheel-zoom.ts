@@ -23,10 +23,7 @@ export default class WheelZoom {
         ratio -= ratio * 0.05
       }
 
-      // const point = this.graph.getPointByClient(e.x, e.y)
-      // this.graph.translate(-point.x, -point.y)
       this.graph.zoom(ratio)
-      // this.graph.translate(point.x, point.y)
     }
   }
 }

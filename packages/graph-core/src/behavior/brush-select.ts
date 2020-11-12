@@ -1,4 +1,5 @@
 import Graph from '../controller/graph'
+import Node from '../item/node'
 
 export default class BrushSelect {
   graph: Graph
@@ -31,11 +32,11 @@ export default class BrushSelect {
       return
     }
 
-    const viewController = this.graph.viewController
-    const startX = this.originX - viewController.svgInfo.x
-    const startY = this.originY - viewController.svgInfo.y
-    const endX = e.x - viewController.svgInfo.x
-    const endY = e.y - viewController.svgInfo.y
+    const { x, y } = this.graph.getSvgInfo()
+    const startX = this.originX - x
+    const startY = this.originY - y
+    const endX = e.x - x
+    const endY = e.y - y
 
     const selectPath = `M${startX},${startY}H${endX}V${endY}H${startX}Z`
     this.graph.emit('brushing', selectPath)
@@ -57,19 +58,19 @@ export default class BrushSelect {
       endY: Math.max(startY, endY)
     }
 
-    const selectedNode = this.graph.nodes.filter(item => {
+    const nodes = this.graph.getNodes()
+
+    const selectedNode = nodes.filter(item => {
       return this.checkNodeRange(item, range)
     })
 
-    this.graph.setNodeState('select', selectedNode)
     this.graph.emit('nodeselectchange', selectedNode)
   }
 
   checkNodeRange(
-    item: INodeType,
+    item: Node,
     range: { startX: number; startY: number; endX: number; endY: number }
   ) {
-    const viewController = this.graph.viewController
     const { x: startX, y: startY } = this.graph.getPointByClient(
       range.startX,
       range.startY
@@ -79,18 +80,18 @@ export default class BrushSelect {
       range.endY
     )
 
-    const nodeWidth = this.graph.getNodeWidth()
-    const nodeHeight = this.graph.getNodeHeight()
+    const { width, height } = this.graph.getNodeInfo()
 
-    if (item.posY + nodeHeight < startY) {
+    if (item.y + width < startY) {
       return false
-    } else if (item.posY > endY) {
+    } else if (item.y > endY) {
       return false
-    } else if (item.posX + nodeWidth < startX) {
+    } else if (item.x + height < startX) {
       return false
-    } else if (item.posX > endX) {
+    } else if (item.x > endX) {
       return false
     } else {
+      item.setState('selected')
       return true
     }
   }

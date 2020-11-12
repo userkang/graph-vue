@@ -15,17 +15,19 @@ export default class ClickSelect {
     this.graph.on('svg.click', this.clickSvg.bind(this))
   }
 
-  clickNode(e: MouseEvent, item: INodeType) {
+  clickNode(e: MouseEvent, id: string) {
     this.resetSelect()
-    const selectNodes = [this.graph.findNode(item.nodeId)]
-    this.graph.setNodeState('select', selectNodes)
+    const node = this.graph.findNode(id)
+    node.setState('selected')
+    const selectNodes = [this.graph.findNode(id)]
     this.graph.emit('nodeselectchange', selectNodes)
   }
 
-  clickEdge(e: MouseEvent, item: IEdgeType) {
+  clickEdge(e: MouseEvent, id: string) {
     this.resetSelect()
-    this.graph.setEdgeState('select', item)
-    this.graph.emit('edgeselectchange', item)
+    const edges = this.graph.findEdge(id)
+    edges.setState('selected')
+    this.graph.emit('edgeselectchange', edges)
   }
 
   clickSvg(e: MouseEvent) {
@@ -33,8 +35,14 @@ export default class ClickSelect {
   }
 
   resetSelect() {
-    this.graph.setNodeState('select', [])
-    this.graph.setEdgeState('select', [])
+    const nodes = this.graph.getNodes()
+    const edges = this.graph.getEdges()
+    nodes.forEach(node => {
+      node.clearState('selected')
+    })
+    edges.forEach(edge => {
+      edge.clearState('selected')
+    })
     this.graph.emit('nodeselectchange', [])
     this.graph.emit('edgeselectchange', [])
   }

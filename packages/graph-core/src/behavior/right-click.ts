@@ -27,13 +27,15 @@ export default class RightClick {
     this.graph.emit('showmenu', this.menu)
   }
 
-  onNodeMenu(e: MouseEvent, item: INodeType) {
-    this.showMenu(e, 'node', item)
+  onNodeMenu(e: MouseEvent, id: string) {
+    const node = this.graph.findNode(id)
+    this.showMenu(e, 'node', node)
     this.graph.emit('showmenu', this.menu)
   }
 
-  onEdgeMenu(e: MouseEvent, item: IEdgeType) {
-    this.showMenu(e, 'edge', item)
+  onEdgeMenu(e: MouseEvent, id: string) {
+    const edge = this.graph.findEdge(id)
+    this.showMenu(e, 'edge', edge)
     this.graph.emit('showmenu', this.menu)
   }
 

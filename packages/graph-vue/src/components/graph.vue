@@ -27,21 +27,7 @@
           :selectedNodes="selectedNodes"
         />
 
-        <!-- <template v-if="nodeGroups">
-          <GraphGroup
-            v-for="(group, index) in nodeGroups"
-            :key="group.id"
-            :group="group"
-            :index="index"
-            :groupPosition="groupPosition"
-            :fromNodeId="fromNodeId"
-            @mousedown="setDragGroupStart"
-            @handleNodeClick="handleNodeClick"
-            @handleDoubleClick="handleDoubleClick"
-          />
-        </template> -->
-
-        <NewEdge :path="newEdgePath" />
+        <NewEdge :createEdge="createEdge" />
       </g>
       <path
         :d="brushPath"
@@ -57,7 +43,7 @@
         }
       "
     />
-    <Menu ref="menu"></Menu>
+    <Menu v-if="graph"></Menu>
   </div>
 </template>
 
@@ -81,22 +67,20 @@ import Graph from '@datafe/graph-core'
     Node,
     ToolBox,
     Menu
-    // GraphGroupNode,
-    // GraphGroup
   }
 })
 export default class GraphContent extends Vue {
   @Prop({
     required: true
   })
-  data!: IGraphDataType
+  data!: IDataModel & IGraphDataType
 
   @Prop()
   nodeStyle!: INodeStyle
 
   componentState = ComponentListStore.state
 
-  graph: Graph = {} as any
+  graph: Graph = null as any
 
   nodeInfo = {
     width: 190,
@@ -113,7 +97,7 @@ export default class GraphContent extends Vue {
   }
   isBrushing = false
   brushPath = ''
-  newEdgePath = ''
+  createEdge = {}
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -121,24 +105,28 @@ export default class GraphContent extends Vue {
 
   handleDrop(e: DragEvent) {
     e.preventDefault()
-    const { clientX: x, clientY: y } = e
-    const posX = x - this.dragingInfo.offsetX * this.graph.getZoom()
-    const posY = y - this.dragingInfo.offsetY * this.graph.getZoom()
+    const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
+    const y = e.y - this.dragingInfo.offsetY * this.graph.getZoom()
+    const point = this.graph.getPointByClient(x, y)
 
     // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
-      nodeId: Number(posX + '' + posY),
+      nodeId: Number(x + '' + y),
       nodeName: this.dragingInfo.component.componentName,
-      nodeDesc: this.dragingInfo.component.componentDesc,
-      posX,
-      posY
-    } as any)
+      x: point.x,
+      y: point.y,
+      slots: [
+        { slotId: 111, type: 'in' },
+        { slotId: 2222, type: 'out' },
+        { slotId: 123, type: 'out' }
+      ]
+    })
   }
 
   mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as SVGElement,
-      drection: 'LR',
+      drection: 'TB',
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
@@ -150,8 +138,7 @@ export default class GraphContent extends Vue {
         'create-edge',
         'wheel-move',
         'wheel-zoom',
-        'brush-select',
-        'right-click'
+        'brush-select'
       ]
     })
     this.graph.data(this.data)
@@ -160,21 +147,23 @@ export default class GraphContent extends Vue {
   }
 
   initCustomHooks() {
-    const hooks = [
-      'afteraddnode',
-      'nodeselectchange',
-      'aftertranslate',
-      'afterzoom',
-      'afteraddedge',
-      'brushing',
-      'mouseup',
-      'showmenu',
-      'afterremovenode',
-      'afterremoveedge',
-      'addingEdge'
-    ]
-    hooks.forEach(hook => {
-      this.graph.on(hook, (this as any)[hook])
+    const hooks = {
+      afteraddnode: 'afteraddnode',
+      nodeselectchange: 'nodeselectchange',
+      edgeselectchange: 'edgeselectchange',
+      aftertranslate: 'aftertranslate',
+      afterzoom: 'afterzoom',
+      afteraddedge: 'afteraddedge',
+      brushing: 'brushing',
+      mouseup: 'mouseup',
+      showmenu: 'showmenu',
+      afterremovenode: 'afterremovenode',
+      afterremoveedge: 'afterremoveedge'
+    }
+
+    Object.keys(hooks).forEach(key => {
+      const hook = (hooks as any)[key]
+      this.graph.on(key, (this as any)[hook])
     })
   }
 
@@ -187,12 +176,6 @@ export default class GraphContent extends Vue {
       this.graph.setBrushing(false)
       this.isBrushing = false
     }
-  }
-
-  addingEdge(createEdge: any) {
-    this.nodes = this.graph.getNodes()
-    const { source, target } = createEdge
-    this.newEdgePath = calculateCurve(source.x, source.y, target.x, target.y)
   }
 
   afteraddnode(item: INodeType) {
@@ -213,7 +196,11 @@ export default class GraphContent extends Vue {
   }
 
   nodeselectchange(nodes: INodeType[]) {
-    this.selectedNodes = nodes
+    this.nodes = this.graph.getNodes()
+  }
+
+  edgeselectchange() {
+    this.edges = this.graph.getEdges()
   }
 
   aftertranslate(x: number, y: number) {
@@ -227,10 +214,6 @@ export default class GraphContent extends Vue {
 
   beforeDestroy() {
     this.graph.destroy()
-  }
-
-  showmenu(menu: IMenu) {
-    ;((this.$refs.menu as Menu) as any).showMenu(menu)
   }
 }
 </script>

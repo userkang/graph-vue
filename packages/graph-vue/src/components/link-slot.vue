@@ -1,17 +1,15 @@
 <template>
   <circle
-    :data-type="`${isInOrOut}slot`"
-    :data-item="item"
+    data-type="slot"
+    :data-id="item.id"
     class="slot-style"
     :class="{
       'enable-slot': slotEnableLink,
-      'active-slot': isInOrOut === 'out',
+      'active-slot': item.type === 'out',
       'linked-slot': slotLinked
     }"
     :r="slotEnableLink ? highlightCircleR : circleR"
-    :transform="
-      `translate(${node[isInOrOut + 'Slot'].x}, ${node[isInOrOut + 'Slot'].y})`
-    "
+    :transform="`translate(${item.x}, ${item.y})`"
   ></circle>
 </template>
 
@@ -24,48 +22,17 @@ export default class LinkSlot extends Vue {
   @Prop({
     required: true
   })
-  node!: INodeType
-
-  @Prop({
-    type: String
-  })
-  isInOrOut!: string
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
-  }
-
-  get item() {
-    return JSON.stringify(this.node)
-  }
+  item: any
 
   circleR = 4
   highlightCircleR = 6
 
-  get isSlotLinked() {
-    if (this.isInOrOut === 'in') {
-      return this.graph
-        .getEdges()
-        .map((item: any) => {
-          return item.toNodeId
-        })
-        .includes(this.node.nodeId)
-    } else {
-      return this.graph
-        .getEdges()
-        .map((item: any) => {
-          return item.fromNodeId
-        })
-        .includes(this.node.nodeId)
-    }
-  }
-
   get slotEnableLink() {
-    return (this.node as any)[this.isInOrOut + 'Slot'].status === 'enable'
+    return this.item.hasState('enable')
   }
 
   get slotLinked() {
-    return (this.node as any)[this.isInOrOut + 'Slot'].status === 'linked'
+    return this.item.hasState('linked') && !this.slotEnableLink
   }
 }
 </script>
@@ -75,6 +42,7 @@ export default class LinkSlot extends Vue {
   stroke: #dddeeb;
   fill: #fff;
   stroke-width: 1;
+  cursor: pointer;
   &.active-slot {
     &:hover {
       stroke: $d2;

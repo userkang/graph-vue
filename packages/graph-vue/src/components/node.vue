@@ -1,11 +1,11 @@
 <template>
   <g>
     <foreignObject
-      :transform="`translate(${node.posX}, ${node.posY})`"
-      :width="nodeInfo.width"
-      :height="nodeInfo.height"
+      :transform="`translate(${node.x}, ${node.y})`"
+      :width="node.width"
+      :height="node.height"
       data-type="node"
-      :data-item="JSON.stringify(node)"
+      :data-id="node.id"
     >
       <div
         class="graph-node"
@@ -16,11 +16,10 @@
             : 'rgba(252,252,251,0.9)'
         }"
       >
-        {{ node.nodeName }}
+        {{ node.model.nodeName }}
       </div>
     </foreignObject>
-    <LinkSlot :node="node" isInOrOut="in" />
-    <LinkSlot :node="node" isInOrOut="out" />
+    <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot" />
   </g>
 </template>
 
@@ -38,10 +37,7 @@ export default class Node extends Vue {
   @Prop({
     required: true
   })
-  node!: INodeType
-
-  @Prop()
-  nodeInfo!: { width: number; height: number }
+  node!: any
 
   @Prop()
   selectedNodes!: INodeType[]
@@ -51,23 +47,7 @@ export default class Node extends Vue {
   }
 
   get isNodeSelected() {
-    return this.nodeSelected(this.node.nodeId)
-  }
-
-  nodeSelected(id: number) {
-    for (const item of this.selectedNodes) {
-      if (item.nodeId === id) {
-        return true
-      }
-    }
-
-    return false
-  }
-
-  showMenuTips(e: MouseEvent) {
-    e.preventDefault()
-    e.stopPropagation()
-    this.$emit('contextMenu', e, 'node', this.node)
+    return this.node.hasState('selected')
   }
 }
 </script>

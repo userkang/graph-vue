@@ -66,7 +66,7 @@ export default class GraphContent extends Vue {
   @Prop({
     required: true
   })
-  data!: IDataModel & IGraphDataType
+  data!: IGraphDataType
 
   @Prop()
   nodeStyle!: INodeStyle

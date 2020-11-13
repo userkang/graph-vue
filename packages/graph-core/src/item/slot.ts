@@ -2,7 +2,7 @@ import Base from './base'
 import { uniqueId } from '../util/utils'
 
 export default class Slot extends Base {
-  constructor(model, cfg) {
+  constructor(model: any, cfg: { [key: string]: unknown }) {
     super(model)
 
     if (!this.get('id')) {

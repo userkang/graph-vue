@@ -60,12 +60,12 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel) {
+  public addNode(item: any) {
     this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
   }
 
-  public addEdge(item: IEdgeModel) {
+  public addEdge(item: any) {
     this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
   }
@@ -76,6 +76,10 @@ export default class Graph extends EventEmitter {
 
   deleteNode(id: string) {
     const node = this.findNode(id)
+    if (!node) {
+      return
+    }
+
     // 先删除与节点相关的边
     const edgeIds = node.edges.map(edge => edge.id)
     edgeIds.forEach(id => {
@@ -88,6 +92,9 @@ export default class Graph extends EventEmitter {
 
   deleteEdge(id: string) {
     const edge = this.findEdge(id)
+    if (!edge) {
+      return
+    }
 
     // 先删除前后节点的相关边
     edge.fromNode.deleteEdge(id)
@@ -168,12 +175,12 @@ export default class Graph extends EventEmitter {
   }
 
   // 加载数据
-  data(data: IDataModel) {
+  data(data: any) {
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach(node => {
+    data.nodes.forEach((node: any) => {
       this.addNode(node)
     })
-    data.edges.forEach(edge => {
+    data.edges.forEach((edge: any) => {
       this.addEdge(edge)
     })
 

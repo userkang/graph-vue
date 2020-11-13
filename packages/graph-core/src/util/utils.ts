@@ -45,8 +45,8 @@ export const isFullScreen = () => {
   )
 }
 
-const map = {}
-export const uniqueId = prefix => {
+const map: { [key: string]: number } = {}
+export const uniqueId = (prefix: string) => {
   if (!map[prefix]) {
     map[prefix] = 1
   } else {

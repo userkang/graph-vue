@@ -8,7 +8,7 @@ export default class NodeController {
     this.graph = graph
   }
 
-  addNode(item: INodeModel) {
+  addNode(item: any) {
     const { width, height } = this.graph.getNodeInfo()
     const node = new Node(item, {
       width,

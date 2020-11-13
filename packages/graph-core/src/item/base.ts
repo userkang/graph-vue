@@ -1,11 +1,11 @@
 export default class Base {
   public _cfg: { [key: string]: unknown } = {
     id: '',
-    model: {} as INodeModel & IEdgeModel,
+    model: {} as any,
     states: []
   }
 
-  constructor(model) {
+  constructor(model: any) {
     this.set('model', model)
 
     if (model.id) {
@@ -17,7 +17,7 @@ export default class Base {
     return this.get('id')
   }
 
-  public get model(): INodeModel | IEdgeModel {
+  public get model(): any {
     return this.get('model')
   }
 

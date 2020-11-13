@@ -1,9 +1,10 @@
 import Base from './base'
 import Slot from './slot'
+import Edge from './edge'
 import { uniqueId } from '../util/utils'
 
 export default class Node extends Base {
-  constructor(model, cfg) {
+  constructor(model: any, cfg: { [key: string]: unknown }) {
     super(model)
     if (!this.get('id')) {
       this.set('id', uniqueId('node'))
@@ -39,15 +40,15 @@ export default class Node extends Base {
     return this.get('height')
   }
 
-  public get slots() {
+  public get slots(): Slot[] {
     return this.get('slots')
   }
 
-  public get edges() {
+  public get edges(): Edge[] {
     return this.get('edges')
   }
 
-  public addEdge(edge) {
+  public addEdge(edge: Edge) {
     this.get('edges').push(edge)
   }
 
@@ -62,7 +63,7 @@ export default class Node extends Base {
     }
   }
 
-  public updatePosition(x, y) {
+  public updatePosition(x: number, y: number) {
     // 记录移动距离
     const moveX = x - this.x
     const moveY = y - this.y
@@ -96,10 +97,10 @@ export default class Node extends Base {
     const height = this.get('height')
 
     this.set('slots', [])
-    let inSlots = []
-    let outSlots = []
+    let inSlots: Slot[] = []
+    let outSlots: Slot[] = []
     if (Array.isArray(model.slots)) {
-      model.slots.forEach(item => {
+      model.slots.forEach((item: any) => {
         if (item.type && item.type === 'out') {
           outSlots.push(item)
         } else {
@@ -107,7 +108,7 @@ export default class Node extends Base {
         }
       })
     } else {
-      inSlots = outSlots = [{}]
+      inSlots = outSlots = [{} as any]
     }
 
     const inSlotLen = inSlots.length

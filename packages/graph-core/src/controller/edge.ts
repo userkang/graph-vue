@@ -8,7 +8,7 @@ export default class EdgeController {
     this.graph = graph
   }
 
-  public addEdge(item: IEdgeModel) {
+  public addEdge(item: any) {
     const fromNode = this.graph.findNode(item.fromNodeId)
     const toNode = this.graph.findNode(item.toNodeId)
     const edge = new Edge(item, fromNode, toNode)

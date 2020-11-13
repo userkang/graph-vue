@@ -57,8 +57,7 @@ export default class ViewController {
     this.translateToCenter()
     // 变换group的信息
     setTimeout(() => {
-      const box = this.getGroupBox()
-      const transformInfo = box.getBoundingClientRect()
+      const transformInfo = this.getGroupBox()
 
       const vScale =
         (this.svgInfo.width / transformInfo.width) * this.transform.scale
@@ -89,8 +88,7 @@ export default class ViewController {
   translateToCenter() {
     setTimeout(() => {
       // 这里需要到下一个周期获取g变换后的位置信息
-      const box = this.getGroupBox()
-      const transformInfo = box.getBoundingClientRect()
+      const transformInfo = this.getGroupBox()
 
       // 变换g与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
@@ -117,7 +115,15 @@ export default class ViewController {
   }
 
   getGroupBox() {
-    return this.$container.querySelector('g') as SVGElement
+    const clientRect = this.$container
+      .querySelector('g')
+      .getBoundingClientRect()
+    return {
+      x: clientRect.left,
+      y: clientRect.top,
+      width: clientRect.width,
+      height: clientRect.height
+    }
   }
 
   getPointByClient(originX: number, originY: number) {
@@ -136,15 +142,15 @@ export default class ViewController {
     const bounding = this.$container.getBoundingClientRect()
 
     this.svgInfo = {
-      x: bounding.x,
-      y: bounding.y,
+      x: bounding.left,
+      y: bounding.top,
       width: bounding.width,
       height: bounding.height
     }
   }
 
   judgeBoundary(x: number, y: number) {
-    const transformInfo = this.getGroupBox().getBoundingClientRect()
+    const transformInfo = this.getGroupBox()
 
     const { height: gHeight, width: gWidth, x: gX, y: gY } = transformInfo
     //  右边界

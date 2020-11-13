@@ -5,7 +5,6 @@ import CreateEdge from './create-edge'
 import WheelMove from './wheel-move'
 import WheelZoom from './wheel-zoom'
 import BrushSelect from './brush-select'
-import RightClick from './right-click'
 
 // 维护一个 behavior 注册表
 const behaviors: { [key: string]: any } = {
@@ -15,8 +14,7 @@ const behaviors: { [key: string]: any } = {
   'create-edge': CreateEdge,
   'wheel-move': WheelMove,
   'wheel-zoom': WheelZoom,
-  'brush-select': BrushSelect,
-  'right-click': RightClick
+  'brush-select': BrushSelect
 }
 
 export default behaviors

@@ -52,6 +52,7 @@ import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@datafe/graph-core'
+import { IEdge, IGraph, INode } from '@datafe/graph-core/dist/src'
 
 @Component({
   components: {
@@ -80,8 +81,8 @@ export default class GraphContent extends Vue {
     height: 35
   }
 
-  nodes: any[] = []
-  edges: any[] = []
+  nodes: INode[] = []
+  edges: IEdge[] = []
 
   transform = {
     scale: 1,

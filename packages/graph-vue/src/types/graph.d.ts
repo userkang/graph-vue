@@ -40,26 +40,12 @@ declare interface IEdgeType {
   toSlotId: string
 }
 
-declare interface IRectInfo {
-  width: number
-  height: number
-  rx: number
-  ry: number
-}
-
 declare interface IMenu {
   show: boolean
   x: number
   y: number
   type: string
   item?: { [key: string]: unknown }
-}
-
-declare interface INodeStyle {
-  width: number
-  height: number
-  rx: number
-  ry: number
 }
 
 declare interface IDataItem {

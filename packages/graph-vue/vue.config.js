@@ -6,7 +6,6 @@ const htmlPath = path.resolve(__dirname, './public/index.html')
 
 // Talos 线上构建会注入 PUBLIC_URL 环境变量
 const { PUBLIC_URL } = process.env
-console.log(__dirname, process.cwd())
 
 module.exports = {
   outputDir: path.resolve(__dirname, './build'),
@@ -15,15 +14,15 @@ module.exports = {
     loaderOptions: {
       sass: {
         implementation: require('sass'),
-        data: `@import "@/assets/css/variable.scss";`,
-      },
-    },
+        data: `@import "@/assets/css/variable.scss";`
+      }
+    }
   },
   configureWebpack: {
     resolve: {
       alias: {
-        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
-      },
+        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+      }
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -34,19 +33,19 @@ module.exports = {
         minify: {
           removeComments: true,
           collapseWhitespace: true,
-          removeAttributeQuotes: true,
+          removeAttributeQuotes: true
           // more options:
           // https://github.com/kangax/html-minifier#options-quick-reference
         },
         // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-        chunksSortMode: 'dependency',
-      }),
-    ],
+        chunksSortMode: 'dependency'
+      })
+    ]
   },
   devServer: {
     open: true,
     port: 8090,
     hot: true,
-    disableHostCheck: true,
-  },
+    disableHostCheck: true
+  }
 }

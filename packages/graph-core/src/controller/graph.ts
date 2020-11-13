@@ -5,17 +5,16 @@ import EventController from './event'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
-import Node from '../item/node'
-import Edge from '../item/edge'
+import { INode, IEdge } from '../types/index'
 
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
 
-  public viewController: ViewController
+  public viewController = null
   public layoutController: LayoutController
   public eventController: EventController
-  public nodeController: NodeController & { [key: string]: any }
-  public edgeController: EdgeController & { [key: string]: any }
+  public nodeController: NodeController
+  public edgeController: EdgeController
   public stackController: StackController
 
   constructor(config: any) {
@@ -176,6 +175,9 @@ export default class Graph extends EventEmitter {
 
   // 加载数据
   data(data: any) {
+    this.set('nodes', [])
+    this.set('edges', [])
+
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
     data.nodes.forEach((node: any) => {
       this.addNode(node)
@@ -197,11 +199,11 @@ export default class Graph extends EventEmitter {
     return this.viewController.nodeInfo
   }
 
-  getNodes(): Node[] {
+  getNodes(): INode[] {
     return this.get('nodes')
   }
 
-  getEdges(): Edge[] {
+  getEdges(): IEdge[] {
     return this.get('edges')
   }
 

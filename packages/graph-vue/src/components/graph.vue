@@ -150,7 +150,8 @@ export default class GraphContent extends Vue {
       mouseup: 'mouseup',
       showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
-      afterdeleteedge: 'afterdeleteedge'
+      afterdeleteedge: 'afterdeleteedge',
+      afterdragnode: 'afterDragNode'
     }
 
     Object.keys(hooks).forEach(key => {
@@ -168,6 +169,10 @@ export default class GraphContent extends Vue {
       this.graph.setBrushing(false)
       this.isBrushing = false
     }
+  }
+
+  afterDragNode() {
+    console.log('drag')
   }
 
   afteraddnode(item: any) {

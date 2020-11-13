@@ -82,8 +82,8 @@ export default class Graph extends EventEmitter {
 
     // 先删除与节点相关的边
     const edgeIds = node.edges.map(edge => edge.id)
-    edgeIds.forEach(id => {
-      this.deleteEdge(id)
+    edgeIds.forEach(item => {
+      this.deleteEdge(item)
     })
 
     this.nodeController.deleteNode(id)
@@ -164,9 +164,9 @@ export default class Graph extends EventEmitter {
 
   public findSlot(id: string) {
     const nodes = this.getNodes()
-    for (let i = 0; i < nodes.length; i++) {
-      const slot = nodes[i].slots.find(slot => {
-        return slot.id === id
+    for (const node of nodes) {
+      const slot = node.slots.find(item => {
+        return item.id === id
       })
       if (slot) {
         return slot

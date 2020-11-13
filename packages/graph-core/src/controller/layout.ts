@@ -7,11 +7,10 @@ export default class LayoutController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.init()
   }
 
   init() {
-    const rankdir = this.graph.cfg.drection ? this.graph.cfg.drection : 'TB'
+    const rankdir = this.graph.get('drection') || 'TB'
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
@@ -25,10 +24,11 @@ export default class LayoutController {
   }
 
   layout() {
-    const { graph } = this
+    this.init()
+
     const { width, height } = this.graph.getNodeInfo()
-    const nodes = graph.getNodes()
-    const edges = graph.getEdges()
+    const nodes = this.graph.getNodes()
+    const edges = this.graph.getEdges()
 
     nodes.forEach(item => {
       this.dagre.setNode(item.id, {
@@ -48,7 +48,6 @@ export default class LayoutController {
     const svgInfo = this.graph.getSvgInfo()
 
     this.dagre.nodes().forEach((v: string) => {
-      const nodes = this.graph.getNodes()
       nodes.forEach(item => {
         if (item.id === v) {
           const { x, y } = this.dagre.node(v)

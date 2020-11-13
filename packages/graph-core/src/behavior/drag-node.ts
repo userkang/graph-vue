@@ -54,9 +54,9 @@ export default class DragNode {
       this.moveY = y - this.startY
 
       this.moveNode.forEach(item => {
-        const x = item.x + this.moveX / this.graph.getZoom()
-        const y = item.y + this.moveY / this.graph.getZoom()
-        item.updatePosition(x, y)
+        const posX = item.x + this.moveX / this.graph.getZoom()
+        const posY = item.y + this.moveY / this.graph.getZoom()
+        item.updatePosition(posX, posY)
         this.graph.emit('dragingnode')
       })
     }

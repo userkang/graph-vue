@@ -18,7 +18,7 @@ export default class EdgeController {
   public deleteEdge(id: string) {
     const edges = this.graph.getEdges()
     edges.splice(
-      edges.findIndex(item => item.edgeId === id),
+      edges.findIndex(item => item.id === id),
       1
     )
   }

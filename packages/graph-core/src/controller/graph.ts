@@ -5,6 +5,8 @@ import EventController from './event'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
+import Node from '../item/node'
+import Edge from '../item/edge'
 
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
@@ -74,22 +76,43 @@ export default class Graph extends EventEmitter {
 
   deleteNode(id: string) {
     const node = this.findNode(id)
-    // node.set('edges', [])
+    // 先删除与节点相关的边
+    const edgeIds = node.edges.map(edge => edge.id)
+    edgeIds.forEach(id => {
+      this.deleteEdge(id)
+    })
+
     this.nodeController.deleteNode(id)
-    this.emit('afterremovenode', node)
+    this.emit('afterdeletenode', node)
   }
 
   deleteEdge(id: string) {
     const edge = this.findEdge(id)
-    edge.fromSlot.clearState('linked')
-    edge.toSlot.clearState('linked')
 
+    // 先删除前后节点的相关边
     edge.fromNode.deleteEdge(id)
     edge.toNode.deleteEdge(id)
 
+    // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
+    const hasFromSlotLinked = edge.fromNode.edges.find(
+      item => item.fromSlot.id === edge.fromSlot.id
+    )
+    const hasToSlotLinked = edge.toNode.edges.find(
+      item => item.toSlot.id === edge.toSlot.id
+    )
+
+    if (!hasFromSlotLinked) {
+      edge.fromSlot.clearState('linked')
+    }
+
+    if (!hasToSlotLinked) {
+      edge.toSlot.clearState('linked')
+    }
+
+    // 删除数据中的边
     this.edgeController.deleteEdge(id)
 
-    this.emit('afterremoveedge', edge)
+    this.emit('afterdeleteedge', edge)
   }
 
   public getZoom() {
@@ -146,13 +169,18 @@ export default class Graph extends EventEmitter {
 
   // 加载数据
   data(data: IDataModel) {
-    // TODO 判断有没有坐标，没有的话需要先格式化
-
+    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
     data.nodes.forEach(node => {
-      this.nodeController.addNode(node)
+      this.addNode(node)
     })
     data.edges.forEach(edge => {
-      this.edgeController.addEdge(edge)
+      this.addEdge(edge)
+    })
+
+    const edges = this.getEdges()
+    edges.forEach(item => {
+      item.fromSlot.setState('linked')
+      item.toSlot.setState('linked')
     })
 
     this.emit('refreshgraph')
@@ -162,11 +190,11 @@ export default class Graph extends EventEmitter {
     return this.viewController.nodeInfo
   }
 
-  getNodes() {
+  getNodes(): Node[] {
     return this.get('nodes')
   }
 
-  getEdges() {
+  getEdges(): Edge[] {
     return this.get('edges')
   }
 

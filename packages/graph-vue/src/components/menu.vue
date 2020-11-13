@@ -44,7 +44,6 @@ export default class Menu extends Vue {
 
   handleDelete() {
     if (this.menu.type === 'node') {
-      console.log(this.menu.item)
       this.graph.deleteNode((this.menu.item as any).id)
     }
 

@@ -53,27 +53,29 @@ export default class ViewController {
 
   // 让g的宽和高适应画布
   fitView() {
-    // 变换group的信息
-    const box = this.getGroupBox()
-    const transformInfo = box.getBoundingClientRect()
-
-    const vScale =
-      (this.svgInfo.width / transformInfo.width) * this.transform.scale
-    const hScale =
-      (this.svgInfo.height / transformInfo.height) * this.transform.scale
-    let scale = vScale < hScale ? vScale : hScale
-
-    if (scale > 2) {
-      scale = 2
-    }
-
-    if (scale < 0.5) {
-      scale = 0.5
-    }
-
-    this.graph.zoom(scale)
-
+    // 先居中再放大
     this.translateToCenter()
+    // 变换group的信息
+    setTimeout(() => {
+      const box = this.getGroupBox()
+      const transformInfo = box.getBoundingClientRect()
+
+      const vScale =
+        (this.svgInfo.width / transformInfo.width) * this.transform.scale
+      const hScale =
+        (this.svgInfo.height / transformInfo.height) * this.transform.scale
+      let scale = vScale < hScale ? vScale : hScale
+
+      if (scale > 2) {
+        scale = 2
+      }
+
+      if (scale < 0.5) {
+        scale = 0.5
+      }
+
+      this.graph.zoom(scale)
+    })
   }
 
   caculateOffset() {
@@ -89,7 +91,6 @@ export default class ViewController {
       // 这里需要到下一个周期获取g变换后的位置信息
       const box = this.getGroupBox()
       const transformInfo = box.getBoundingClientRect()
-      box.style.transition = 'transform 0.5s'
 
       // 变换g与画布左方和上方的距离
       const transformLeft = transformInfo.x - this.svgInfo.x
@@ -103,10 +104,6 @@ export default class ViewController {
         this.transform.scale
 
       this.graph.translate(translateX, translateY)
-
-      setTimeout(() => {
-        box.style.transition = ''
-      }, 500)
     })
   }
 

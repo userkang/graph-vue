@@ -19,14 +19,7 @@
         v-if="graph"
       >
         <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
-        <Node
-          v-for="item in nodes"
-          :key="item.nodeId"
-          :node="item"
-          :nodeInfo="nodeInfo"
-          :selectedNodes="selectedNodes"
-        />
-
+        <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
         <NewEdge :createEdge="createEdge" />
       </g>
       <path
@@ -87,9 +80,9 @@ export default class GraphContent extends Vue {
     height: 35
   }
 
-  nodes: INodeType[] = []
-  edges: IEdgeType[] = []
-  selectedNodes: INodeType[] = []
+  nodes: any[] = []
+  edges: any[] = []
+
   transform = {
     scale: 1,
     translateX: 0,
@@ -141,24 +134,23 @@ export default class GraphContent extends Vue {
         'brush-select'
       ]
     })
-    this.graph.data(this.data)
-
     this.initCustomHooks()
+    this.graph.data(this.data)
   }
 
   initCustomHooks() {
     const hooks = {
       afteraddnode: 'afteraddnode',
+      afteraddedge: 'afteraddedge',
       nodeselectchange: 'nodeselectchange',
       edgeselectchange: 'edgeselectchange',
       aftertranslate: 'aftertranslate',
       afterzoom: 'afterzoom',
-      afteraddedge: 'afteraddedge',
       brushing: 'brushing',
       mouseup: 'mouseup',
       showmenu: 'showmenu',
-      afterremovenode: 'afterremovenode',
-      afterremoveedge: 'afterremoveedge'
+      afterdeletenode: 'afterdeletenode',
+      afterdeleteedge: 'afterdeleteedge'
     }
 
     Object.keys(hooks).forEach(key => {
@@ -178,20 +170,20 @@ export default class GraphContent extends Vue {
     }
   }
 
-  afteraddnode(item: INodeType) {
+  afteraddnode(item: any) {
     this.nodes = this.graph.getNodes()
   }
 
-  afteraddedge(item: IEdgeType) {
+  afteraddedge(item: any) {
     this.edges = this.graph.getEdges()
   }
 
-  afterremovenode() {
+  afterdeletenode() {
     this.nodes = this.graph.getNodes()
     this.edges = this.graph.getEdges()
   }
 
-  afterremoveedge() {
+  afterdeleteedge() {
     this.edges = this.graph.getEdges()
   }
 

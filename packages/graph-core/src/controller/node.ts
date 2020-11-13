@@ -26,11 +26,5 @@ export default class NodeController {
     )
 
     // 与节点相关的边也需要删除
-    const edges = this.graph.getEdges()
-    for (let i = edges.length - 1; i >= 0; i--) {
-      if (edges[i].fromNode.id === id || edges[i].toNode.id === id) {
-        this.graph.deleteEdge(edges[i].id)
-      }
-    }
   }
 }

@@ -16,28 +16,28 @@ declare interface ITransform {
 }
 
 declare interface ISlot {
-  slotId: number
-  type: ''
+  id: string
+  type: string
 }
 
 declare interface INodeType {
-  nodeId: number
+  id: string
   // 组件名称
   nodeName: string
   // 节点X坐标
   x: number
   // 节点Y坐标
   y: number
-  slots?: []
+  slots?: ISlot[]
 }
 
 declare interface IEdgeType {
-  // 连线ID
-  edgeId?: number | string
   // 源节点ID
-  fromNodeId: number
+  fromNodeId: string
   // 目标节点ID
-  toNodeId: number
+  toNodeId: string
+  fromSlotId: string
+  toSlotId: string
 }
 
 declare interface IRectInfo {

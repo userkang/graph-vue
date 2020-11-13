@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-core",
-  "version": "0.1.12",
+  "version": "0.2.0",
   "main": "dist/core.min.js",
   "types": "dist/src/controller/graph.d.ts",
   "files": [
@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "build": "tsc && webpack --config webpack.config.js --mode production",
-    "release": "yarn build && npm version patch",
+    "patch": "npm version patch",
     "pub": "mnpm publish"
   },
   "dependencies": {

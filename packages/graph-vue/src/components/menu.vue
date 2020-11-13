@@ -75,7 +75,7 @@ export default class Menu extends Vue {
       type: 'node',
       x: e.x,
       y: e.y,
-      item: node
+      item: node as any
     }
   }
 
@@ -86,7 +86,7 @@ export default class Menu extends Vue {
       type: 'edge',
       x: e.x,
       y: e.y,
-      item: edge
+      item: edge as any
     }
   }
 

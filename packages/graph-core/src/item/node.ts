@@ -1,10 +1,10 @@
 import Base from './base'
 import Slot from './slot'
-import Edge from './edge'
 import { uniqueId } from '../util/utils'
+import { INodeModel, ISlot, IEdge, ISlotModel } from '../types'
 
 export default class Node extends Base {
-  constructor(model: any, cfg: { [key: string]: unknown }) {
+  constructor(model: INodeModel, cfg: { [key: string]: unknown }) {
     super(model)
     if (!this.get('id')) {
       this.set('id', uniqueId('node'))
@@ -40,15 +40,15 @@ export default class Node extends Base {
     return this.get('height')
   }
 
-  public get slots(): Slot[] {
+  public get slots(): ISlot[] {
     return this.get('slots')
   }
 
-  public get edges(): Edge[] {
+  public get edges(): IEdge[] {
     return this.get('edges')
   }
 
-  public addEdge(edge: Edge) {
+  public addEdge(edge: IEdge) {
     this.get('edges').push(edge)
   }
 
@@ -97,10 +97,10 @@ export default class Node extends Base {
     const height = this.get('height')
 
     this.set('slots', [])
-    let inSlots: Slot[] = []
-    let outSlots: Slot[] = []
+    let inSlots: ISlotModel[] = []
+    let outSlots: ISlotModel[] = []
     if (Array.isArray(model.slots)) {
-      model.slots.forEach((item: any) => {
+      model.slots.forEach(item => {
         if (item.type && item.type === 'out') {
           outSlots.push(item)
         } else {

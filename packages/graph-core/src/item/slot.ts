@@ -1,9 +1,9 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { INode } from '../types'
+import { INode, ISlotModel } from '../types'
 
 export default class Slot extends Base {
-  constructor(model: any, cfg: { [key: string]: unknown }) {
+  constructor(model: ISlotModel, cfg: { [key: string]: unknown }) {
     super(model)
 
     if (!this.get('id')) {

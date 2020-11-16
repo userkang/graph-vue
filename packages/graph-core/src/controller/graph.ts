@@ -5,7 +5,15 @@ import EventController from './event'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
-import { INode, IEdge } from '../types/index'
+import {
+  INode,
+  IEdge,
+  ISlot,
+  IDataModel,
+  INodeModel,
+  IEdgeModel,
+  IGraphConfig
+} from '../types/index'
 
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
@@ -17,7 +25,7 @@ export default class Graph extends EventEmitter {
   public edgeController: EdgeController
   public stackController: StackController
 
-  constructor(config: any) {
+  constructor(config: IGraphConfig) {
     super()
     this.cfg = Object.assign({}, this.getDefaultCfg(), config)
     this.initController()
@@ -59,12 +67,12 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: any) {
+  public addNode(item: INodeModel) {
     this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
   }
 
-  public addEdge(item: any) {
+  public addEdge(item: IEdgeModel) {
     this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
   }
@@ -149,21 +157,21 @@ export default class Graph extends EventEmitter {
     )
   }
 
-  public findNode(id: string | number) {
+  public findNode(id: string | number): INode {
     const _id = String(id)
     return this.getNodes().find(item => {
       return _id === item.id
     })
   }
 
-  public findEdge(id: string | number) {
+  public findEdge(id: string | number): IEdge {
     const _id = String(id)
     return this.getEdges().find(item => {
       return _id === item.id
     })
   }
 
-  public findSlot(id: string | number) {
+  public findSlot(id: string | number): ISlot {
     const _id = String(id)
     const nodes = this.getNodes()
     for (const node of nodes) {
@@ -176,16 +184,28 @@ export default class Graph extends EventEmitter {
     }
   }
 
+  public findNodeByState(state): INode[] {
+    return this.getNodes().filter(item => {
+      return item.hasState(state)
+    })
+  }
+
+  public findEdgeByState(state): IEdge[] {
+    return this.getEdges().filter(item => {
+      return item.hasState(state)
+    })
+  }
+
   // 加载数据
-  data(data: any) {
+  data(data: IDataModel) {
     this.set('nodes', [])
     this.set('edges', [])
 
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach((node: INode) => {
+    data.nodes.forEach((node: INodeModel) => {
       this.addNode(node)
     })
-    data.edges.forEach((edge: IEdge) => {
+    data.edges.forEach((edge: IEdgeModel) => {
       this.addEdge(edge)
     })
 

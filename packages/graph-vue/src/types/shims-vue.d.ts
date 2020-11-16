@@ -12,3 +12,5 @@ declare module '*.svg' {
   const img: any
   export default img
 }
+
+declare module '@datafe/graph-core'

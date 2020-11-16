@@ -1,5 +1,6 @@
 import Graph from './graph'
 import Node from '../item/node'
+import { INodeModel } from '../types'
 
 export default class NodeController {
   graph: Graph
@@ -8,7 +9,7 @@ export default class NodeController {
     this.graph = graph
   }
 
-  addNode(item: any) {
+  addNode(item: INodeModel) {
     const { width, height } = this.graph.getNodeInfo()
     const node = new Node(item, {
       width,

@@ -40,3 +40,17 @@ export interface IEdgeModel {
   toSlotId?: string
   [key: string]: unknown
 }
+
+export interface IGraphConfig {
+  // svg 容器
+  container: string | HTMLElement
+  // 图的方向： LF 从左到右， TB 自上到下
+  drection: 'LF' | 'TB'
+  // 节点的宽高 单位：px
+  nodeInfo: {
+    width: number
+    height: number
+  }
+  // 默认的行为配置
+  action: string[]
+}

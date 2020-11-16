@@ -16,7 +16,7 @@ export const isTarget = (e: MouseEvent, type: string) => {
 export const addEventListener = (
   target: HTMLElement | Window,
   eventType: string,
-  callback: any
+  callback: () => void
 ) => {
   if (target) {
     if (typeof target.addEventListener === 'function') {

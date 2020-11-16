@@ -2,7 +2,6 @@ import Graph from '../controller/graph'
 
 export default class ClickSelect {
   graph: Graph
-  event: { [key: string]: any } = []
 
   constructor(graph: Graph) {
     this.graph = graph

@@ -52,6 +52,7 @@ import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@datafe/graph-core'
+import { IDataModel, IGraph } from '@datafe/graph-core/dist/src/types'
 
 @Component({
   components: {
@@ -66,11 +67,11 @@ export default class GraphContent extends Vue {
   @Prop({
     required: true
   })
-  data!: IGraphDataType
+  data!: IDataModel
 
   componentState = ComponentListStore.state
 
-  graph: Graph = null as any
+  graph: IGraph = null as any
 
   nodeInfo = {
     width: 190,
@@ -115,7 +116,7 @@ export default class GraphContent extends Vue {
 
   mounted() {
     this.graph = new Graph({
-      container: this.$refs.svg as SVGElement,
+      container: this.$refs.svg as HTMLElement,
       drection: 'TB',
       nodeInfo: {
         width: this.nodeInfo.width,
@@ -148,7 +149,8 @@ export default class GraphContent extends Vue {
       showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
-      afterdragnode: 'afterDragNode'
+      afterdragnode: 'afterDragNode',
+      keyup: 'handleKeyUp'
     }
 
     Object.keys(hooks).forEach(key => {
@@ -204,6 +206,25 @@ export default class GraphContent extends Vue {
 
   afterzoom(zoom: number) {
     this.transform.scale = zoom
+  }
+
+  handleKeyUp(e: KeyboardEvent) {
+    e.stopPropagation()
+    const tagName = (e.target as HTMLBodyElement).tagName
+    if (tagName === 'BODY') {
+      if (['Delete', 'Backspace'].includes(e.key)) {
+        const selectedNodes = this.graph.findNodeByState('selected')
+        const selectedEdges = this.graph.findEdgeByState('selected')
+        if (selectedEdges.length) {
+          this.graph.deleteEdge(selectedEdges[0].id)
+        }
+        if (selectedNodes.length) {
+          selectedNodes.forEach(item => {
+            this.graph.deleteNode(item.id)
+          })
+        }
+      }
+    }
   }
 
   beforeDestroy() {

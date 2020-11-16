@@ -1,6 +1,6 @@
+import { IEdgeModel } from '../types'
 import Graph from '../controller/graph'
 import Edge from '../item/edge'
-
 export default class EdgeController {
   graph: Graph
 
@@ -8,7 +8,7 @@ export default class EdgeController {
     this.graph = graph
   }
 
-  public addEdge(item: any) {
+  public addEdge(item: IEdgeModel) {
     const fromNode = this.graph.findNode(item.fromNodeId)
     const toNode = this.graph.findNode(item.toNodeId)
     const edge = new Edge(item, fromNode, toNode)

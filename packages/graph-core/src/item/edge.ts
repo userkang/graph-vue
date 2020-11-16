@@ -1,9 +1,10 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import Node from '../item/node'
+import { IEdgeModel } from '../types'
 
 export default class Edge extends Base {
-  constructor(model: any, fromNode: Node, toNode: Node) {
+  constructor(model: IEdgeModel, fromNode: Node, toNode: Node) {
     super(model)
     if (!this.get('id')) {
       this.set('id', uniqueId('edge'))

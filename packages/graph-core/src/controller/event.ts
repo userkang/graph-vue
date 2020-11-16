@@ -147,23 +147,6 @@ export default class EventController {
     this.preItemType = this.currentItemType
   }
 
-  // handleKeyUp(e: KeyboardEvent) {
-  //   e.stopPropagation()
-  //   const tagName = (e.target as HTMLBodyElement).tagName
-  //   if (tagName === 'BODY') {
-  //     if (['Delete', 'Backspace'].includes(e.key)) {
-  //       if (this.activeEdgeId) {
-  //         this.graph.edgeController.deleteEdge(this.activeEdgeId)
-  //         this.activeEdgeId = 0
-  //       }
-  //       if (this.selectedNode.length === 1) {
-  //         this.graph.nodeController.deleteNode(this.selectedNode[0].nodeId)
-  //         this.selectedNode = []
-  //       }
-  //     }
-  //   }
-  // }
-
   destroy() {
     this.eventQueue.forEach((item: any) => {
       item.remove()

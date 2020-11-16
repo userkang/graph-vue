@@ -3,7 +3,6 @@ import Node from '../item/node'
 
 export default class BrushSelect {
   graph: Graph
-  event: { [key: string]: any } = []
   originX = 0
   originY = 0
   moving = false

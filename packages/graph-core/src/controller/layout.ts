@@ -3,7 +3,7 @@ import Graph from './graph'
 
 export default class LayoutController {
   graph: Graph
-  dagre: any = null
+  dagre = null
 
   constructor(graph: Graph) {
     this.graph = graph

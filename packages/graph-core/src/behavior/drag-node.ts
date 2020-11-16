@@ -4,7 +4,6 @@ import Node from '../item/node'
 const MOVE_DEVIATION = 2
 export default class DragNode {
   graph: Graph
-  event: { [key: string]: any } = []
   isMoving = false
 
   // 当前拖动节点

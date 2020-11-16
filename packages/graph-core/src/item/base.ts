@@ -1,11 +1,13 @@
+import { IEdgeModel, INodeModel, ISlotModel } from '../types'
+
 export default class Base {
   public _cfg: { [key: string]: unknown } = {
     id: '',
-    model: {} as any,
+    model: {},
     states: []
   }
 
-  constructor(model: any) {
+  constructor(model: INodeModel | IEdgeModel | ISlotModel) {
     this.set('model', model)
 
     if (model.id) {
@@ -17,7 +19,7 @@ export default class Base {
     return this.get('id')
   }
 
-  public get model(): any {
+  public get model(): INodeModel | IEdgeModel | ISlotModel {
     return this.get('model')
   }
 

@@ -52,7 +52,6 @@ import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@datafe/graph-core'
-import { IEdge, IGraph, INode } from '@datafe/graph-core/dist/src'
 
 @Component({
   components: {
@@ -69,9 +68,6 @@ export default class GraphContent extends Vue {
   })
   data!: IGraphDataType
 
-  @Prop()
-  nodeStyle!: INodeStyle
-
   componentState = ComponentListStore.state
 
   graph: Graph = null as any
@@ -81,8 +77,8 @@ export default class GraphContent extends Vue {
     height: 35
   }
 
-  nodes: INode[] = []
-  edges: IEdge[] = []
+  nodes = []
+  edges = []
 
   transform = {
     scale: 1,
@@ -110,9 +106,9 @@ export default class GraphContent extends Vue {
       x: point.x,
       y: point.y,
       slots: [
-        { slotId: 111, type: 'in' },
-        { slotId: 2222, type: 'out' },
-        { slotId: 123, type: 'out' }
+        { slotId: 1, type: 'in' },
+        { slotId: 2, type: 'out' },
+        { slotId: 3, type: 'out' }
       ]
     })
   }

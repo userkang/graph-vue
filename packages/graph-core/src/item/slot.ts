@@ -1,5 +1,6 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
+import { INode } from '../types'
 
 export default class Slot extends Base {
   constructor(model: any, cfg: { [key: string]: unknown }) {
@@ -15,19 +16,19 @@ export default class Slot extends Base {
     this.set('type', cfg.type)
   }
 
-  get x() {
+  get x(): number {
     return this.get('x')
   }
 
-  get y() {
+  get y(): number {
     return this.get('y')
   }
 
-  get type() {
+  get type(): string {
     return this.get('type')
   }
 
-  get node() {
+  get node(): INode {
     return this.get('node')
   }
 }

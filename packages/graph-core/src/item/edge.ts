@@ -44,16 +44,15 @@ export default class Edge extends Base {
   }
 
   public setPoint() {
-    const model = this.model
+    const fromSlotId = String(this.model.fromSlotId)
+    const toSlotId = String(this.model.toSlotId)
     const fromNode = this.fromNode
     const toNode = this.toNode
 
     fromNode.slots.find(item => {
       if (
-        (model.fromSlotId &&
-          item.id === model.fromSlotId &&
-          item.type === 'out') ||
-        (!model.fromNodeId && item.type === 'out')
+        (fromSlotId && item.id === fromSlotId && item.type === 'out') ||
+        (!this.fromNode.id && item.type === 'out')
       ) {
         this.set('fromSlot', item)
         this.set('fromPoint', { x: item.x, y: item.y })
@@ -63,8 +62,8 @@ export default class Edge extends Base {
 
     toNode.slots.find(item => {
       if (
-        (model.toSlotId && item.id === model.toSlotId && item.type === 'in') ||
-        (!model.toNodeId && item.type === 'in')
+        (toSlotId && item.id === toSlotId && item.type === 'in') ||
+        (!this.toNode.id && item.type === 'in')
       ) {
         this.set('toSlot', item)
         this.set('toPoint', { x: item.x, y: item.y })

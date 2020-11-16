@@ -9,8 +9,6 @@ export type ISlot = Slot
 export type INode = Node
 
 export interface IDataModel {
-  // DAG图ID
-  graphId?: number | string
   // 实验节点信息
   nodes: INodeModel[]
   // 实验连线信息

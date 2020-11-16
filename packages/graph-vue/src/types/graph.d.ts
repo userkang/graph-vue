@@ -16,12 +16,12 @@ declare interface ITransform {
 }
 
 declare interface ISlot {
-  id: string
+  id: number
   type: string
 }
 
 declare interface INodeType {
-  id: string
+  id: number
   // 组件名称
   nodeName: string
   // 节点X坐标
@@ -33,11 +33,11 @@ declare interface INodeType {
 
 declare interface IEdgeType {
   // 源节点ID
-  fromNodeId: string
+  fromNodeId: number
   // 目标节点ID
-  toNodeId: string
-  fromSlotId: string
-  toSlotId: string
+  toNodeId: number
+  fromSlotId: number
+  toSlotId: number
 }
 
 declare interface IMenu {

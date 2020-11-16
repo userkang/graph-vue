@@ -149,23 +149,26 @@ export default class Graph extends EventEmitter {
     )
   }
 
-  public findNode(id: string) {
+  public findNode(id: string | number) {
+    const _id = String(id)
     return this.getNodes().find(item => {
-      return id === item.id
+      return _id === item.id
     })
   }
 
-  public findEdge(id: string) {
+  public findEdge(id: string | number) {
+    const _id = String(id)
     return this.getEdges().find(item => {
-      return id === item.id
+      return _id === item.id
     })
   }
 
-  public findSlot(id: string) {
+  public findSlot(id: string | number) {
+    const _id = String(id)
     const nodes = this.getNodes()
     for (const node of nodes) {
       const slot = node.slots.find(item => {
-        return item.id === id
+        return item.id === _id
       })
       if (slot) {
         return slot
@@ -179,10 +182,10 @@ export default class Graph extends EventEmitter {
     this.set('edges', [])
 
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach((node: any) => {
+    data.nodes.forEach((node: INode) => {
       this.addNode(node)
     })
-    data.edges.forEach((edge: any) => {
+    data.edges.forEach((edge: IEdge) => {
       this.addEdge(edge)
     })
 
@@ -207,7 +210,7 @@ export default class Graph extends EventEmitter {
     return this.get('edges')
   }
 
-  getBrushing() {
+  getBrushing(): boolean {
     return this.get('brushing')
   }
 

@@ -12,7 +12,8 @@ import {
   IDataModel,
   INodeModel,
   IEdgeModel,
-  IGraphConfig
+  IGraphConfig,
+  IStackData
 } from '../types/index'
 
 export default class Graph extends EventEmitter {
@@ -67,21 +68,27 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel) {
-    this.nodeController.addNode(item)
+  public addNode(item: INodeModel, stack: boolean = true) {
+    const node = this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
+    if (stack) {
+      // this.pushStack({ type: 'addNode', before: [], after: [{ id: node.id }] })
+    }
   }
 
-  public addEdge(item: IEdgeModel) {
-    this.edgeController.addEdge(item)
+  public addEdge(item: IEdgeModel, stack: boolean = true) {
+    const edge = this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
+    if (stack) {
+      // this.pushStack({ type: 'addEdge', before: [], after: [{ id: edge.id }] })
+    }
   }
 
   public getSvgInfo() {
     return this.viewController.svgInfo
   }
 
-  deleteNode(id: string) {
+  deleteNode(id: string, stack: boolean = true) {
     const node = this.findNode(id)
     if (!node) {
       return
@@ -95,9 +102,16 @@ export default class Graph extends EventEmitter {
 
     this.nodeController.deleteNode(id)
     this.emit('afterdeletenode', node)
+    if (stack) {
+      // this.pushStack({
+      //   type: 'deleteNode',
+      //   before: [{ ...node.model }],
+      //   after: []
+      // })
+    }
   }
 
-  deleteEdge(id: string) {
+  deleteEdge(id: string, stack: boolean = true) {
     const edge = this.findEdge(id)
     if (!edge) {
       return
@@ -127,6 +141,14 @@ export default class Graph extends EventEmitter {
     this.edgeController.deleteEdge(id)
 
     this.emit('afterdeleteedge', edge)
+
+    if (stack) {
+      // this.pushStack({
+      //   type: 'deleteNode',
+      //   before: [{ ...edge.model }],
+      //   after: []
+      // })
+    }
   }
 
   public getZoom() {
@@ -203,10 +225,10 @@ export default class Graph extends EventEmitter {
 
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
     data.nodes.forEach((node: INodeModel) => {
-      this.addNode(node)
+      this.addNode(node, false)
     })
     data.edges.forEach((edge: IEdgeModel) => {
-      this.addEdge(edge)
+      this.addEdge(edge, false)
     })
 
     const edges = this.getEdges()
@@ -244,6 +266,19 @@ export default class Graph extends EventEmitter {
 
   redo() {
     this.stackController.redo()
+  }
+
+  pushStack(type: string, data: IStackData[], stackType = 'undo') {
+    this.stackController.pushStack(type, data, stackType)
+    this.emit('afterstackchange')
+  }
+
+  getUndoStack() {
+    return this.stackController.undoStack
+  }
+
+  getRndoStack() {
+    return this.stackController.redoStack
   }
 
   resize() {

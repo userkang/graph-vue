@@ -1,59 +1,67 @@
+import { IStack, IStackData } from '../types'
 import Graph from './graph'
+import { clone } from '../util/utils'
+
+const DEEP = 10
 
 export default class Stack {
   private graph: Graph
 
-  private initialStates: any = {
-    nodes: [],
-    edges: []
-  }
+  public undoStack: IStack[] = []
 
-  private undoStack: any[] = []
-
-  private redoStack: any[] = []
+  public redoStack: IStack[] = []
 
   constructor(graph: Graph) {
     this.graph = graph
-    const nodes = this.graph.getNodes()
-    const edges = this.graph.getEdges()
-    const data = JSON.parse(
-      JSON.stringify({
-        nodes,
-        edges
-      })
-    )
-    this.initialStates.nodes = data.nodes
-    this.initialStates.edges = data.edges
   }
 
-  public push(data: any) {
-    this.undoStack.push(JSON.parse(JSON.stringify(data)))
+  public pushStack(type: string, data: IStackData[], stackType = 'undo') {
+    let stack = []
+    if (stackType === 'undo') {
+      stack = this.undoStack
+    } else {
+      stack = this.redoStack
+    }
+
+    stack.push({ type, data: clone(data) })
+    if (stack.length > DEEP) {
+      stack = stack.slice(-DEEP)
+    }
   }
 
-  undo() {
+  public undo() {
     const redoItem = this.undoStack.pop()
-    if (redoItem) {
-      this.redoStack.push(redoItem)
-    }
 
-    if (!this.undoStack.length) {
-      this.graph.set('nodes', this.initialStates.nodes)
-      this.graph.set('edges', this.initialStates.edges)
+    if (!redoItem) {
       return
     }
-    this.graph.set('nodes', this.undoStack[this.undoStack.length - 1].nodes)
-    this.graph.set('edges', this.undoStack[this.undoStack.length - 1].edges)
+
+    // this.graph.pushStack(redoItem.type, redoItem.data, 'redo')
+
+    switch (redoItem.type) {
+      case 'addNode':
+        redoItem.data.forEach(item => {
+          this.graph.deleteNode(item.id, false)
+        })
+        break
+      case 'updateNodePosition':
+        redoItem.data.forEach(item => {
+          this.graph.getNodes().forEach(node => {
+            if (item.id === node.id) {
+              node.updatePosition(item.x as number, item.y as number)
+            }
+          })
+        })
+        break
+    }
   }
 
-  redo() {
-    if (!this.redoStack.length) {
+  public redo() {
+    const undoItem = this.redoStack.pop()
+    if (!undoItem) {
       return
     }
-    const redoItem = this.redoStack.pop()
-    if (redoItem) {
-      this.push(redoItem)
-    }
-    this.graph.set('nodes', redoItem!.nodes)
-    this.graph.set('edges', redoItem!.edges)
+
+    // this.pushStack()
   }
 }

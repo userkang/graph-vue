@@ -17,6 +17,7 @@ export default class NodeController {
       drection: this.graph.get('drection')
     })
     this.graph.getNodes().push(node)
+    return node
   }
 
   deleteNode(id: string) {
@@ -25,7 +26,5 @@ export default class NodeController {
       nodes.findIndex(item => item.id === id),
       1
     )
-
-    // 与节点相关的边也需要删除
   }
 }

@@ -13,6 +13,8 @@ export default class EdgeController {
     const toNode = this.graph.findNode(item.toNodeId)
     const edge = new Edge(item, fromNode, toNode)
     this.graph.getEdges().push(edge)
+
+    return edge
   }
 
   public deleteEdge(id: string) {

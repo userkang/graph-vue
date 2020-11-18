@@ -100,7 +100,6 @@ export default class GraphContent extends Vue {
     const y = e.y - this.dragingInfo.offsetY * this.graph.getZoom()
     const point = this.graph.getPointByClient(x, y)
 
-    // 这块参数可以只传 nodeId, 其余节点信息后端存有
     this.graph.addNode({
       nodeId: Number(x + '' + y),
       nodeName: this.dragingInfo.component.componentName,

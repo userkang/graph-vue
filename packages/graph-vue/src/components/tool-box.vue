@@ -1,5 +1,7 @@
 <template>
   <div class="scale-panel" @click="handleChange" v-if="graph">
+    <li title="撤销" id="undo" class="iconfont iconundo"></li>
+    <li title="回撤" id="redo" class="iconfont iconredo"></li>
     <li title="放大" id="expand" class="iconfont iconfangdasuoxiao_X"></li>
     <li title="缩小" id="shrink" class="iconfont iconfangdasuoxiao_Y"></li>
     <li title="实际尺寸" id="reset" class="iconfont iconshijichicun"></li>
@@ -32,6 +34,12 @@ export default class ToolBox extends Vue {
     const { graph } = this
     const id = (e.target as HTMLElement).id
     switch (id) {
+      case 'undo':
+        this.graph.undo()
+        break
+      case 'redo':
+        this.graph.redo()
+        break
       case 'expand':
         this.expand()
         break
@@ -99,6 +107,11 @@ export default class ToolBox extends Vue {
   }
   .select {
     color: #ff9801;
+  }
+  #undo,
+  #redo {
+    font-size: 14px;
+    font-weight: 300;
   }
 }
 </style>

@@ -19,8 +19,6 @@ export interface IDataModel {
 export interface ISlotModel {
   id?: string
   type?: string
-  x?: number
-  y?: number
   [key: string]: unknown
 }
 
@@ -54,3 +52,10 @@ export interface IGraphConfig {
   // 默认的行为配置
   action: string[]
 }
+
+export interface IStack {
+  type: string
+  data: IStackData[]
+}
+
+export type IStackData = INodeModel | IEdgeModel

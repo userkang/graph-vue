@@ -13,7 +13,8 @@ import {
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  IStackData
+  IStackData,
+  IStack
 } from '../types/index'
 
 export default class Graph extends EventEmitter {
@@ -273,11 +274,11 @@ export default class Graph extends EventEmitter {
     this.emit('afterstackchange')
   }
 
-  getUndoStack() {
+  getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }
 
-  getRndoStack() {
+  getRndoStack(): IStack[] {
     return this.stackController.redoStack
   }
 

@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-core",
-  "version": "0.2.2",
+  "version": "0.2.4",
   "main": "dist/src/index.js",
   "browser": "dist/core.min.js",
   "types": "dist/src/types/index.ts",

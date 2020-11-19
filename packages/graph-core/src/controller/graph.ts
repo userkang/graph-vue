@@ -226,10 +226,10 @@ export default class Graph extends EventEmitter {
 
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
     data.nodes.forEach((node: INodeModel) => {
-      this.addNode(node, false)
+      this.nodeController.addNode(node)
     })
     data.edges.forEach((edge: IEdgeModel) => {
-      this.addEdge(edge, false)
+      this.edgeController.addEdge(edge)
     })
 
     const edges = this.getEdges()
@@ -238,7 +238,7 @@ export default class Graph extends EventEmitter {
       item.toSlot.setState('linked')
     })
 
-    this.emit('refreshgraph')
+    this.emit('afterchangedata')
   }
 
   getNodeInfo() {

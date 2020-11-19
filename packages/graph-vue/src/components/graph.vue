@@ -149,7 +149,8 @@ export default class GraphContent extends Vue {
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
-      keyup: 'handleKeyUp'
+      keyup: 'handleKeyUp',
+      afterchangedata: 'refreshGraph'
     }
 
     Object.keys(hooks).forEach(key => {
@@ -167,6 +168,11 @@ export default class GraphContent extends Vue {
       this.graph.setBrushing(false)
       this.isBrushing = false
     }
+  }
+
+  refreshGraph() {
+    this.nodes = this.graph.getNodes()
+    this.edges = this.graph.getEdges()
   }
 
   afterDragNode() {

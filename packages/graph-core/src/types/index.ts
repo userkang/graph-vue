@@ -2,6 +2,7 @@ import Graph from '../controller/graph'
 import Node from '../item/node'
 import Edge from '../item/edge'
 import Slot from '../item/slot'
+import './stack'
 
 export type IGraph = Graph
 export type IEdge = Edge
@@ -55,7 +56,20 @@ export interface IGraphConfig {
 
 export interface IStack {
   type: string
-  data: IStackData[]
+  data: IDataStack
 }
 
-export type IStackData = INodeModel | IEdgeModel
+export interface IDataStack {
+  nodes?: INodeStack[]
+  edges?: IEdgeStack[]
+}
+
+export interface INodeStack {
+  id: string
+  model: INodeModel
+}
+
+export interface IEdgeStack {
+  id: string
+  model: IEdgeModel
+}

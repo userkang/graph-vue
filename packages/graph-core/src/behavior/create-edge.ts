@@ -66,7 +66,6 @@ export default class CreateEdge {
       })
     }
 
-    this.setLinkedSlot()
     this.setResetEdge()
     this.graph.emit('addingedge', null)
   }
@@ -94,28 +93,9 @@ export default class CreateEdge {
     })
   }
 
-  setLinkedSlot() {
-    const nodes = this.graph.getNodes()
-    const edges = this.graph.getEdges()
-
-    edges.forEach(edge => {
-      nodes.forEach(node => {
-        node.slots.forEach(slot => {
-          if (
-            slot.id === edge.model.fromSlotId ||
-            slot.id === edge.model.toSlotId
-          ) {
-            slot.setState('linked')
-          }
-        })
-      })
-    })
-  }
-
   isDirectLinked(slot: Slot) {
     let linked = false
 
-    // console.log(this.fromSlot.node.edges)
     for (const item of this.fromSlot.node.edges) {
       linked =
         item.model.fromSlotId === this.fromSlot.id &&

@@ -1,4 +1,4 @@
-import { INodeModel } from '../types'
+import { INodeStack } from '../types'
 import Graph from '../controller/graph'
 import Node from '../item/node'
 
@@ -11,7 +11,7 @@ export default class DragNode {
   activeNode!: Node
   // 移动的节点
   moveNode: Node[] = []
-  stackNode: INodeModel[] = []
+  stackNode: INodeStack[] = []
 
   // 移动前初始值
   originX = 0
@@ -43,6 +43,11 @@ export default class DragNode {
     this.activeNode = this.graph.findNode(id)
 
     this.checkActiveNodeIsSelected()
+
+    // 整理存入栈的节点信息
+    this.moveNode.forEach(item => {
+      this.stackNode.push({ model: { ...item.model }, id: item.id })
+    })
   }
 
   mouseMove(e: MouseEvent) {
@@ -75,27 +80,19 @@ export default class DragNode {
 
     // 没有移动的情况下，不触发 afterdragnode 事件
     if (this.isMoving && hasMove) {
-      this.graph.emit('afterdragnode', this.moveNode)
-      this.graph.pushStack('updateNodePosition', this.stackNode)
+      const moveNodeModel = this.moveNode.map(item => item.model)
+      this.graph.emit('afterdragnode', moveNodeModel)
+      this.graph.pushStack('updateNodePosition', { nodes: this.stackNode })
     }
     this.isMoving = false
   }
 
   checkActiveNodeIsSelected() {
     this.moveNode = [this.activeNode]
-    const nodes = this.graph.getNodes()
-    const selectedNode = nodes.filter(node => {
-      return node.hasState('selected')
-    })
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
     if (this.activeNode.hasState('selected')) {
+      const selectedNode = this.graph.findNodeByState('selected')
       this.moveNode = selectedNode
     }
-
-    // 整理存入栈的节点信息
-    this.moveNode.forEach(item => {
-      console.log(item)
-      this.stackNode.push({ ...item.model, id: item.id })
-    })
   }
 }

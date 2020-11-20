@@ -52,7 +52,7 @@ import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@datafe/graph-core'
-import { IDataModel, IGraph } from '@datafe/graph-core/dist/src/types'
+import { IDataModel, IGraph, INodeModel } from '@datafe/graph-core/dist/src/types'
 
 @Component({
   components: {
@@ -150,7 +150,7 @@ export default class GraphContent extends Vue {
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
       keyup: 'handleKeyUp',
-      afterchangedata: 'refreshGraph'
+      afterdatachange: 'refreshGraph'
     }
 
     Object.keys(hooks).forEach(key => {
@@ -175,8 +175,8 @@ export default class GraphContent extends Vue {
     this.edges = this.graph.getEdges()
   }
 
-  afterDragNode() {
-    console.log('drag')
+  afterDragNode(nodes: INodeModel[]) {
+    // console.log('drag', nodes)
   }
 
   afteraddnode(item: any) {

@@ -55,6 +55,7 @@ export default class Edge extends Base {
         (fromSlotId && item.id === fromSlotId && item.type === 'out') ||
         (!this.fromNode.id && item.type === 'out')
       ) {
+        item.setState('linked')
         this.set('fromSlot', item)
         this.set('fromPoint', { x: item.x, y: item.y })
         return true
@@ -66,6 +67,7 @@ export default class Edge extends Base {
         (toSlotId && item.id === toSlotId && item.type === 'in') ||
         (!this.toNode.id && item.type === 'in')
       ) {
+        item.setState('linked')
         this.set('toSlot', item)
         this.set('toPoint', { x: item.x, y: item.y })
         return true

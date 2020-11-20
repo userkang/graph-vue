@@ -13,8 +13,9 @@ import {
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  IStackData,
-  IStack
+  IStack,
+  IEdgeStack,
+  IDataStack
 } from '../types/index'
 
 export default class Graph extends EventEmitter {
@@ -73,16 +74,19 @@ export default class Graph extends EventEmitter {
     const node = this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
     if (stack) {
-      // this.pushStack({ type: 'addNode', before: [], after: [{ id: node.id }] })
+      const data = { nodes: [{ id: node.id, model: { ...item } }] }
+      this.pushStack('addNode', data)
     }
+    return node
   }
 
   public addEdge(item: IEdgeModel, stack: boolean = true) {
     const edge = this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
     if (stack) {
-      // this.pushStack({ type: 'addEdge', before: [], after: [{ id: edge.id }] })
+      // this.pushStack('addEdge', [{ id: edge.id, model: { ...item } }])
     }
+    return edge
   }
 
   public getSvgInfo() {
@@ -95,6 +99,18 @@ export default class Graph extends EventEmitter {
       return
     }
 
+    if (stack) {
+      const data: IDataStack = {}
+      data.nodes = [{ id: node.id, model: { ...node.model } }]
+      data.edges = node.edges.map(item => {
+        return {
+          id: item.id,
+          model: { ...item.model }
+        } as IEdgeStack
+      })
+      this.pushStack('deleteNode', data)
+    }
+
     // 先删除与节点相关的边
     const edgeIds = node.edges.map(edge => edge.id)
     edgeIds.forEach(item => {
@@ -102,14 +118,9 @@ export default class Graph extends EventEmitter {
     })
 
     this.nodeController.deleteNode(id)
-    this.emit('afterdeletenode', node)
-    if (stack) {
-      // this.pushStack({
-      //   type: 'deleteNode',
-      //   before: [{ ...node.model }],
-      //   after: []
-      // })
-    }
+    this.emit('afterdeletenode', node.model)
+
+    return node
   }
 
   deleteEdge(id: string, stack: boolean = true) {
@@ -141,15 +152,13 @@ export default class Graph extends EventEmitter {
     // 删除数据中的边
     this.edgeController.deleteEdge(id)
 
-    this.emit('afterdeleteedge', edge)
+    this.emit('afterdeleteedge', edge.model)
 
     if (stack) {
-      // this.pushStack({
-      //   type: 'deleteNode',
-      //   before: [{ ...edge.model }],
-      //   after: []
-      // })
+      // this.pushStack('deleteNode', [{ id: edge.id, model: { ...edge.model } }])
     }
+
+    return edge
   }
 
   public getZoom() {
@@ -238,7 +247,7 @@ export default class Graph extends EventEmitter {
       item.toSlot.setState('linked')
     })
 
-    this.emit('afterchangedata')
+    this.emit('afterdatachange')
   }
 
   getNodeInfo() {
@@ -269,7 +278,7 @@ export default class Graph extends EventEmitter {
     this.stackController.redo()
   }
 
-  pushStack(type: string, data: IStackData[], stackType = 'undo') {
+  pushStack(type: string, data: IDataStack, stackType = 'undo') {
     this.stackController.pushStack(type, data, stackType)
     this.emit('afterstackchange')
   }

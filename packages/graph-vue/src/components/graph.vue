@@ -52,7 +52,11 @@ import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
 
 import Graph from '@datafe/graph-core'
-import { IDataModel, IGraph, INodeModel } from '@datafe/graph-core/dist/src/types'
+import {
+  IDataModel,
+  IGraph,
+  INodeModel
+} from '@datafe/graph-core/dist/src/types'
 
 @Component({
   components: {
@@ -224,9 +228,16 @@ export default class GraphContent extends Vue {
           this.graph.deleteEdge(selectedEdges[0].id)
         }
         if (selectedNodes.length) {
+          const edges = []
+          const nodes = []
           selectedNodes.forEach(item => {
-            this.graph.deleteNode(item.id)
+            item.edges.forEach(edge => {
+              edges.push({ id: edge.id, model: { ...edge.model } })
+            })
+            nodes.push({ id: item.id, model: { ...item.model } })
+            this.graph.deleteNode(item.id, false)
           })
+          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }

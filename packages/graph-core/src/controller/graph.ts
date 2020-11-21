@@ -84,8 +84,10 @@ export default class Graph extends EventEmitter {
     const edge = this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
     if (stack) {
-      // this.pushStack('addEdge', [{ id: edge.id, model: { ...item } }])
+      const data = { edges: [{ id: edge.id, model: { ...item } }] }
+      this.pushStack('addEdge', data)
     }
+
     return edge
   }
 
@@ -114,7 +116,7 @@ export default class Graph extends EventEmitter {
     // 先删除与节点相关的边
     const edgeIds = node.edges.map(edge => edge.id)
     edgeIds.forEach(item => {
-      this.deleteEdge(item)
+      this.deleteEdge(item, false)
     })
 
     this.nodeController.deleteNode(id)
@@ -149,14 +151,17 @@ export default class Graph extends EventEmitter {
       edge.toSlot.clearState('linked')
     }
 
+    if (stack) {
+      const data = {
+        edges: [{ id: edge.id, model: { ...edge.model } as IEdgeModel }]
+      }
+      this.pushStack('deleteEdge', data)
+    }
+
     // 删除数据中的边
     this.edgeController.deleteEdge(id)
 
     this.emit('afterdeleteedge', edge.model)
-
-    if (stack) {
-      // this.pushStack('deleteNode', [{ id: edge.id, model: { ...edge.model } }])
-    }
 
     return edge
   }

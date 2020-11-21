@@ -83,6 +83,7 @@ export default class DragNode {
       const moveNodeModel = this.moveNode.map(item => item.model)
       this.graph.emit('afterdragnode', moveNodeModel)
       this.graph.pushStack('updateNodePosition', { nodes: this.stackNode })
+      this.stackNode = []
     }
     this.isMoving = false
   }

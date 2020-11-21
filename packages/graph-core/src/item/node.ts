@@ -54,9 +54,7 @@ export default class Node extends Base {
 
   public deleteEdge(id: string) {
     const edges = this.edges
-    const index = edges.findIndex(item => {
-      return item.id === id
-    })
+    const index = edges.findIndex(item => item.id === id)
 
     if (index > -1) {
       edges.splice(index, 1)

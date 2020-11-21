@@ -98,8 +98,8 @@ export default class CreateEdge {
 
     for (const item of this.fromSlot.node.edges) {
       linked =
-        item.model.fromSlotId === this.fromSlot.id &&
-        item.model.toSlotId === slot.id
+        item.fromSlot.id === this.fromSlot.id &&
+        item.toSlot.id === slot.id
       if (linked) {
         break
       }

@@ -1,7 +1,17 @@
 <template>
   <div class="scale-panel" @click="handleChange" v-if="graph">
-    <li title="撤销" id="undo" class="iconfont iconundo"></li>
-    <li title="回撤" id="redo" class="iconfont iconredo"></li>
+    <li
+      title="撤销"
+      id="undo"
+      :class="{ disable: !undoEnable }"
+      class="iconfont iconundo"
+    ></li>
+    <li
+      title="回撤"
+      id="redo"
+      :class="{ disable: !redoEnable }"
+      class="iconfont iconredo"
+    ></li>
     <li title="放大" id="expand" class="iconfont iconfangdasuoxiao_X"></li>
     <li title="缩小" id="shrink" class="iconfont iconfangdasuoxiao_Y"></li>
     <li title="实际尺寸" id="reset" class="iconfont iconshijichicun"></li>
@@ -25,6 +35,9 @@ import GraphContent from './graph.vue'
 export default class ToolBox extends Vue {
   @Prop()
   isBrushing = false
+
+  undoEnable = false
+  redoEnable = false
 
   get graph() {
     return (this.$parent as GraphContent).graph
@@ -80,6 +93,13 @@ export default class ToolBox extends Vue {
     this.graph.setBrushing(!this.graph.getBrushing())
     this.$emit('clickBrush', this.graph.getBrushing())
   }
+
+  mounted() {
+    this.graph.on('stackchange', () => {
+      this.undoEnable = this.graph.getUndoStack().length > 0
+      this.redoEnable = this.graph.getRedoStack().length > 0
+    })
+  }
 }
 </script>
 
@@ -112,6 +132,13 @@ export default class ToolBox extends Vue {
   #redo {
     font-size: 14px;
     font-weight: 300;
+  }
+  .disable {
+    cursor: not-allowed;
+    color: #ddd;
+    &:hover {
+      background: none;
+    }
   }
 }
 </style>

@@ -24,6 +24,8 @@ declare interface INodeType {
   id: number
   // 组件名称
   nodeName: string
+  width?: number
+  height?: number
   // 节点X坐标
   x: number
   // 节点Y坐标

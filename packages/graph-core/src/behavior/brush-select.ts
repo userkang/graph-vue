@@ -79,13 +79,11 @@ export default class BrushSelect {
       range.endY
     )
 
-    const { width, height } = this.graph.getNodeInfo()
-
-    if (item.y + height < startY) {
+    if (item.y + item.height < startY) {
       return false
     } else if (item.y > endY) {
       return false
-    } else if (item.x + width < startX) {
+    } else if (item.x + item.width < startX) {
       return false
     } else if (item.x > endX) {
       return false

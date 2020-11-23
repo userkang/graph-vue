@@ -29,6 +29,7 @@
     </svg>
 
     <ToolBox
+      v-if="graph"
       :isBrushing="isBrushing"
       @clickBrush="
         value => {
@@ -148,7 +149,7 @@ export default class GraphContent extends Vue {
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
       keyup: 'handleKeyUp',
-      afterdatachange: 'refreshGraph'
+      datachange: 'refreshGraph'
     }
 
     Object.keys(hooks).forEach(key => {

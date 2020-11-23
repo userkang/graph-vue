@@ -58,10 +58,11 @@ export default class CreateEdge {
 
     if (slot.hasState('enable')) {
       // 这里要传 model 下的 id，保证用户数据类型正确
+      // 当 model 下无 id 时，再取自生成 id
       this.graph.addEdge({
-        fromNodeId: this.fromSlot.node.model.id,
+        fromNodeId: this.fromSlot.node.model.id || this.fromSlot.node.id,
         toNodeId: slot.node.model.id,
-        fromSlotId: this.fromSlot.model.id,
+        fromSlotId: this.fromSlot.model.id || this.fromSlot.id,
         toSlotId: slot.model.id
       })
     }
@@ -98,8 +99,7 @@ export default class CreateEdge {
 
     for (const item of this.fromSlot.node.edges) {
       linked =
-        item.fromSlot.id === this.fromSlot.id &&
-        item.toSlot.id === slot.id
+        item.fromSlot.id === this.fromSlot.id && item.toSlot.id === slot.id
       if (linked) {
         break
       }

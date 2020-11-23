@@ -252,7 +252,7 @@ export default class Graph extends EventEmitter {
       item.toSlot.setState('linked')
     })
 
-    this.emit('afterdatachange')
+    this.emit('datachange')
   }
 
   getNodeInfo() {
@@ -285,14 +285,14 @@ export default class Graph extends EventEmitter {
 
   pushStack(type: string, data: IDataStack, stackType = 'undo') {
     this.stackController.pushStack(type, data, stackType)
-    this.emit('afterstackchange')
+    this.emit('stackchange')
   }
 
   getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }
 
-  getRndoStack(): IStack[] {
+  getRedoStack(): IStack[] {
     return this.stackController.redoStack
   }
 

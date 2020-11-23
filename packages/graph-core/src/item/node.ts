@@ -12,8 +12,8 @@ export default class Node extends Base {
 
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
     this.set('drection', cfg.drection)
-    this.set('width', cfg.width)
-    this.set('height', cfg.height)
+    this.set('width', model.width || cfg.width)
+    this.set('height', model.height || cfg.height)
 
     this.set('slots', [])
     // 保存与节点相关的边

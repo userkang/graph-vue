@@ -26,15 +26,14 @@ export default class LayoutController {
   layout() {
     this.init()
 
-    const { width, height } = this.graph.getNodeInfo()
     const nodes = this.graph.getNodes()
     const edges = this.graph.getEdges()
 
     nodes.forEach(item => {
       this.dagre.setNode(item.id, {
         label: '',
-        width,
-        height
+        width: item.width,
+        height: item.height
       })
     })
 
@@ -52,8 +51,8 @@ export default class LayoutController {
         if (item.id === v) {
           const { x, y } = this.dagre.node(v)
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-          const posX = x - (width + group.width - svgInfo.width) / 2
-          const posY = y - (height + group.height - svgInfo.height) / 2
+          const posX = x - (item.width + group.width - svgInfo.width) / 2
+          const posY = y - (item.height + group.height - svgInfo.height) / 2
           item.updatePosition(posX, posY)
         }
       })

@@ -6,6 +6,8 @@ export const dagMock: IGraphDataType = {
       nodeName: '工具栏悬浮有说明',
       x: 455,
       y: 122.5,
+      width: 200,
+      height: 50,
       slots: [
         {
           id: 11,
@@ -26,6 +28,8 @@ export const dagMock: IGraphDataType = {
       nodeName: '拖动添加组件',
       x: 540,
       y: 407.5,
+      width: 210,
+      height: 30,
       slots: [
         {
           id: 21,
@@ -46,6 +50,8 @@ export const dagMock: IGraphDataType = {
       nodeName: '拖动插槽连线',
       x: 641,
       y: 284.5,
+      width: 150,
+      height: 50,
       slots: [
         {
           id: 31,

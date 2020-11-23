@@ -50,13 +50,7 @@ import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
 import { calculateCurve } from '@/assets/js/utils'
-
-import Graph from '@datafe/graph-core'
-import {
-  IDataModel,
-  IGraph,
-  INodeModel
-} from '@datafe/graph-core/dist/src/types'
+import Graph, { IDataModel, INodeModel } from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -75,7 +69,7 @@ export default class GraphContent extends Vue {
 
   componentState = ComponentListStore.state
 
-  graph: IGraph = null as any
+  graph: Graph = null as any
 
   nodeInfo = {
     width: 190,

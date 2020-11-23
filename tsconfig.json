@@ -10,7 +10,7 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["packages/graph-vue/src/*", "packages/graph-core/src/*"],
-      "@datafe/*": ["packages/*/src"]
+      "@datafe/graph-core": ["packages/graph-core/src"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

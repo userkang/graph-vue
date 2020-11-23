@@ -70,7 +70,7 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel, stack: boolean = true) {
+  public addNode(item: INodeModel, stack: boolean = true): INode {
     const node = this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
     if (stack) {
@@ -80,7 +80,7 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  public addEdge(item: IEdgeModel, stack: boolean = true) {
+  public addEdge(item: IEdgeModel, stack: boolean = true): IEdge {
     const edge = this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
     if (stack) {
@@ -95,7 +95,7 @@ export default class Graph extends EventEmitter {
     return this.viewController.svgInfo
   }
 
-  deleteNode(id: string, stack: boolean = true) {
+  deleteNode(id: string, stack: boolean = true): INode {
     const node = this.findNode(id)
     if (!node) {
       return
@@ -125,7 +125,7 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  deleteEdge(id: string, stack: boolean = true) {
+  deleteEdge(id: string, stack: boolean = true): IEdge {
     const edge = this.findEdge(id)
     if (!edge) {
       return

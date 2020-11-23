@@ -14,10 +14,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "types": ["webpack-env"],
-    "paths": {
-      "@/*": ["src/*"]
-    },
     "lib": ["esnext", "dom"]
   },
-  "include": ["src"]
+  "include": ["src", "shims.d.ts"]
 }

@@ -1,10 +1,7 @@
-import Graph from '../controller/graph'
 import Node from '../item/node'
 import Edge from '../item/edge'
 import Slot from '../item/slot'
-import './stack'
 
-export type IGraph = Graph
 export type IEdge = Edge
 export type ISlot = Slot
 export type INode = Node

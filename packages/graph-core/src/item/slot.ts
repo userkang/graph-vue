@@ -1,16 +1,18 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { INode, ISlotModel } from '../types'
+import { ISlotModel } from '../types'
 
 export default class Slot extends Base {
   constructor(model: ISlotModel, cfg: { [key: string]: unknown }) {
     super(model)
 
-    if (!this.get('id')) {
-      this.set('id', uniqueId('slot'))
+    if (!this.id) {
+      const id = uniqueId('slot')
+      this.set('id', id)
+      this.get('model').id = id
     }
 
-    this.set('node', cfg.node)
+    this.set('nodeId', cfg.nodeId)
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', cfg.type)
@@ -28,7 +30,7 @@ export default class Slot extends Base {
     return this.get('type')
   }
 
-  get node(): INode {
-    return this.get('node')
+  get nodeId(): string {
+    return this.get('nodeId')
   }
 }

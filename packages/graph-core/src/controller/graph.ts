@@ -14,7 +14,6 @@ import {
   IEdgeModel,
   IGraphConfig,
   IStack,
-  IEdgeStack,
   IDataStack
 } from '../types/index'
 
@@ -74,7 +73,7 @@ export default class Graph extends EventEmitter {
     const node = this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
     if (stack) {
-      const data = { nodes: [{ id: node.id, model: { ...item } }] }
+      const data = { nodes: [item] }
       this.pushStack('addNode', data)
     }
     return node
@@ -84,7 +83,7 @@ export default class Graph extends EventEmitter {
     const edge = this.edgeController.addEdge(item)
     this.emit('afteraddedge', item)
     if (stack) {
-      const data = { edges: [{ id: edge.id, model: { ...item } }] }
+      const data = { edges: [item] }
       this.pushStack('addEdge', data)
     }
 
@@ -103,12 +102,9 @@ export default class Graph extends EventEmitter {
 
     if (stack) {
       const data: IDataStack = {}
-      data.nodes = [{ id: node.id, model: { ...node.model } }]
+      data.nodes = [node.model]
       data.edges = node.edges.map(item => {
-        return {
-          id: item.id,
-          model: { ...item.model }
-        } as IEdgeStack
+        return item.model as IEdgeModel
       })
       this.pushStack('deleteNode', data)
     }
@@ -152,10 +148,7 @@ export default class Graph extends EventEmitter {
     }
 
     if (stack) {
-      const data = {
-        edges: [{ id: edge.id, model: { ...edge.model } as IEdgeModel }]
-      }
-      this.pushStack('deleteEdge', data)
+      this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
     }
 
     // 删除数据中的边

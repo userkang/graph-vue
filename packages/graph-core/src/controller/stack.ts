@@ -1,4 +1,4 @@
-import { IDataStack, IEdgeModel, IStack } from '../types'
+import { IDataStack, IEdgeModel, INodeModel, IStack } from '../types'
 import Graph from './graph'
 import { clone } from '../util/utils'
 
@@ -46,16 +46,12 @@ export default class Stack {
         })
         break
       case 'deleteNode':
+        newData = stack.data
         stack.data.nodes.forEach(item => {
-          const node = this.graph.addNode(item.model, false)
-          newData.nodes.push({ id: node.id, model: { ...node.model } })
+          this.graph.addNode(item, false)
         })
         stack.data.edges.forEach(item => {
-          const edge = this.graph.addEdge(item.model, false)
-          newData.edges.push({
-            id: edge.id,
-            model: { ...edge.model } as IEdgeModel
-          })
+          this.graph.addEdge(item, false)
         })
         break
       case 'addEdge':
@@ -65,27 +61,23 @@ export default class Stack {
         })
         break
       case 'deleteEdge':
+        newData = stack.data
         stack.data.edges.forEach(item => {
-          const edge = this.graph.addEdge(item.model, false)
-          newData.edges.push({
-            id: edge.id,
-            model: { ...edge.model } as IEdgeModel
-          })
+          this.graph.addEdge(item, false)
         })
         break
       case 'updateNodePosition':
         stack.data.nodes.forEach(item => {
           this.graph.getNodes().forEach(node => {
-            if (item.id === node.id) {
+            if (String(item.id) === node.id) {
               // 保存位置改变前的位置
-              newData.nodes.push({ id: item.id, model: { ...node.model } })
-              const { x, y } = item.model
+              newData.nodes.push({ ...node.model })
+              const { x, y } = item
               node.updatePosition(x as number, y as number)
             }
           })
         })
-        const nodesModel = stack.data.nodes.map(item => item.model)
-        this.graph.emit('afterdragnode', nodesModel)
+        this.graph.emit('afterdragnode', clone(stack.data.nodes))
         break
     }
 
@@ -102,9 +94,9 @@ export default class Stack {
 
     switch (stack.type) {
       case 'addNode':
+        newData = stack.data
         stack.data.nodes.forEach(item => {
-          const node = this.graph.addNode(item.model, false)
-          newData.nodes.push({ id: node.id, model: { ...node.model } })
+          this.graph.addNode(item, false)
         })
         break
       case 'deleteNode':
@@ -117,12 +109,9 @@ export default class Stack {
         })
         break
       case 'addEdge':
+        newData = stack.data
         stack.data.edges.forEach(item => {
-          const node = this.graph.addEdge(item.model, false)
-          newData.edges.push({
-            id: node.id,
-            model: { ...node.model } as IEdgeModel
-          })
+          this.graph.addEdge(item, false)
         })
         break
       case 'deleteEdge':
@@ -134,16 +123,16 @@ export default class Stack {
       case 'updateNodePosition':
         stack.data.nodes.forEach(item => {
           this.graph.getNodes().forEach(node => {
-            if (item.id === node.id) {
+            if (String(item.id) === node.id) {
               // 保存位置改变前的位置
-              newData.nodes.push({ id: item.id, model: { ...node.model } })
-              const { x, y } = clone(item.model)
+              newData.nodes.push({ ...node.model })
+              const { x, y } = item
               node.updatePosition(x as number, y as number)
             }
           })
         })
-        const nodesModel = stack.data.nodes.map(item => item.model)
-        this.graph.emit('afterdragnode', nodesModel)
+
+        this.graph.emit('afterdragnode', clone(stack.data.nodes))
         break
     }
 

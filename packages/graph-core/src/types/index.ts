@@ -59,16 +59,6 @@ export interface IStack {
 }
 
 export interface IDataStack {
-  nodes?: INodeStack[]
-  edges?: IEdgeStack[]
-}
-
-export interface INodeStack {
-  id: string
-  model: INodeModel
-}
-
-export interface IEdgeStack {
-  id: string
-  model: IEdgeModel
+  nodes?: INodeModel[]
+  edges?: IEdgeModel[]
 }

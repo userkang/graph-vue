@@ -227,9 +227,9 @@ export default class GraphContent extends Vue {
           const nodes = []
           selectedNodes.forEach(item => {
             item.edges.forEach(edge => {
-              edges.push({ id: edge.id, model: { ...edge.model } })
+              edges.push(edge.model)
             })
-            nodes.push({ id: item.id, model: { ...item.model } })
+            nodes.push(item.model)
             this.graph.deleteNode(item.id, false)
           })
           this.graph.pushStack('deleteNode', { nodes, edges })

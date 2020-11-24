@@ -4,6 +4,7 @@ import Slot from '../item/slot'
 export default class CreateEdge {
   graph: Graph
   fromSlot = null
+  fromNode = null
   isMoveing = false
   createEdge = {
     fromPoint: {
@@ -39,6 +40,7 @@ export default class CreateEdge {
     this.setNewEdgeStart(x, y)
     this.setNewEdgeMove(x, y)
     this.fromSlot = slot
+    this.fromNode = this.graph.findNode(slot.nodeId)
     this.setEnableSlot()
   }
 
@@ -59,9 +61,10 @@ export default class CreateEdge {
     if (slot.hasState('enable')) {
       // 这里要传 model 下的 id，保证用户数据类型正确
       // 当 model 下无 id 时，再取自生成 id
+      const node = this.graph.findNode(slot.nodeId)
       this.graph.addEdge({
-        fromNodeId: this.fromSlot.node.model.id || this.fromSlot.node.id,
-        toNodeId: slot.node.model.id,
+        fromNodeId: this.fromNode.model.id || this.fromNode.id,
+        toNodeId: node.model.id,
         fromSlotId: this.fromSlot.model.id || this.fromSlot.id,
         toSlotId: slot.model.id
       })
@@ -85,7 +88,7 @@ export default class CreateEdge {
       node.slots.forEach(slot => {
         if (
           slot.type === 'in' &&
-          node.id !== this.fromSlot.node.id &&
+          node.id !== this.fromNode.id &&
           !this.isDirectLinked(slot)
         ) {
           slot.setState('enable')
@@ -97,7 +100,7 @@ export default class CreateEdge {
   isDirectLinked(slot: Slot) {
     let linked = false
 
-    for (const item of this.fromSlot.node.edges) {
+    for (const item of this.fromNode.edges) {
       linked =
         item.fromSlot.id === this.fromSlot.id && item.toSlot.id === slot.id
       if (linked) {

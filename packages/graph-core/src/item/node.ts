@@ -6,8 +6,10 @@ import { INodeModel, ISlot, IEdge, ISlotModel } from '../types'
 export default class Node extends Base {
   constructor(model: INodeModel, cfg: { [key: string]: unknown }) {
     super(model)
-    if (!this.get('id')) {
-      this.set('id', uniqueId('node'))
+    if (!this.id) {
+      const id = uniqueId('node')
+      this.set('id', id)
+      this.get('model').id = id
     }
 
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
@@ -116,14 +118,20 @@ export default class Node extends Base {
       inSlots.forEach((item, index) => {
         const x = Number(model.x) + (width / (inSlotLen + 1)) * (index + 1)
         const y = Number(model.y)
-        const slot = new Slot(item, { x, y, type: 'in', node: this })
+        const slot = new Slot(item, { x, y, type: 'in', nodeId: this.id })
         this.get('slots').push(slot)
       })
 
       outSlots.forEach((item, index) => {
         const x = Number(model.x) + (width / (outSlotLen + 1)) * (index + 1)
         const y = Number(model.y) + height
-        const slot = new Slot(item, { x, y, type: 'out', node: this })
+        const slot = new Slot(item, {
+          x,
+          y,
+          type: 'out',
+          index,
+          nodeId: this.id
+        })
 
         this.get('slots').push(slot)
       })
@@ -131,14 +139,26 @@ export default class Node extends Base {
       inSlots.forEach((item, index) => {
         const x = Number(model.x)
         const y = Number(model.y) + (height / (inSlotLen + 1)) * (index + 1)
-        const slot = new Slot(item, { x, y, type: 'in', node: this })
+        const slot = new Slot(item, {
+          x,
+          y,
+          type: 'in',
+          index,
+          nodeId: this.id
+        })
         this.get('slots').push(slot)
       })
 
       outSlots.forEach((item, index) => {
         const x = Number(model.x) + width
         const y = Number(model.y) + (height / (outSlotLen + 1)) * (index + 1)
-        const slot = new Slot(item, { x, y, type: 'out', node: this })
+        const slot = new Slot(item, {
+          x,
+          y,
+          type: 'out',
+          index,
+          nodeId: this.id
+        })
         this.get('slots').push(slot)
       })
     }

@@ -1,4 +1,4 @@
-import { INodeStack } from '../types'
+import { INodeModel } from '../types'
 import Graph from '../controller/graph'
 import Node from '../item/node'
 
@@ -11,7 +11,7 @@ export default class DragNode {
   activeNode!: Node
   // 移动的节点
   moveNode: Node[] = []
-  stackNode: INodeStack[] = []
+  stackNode: INodeModel[] = []
 
   // 移动前初始值
   originX = 0
@@ -45,8 +45,8 @@ export default class DragNode {
     this.checkActiveNodeIsSelected()
 
     // 整理存入栈的节点信息
-    this.moveNode.forEach(item => {
-      this.stackNode.push({ model: { ...item.model }, id: item.id })
+    this.stackNode = this.moveNode.map(item => {
+      return { ...item.model }
     })
   }
 

@@ -6,8 +6,10 @@ import { IEdgeModel } from '../types'
 export default class Edge extends Base {
   constructor(model: IEdgeModel, fromNode: Node, toNode: Node) {
     super(model)
-    if (!this.get('id')) {
-      this.set('id', uniqueId('edge'))
+    if (!this.id) {
+      const id = uniqueId('edge')
+      this.set('id', id)
+      this.get('model').id = id
     }
 
     this.set('fromNode', fromNode)

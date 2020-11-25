@@ -4,10 +4,10 @@
       stroke-width="2"
       :d="
         calculateCurve(
-          edge.fromPoint.x,
-          edge.fromPoint.y,
-          edge.toPoint.x,
-          edge.toPoint.y
+          edge.fromSlot.x,
+          edge.fromSlot.y,
+          edge.toSlot.x,
+          edge.toSlot.y
         )
       "
       fill="transparent"

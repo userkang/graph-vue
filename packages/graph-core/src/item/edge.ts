@@ -38,14 +38,6 @@ export default class Edge extends Base {
     return this.get('toSlot')
   }
 
-  public get fromPoint() {
-    return this.get('fromPoint')
-  }
-
-  public get toPoint() {
-    return this.get('toPoint')
-  }
-
   public setPoint() {
     const fromSlotId = String(this.model.fromSlotId)
     const toSlotId = String(this.model.toSlotId)
@@ -59,7 +51,6 @@ export default class Edge extends Base {
       ) {
         item.setState('linked')
         this.set('fromSlot', item)
-        this.set('fromPoint', { x: item.x, y: item.y })
         return true
       }
     })
@@ -71,7 +62,6 @@ export default class Edge extends Base {
       ) {
         item.setState('linked')
         this.set('toSlot', item)
-        this.set('toPoint', { x: item.x, y: item.y })
         return true
       }
     })

@@ -75,20 +75,6 @@ export default class Node extends Base {
       slot.set('x', slot.x + moveX)
       slot.set('y', slot.y + moveY)
     })
-    // 边位置更新
-    this.edges.forEach(edge => {
-      if (this.id === edge.fromNode.id) {
-        edge.set('fromPoint', {
-          x: edge.fromPoint.x + moveX,
-          y: edge.fromPoint.y + moveY
-        })
-      } else {
-        edge.set('toPoint', {
-          x: edge.toPoint.x + moveX,
-          y: edge.toPoint.y + moveY
-        })
-      }
-    })
   }
 
   public setSlotsPoint() {

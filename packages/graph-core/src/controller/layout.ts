@@ -1,3 +1,4 @@
+import { INodeModel } from '../types'
 import dagre from 'dagre'
 import Graph from './graph'
 
@@ -45,6 +46,7 @@ export default class LayoutController {
 
     const group = this.dagre.graph()
     const svgInfo = this.graph.getSvgInfo()
+    const stackNode: INodeModel[] = []
 
     this.dagre.nodes().forEach((v: string) => {
       nodes.forEach(item => {
@@ -53,10 +55,13 @@ export default class LayoutController {
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
           const posX = x - (item.width + group.width - svgInfo.width) / 2
           const posY = y - (item.height + group.height - svgInfo.height) / 2
+          stackNode.push({ ...item.model })
           item.updatePosition(posX, posY)
         }
       })
     })
+
+    this.graph.pushStack('updateNodePosition', { nodes: stackNode })
 
     this.graph.fitCenter()
   }

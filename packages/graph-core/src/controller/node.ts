@@ -22,9 +22,9 @@ export default class NodeController {
 
   deleteNode(id: string) {
     const nodes = this.graph.getNodes()
-    nodes.splice(
-      nodes.findIndex(item => item.id === id),
-      1
-    )
+    const index = nodes.findIndex(item => item.id === id)
+    if (index > -1) {
+      nodes.splice(index, 1)
+    }
   }
 }

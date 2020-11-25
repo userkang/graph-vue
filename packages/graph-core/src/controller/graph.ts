@@ -115,7 +115,7 @@ export default class Graph extends EventEmitter {
       this.deleteEdge(item, false)
     })
 
-    this.nodeController.deleteNode(id)
+    this.nodeController.deleteNode(node.id)
     this.emit('afterdeletenode', node.model)
 
     return node
@@ -152,7 +152,7 @@ export default class Graph extends EventEmitter {
     }
 
     // 删除数据中的边
-    this.edgeController.deleteEdge(id)
+    this.edgeController.deleteEdge(edge.id)
 
     this.emit('afterdeleteedge', edge.model)
 

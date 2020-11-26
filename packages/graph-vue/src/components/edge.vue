@@ -1,18 +1,28 @@
 <template>
   <g data-type="edge" :data-id="edge.id">
+    <!-- <defs>
+      <marker
+        id="markerArrow"
+        markerWidth="10"
+        markerHeight="10"
+        refX="10"
+        refY="3"
+        orient="auto"
+        markerUnits="strokeWidth"
+      >
+        <path d="M0,0 L0,6 L9,3 Z" style="fill:#00ff00" />
+      </marker>
+    </defs> -->
     <path
+      marker-start="url(#markerArrow)"
+      marker-mid="url(#markerArrow)"
+      marker-end="url(#markerArrow)"
       stroke-width="2"
-      :d="
-        calculateCurve(
-          edge.fromSlot.x,
-          edge.fromSlot.y,
-          edge.toSlot.x,
-          edge.toSlot.y
-        )
-      "
+      :d="path.line"
       fill="transparent"
       :class="lineClassName"
     ></path>
+    <path :d="path.arrow" class="arrow-style"></path>
   </g>
 </template>
 
@@ -28,8 +38,6 @@ export default class Edge extends Vue {
   })
   edge!: any
 
-  path = ''
-  calculateCurve = calculateCurve
   activeEdgeId = ''
 
   get graph() {
@@ -38,6 +46,16 @@ export default class Edge extends Vue {
 
   get lineClassName() {
     return this.edge.hasState('selected') ? 'edge-selected-style' : 'edge-style'
+  }
+
+  get path() {
+    const { fromSlot, toSlot } = this.edge
+    return calculateCurve(this.graph.get('drection'), {
+      x1: fromSlot.x,
+      y1: fromSlot.y,
+      x2: toSlot.x,
+      y2: toSlot.y
+    })
   }
 }
 </script>
@@ -58,5 +76,11 @@ export default class Edge extends Vue {
   stroke: #4150f6;
   stroke-width: 2.5;
   cursor: pointer;
+}
+.arrow-style {
+  stroke: #d1d1d1;
+  stroke-width: 2;
+  stroke-linecap: round;
+  fill: #d1d1d1;
 }
 </style>

@@ -50,7 +50,6 @@ import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
-import { calculateCurve } from '@/assets/js/utils'
 import Graph, { IDataModel, INodeModel } from '@datafe/graph-core'
 
 @Component({
@@ -115,7 +114,7 @@ export default class GraphContent extends Vue {
   mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      drection: 'TB',
+      drection: 'LR',
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height

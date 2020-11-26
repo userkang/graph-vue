@@ -1,13 +1,7 @@
 <template>
-  <path
-    stroke-linecap="round"
-    stroke-width="1.5"
-    stroke="#d1d1d1"
-    fill="transparent"
-    class="new-edge"
-    :d="path"
-    v-if="path"
-  ></path>
+  <g>
+    <path class="new-edge" :d="path.line" v-if="path.line"></path>
+  </g>
 </template>
 
 <script lang="ts">
@@ -17,7 +11,7 @@ import { calculateCurve } from '@/assets/js/utils'
 
 @Component
 export default class NewEdge extends Vue {
-  path = ''
+  path = {}
 
   get graph() {
     return (this.$parent as GraphContent).graph
@@ -29,10 +23,15 @@ export default class NewEdge extends Vue {
 
   handlePath(createEdge: any) {
     if (!createEdge) {
-      this.path = ''
+      this.path = {}
     } else {
       const { fromPoint, toPoint } = createEdge
-      this.path = calculateCurve(fromPoint.x, fromPoint.y, toPoint.x, toPoint.y)
+      this.path = calculateCurve(this.graph.get('drection'), {
+        x1: fromPoint.x,
+        y1: fromPoint.y,
+        x2: toPoint.x,
+        y2: toPoint.y
+      })
     }
   }
 }
@@ -42,5 +41,9 @@ export default class NewEdge extends Vue {
 .new-edge {
   pointer-events: none;
   stroke-dasharray: 5;
+  stroke-linecap: round;
+  stroke-width: 1.5;
+  stroke: #d1d1d1;
+  fill: transparent;
 }
 </style>

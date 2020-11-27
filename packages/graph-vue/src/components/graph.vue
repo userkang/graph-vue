@@ -20,7 +20,7 @@
       >
         <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
         <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
-        <NewEdge :createEdge="createEdge" />
+        <NewEdge />
       </g>
       <path
         :d="brushPath"

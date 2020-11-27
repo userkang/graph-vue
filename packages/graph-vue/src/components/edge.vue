@@ -1,28 +1,17 @@
 <template>
   <g data-type="edge" :data-id="edge.id">
-    <!-- <defs>
-      <marker
-        id="markerArrow"
-        markerWidth="10"
-        markerHeight="10"
-        refX="10"
-        refY="3"
-        orient="auto"
-        markerUnits="strokeWidth"
-      >
-        <path d="M0,0 L0,6 L9,3 Z" style="fill:#00ff00" />
-      </marker>
-    </defs> -->
     <path
-      marker-start="url(#markerArrow)"
-      marker-mid="url(#markerArrow)"
-      marker-end="url(#markerArrow)"
       stroke-width="2"
       :d="path.line"
-      fill="transparent"
-      :class="lineClassName"
+      fill="none"
+      class="edge-style"
+      :class="{ 'edge-selected-style': isSelected }"
     ></path>
-    <path :d="path.arrow" class="arrow-style"></path>
+    <path
+      :d="path.arrow"
+      class="arrow-style"
+      :class="{ 'arrow-selected': isSelected }"
+    ></path>
   </g>
 </template>
 
@@ -44,18 +33,21 @@ export default class Edge extends Vue {
     return (this.$parent as GraphContent).graph
   }
 
-  get lineClassName() {
-    return this.edge.hasState('selected') ? 'edge-selected-style' : 'edge-style'
+  get isSelected() {
+    return this.edge.hasState('selected')
   }
 
   get path() {
     const { fromSlot, toSlot } = this.edge
-    return calculateCurve(this.graph.get('drection'), {
-      x1: fromSlot.x,
-      y1: fromSlot.y,
-      x2: toSlot.x,
-      y2: toSlot.y
-    })
+    return calculateCurve(
+      {
+        x1: fromSlot.x,
+        y1: fromSlot.y,
+        x2: toSlot.x,
+        y2: toSlot.y
+      },
+      this.graph.get('drection')
+    )
   }
 }
 </script>
@@ -69,18 +61,26 @@ export default class Edge extends Vue {
     stroke: #4150f6;
     stroke-width: 2.5;
     cursor: pointer;
+    + .arrow-style {
+      stroke: #4150f6;
+      fill: #4150f6;
+    }
   }
 }
-
 .edge-selected-style {
   stroke: #4150f6;
   stroke-width: 2.5;
   cursor: pointer;
+  stroke-linecap: round;
 }
 .arrow-style {
   stroke: #d1d1d1;
   stroke-width: 2;
   stroke-linecap: round;
   fill: #d1d1d1;
+}
+.arrow-selected {
+  stroke: #4150f6;
+  fill: #4150f6;
 }
 </style>

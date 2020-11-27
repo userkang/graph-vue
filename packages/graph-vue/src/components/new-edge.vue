@@ -1,6 +1,7 @@
 <template>
   <g>
     <path class="new-edge" :d="path.line" v-if="path.line"></path>
+    <path class="arrow" :d="path.arrow" />
   </g>
 </template>
 
@@ -26,12 +27,15 @@ export default class NewEdge extends Vue {
       this.path = {}
     } else {
       const { fromPoint, toPoint } = createEdge
-      this.path = calculateCurve(this.graph.get('drection'), {
-        x1: fromPoint.x,
-        y1: fromPoint.y,
-        x2: toPoint.x,
-        y2: toPoint.y
-      })
+      this.path = calculateCurve(
+        {
+          x1: fromPoint.x,
+          y1: fromPoint.y,
+          x2: toPoint.x,
+          y2: toPoint.y
+        },
+        this.graph.get('drection')
+      )
     }
   }
 }
@@ -45,5 +49,11 @@ export default class NewEdge extends Vue {
   stroke-width: 1.5;
   stroke: #d1d1d1;
   fill: transparent;
+}
+.arrow {
+  pointer-events: none;
+  stroke-width: 2;
+  stroke: #d1d1d1;
+  fill: #d1d1d1;
 }
 </style>

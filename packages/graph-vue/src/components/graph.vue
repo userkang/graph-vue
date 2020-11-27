@@ -114,7 +114,7 @@ export default class GraphContent extends Vue {
   mounted() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      drection: 'LR',
+      drection: 'TB',
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height

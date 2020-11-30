@@ -1,9 +1,7 @@
 <template>
   <g data-type="edge" :data-id="edge.id">
     <path
-      stroke-width="2"
       :d="path.line"
-      fill="none"
       class="edge-style"
       :class="{ 'edge-selected-style': isSelected }"
     ></path>
@@ -53,10 +51,22 @@ export default class Edge extends Vue {
 </script>
 
 <style lang="scss" scoped>
+@keyframes dash {
+  from {
+    stroke-dashoffset: 320;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 .edge-style {
-  stroke: #d1d1d1;
+  stroke: #ddd;
   stroke-width: 2;
+  fill: none;
   stroke-linecap: round;
+  stroke-dasharray: 5;
+  animation: dash 10s linear infinite;
   &:hover {
     stroke: #4150f6;
     stroke-width: 2.5;

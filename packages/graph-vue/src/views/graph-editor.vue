@@ -1,8 +1,13 @@
 <template>
-  <div class="main-wrap">
-    <ComponentPanel class="component-panel" />
-    <div class="main-center-wrap">
-      <Graph ref="graphRef" :data="data" />
+  <div class="container">
+    <div class="top-panel">
+      <div class="name">graph-editor</div>
+    </div>
+    <div class="main-wrap">
+      <ComponentPanel class="component-panel" />
+      <div class="main-center-wrap">
+        <Graph ref="graphRef" :data="data" />
+      </div>
     </div>
   </div>
 </template>
@@ -35,6 +40,20 @@ export default class GraphEditor extends Vue {
 </script>
 
 <style lang="scss" scoped>
+.top-panel {
+  display: flex;
+  height: 42px;
+  line-height: 42px;
+  background: #fff;
+  padding: 0px 10px;
+  box-shadow: inset 0 2px 3px 0 #eee;
+  .name {
+    font-size: 16px;
+    font-weight: 800;
+    font-style: italic;
+    color: #666;
+  }
+}
 .main-wrap {
   position: relative;
   width: 100%;

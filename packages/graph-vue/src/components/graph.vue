@@ -50,7 +50,13 @@ import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
-import Graph, { IDataModel, INodeModel } from '@datafe/graph-core'
+import Graph, {
+  IDataModel,
+  INodeModel,
+  IEdgeModel,
+  INode,
+  IEdge
+} from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -174,32 +180,31 @@ export default class GraphContent extends Vue {
   }
 
   afterDragNode(nodes: INodeModel[]) {
-    // console.log('drag', nodes)
+    console.log('afterdragnode', nodes)
   }
 
-  afteraddnode(item: any) {
-    this.nodes = this.graph.getNodes()
+  afteraddnode(item: INodeModel) {
+    console.log('afteraddnode', item)
   }
 
-  afteraddedge(item: any) {
-    this.edges = this.graph.getEdges()
+  afteraddedge(item: IEdgeModel) {
+    console.log('afteraddedge', item)
   }
 
-  afterdeletenode() {
-    this.nodes = this.graph.getNodes()
-    this.edges = this.graph.getEdges()
+  afterdeletenode(item: INodeModel) {
+    console.log('afterdeletenode', item)
   }
 
-  afterdeleteedge() {
-    this.edges = this.graph.getEdges()
+  afterdeleteedge(item: IEdgeModel) {
+    console.log('afterdeleteedge', item)
   }
 
-  nodeselectchange(nodes: INodeType[]) {
-    this.nodes = this.graph.getNodes()
+  nodeselectchange(nodes: INodeModel[]) {
+    console.log('nodeselectchange', nodes)
   }
 
-  edgeselectchange() {
-    this.edges = this.graph.getEdges()
+  edgeselectchange(edges: IEdgeModel[]) {
+    console.log('edgeselectchange', edges)
   }
 
   aftertranslate(x: number, y: number) {

@@ -29,7 +29,8 @@ export default class CreateEdge {
     this.graph.on('mouseup', this.mouseUp.bind(this))
   }
 
-  slotMouseDown(e: MouseEvent, id: string) {
+  slotMouseDown(e: MouseEvent, data: { id: string }) {
+    const { id } = data
     // 初始化连线的起点和移动位置
     const slot = this.graph.findSlot(id)
     if (slot.type === 'in') {
@@ -53,9 +54,9 @@ export default class CreateEdge {
     this.graph.emit('addingedge', this.createEdge)
   }
 
-  slotMouseUp(e: MouseEvent, id: string) {
+  slotMouseUp(e: MouseEvent, data: { id: string }) {
     e.stopPropagation()
-
+    const { id } = data
     const slot = this.graph.findSlot(id)
 
     if (slot.hasState('enable')) {

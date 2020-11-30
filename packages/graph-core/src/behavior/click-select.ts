@@ -14,35 +14,62 @@ export default class ClickSelect {
     this.graph.on('svg.click', this.clickSvg.bind(this))
   }
 
-  clickNode(e: MouseEvent, id: string) {
+  clickNode(e: MouseEvent, data: { id: string }) {
+    const { id } = data
+    const selectedNodes = this.graph.findNodeByState('selected')
+    const exist = selectedNodes.findIndex(item => item.id === id)
+    if (exist > -1) {
+      return
+    }
+
     this.resetSelect()
     const node = this.graph.findNode(id)
     node.setState('selected')
-    const selectNodes = [this.graph.findNode(id)]
-    this.graph.emit('nodeselectchange', selectNodes)
+    this.graph.emit('nodeselectchange', [node.model])
   }
 
-  clickEdge(e: MouseEvent, id: string) {
+  clickEdge(e: MouseEvent, data: { id: string }) {
+    const { id } = data
+    const selectedEdges = this.graph.findEdgeByState('selected')
+    const exist = selectedEdges.findIndex(item => item.id === id)
+    if (exist > -1) {
+      return
+    }
+
     this.resetSelect()
-    const edges = this.graph.findEdge(id)
-    edges.setState('selected')
-    this.graph.emit('edgeselectchange', edges)
+    const edge = this.graph.findEdge(id)
+    edge.setState('selected')
+    this.graph.emit('edgeselectchange', [edge.model])
   }
 
   clickSvg(e: MouseEvent) {
-    this.resetSelect()
+    this.resetSelect(true)
   }
 
-  resetSelect() {
+  resetSelect(triggerEmit = false) {
     const nodes = this.graph.getNodes()
     const edges = this.graph.getEdges()
+    const selectedNodes = []
+    const selectedEdges = []
     nodes.forEach(node => {
-      node.clearState('selected')
+      if (node.hasState('selected')) {
+        selectedNodes.push(node)
+        node.clearState('selected')
+      }
     })
     edges.forEach(edge => {
-      edge.clearState('selected')
+      if (edge.hasState('selected')) {
+        selectedEdges.push(edge)
+        edge.clearState('selected')
+      }
     })
-    this.graph.emit('nodeselectchange', [])
-    this.graph.emit('edgeselectchange', [])
+
+    if (selectedNodes.length && triggerEmit) {
+      this.graph.emit('nodeselectchange', [])
+    }
+
+    if (selectedEdges.length && triggerEmit) {
+      this.graph.emit('edgeselectchange', [])
+    }
   }
 }

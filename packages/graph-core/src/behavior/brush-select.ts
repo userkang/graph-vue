@@ -6,6 +6,8 @@ export default class BrushSelect {
   originX = 0
   originY = 0
   moving = false
+  beforeSelectedNodes = []
+  afterSelectedNodes = []
 
   constructor(graph: Graph) {
     this.graph = graph
@@ -23,6 +25,7 @@ export default class BrushSelect {
     this.originY = e.y
     if (this.graph.getBrushing()) {
       this.moving = true
+      this.beforeSelectedNodes = this.graph.findNodeByState('selected')
     }
   }
 
@@ -43,6 +46,15 @@ export default class BrushSelect {
   }
 
   onMouseUp(e: MouseEvent) {
+    if (this.moving) {
+      const before = this.beforeSelectedNodes.map(item => item.id)
+      const after = this.afterSelectedNodes.map(item => item.id)
+      if (String(before) !== String(after)) {
+        const nodeModels = this.afterSelectedNodes.map(item => item.model)
+        this.graph.emit('nodeselectchange', nodeModels)
+      }
+    }
+
     this.moving = false
     this.graph.emit('brushing', '')
   }
@@ -59,11 +71,9 @@ export default class BrushSelect {
 
     const nodes = this.graph.getNodes()
 
-    const selectedNode = nodes.filter(item => {
+    this.afterSelectedNodes = nodes.filter(item => {
       return this.checkNodeRange(item, range)
     })
-
-    this.graph.emit('nodeselectchange', selectedNode)
   }
 
   checkNodeRange(

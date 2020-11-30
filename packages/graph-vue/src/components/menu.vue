@@ -68,8 +68,8 @@ export default class Menu extends Vue {
     })
   }
 
-  showNodeMenu(e: MouseEvent, id: string) {
-    const node = this.graph.findNode(id)
+  showNodeMenu(e: MouseEvent, data: { id: string }) {
+    const node = this.graph.findNode(data.id)
     this.menu = {
       show: true,
       type: 'node',
@@ -79,8 +79,8 @@ export default class Menu extends Vue {
     }
   }
 
-  showEdgeMenu(e: MouseEvent, id: string) {
-    const edge = this.graph.findEdge(id)
+  showEdgeMenu(e: MouseEvent, data: { id: string }) {
+    const edge = this.graph.findEdge(data.id)
     this.menu = {
       show: true,
       type: 'edge',

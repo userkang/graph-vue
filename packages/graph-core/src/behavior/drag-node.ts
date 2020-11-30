@@ -35,7 +35,8 @@ export default class DragNode {
     this.graph.on('mouseleave', this.mouseUp.bind(this))
   }
 
-  mouseDown(e: MouseEvent, id: string) {
+  mouseDown(e: MouseEvent, data: { id: string }) {
+    const { id } = data
     this.isMoving = true
     this.originX = this.startX = e.x
     this.originY = this.startY = e.y

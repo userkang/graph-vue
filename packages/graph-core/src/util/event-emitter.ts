@@ -1,7 +1,7 @@
 export default class EventEmitter {
   _events = {}
 
-  on(evt: string | [], callback: (...args: unknown[]) => void) {
+  on(evt: string | string[], callback: (...args: unknown[]) => void) {
     const bind = (e: string) => {
       if (!this._events[e]) {
         this._events[e] = []

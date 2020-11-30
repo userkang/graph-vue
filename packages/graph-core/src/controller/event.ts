@@ -1,5 +1,5 @@
 import Graph from './graph'
-import { addEventListener, isTarget, getItemId } from '../util/dom'
+import { addEventListener, isTarget, getItemData } from '../util/dom'
 import behaviors from '../behavior'
 
 const EVENTS = [
@@ -22,6 +22,17 @@ const MOVE_DEVIATION = 2
 
 const EXTENDEVENTS = ['keyup', 'keydown', 'wheel']
 
+const DATACHANGE = [
+  'afteraddnode',
+  'afteraddedge',
+  'nodeselectchange',
+  'edgeselectchange',
+  'afterdeletenode',
+  'afterdeleteedge',
+  'afterdragnode',
+  'afterlayout'
+]
+
 export default class EventController {
   private graph: Graph
 
@@ -39,6 +50,7 @@ export default class EventController {
     this.graph = graph
     this.$svg = graph.cfg.container
     this.initBehavior()
+    this.defaultEmit()
     this.initEvent()
   }
 
@@ -126,8 +138,8 @@ export default class EventController {
     typeSet.forEach(type => {
       if (isTarget(e, type)) {
         this.currentItemType = type
-        const id = getItemId(e)
-        this.graph.emit(`${this.currentItemType}.${eventType}`, e, id)
+        const data = getItemData(e)
+        this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
       }
     })
 
@@ -145,6 +157,16 @@ export default class EventController {
     }
 
     this.preItemType = this.currentItemType
+  }
+
+  /**
+   *  在这里做一次拦截监听，触发需要默认 emit 的事件
+   */
+  defaultEmit() {
+    // 有些事件默认触发datachange事件
+    this.graph.on(DATACHANGE, () => {
+      this.graph.emit('datachange')
+    })
   }
 
   destroy() {

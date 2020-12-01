@@ -15,12 +15,13 @@ const EVENTS = [
   'drag',
   'dragover',
   'dragout',
-  'drop'
+  'drop',
+  'wheel'
 ]
 
 const MOVE_DEVIATION = 2
 
-const EXTENDEVENTS = ['keyup', 'keydown', 'wheel']
+const EXTENDEVENTS = ['keyup', 'keydown']
 
 const DATACHANGE = [
   'afteraddnode',
@@ -63,20 +64,12 @@ export default class EventController {
 
     EXTENDEVENTS.forEach(eventType => {
       this.eventQueue.push(
-        addEventListener(
-          window as any,
-          eventType,
-          this.handleExtendEvents.bind(this)
-        )
+        addEventListener(window, eventType, this.handleExtendEvents.bind(this))
       )
     })
 
     this.eventQueue.push(
-      addEventListener(
-        window as any,
-        'resize',
-        this.graph.resize.bind(this.graph)
-      )
+      addEventListener(window, 'resize', this.graph.resize.bind(this.graph))
     )
   }
 

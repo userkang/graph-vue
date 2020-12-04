@@ -1,93 +1,102 @@
 <template>
-  <div class="comp-panel">
-    <div class="title">组件</div>
-    <li
-      v-for="item in componentList"
-      :key="item.id"
-      ref="component"
-      class="component-item"
-      @dragstart="e => handleDragStart(e, item)"
-      @dragend="handleDragEnd"
-      draggable
-    >
-      <i class="iconfont iconzujian"></i>
-      <span>{{ item.componentName }}</span>
-    </li>
+  <div class="config-panel-wrapper">
+    <div class="title">画布配置</div>
+
+    <div class="form-item">
+      <div class="label">图方向</div>
+      <select class="content" v-model="graphConfigState.drection">
+        <option value="TB">TB（自上而下）</option>
+        <option value="LR">LR（从左往右）</option>
+      </select>
+    </div>
+
+    <div class="item">
+      <div class="label">交互行为</div>
+      <div class="checkbox-item" v-for="(item, key) in actionList" :key="key">
+        <input
+          :id="key"
+          type="checkbox"
+          :value="key"
+          v-model="graphConfigState.action"
+        />
+        <label :for="key">{{ item }}</label>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ComponentListStore } from '@/stores/component-list'
+import { GraphConfigStore } from '@/stores/graph-config'
 
 @Component
-export default class ComponentPanel extends Vue {
-  dragged!: HTMLLIElement
-  componentState = ComponentListStore.state
-
-  get componentList() {
-    return this.componentState.list
-  }
-
-  handleDragStart(e: DragEvent, component: IComponentType) {
-    this.dragged = e.target as HTMLLIElement
-
-    // 添加拖动样式
-    this.dragged.classList.add('active')
-
-    const rect = this.dragged.getBoundingClientRect()
-    this.componentState.dragingInfo.component = component
-
-    // 保存鼠标距离组件左上角距离
-    this.componentState.dragingInfo.offsetX = e.clientX - rect.x
-    this.componentState.dragingInfo.offsetY = e.clientY - rect.y
-  }
-
-  handleDragEnd(e: DragEvent) {
-    ;(e.target as HTMLElement).classList.remove('active')
-  }
-
-  async mounted() {
-    await ComponentListStore.getComponentList()
+export default class ConfigPanel extends Vue {
+  graphConfigState = GraphConfigStore.state
+  actionList = {
+    'drag-svg': '拖动画布',
+    'drag-node': '拖动节点',
+    'click-select': '点击选中',
+    'create-edge': '创建边',
+    'wheel-move': '滚轮移动画布',
+    'wheel-zoom': '双指缩放',
+    'brush-select': '框选'
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.comp-panel {
-  position: relative;
+.config-panel-wrapper {
   width: 190px;
   height: 100%;
   box-sizing: border-box;
   background: $l1;
-  border-right: 1px solid $l2;
+  border-left: 1px solid $l2;
+  color: #666;
+  font-size: 14px;
+  padding: 5px 10px;
+  .form-item {
+    width: 100%;
+    margin-bottom: 7px;
+  }
+  .label {
+    font-size: 12px;
+    padding: 5px 0;
+    font-weight: 800;
+  }
+  input,
+  select {
+    line-height: 1;
+    font-size: 12px;
+    border: 1px solid #eee;
+    outline: none;
+    padding: 3px 2px;
+    box-shadow: 0 2px 3px 0 #eee;
+    vertical-align: middle;
+    cursor: pointer;
+  }
+  select {
+    width: 100%;
+  }
+  input[type='text'] {
+    width: 100%;
+  }
+  label {
+    padding: 4px 2px;
+    font-size: 12px;
+    cursor: pointer;
+  }
+  .checkbox-item {
+    display: inline-flex;
+    align-items: center;
+    margin-right: 10px;
+    margin-bottom: 5px;
+    height: 20px;
+  }
 }
 .title {
   font-size: 12px;
   color: $d1;
   text-align: left;
-  margin: 5px 10px;
-}
-.component-item {
-  display: flex;
-  height: 35px;
-  box-sizing: border-box;
-  color: $d4;
-  font-size: 12px;
-  padding-left: 40px;
-  align-items: center;
-  cursor: pointer;
-  user-select: none;
-  .iconfont {
-    margin-right: 6px;
-  }
-  &:hover {
-    background: $l2;
-    color: $d2;
-  }
-}
-.active {
-  border: 1px dashed #606be1;
-  cursor: grabbing;
+  padding: 10px 0px;
 }
 </style>

@@ -1,8 +1,8 @@
 import Graph from '../controller/graph'
 import Node from '../item/node'
+import Base from './base'
 
-export default class BrushSelect {
-  graph: Graph
+export default class BrushSelect extends Base {
   originX = 0
   originY = 0
   moving = false
@@ -10,14 +10,14 @@ export default class BrushSelect {
   afterSelectedNodes = []
 
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('svg.mousedown', this.onMouseDown.bind(this))
-    this.graph.on('mousemove', this.onMouseMove.bind(this))
-    this.graph.on('mouseup', this.onMouseUp.bind(this))
+    this.addEvent('svg.mousedown', this.onMouseDown)
+    this.addEvent('mousemove', this.onMouseMove)
+    this.addEvent('mouseup', this.onMouseUp)
   }
 
   onMouseDown(e: MouseEvent) {

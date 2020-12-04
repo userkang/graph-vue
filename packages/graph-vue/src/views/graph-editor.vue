@@ -8,6 +8,7 @@
       <div class="main-center-wrap">
         <Graph ref="graphRef" :data="data" />
       </div>
+      <ConfigPanel />
     </div>
   </div>
 </template>
@@ -15,6 +16,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
+import ConfigPanel from '@/components/config-panel.vue'
 import Graph from '@/components/graph.vue'
 
 import GraphStore from '@/stores/graph'
@@ -27,7 +29,8 @@ interface CopyReturnValue {
 @Component({
   components: {
     Graph,
-    ComponentPanel
+    ComponentPanel,
+    ConfigPanel
   }
 })
 export default class GraphEditor extends Vue {
@@ -57,7 +60,7 @@ export default class GraphEditor extends Vue {
 .main-wrap {
   position: relative;
   width: 100%;
-  height: 100vh;
+  height: calc(100vh - 42px);
   display: flex;
 }
 .main-center-wrap {

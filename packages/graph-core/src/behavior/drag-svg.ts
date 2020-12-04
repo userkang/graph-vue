@@ -1,8 +1,7 @@
 import Graph from '../controller/graph'
+import Base from './base'
 
-export default class DragSvg {
-  graph: Graph
-
+export default class DragSvg extends Base {
   isMoving = false
   // 移动时动态起始值
   startX = 0
@@ -12,15 +11,15 @@ export default class DragSvg {
   moveY = 0
 
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('svg.mousedown', this.mouseDown.bind(this))
-    this.graph.on('mousemove', this.mouseMove.bind(this))
-    this.graph.on('mouseup', this.mouseUp.bind(this))
-    this.graph.on('mouseleave', this.mouseUp.bind(this))
+    this.addEvent('svg.mousedown', this.mouseDown)
+    this.addEvent('mousemove', this.mouseMove)
+    this.addEvent('mouseup', this.mouseUp)
+    this.addEvent('mouseleave', this.mouseUp)
   }
 
   mouseDown(e: MouseEvent) {

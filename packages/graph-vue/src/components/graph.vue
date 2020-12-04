@@ -42,9 +42,9 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import GraphStore from '@/stores/graph'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { ComponentListStore } from '@/stores/component-list'
+import { GraphConfigStore } from '@/stores/graph-config'
 import Node from '@/components/node.vue'
 import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
@@ -74,6 +74,7 @@ export default class GraphContent extends Vue {
   data!: IDataModel
 
   componentState = ComponentListStore.state
+  configState = GraphConfigStore.state
 
   graph: Graph = null as any
 
@@ -118,22 +119,18 @@ export default class GraphContent extends Vue {
   }
 
   mounted() {
+    this.init()
+  }
+
+  init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      drection: 'TB',
+      drection: this.configState.drection,
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
       },
-      action: [
-        'drag-svg',
-        'drag-node',
-        'click-select',
-        'create-edge',
-        'wheel-move',
-        'wheel-zoom',
-        'brush-select'
-      ]
+      action: this.configState.action
     })
     this.initCustomHooks()
     this.graph.data(this.data)
@@ -244,6 +241,19 @@ export default class GraphContent extends Vue {
 
   beforeDestroy() {
     this.graph.destroy()
+  }
+
+  @Watch('configState.drection')
+  handleConfigChange(v: string) {
+    this.graph.destroy()
+    this.init()
+    this.graph.layout()
+  }
+
+  @Watch('configState.action')
+  handleActionChange(v: string[]) {
+    this.graph.removeAction()
+    this.graph.addAction(v)
   }
 }
 </script>

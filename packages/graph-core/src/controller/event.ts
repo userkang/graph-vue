@@ -41,7 +41,7 @@ export default class EventController {
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
   currentItemType = 'svg'
-  behaveInstance: any = {}
+  behaveInstance = {}
 
   // 移动前的坐标
   originX = 0
@@ -50,7 +50,7 @@ export default class EventController {
   constructor(graph: Graph) {
     this.graph = graph
     this.$svg = graph.cfg.container
-    this.initBehavior()
+    this.addBehavior()
     this.defaultEmit()
     this.initEvent()
   }
@@ -73,10 +73,10 @@ export default class EventController {
     )
   }
 
-  initBehavior() {
-    const action = this.graph.cfg.action
-    if (action) {
-      action.forEach((item: string) => {
+  addBehavior(action?: string[]) {
+    const actions = action || this.graph.cfg.action
+    if (actions) {
+      actions.forEach((item: string) => {
         const func = behaviors[item]
         if (func && !this.behaveInstance[item]) {
           const behave = new func(this.graph)
@@ -86,6 +86,23 @@ export default class EventController {
         }
       })
     }
+  }
+
+  removeBehavior(action?: string | string[]) {
+    if (!action) {
+      // 全部清楚
+      Object.keys(this.behaveInstance).forEach(key => {
+        this.behaveInstance[key].destory()
+      })
+      this.behaveInstance = {}
+      return
+    }
+
+    const actions = !Array.isArray(action) ? [action] : action
+    actions.forEach(item => {
+      this.behaveInstance[item].destory()
+      delete this.behaveInstance[item]
+    })
   }
 
   handleMouseEvent(e: MouseEvent) {

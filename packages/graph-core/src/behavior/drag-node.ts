@@ -1,10 +1,10 @@
 import { INodeModel } from '../types'
 import Graph from '../controller/graph'
 import Node from '../item/node'
+import Base from './base'
 
 const MOVE_DEVIATION = 2
-export default class DragNode {
-  graph: Graph
+export default class DragNode extends Base {
   isMoving = false
 
   // 当前拖动节点
@@ -24,15 +24,15 @@ export default class DragNode {
   moveY = 0
 
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('node.mousedown', this.mouseDown.bind(this))
-    this.graph.on('mousemove', this.mouseMove.bind(this))
-    this.graph.on('mouseup', this.mouseUp.bind(this))
-    this.graph.on('mouseleave', this.mouseUp.bind(this))
+    this.addEvent('node.mousedown', this.mouseDown)
+    this.addEvent('mousemove', this.mouseMove)
+    this.addEvent('mouseup', this.mouseUp)
+    this.addEvent('mouseleave', this.mouseUp)
   }
 
   mouseDown(e: MouseEvent, data: { id: string }) {

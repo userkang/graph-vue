@@ -1,15 +1,14 @@
 import Graph from '../controller/graph'
+import Base from './base'
 
-export default class WheelMove {
-  graph: Graph
-
+export default class WheelMove extends Base {
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('wheel', this.onWheel.bind(this))
+    this.addEvent('wheel', this.onWheel)
   }
 
   onWheel(e: WheelEvent) {

@@ -268,6 +268,15 @@ export default class Graph extends EventEmitter {
     this.set('brushing', value)
   }
 
+  addAction(action: string | string[]) {
+    const actions = !Array.isArray(action) ? [action] : action
+    this.eventController.addBehavior(actions)
+  }
+
+  removeAction(action?: string | string[]) {
+    this.eventController.removeBehavior(action)
+  }
+
   undo() {
     this.stackController.undo()
   }

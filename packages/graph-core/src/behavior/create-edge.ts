@@ -1,8 +1,8 @@
 import Graph from '../controller/graph'
 import Slot from '../item/slot'
+import Base from './base'
 
-export default class CreateEdge {
-  graph: Graph
+export default class CreateEdge extends Base {
   fromSlot = null
   fromNode = null
   isMoveing = false
@@ -18,15 +18,15 @@ export default class CreateEdge {
   }
 
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('slot.mousedown', this.slotMouseDown.bind(this))
-    this.graph.on('mousemove', this.mouseMove.bind(this))
-    this.graph.on('slot.mouseup', this.slotMouseUp.bind(this))
-    this.graph.on('mouseup', this.mouseUp.bind(this))
+    this.addEvent('slot.mousedown', this.slotMouseDown)
+    this.addEvent('mousemove', this.mouseMove)
+    this.addEvent('slot.mouseup', this.slotMouseUp)
+    this.addEvent('mouseup', this.mouseUp)
   }
 
   slotMouseDown(e: MouseEvent, data: { id: string }) {

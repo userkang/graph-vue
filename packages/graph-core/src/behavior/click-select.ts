@@ -1,17 +1,16 @@
 import Graph from '../controller/graph'
+import Base from './base'
 
-export default class ClickSelect {
-  graph: Graph
-
+export default class ClickSelect extends Base {
   constructor(graph: Graph) {
-    this.graph = graph
+    super(graph)
     this.init()
   }
 
   init() {
-    this.graph.on('node.click', this.clickNode.bind(this))
-    this.graph.on('edge.click', this.clickEdge.bind(this))
-    this.graph.on('svg.click', this.clickSvg.bind(this))
+    this.addEvent('node.click', this.clickNode)
+    this.addEvent('edge.click', this.clickEdge)
+    this.addEvent('svg.click', this.clickSvg)
   }
 
   clickNode(e: MouseEvent, data: { id: string }) {

@@ -4,13 +4,13 @@
 
     <div class="form-item">
       <div class="label">图方向</div>
-      <select class="content" v-model="graphConfigState.drection">
+      <select v-model="graphConfigState.drection">
         <option value="TB">TB（自上而下）</option>
         <option value="LR">LR（从左往右）</option>
       </select>
     </div>
 
-    <div class="item">
+    <div class="form-item">
       <div class="label">交互行为</div>
       <div class="checkbox-item" v-for="(item, key) in actionList" :key="key">
         <input
@@ -22,15 +22,22 @@
         <label :for="key">{{ item }}</label>
       </div>
     </div>
+
+    <div class="form-item">
+      <div class="label">数据</div>
+      <div class="data-content" id="dataContent"></div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { GraphConfigStore } from '@/stores/graph-config'
+import { editor } from 'monaco-editor'
 
 @Component
 export default class ConfigPanel extends Vue {
+  editor = null
   graphConfigState = GraphConfigStore.state
   actionList = {
     'drag-svg': '拖动画布',
@@ -41,11 +48,50 @@ export default class ConfigPanel extends Vue {
     'wheel-zoom': '双指缩放',
     'brush-select': '框选'
   }
+
+  mounted() {
+    this.editor = editor.create(document.getElementById('dataContent'), {
+      value: JSON.stringify(this.graphConfigState.data),
+      language: 'json',
+      lineNumbers: 'off',
+      scrollBeyondLastLine: false,
+      overviewRulerBorder: false, // 不要滚动条的边框
+      scrollbar: {
+        horizontalHasArrows: false,
+        verticalScrollbarSize: 4,
+        horizontal: 'hidden'
+      },
+      minimap: {
+        // 不要小地图
+        enabled: false
+      },
+      folding: false,
+      contextmenu: false,
+      formatOnPaste: true,
+      tabSize: 1,
+      lineDecorationsWidth: 0
+    })
+
+    this.editor.onDidBlurEditorText(e => {
+      try {
+        const content = JSON.parse(this.editor.getValue())
+        this.graphConfigState.data = content
+      } catch (error) {
+        console.log('数据格式不正确')
+      }
+    })
+  }
+
+  // @Watch('configState.data')
+  // handleDataChange() {
+    // this.editor.setValue(this.graphConfigState.data)
+  // }
 }
 </script>
 
 <style lang="scss" scoped>
 .config-panel-wrapper {
+  overflow: auto;
   width: 190px;
   height: 100%;
   box-sizing: border-box;
@@ -64,7 +110,8 @@ export default class ConfigPanel extends Vue {
     font-weight: 800;
   }
   input,
-  select {
+  select,
+  textarea {
     line-height: 1;
     font-size: 12px;
     border: 1px solid #eee;
@@ -73,6 +120,9 @@ export default class ConfigPanel extends Vue {
     box-shadow: 0 2px 3px 0 #eee;
     vertical-align: middle;
     cursor: pointer;
+    &:focus {
+      border: 1px solid rgb(9, 104, 194);
+    }
   }
   select {
     width: 100%;
@@ -98,5 +148,12 @@ export default class ConfigPanel extends Vue {
   color: $d1;
   text-align: left;
   padding: 10px 0px;
+}
+.data-content {
+  width: 100%;
+  display: block;
+  height: 400px;
+  box-sizing: border-box;
+  white-space: pre-line;
 }
 </style>

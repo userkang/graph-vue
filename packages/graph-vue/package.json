@@ -12,6 +12,8 @@
     "@datafe/graph-core": "^0.2.6",
     "axios": "^0.18.0",
     "core-js": "^2.6.11",
+    "monaco-editor": "0.21.2",
+    "monaco-editor-webpack-plugin": "^2.0.0",
     "url-loader": "^2.2.0",
     "vue": "2.5.22",
     "vue-class-component": "^6.0.0",

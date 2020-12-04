@@ -1,6 +1,7 @@
 interface GraphConfigState {
   drection: 'TB' | 'LR'
   action: string[]
+  data: object
 }
 
 class GraphConfig {
@@ -14,7 +15,11 @@ class GraphConfig {
       'wheel-move',
       'wheel-zoom',
       'brush-select'
-    ]
+    ],
+    data: {
+      nodes: [],
+      edges: []
+    }
   }
 }
 

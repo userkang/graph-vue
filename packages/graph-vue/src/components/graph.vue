@@ -68,11 +68,6 @@ import Graph, {
   }
 })
 export default class GraphContent extends Vue {
-  @Prop({
-    required: true
-  })
-  data!: IDataModel
-
   componentState = ComponentListStore.state
   configState = GraphConfigStore.state
 
@@ -133,7 +128,7 @@ export default class GraphContent extends Vue {
       action: this.configState.action
     })
     this.initCustomHooks()
-    this.graph.data(this.data)
+    this.graph.data(this.configState.data as IDataModel)
   }
 
   initCustomHooks() {
@@ -174,6 +169,10 @@ export default class GraphContent extends Vue {
   refreshGraph() {
     this.nodes = this.graph.getNodes()
     this.edges = this.graph.getEdges()
+    // const nodes = this.nodes.map(item => item.model)
+    // const edges = this.edges.map(item => item.model)
+
+    // this.configState.data = { nodes, edges }
   }
 
   afterDragNode(nodes: INodeModel[]) {
@@ -255,6 +254,11 @@ export default class GraphContent extends Vue {
     this.graph.removeAction()
     this.graph.addAction(v)
   }
+
+  // @Watch('configState.data')
+  // handleDataChange() {
+  //   console.log(23)
+  // }
 }
 </script>
 

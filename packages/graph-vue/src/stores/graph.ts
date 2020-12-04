@@ -1,8 +1,9 @@
 import { dagMock } from '@/mock/graph'
+import { GraphConfigStore } from './graph-config'
 
 class Graph {
   public getData() {
-    return dagMock
+    GraphConfigStore.state.data = dagMock
   }
 }
 

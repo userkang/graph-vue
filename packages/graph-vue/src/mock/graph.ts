@@ -1,5 +1,4 @@
-export const dagMock: IGraphDataType = {
-  graphId: 0,
+export const dagMock = {
   nodes: [
     {
       id: 1,

@@ -6,7 +6,7 @@
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graphRef" :data="data" />
+        <Graph ref="graphRef" />
       </div>
       <ConfigPanel />
     </div>
@@ -34,10 +34,8 @@ interface CopyReturnValue {
   }
 })
 export default class GraphEditor extends Vue {
-  data!: IGraphDataType
-
   created() {
-    this.data = GraphStore.getData()
+    GraphStore.getData()
   }
 }
 </script>

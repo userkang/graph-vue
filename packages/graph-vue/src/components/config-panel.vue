@@ -26,6 +26,7 @@
     <div class="form-item">
       <div class="label">数据</div>
       <div class="data-content" id="dataContent"></div>
+      <!-- <textarea v-model.lazy="content" class="data-content"></textarea> -->
     </div>
   </div>
 </template>
@@ -33,12 +34,15 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { GraphConfigStore } from '@/stores/graph-config'
+import GraphStore from '@/stores/graph'
 import { editor } from 'monaco-editor'
+import Graph from '@datafe/graph-core'
 
 @Component
 export default class ConfigPanel extends Vue {
   editor = null
   graphConfigState = GraphConfigStore.state
+  graphState = GraphStore.state
   actionList = {
     'drag-svg': '拖动画布',
     'drag-node': '拖动节点',
@@ -49,12 +53,12 @@ export default class ConfigPanel extends Vue {
     'brush-select': '框选'
   }
 
-  mounted() {
-    this.editor = editor.create(document.getElementById('dataContent'), {
-      value: JSON.stringify(this.graphConfigState.data),
+  async mounted() {
+    this.editor = await editor.create(document.getElementById('dataContent'), {
+      value: JSON.stringify(this.graphConfigState.data, null, ' '),
       language: 'json',
-      lineNumbers: 'off',
-      scrollBeyondLastLine: false,
+      lineNumbers: 'off', // 不要行号
+      scrollBeyondLastLine: false, // 去掉最后一行后面的空白
       overviewRulerBorder: false, // 不要滚动条的边框
       scrollbar: {
         horizontalHasArrows: false,
@@ -62,30 +66,48 @@ export default class ConfigPanel extends Vue {
         horizontal: 'hidden'
       },
       minimap: {
-        // 不要小地图
         enabled: false
       },
       folding: false,
       contextmenu: false,
-      formatOnPaste: true,
       tabSize: 1,
-      lineDecorationsWidth: 0
+      lineDecorationsWidth: 0,
+      automaticLayout: true
     })
+
+    const graph = this.graphState.graph as Graph
 
     this.editor.onDidBlurEditorText(e => {
       try {
         const content = JSON.parse(this.editor.getValue())
-        this.graphConfigState.data = content
+        graph.data(content)
       } catch (error) {
         console.log('数据格式不正确')
       }
     })
+    graph.on('datachange', () => {
+      const nodes = graph.getNodes().map(item => item.model)
+      const edges = graph.getEdges().map(item => item.model)
+      this.editor.setValue(JSON.stringify({ nodes, edges }, null, ' '))
+    })
   }
 
-  // @Watch('configState.data')
-  // handleDataChange() {
-    // this.editor.setValue(this.graphConfigState.data)
+  // get content() {
+  //   return JSON.stringify(this.graphConfigState.data, null, ' ')
   // }
+
+  // set content(v) {
+  //   try {
+  //     const content = JSON.parse(v)
+  //     ;(this.graphState.graph as Graph).data(content)
+  //   } catch (error) {
+  //     console.log('数据格式不正确')
+  //   }
+  // }
+
+  beforeDestory() {
+    this.editor.destory()
+  }
 }
 </script>
 
@@ -112,7 +134,6 @@ export default class ConfigPanel extends Vue {
   input,
   select,
   textarea {
-    line-height: 1;
     font-size: 12px;
     border: 1px solid #eee;
     outline: none;
@@ -155,5 +176,6 @@ export default class ConfigPanel extends Vue {
   height: 400px;
   box-sizing: border-box;
   white-space: pre-line;
+  line-height: 1.4;
 }
 </style>

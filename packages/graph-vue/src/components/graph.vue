@@ -45,6 +45,7 @@
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import { ComponentListStore } from '@/stores/component-list'
 import { GraphConfigStore } from '@/stores/graph-config'
+import GraphStore from '@/stores/graph'
 import Node from '@/components/node.vue'
 import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
@@ -129,6 +130,7 @@ export default class GraphContent extends Vue {
     })
     this.initCustomHooks()
     this.graph.data(this.configState.data as IDataModel)
+    GraphStore.state.graph = this.graph
   }
 
   initCustomHooks() {
@@ -169,10 +171,10 @@ export default class GraphContent extends Vue {
   refreshGraph() {
     this.nodes = this.graph.getNodes()
     this.edges = this.graph.getEdges()
-    // const nodes = this.nodes.map(item => item.model)
-    // const edges = this.edges.map(item => item.model)
+    const nodes = this.nodes.map(item => item.model)
+    const edges = this.edges.map(item => item.model)
 
-    // this.configState.data = { nodes, edges }
+    this.configState.data = { nodes, edges }
   }
 
   afterDragNode(nodes: INodeModel[]) {
@@ -246,6 +248,9 @@ export default class GraphContent extends Vue {
   handleConfigChange(v: string) {
     this.graph.destroy()
     this.init()
+    this.transform.translateX = 0
+    this.transform.translateY = 0
+    this.transform.scale = 1
     this.graph.layout()
   }
 
@@ -254,11 +259,6 @@ export default class GraphContent extends Vue {
     this.graph.removeAction()
     this.graph.addAction(v)
   }
-
-  // @Watch('configState.data')
-  // handleDataChange() {
-  //   console.log(23)
-  // }
 }
 </script>
 

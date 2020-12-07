@@ -56,7 +56,7 @@ export default class ConfigPanel extends Vue {
   async mounted() {
     this.editor = await editor.create(document.getElementById('dataContent'), {
       value: JSON.stringify(this.graphConfigState.data, null, ' '),
-      language: 'json',
+      language: 'mysql',
       lineNumbers: 'off', // 不要行号
       scrollBeyondLastLine: false, // 去掉最后一行后面的空白
       overviewRulerBorder: false, // 不要滚动条的边框

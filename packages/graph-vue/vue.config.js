@@ -1,5 +1,5 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
+// const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 const path = require('path')
 
@@ -9,7 +9,7 @@ const htmlPath = path.resolve(__dirname, './public/index.html')
 const { PUBLIC_URL } = process.env
 
 module.exports = {
-  outputDir: path.resolve(__dirname, './build/_worker'),
+  outputDir: path.resolve(__dirname, './build'),
   publicPath: process.env.NODE_ENV === 'production' ? PUBLIC_URL : './',
   css: {
     loaderOptions: {
@@ -26,9 +26,9 @@ module.exports = {
       }
     },
     plugins: [
-      new MonacoWebpackPlugin({
-        languages: ['json']
-      }),
+      // new MonacoWebpackPlugin({
+      //   languages: ['json']
+      // }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: htmlPath,

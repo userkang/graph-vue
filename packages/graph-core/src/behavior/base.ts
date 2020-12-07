@@ -8,7 +8,7 @@ abstract class Base {
     this.graph = graph
   }
 
-  addEvent(type: string, callback: (...args: any) => void) {
+  addEvent(type: string, callback: (...args: any[]) => void) {
     const bindFunc = callback.bind(this)
     this.eventQueue.push({ type, bindFunc })
     this.graph.on(type, bindFunc)

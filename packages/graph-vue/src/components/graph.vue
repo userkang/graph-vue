@@ -51,7 +51,8 @@ import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
-import Graph, {
+import {
+  Graph,
   IDataModel,
   INodeModel,
   IEdgeModel,

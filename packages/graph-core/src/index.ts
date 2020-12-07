@@ -1,5 +1,6 @@
 import Graph from './controller/graph'
+import Behaivor from './behavior/base'
 
-export default Graph
+export { Graph, Behaivor }
 
 export * from './types'

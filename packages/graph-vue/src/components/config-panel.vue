@@ -36,7 +36,7 @@ import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { GraphConfigStore } from '@/stores/graph-config'
 import GraphStore from '@/stores/graph'
 import { editor } from 'monaco-editor'
-import Graph from '@datafe/graph-core'
+import { Graph } from '@datafe/graph-core'
 
 @Component
 export default class ConfigPanel extends Vue {
@@ -73,7 +73,8 @@ export default class ConfigPanel extends Vue {
       tabSize: 1,
       lineDecorationsWidth: 0,
       automaticLayout: true,
-      theme: 'vs-dark'
+      theme: 'vs-dark',
+      renderIndentGuides: false
     })
 
     const graph = this.graphState.graph as Graph

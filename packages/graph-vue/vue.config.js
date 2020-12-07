@@ -10,7 +10,7 @@ const { PUBLIC_URL } = process.env
 
 module.exports = {
   outputDir: path.resolve(__dirname, './build'),
-  publicPath: process.env.NODE_ENV === 'production' ? PUBLIC_URL : '/',
+  publicPath: './',
   css: {
     loaderOptions: {
       sass: {

@@ -246,11 +246,8 @@ export default class GraphContent extends Vue {
 
   @Watch('configState.drection')
   handleConfigChange(v: string) {
-    this.graph.destroy()
-    this.init()
-    this.transform.translateX = 0
-    this.transform.translateY = 0
-    this.transform.scale = 1
+    this.graph.set('drection', v)
+    this.graph.data(this.configState.data as IDataModel)
     this.graph.layout()
   }
 
@@ -264,7 +261,7 @@ export default class GraphContent extends Vue {
 
 <style lang="scss" scoped>
 .graph-content-wrap {
-  background: url('../assets/imgs/grid.svg') no-repeat center rgba(20, 40, 60);
+  background: #242424;
   position: relative;
   width: 100%;
   height: 100%;

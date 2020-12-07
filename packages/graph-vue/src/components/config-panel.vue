@@ -72,7 +72,8 @@ export default class ConfigPanel extends Vue {
       contextmenu: false,
       tabSize: 1,
       lineDecorationsWidth: 0,
-      automaticLayout: true
+      automaticLayout: true,
+      theme: 'vs-dark'
     })
 
     const graph = this.graphState.graph as Graph
@@ -117,9 +118,9 @@ export default class ConfigPanel extends Vue {
   width: 190px;
   height: 100%;
   box-sizing: border-box;
-  background: $l1;
-  border-left: 1px solid $l2;
-  color: #666;
+  background: #2d2d2d;
+  border-left: 1px solid #222;
+  color: #ddd;
   font-size: 14px;
   padding: 5px 10px;
   .form-item {
@@ -135,14 +136,15 @@ export default class ConfigPanel extends Vue {
   select,
   textarea {
     font-size: 12px;
-    border: 1px solid #eee;
+    border: none;
     outline: none;
     padding: 3px 2px;
-    box-shadow: 0 2px 3px 0 #eee;
     vertical-align: middle;
+    color: #ddd;
     cursor: pointer;
+    background: #484848;
     &:focus {
-      border: 1px solid rgb(9, 104, 194);
+      box-shadow: none;
     }
   }
   select {
@@ -166,7 +168,7 @@ export default class ConfigPanel extends Vue {
 }
 .title {
   font-size: 12px;
-  color: $d1;
+  color: #ddd;
   text-align: left;
   padding: 10px 0px;
 }

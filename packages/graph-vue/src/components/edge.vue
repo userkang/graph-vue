@@ -51,6 +51,9 @@ export default class Edge extends Vue {
 </script>
 
 <style lang="scss" scoped>
+$edge-color: #d1d1dd;
+$select-color: #4150f6;
+
 @keyframes dash {
   from {
     stroke-dashoffset: 320;
@@ -61,36 +64,36 @@ export default class Edge extends Vue {
 }
 
 .edge-style {
-  stroke: #ddd;
+  stroke: $edge-color;
   stroke-width: 2;
   fill: none;
   stroke-linecap: round;
   stroke-dasharray: 5;
   animation: dash 10s linear infinite;
   &:hover {
-    stroke: #4150f6;
+    stroke: $select-color;
     stroke-width: 2.5;
     cursor: pointer;
     + .arrow-style {
-      stroke: #4150f6;
-      fill: #4150f6;
+      stroke: $select-color;
+      fill: $select-color;
     }
   }
 }
 .edge-selected-style {
-  stroke: #4150f6;
+  stroke: $select-color;
   stroke-width: 2.5;
   cursor: pointer;
   stroke-linecap: round;
 }
 .arrow-style {
-  stroke: #d1d1d1;
+  stroke: $edge-color;
   stroke-width: 2;
   stroke-linecap: round;
-  fill: #d1d1d1;
+  fill: $edge-color;
 }
 .arrow-selected {
-  stroke: #4150f6;
-  fill: #4150f6;
+  stroke: $select-color;
+  fill: $select-color;
 }
 </style>

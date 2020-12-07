@@ -109,10 +109,10 @@ export default class ToolBox extends Vue {
   display: flex;
   right: 10px;
   top: 10px;
-  background: #f7f9ff;
-  border: 1px solid #e8ecfa;
-  color: #8a94c2;
-  font-weight: 600;
+  background: #383838;
+  border: 1px solid #222;
+  color: #ddd;
+  font-weight: 400;
   font-size: 18px;
   & > li {
     display: flex;
@@ -122,7 +122,7 @@ export default class ToolBox extends Vue {
     justify-content: center;
     cursor: pointer;
     &:hover {
-      background: $l2;
+      background: #484848;
     }
   }
   .select {
@@ -131,11 +131,10 @@ export default class ToolBox extends Vue {
   #undo,
   #redo {
     font-size: 14px;
-    font-weight: 300;
   }
   .disable {
     cursor: not-allowed;
-    color: #ddd;
+    color: #585858;
     &:hover {
       background: none;
     }

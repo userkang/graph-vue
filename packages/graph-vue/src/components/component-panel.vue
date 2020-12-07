@@ -59,12 +59,12 @@ export default class ComponentPanel extends Vue {
   width: 190px;
   height: 100%;
   box-sizing: border-box;
-  background: $l1;
-  border-right: 1px solid $l2;
+  background: #333;
+  border-right: 1px solid #222;
 }
 .title {
   font-size: 12px;
-  color: $d1;
+  color: #ddd;
   text-align: left;
   margin: 5px 10px;
 }
@@ -72,7 +72,7 @@ export default class ComponentPanel extends Vue {
   display: flex;
   height: 35px;
   box-sizing: border-box;
-  color: $d4;
+  color: #ddd;
   font-size: 12px;
   padding-left: 40px;
   align-items: center;
@@ -82,12 +82,11 @@ export default class ComponentPanel extends Vue {
     margin-right: 6px;
   }
   &:hover {
-    background: $l2;
-    color: $d2;
+    background: #484848;
   }
 }
 .active {
-  border: 1px dashed #606be1;
+  border: 1px dashed #999;
   cursor: grabbing;
 }
 </style>

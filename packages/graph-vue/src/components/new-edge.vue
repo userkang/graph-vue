@@ -47,13 +47,13 @@ export default class NewEdge extends Vue {
   stroke-dasharray: 5;
   stroke-linecap: round;
   stroke-width: 1.5;
-  stroke: #d1d1d1;
+  stroke: #d1d1d9;
   fill: transparent;
 }
 .arrow {
   pointer-events: none;
   stroke-width: 2;
-  stroke: #d1d1d1;
-  fill: #d1d1d1;
+  stroke: #d1d1d9;
+  fill: #d1d1d9;
 }
 </style>

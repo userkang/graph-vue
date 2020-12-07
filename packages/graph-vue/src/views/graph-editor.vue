@@ -45,14 +45,13 @@ export default class GraphEditor extends Vue {
   display: flex;
   height: 42px;
   line-height: 42px;
-  background: #fff;
+  background: #333;
   padding: 0px 10px;
-  box-shadow: inset 0 2px 3px 0 #eee;
+  border-bottom: 1px solid #222;
   .name {
     font-size: 16px;
     font-weight: 800;
-    font-style: italic;
-    color: #666;
+    color: #fff;
   }
 }
 .main-wrap {

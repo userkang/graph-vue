@@ -10,7 +10,7 @@ const { PUBLIC_URL } = process.env
 
 module.exports = {
   outputDir: path.resolve(__dirname, './build'),
-  publicPath: './',
+  publicPath: process.env.NODE_ENV === 'production' ? PUBLIC_URL : './',
   css: {
     loaderOptions: {
       sass: {
@@ -26,7 +26,10 @@ module.exports = {
       }
     },
     plugins: [
-      new MonacoWebpackPlugin(['json']),
+      new MonacoWebpackPlugin({
+        languages: ['json'],
+        publicPath: process.env.NODE_ENV === 'production' ? PUBLIC_URL : './'
+      }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: htmlPath,

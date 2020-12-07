@@ -26,7 +26,7 @@ module.exports = {
       }
     },
     plugins: [
-      new MonacoWebpackPlugin(),
+      new MonacoWebpackPlugin(['json']),
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: htmlPath,

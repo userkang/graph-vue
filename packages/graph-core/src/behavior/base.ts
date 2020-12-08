@@ -16,7 +16,7 @@ abstract class Base {
 
   destory() {
     this.eventQueue.forEach(item => {
-      this.graph.off(item.type, item.callback)
+      this.graph.off(item.type, item.bindFunc)
     })
   }
 }

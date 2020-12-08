@@ -28,15 +28,7 @@
       />
     </svg>
 
-    <ToolBox
-      v-if="graph"
-      :isBrushing="isBrushing"
-      @clickBrush="
-        value => {
-          this.isBrushing = value
-        }
-      "
-    />
+    <ToolBox v-if="graph" />
     <Menu v-if="graph"></Menu>
   </div>
 </template>
@@ -143,7 +135,6 @@ export default class GraphContent extends Vue {
       aftertranslate: 'aftertranslate',
       afterzoom: 'afterzoom',
       brushing: 'brushing',
-      mouseup: 'mouseup',
       showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
@@ -160,13 +151,6 @@ export default class GraphContent extends Vue {
 
   brushing(path: string) {
     this.brushPath = path
-  }
-
-  mouseup() {
-    if (this.graph.getBrushing()) {
-      this.graph.setBrushing(false)
-      this.isBrushing = false
-    }
   }
 
   refreshGraph() {

@@ -39,7 +39,7 @@ export default class Base {
     states.push(state)
   }
 
-  public hasState(state: string) {
+  public hasState(state: string): boolean {
     const states = this.get('states')
     return states.includes(state)
   }

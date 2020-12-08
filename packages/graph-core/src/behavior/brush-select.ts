@@ -23,7 +23,7 @@ export default class BrushSelect extends Base {
   onMouseDown(e: MouseEvent) {
     this.originX = e.x
     this.originY = e.y
-    if (this.graph.getBrushing()) {
+    if (this.graph.get('brushing')) {
       this.moving = true
       this.beforeSelectedNodes = this.graph.findNodeByState('selected')
     }

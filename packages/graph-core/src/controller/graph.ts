@@ -20,7 +20,7 @@ import {
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
 
-  public viewController = null
+  public viewController: ViewController
   public layoutController: LayoutController
   public eventController: EventController
   public nodeController: NodeController
@@ -42,7 +42,7 @@ export default class Graph extends EventEmitter {
     this.stackController = new StackController(this)
   }
 
-  public getDefaultCfg() {
+  private getDefaultCfg() {
     return {
       container: undefined,
       drection: 'TB',
@@ -56,13 +56,12 @@ export default class Graph extends EventEmitter {
     return this.viewController.getPointByClient(originX, originY)
   }
 
-  public set<T = any>(key: string | object, val?: T): Graph {
+  public set<T = any>(key: string | object, val?: T) {
     if (Object.prototype.toString.call(key) === '[object Object]') {
       this.cfg = { ...this.cfg, ...(key as object) }
     } else {
       this.cfg[key as string] = val
     }
-    return this
   }
 
   public get(key: string) {
@@ -214,13 +213,13 @@ export default class Graph extends EventEmitter {
     }
   }
 
-  public findNodeByState(state): INode[] {
+  public findNodeByState(state: string): INode[] {
     return this.getNodes().filter(item => {
       return item.hasState(state)
     })
   }
 
-  public findEdgeByState(state): IEdge[] {
+  public findEdgeByState(state: string): IEdge[] {
     return this.getEdges().filter(item => {
       return item.hasState(state)
     })
@@ -258,14 +257,6 @@ export default class Graph extends EventEmitter {
 
   getEdges(): IEdge[] {
     return this.get('edges')
-  }
-
-  getBrushing(): boolean {
-    return this.get('brushing')
-  }
-
-  setBrushing(value: boolean) {
-    this.set('brushing', value)
   }
 
   addAction(action: string | string[]) {

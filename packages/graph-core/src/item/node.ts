@@ -34,11 +34,11 @@ export default class Node extends Base {
     return this.model.y as number
   }
 
-  public get width() {
+  public get width(): number {
     return this.get('width')
   }
 
-  public get height() {
+  public get height(): number {
     return this.get('height')
   }
 

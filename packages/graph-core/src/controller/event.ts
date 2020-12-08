@@ -85,6 +85,8 @@ export default class EventController {
           }
         }
       })
+      // 更新当前 action 配置
+      this.graph.set('action', Object.keys(this.behaveInstance))
     }
   }
 
@@ -95,14 +97,18 @@ export default class EventController {
         this.behaveInstance[key].destory()
       })
       this.behaveInstance = {}
+      this.graph.set('action', [])
       return
     }
 
     const actions = !Array.isArray(action) ? [action] : action
     actions.forEach(item => {
-      this.behaveInstance[item].destory()
-      delete this.behaveInstance[item]
+      if (this.behaveInstance[item]) {
+        this.behaveInstance[item].destory()
+        delete this.behaveInstance[item]
+      }
     })
+    this.graph.set('action', Object.keys(this.behaveInstance))
   }
 
   handleMouseEvent(e: MouseEvent) {

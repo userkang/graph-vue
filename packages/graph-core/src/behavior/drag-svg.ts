@@ -23,7 +23,7 @@ export default class DragSvg extends Base {
   }
 
   mouseDown(e: MouseEvent) {
-    if (!this.graph.getBrushing()) {
+    if (!this.graph.get('brushing')) {
       this.isMoving = true
     }
   }

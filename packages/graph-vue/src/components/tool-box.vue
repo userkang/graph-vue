@@ -30,11 +30,13 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
+import { GraphConfigStore } from '@/stores/graph-config'
 
 @Component
 export default class ToolBox extends Vue {
-  @Prop()
   isBrushing = false
+
+  configState = GraphConfigStore.state
 
   undoEnable = false
   redoEnable = false
@@ -90,14 +92,22 @@ export default class ToolBox extends Vue {
   }
 
   brushSelect() {
-    this.graph.setBrushing(!this.graph.getBrushing())
-    this.$emit('clickBrush', this.graph.getBrushing())
+    // 通过设置 brushing 属性，避免 brush-select 和 drag-svg 行为拖动事件的冲突问题。
+    this.isBrushing = !this.graph.get('brushing')
+    this.graph.set('brushing', this.isBrushing)
   }
 
   mounted() {
     this.graph.on('stackchange', () => {
       this.undoEnable = this.graph.getUndoStack().length > 0
       this.redoEnable = this.graph.getRedoStack().length > 0
+    })
+
+    this.graph.on('mouseup', () => {
+      if (this.graph.get('brushing')) {
+        this.graph.set('brushing', false)
+        this.isBrushing = false
+      }
     })
   }
 }

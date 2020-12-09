@@ -52,7 +52,10 @@ export default class Graph extends EventEmitter {
     }
   }
 
-  public getPointByClient(originX: number, originY: number) {
+  public getPointByClient(
+    originX: number,
+    originY: number
+  ): { x: number; y: number } {
     return this.viewController.getPointByClient(originX, originY)
   }
 

@@ -2,6 +2,12 @@
   <div class="container">
     <div class="top-panel">
       <div class="name">graph-editor</div>
+      <a
+        href="https://km.sankuai.com/page/505696797"
+        target="_blank"
+        class="link"
+        >用户文档</a
+      >
     </div>
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
@@ -43,8 +49,9 @@ export default class GraphEditor extends Vue {
 <style lang="scss" scoped>
 .top-panel {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   height: 42px;
-  line-height: 42px;
   background: #333;
   padding: 0px 10px;
   border-bottom: 1px solid #222;
@@ -52,6 +59,12 @@ export default class GraphEditor extends Vue {
     font-size: 16px;
     font-weight: 800;
     color: #fff;
+  }
+  .link {
+    font-size: 12px;
+    color: #eee;
+    text-decoration: none;
+    margin-right: 10px;
   }
 }
 .main-wrap {

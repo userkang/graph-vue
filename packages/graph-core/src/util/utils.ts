@@ -29,13 +29,25 @@ export const isFullScreen = () => {
 }
 
 const map: { [key: string]: number } = {}
+const globalId = []
 export const uniqueId = (prefix: string) => {
   if (!map[prefix]) {
     map[prefix] = 1
   } else {
     map[prefix] += 1
   }
-  return prefix + map[prefix]
+  let id = prefix + map[prefix]
+
+  while (globalId.includes(id)) {
+    map[prefix] += 1
+    id = prefix + map[prefix]
+  }
+
+  return id
+}
+
+export const setGlobalId = (id: string) => {
+  globalId.push(id)
 }
 
 export const clone = obj => {

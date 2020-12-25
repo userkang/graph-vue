@@ -95,15 +95,9 @@ export default class GraphContent extends Vue {
     const point = this.graph.getPointByClient(x, y)
 
     this.graph.addNode({
-      nodeId: Number(x + '' + y),
       nodeName: this.dragingInfo.component.componentName,
       x: point.x,
-      y: point.y,
-      slots: [
-        { slotId: 1, type: 'in' },
-        { slotId: 2, type: 'out' },
-        { slotId: 3, type: 'out' }
-      ]
+      y: point.y
     })
   }
 

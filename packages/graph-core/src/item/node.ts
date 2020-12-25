@@ -79,7 +79,7 @@ export default class Node extends Base {
 
   public setSlotsPoint() {
     const model = this.model
-    const width: number = this.get('width')
+    const width = this.get('width')
     const height = this.get('height')
 
     this.set('slots', [])
@@ -94,7 +94,9 @@ export default class Node extends Base {
         }
       })
     } else {
-      inSlots = outSlots = [{} as any]
+      model.slots = []
+      inSlots = [{}]
+      outSlots = [{}]
     }
 
     const inSlotLen = inSlots.length
@@ -104,49 +106,43 @@ export default class Node extends Base {
       inSlots.forEach((item, index) => {
         const x = Number(model.x) + (width / (inSlotLen + 1)) * (index + 1)
         const y = Number(model.y)
-        const slot = new Slot(item, { x, y, type: 'in', nodeId: this.id })
-        this.get('slots').push(slot)
+        this.setSlot(item, x, y, 'in')
       })
 
       outSlots.forEach((item, index) => {
         const x = Number(model.x) + (width / (outSlotLen + 1)) * (index + 1)
         const y = Number(model.y) + height
-        const slot = new Slot(item, {
-          x,
-          y,
-          type: 'out',
-          index,
-          nodeId: this.id
-        })
-
-        this.get('slots').push(slot)
+        this.setSlot(item, x, y, 'out')
       })
     } else {
       inSlots.forEach((item, index) => {
         const x = Number(model.x)
         const y = Number(model.y) + (height / (inSlotLen + 1)) * (index + 1)
-        const slot = new Slot(item, {
-          x,
-          y,
-          type: 'in',
-          index,
-          nodeId: this.id
-        })
-        this.get('slots').push(slot)
+        this.setSlot(item, x, y, 'in')
       })
 
       outSlots.forEach((item, index) => {
         const x = Number(model.x) + width
         const y = Number(model.y) + (height / (outSlotLen + 1)) * (index + 1)
-        const slot = new Slot(item, {
-          x,
-          y,
-          type: 'out',
-          index,
-          nodeId: this.id
-        })
-        this.get('slots').push(slot)
+        this.setSlot(item, x, y, 'out')
       })
+    }
+  }
+
+  private setSlot(item: ISlotModel, x: number, y: number, type: string) {
+    const isModelEmpty = !Object.keys(item).length
+
+    const slot = new Slot(item, {
+      x,
+      y,
+      type,
+      nodeId: this.id
+    })
+    this.get('slots').push(slot)
+
+    if (isModelEmpty) {
+      slot.model.type = type
+      ;(this.model.slots as ISlotModel[]).push(slot.model)
     }
   }
 }

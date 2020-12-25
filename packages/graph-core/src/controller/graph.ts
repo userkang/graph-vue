@@ -72,6 +72,13 @@ export default class Graph extends EventEmitter {
   }
 
   public addNode(item: INodeModel, stack: boolean = true): INode {
+    if (item.id && this.findNode(item.id)) {
+      console.warn(
+        `The node already exists. Make sure the ID %c${item.id}%c  is uniqued`
+      )
+      return
+    }
+
     const node = this.nodeController.addNode(item)
     this.emit('afteraddnode', item)
     if (stack) {

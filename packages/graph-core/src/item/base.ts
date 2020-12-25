@@ -1,4 +1,5 @@
 import { IEdgeModel, INodeModel, ISlotModel } from '../types'
+import { setGlobalId } from '../util/utils'
 
 export default class Base {
   public _cfg: { [key: string]: unknown } = {
@@ -12,6 +13,10 @@ export default class Base {
 
     if (model.id) {
       this.set('id', String(model.id))
+      // 如果节点保存了之前自动生成的 id，需要累积，解决自动生成 id 重复的问题
+      if (/(node|edge|slot)\d+/.test(model.id)) {
+        setGlobalId(model.id)
+      }
     }
   }
 

@@ -38,4 +38,9 @@ export default class Group extends Container {
     // }
     return element
   }
+
+  draw() {
+    const el = this.createDom()
+    this.parent.get('el').appendChild(el)
+  }
 }

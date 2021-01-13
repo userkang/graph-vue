@@ -5,6 +5,7 @@ import EventController from './event'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
+import View from '../view/svg'
 import {
   INode,
   IEdge,
@@ -30,7 +31,20 @@ export default class Graph extends EventEmitter {
   constructor(config: IGraphConfig) {
     super()
     this.cfg = Object.assign({}, this.getDefaultCfg(), config)
+
+    // 是否触发自带渲染
+    const isRender = !this.get('container').querySelector('svg')
+    if (isRender) {
+      this.initView()
+      this.set('isRender', isRender)
+    }
+
     this.initController()
+  }
+
+  private initView() {
+    const svg = new View(this.get('container'))
+    this.set('svg', svg)
   }
 
   private initController() {

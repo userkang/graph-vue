@@ -49,7 +49,7 @@ export default class EventController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$svg = graph.cfg.container
+    this.$svg = graph.cfg.container.querySelector('svg')
     this.addBehavior()
     this.defaultEmit()
     this.initEvent()

@@ -34,7 +34,7 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$container = graph.cfg.container
+    this.$container = graph.cfg.container.querySelector('svg')
     this.nodeInfo = graph.cfg.nodeInfo
     // this.translateToCenter()
     this.resize()

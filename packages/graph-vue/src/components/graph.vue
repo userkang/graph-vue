@@ -1,10 +1,8 @@
 <template>
-  <div class="graph-content-wrap">
-    <svg
+  <div class="graph-content-wrap" ref="svg">
+    <!-- <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      xmlns:xlink="http://www.w3.org/1999/xlink"
-      ref="svg"
       @dragover="e => e.preventDefault()"
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
@@ -29,7 +27,7 @@
     </svg>
 
     <ToolBox v-if="graph" />
-    <Menu v-if="graph"></Menu>
+    <Menu v-if="graph"></Menu> -->
   </div>
 </template>
 

@@ -1,5 +1,11 @@
 <template>
-  <g data-type="edge" :data-id="edge.id">
+  <g>
+    <path
+      :d="path.line"
+      class="edge-wrapper"
+      data-type="edge"
+      :data-id="edge.id"
+    ></path>
     <path
       :d="path.line"
       class="edge-style"
@@ -62,7 +68,22 @@ $select-color: #4150f6;
     stroke-dashoffset: 0;
   }
 }
-
+.edge-wrapper {
+  stroke-width: 10;
+  fill: none;
+  stroke: transparent;
+  &:hover {
+    + .edge-style {
+      stroke: $select-color;
+      stroke-width: 2.5;
+      cursor: pointer;
+    }
+    + .arrow-style {
+      stroke: $select-color;
+      fill: $select-color;
+    }
+  }
+}
 .edge-style {
   stroke: $edge-color;
   stroke-width: 2;
@@ -70,15 +91,7 @@ $select-color: #4150f6;
   stroke-linecap: round;
   stroke-dasharray: 5;
   animation: dash 10s linear infinite;
-  &:hover {
-    stroke: $select-color;
-    stroke-width: 2.5;
-    cursor: pointer;
-    + .arrow-style {
-      stroke: $select-color;
-      fill: $select-color;
-    }
-  }
+  pointer-events: none;
 }
 .edge-selected-style {
   stroke: $select-color;

@@ -1,46 +1,21 @@
-import Container from './container'
-import { createSVGElement } from './util/dom'
+import Element from './element'
 
-export default class Group extends Container {
+export default class Group extends Element {
   attrs = {}
 
-  constructor(attrs: any) {
+  constructor(attrs?: { [key: string]: string }) {
     super()
     this.attrs = attrs
-    this.initGroup()
-  }
-
-  initGroup() {
-    const el = this.createDom()
-
-    Object.keys(this.attrs).forEach(key => {
-      el.setAttribute(key, this.attrs[key])
-    })
-
-    el.id = this.id
-    this.parent.appendChild(el)
-  }
-
-  createDom() {
-    const element = createSVGElement('g')
-    // this.set('el', element);
-    // const parent = this.getParent();
-    // if (parent) {
-    //   let parentNode = parent.get('el');
-    //   if (parentNode) {
-    //     parentNode.appendChild(element);
-    //   } else {
-    //     // parentNode maybe null for group
-    //     parentNode = (parent as IGroup).createDom();
-    //     parent.set('el', parentNode);
-    //     parentNode.appendChild(element);
-    //   }
-    // }
-    return element
+    this.draw()
   }
 
   draw() {
-    const el = this.createDom()
-    this.parent.get('el').appendChild(el)
+    this.createDom('g', this.attrs)
+  }
+
+  addGroup(attrs?: { [key: string]: string }) {
+    const group = new Group(attrs)
+    this.add(group)
+    return group
   }
 }

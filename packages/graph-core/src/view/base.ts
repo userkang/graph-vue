@@ -5,6 +5,10 @@ export default class Base {
     return this.get('id')
   }
 
+  public get graph() {
+    return this.get('graph')
+  }
+
   public get<T = any>(key: string): T {
     return this._cfg[key] as T
   }

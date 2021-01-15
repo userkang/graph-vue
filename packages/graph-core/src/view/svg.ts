@@ -1,43 +1,62 @@
-import Container from './container'
-import { createSVGElement } from './util/dom'
+import Element from './element'
 import { uniqueId } from '../util/utils'
+import Group from './group'
+import Graph from '../controller/graph'
+import NewEdge from './newEdge'
+import Arrow from './arrow'
 
-export default class Svg extends Container {
-  container = undefined
+export default class Svg extends Element {
+  container!: HTMLElement
 
-  constructor(container: HTMLElement) {
+  constructor(graph: Graph) {
     super()
+    super.set('graph', graph)
     this.set('id', uniqueId('svg'))
-    this.container = container
-    this.initSVG()
+    this.container = graph.get('container')
+    this.draw()
     this.initGroup()
+    this.initNewEdge()
   }
 
-  initSVG() {
-    const el = this.createSvg()
+  draw() {
+    const el = this.createDom('svg', {
+      width: '100%',
+      height: '100%'
+    })
     el.id = this.id
-    this.set('el', el)
     this.container.appendChild(el)
   }
 
   initGroup() {
-    const group = this.addGroup({
-      class: 'root-group'
+    const rootGroup = this.addGroup({
+      class: 'root-group',
+      transform: 'matrix(1,0,0,1,0,0)'
     })
-    group.addGroup({
+    const edgeGroup = rootGroup.addGroup({
       class: 'edge-group'
     })
-    group.addGroup({
+    const nodeGroup = rootGroup.addGroup({
       class: 'node-group'
     })
+    this.set('rootGroup', rootGroup)
+    this.set('edgeGroup', edgeGroup)
+    this.set('nodeGroup', nodeGroup)
   }
 
-  createSvg() {
-    const element = createSVGElement('svg') as SVGSVGElement
-    element.setAttribute('width', '100%')
-    element.setAttribute('height', '100%')
-    return element
+  initNewEdge() {
+    const newEdge = new NewEdge()
+    const arrow = new Arrow()
+    const rootGroup = this.get('rootGroup')
+    const newEdgeGroup = rootGroup.addGroup({
+      class: 'new-edge-group'
+    })
+    newEdgeGroup.add(newEdge)
+    newEdgeGroup.add(arrow)
+  }
+
+  addGroup(attrs) {
+    const group = new Group(attrs)
+    this.add(group)
+    return group
   }
 }
-
-

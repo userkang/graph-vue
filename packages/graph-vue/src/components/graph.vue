@@ -1,11 +1,14 @@
 <template>
-  <div class="graph-content-wrap" ref="svg">
+  <div
+    class="graph-content-wrap"
+    ref="svg"
+    @dragover="e => e.preventDefault()"
+    @drop="handleDrop"
+    @contextmenu="e => e.preventDefault()"
+  >
     <!-- <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
-      @dragover="e => e.preventDefault()"
-      @drop="handleDrop"
-      @contextmenu="e => e.preventDefault()"
       width="100%"
       height="100%"
     >

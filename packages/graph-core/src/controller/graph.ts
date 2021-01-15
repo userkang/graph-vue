@@ -5,7 +5,7 @@ import EventController from './event'
 import NodeController from './node'
 import EdgeController from './edge'
 import StackController from './stack'
-import View from '../view/svg'
+import Svg from '../view/svg'
 import {
   INode,
   IEdge,
@@ -43,7 +43,7 @@ export default class Graph extends EventEmitter {
   }
 
   private initView() {
-    const svg = new View(this.get('container'))
+    const svg = new Svg(this)
     this.set('svg', svg)
   }
 

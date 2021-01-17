@@ -16,9 +16,7 @@ export default class Arrow extends Element {
     this.set('arrowPath', arrowPath)
   }
 
-  initHook() {
-    console.log(this.graph)
-  }
+  initHook() {}
 
   update() {
     const arrowPath = this.get('arrowPath')

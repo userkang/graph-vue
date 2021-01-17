@@ -1,5 +1,6 @@
 export default class Base {
   public _cfg: { [key: string]: unknown } = {}
+  public eventQueue = []
 
   public get id() {
     return this.get('id')
@@ -15,5 +16,17 @@ export default class Base {
 
   public set(key: string, val: unknown) {
     this._cfg[key] = val
+  }
+
+  addEvent(type: string, callback: (...args: any[]) => void) {
+    const bindFunc = callback.bind(this)
+    this.eventQueue.push({ type, bindFunc })
+    this.graph.on(type, bindFunc)
+  }
+
+  destory() {
+    this.eventQueue.forEach(item => {
+      this.graph.off(item.type, item.bindFunc)
+    })
   }
 }

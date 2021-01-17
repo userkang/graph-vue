@@ -34,15 +34,15 @@ export default class Graph extends EventEmitter {
 
     // 是否触发自带渲染
     const isRender = !this.get('container').querySelector('svg')
+    this.set('isRender', isRender)
     if (isRender) {
-      this.initView()
-      this.set('isRender', isRender)
+      this.render()
     }
 
     this.initController()
   }
 
-  private initView() {
+  private render() {
     const svg = new Svg(this)
     this.set('svg', svg)
   }

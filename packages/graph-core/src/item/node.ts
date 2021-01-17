@@ -2,6 +2,8 @@ import Base from './base'
 import Slot from './slot'
 import { uniqueId } from '../util/utils'
 import { INodeModel, ISlot, IEdge, ISlotModel } from '../types'
+import nodeView from '../view/node'
+import Graph from '../controller/graph'
 
 export default class Node extends Base {
   constructor(model: INodeModel, cfg: { [key: string]: unknown }) {
@@ -144,5 +146,9 @@ export default class Node extends Base {
       slot.model.type = type
       ;(this.model.slots as ISlotModel[]).push(slot.model)
     }
+  }
+
+  public render(graph: Graph) {
+    return new nodeView(this, graph)
   }
 }

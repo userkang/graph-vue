@@ -4,16 +4,19 @@ import Group from './group'
 import Graph from '../controller/graph'
 import NewEdge from './newEdge'
 import Arrow from './arrow'
+import { insertCss } from './util/dom'
+import content from './css/index'
 
 export default class Svg extends Element {
   container!: HTMLElement
 
   constructor(graph: Graph) {
     super()
-    super.set('graph', graph)
+    this.set('graph', graph)
     this.set('id', uniqueId('svg'))
     this.container = graph.get('container')
     this.draw()
+    insertCss(content)
     this.initGroup()
     this.initNewEdge()
   }
@@ -21,8 +24,10 @@ export default class Svg extends Element {
   draw() {
     const el = this.createDom('svg', {
       width: '100%',
-      height: '100%'
+      height: '100%',
+      xmlns: 'http://www.w3.org/2000/svg'
     })
+    this.container.innerHTML = ''
     el.id = this.id
     this.container.appendChild(el)
   }

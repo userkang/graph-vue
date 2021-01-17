@@ -1,11 +1,13 @@
-import { INode } from '../types'
+import { INode, INodeModel } from '../types'
 import Element from './element'
+import Graph from '../controller/graph'
 export default class Node extends Element {
   node!: INode
 
-  constructor(node: INode) {
+  constructor(node: INode, graph: Graph) {
     super()
     this.node = node
+    this.set('graph', graph)
     this.draw()
     this.initHook()
   }
@@ -14,31 +16,50 @@ export default class Node extends Element {
     const div = this.createDom('div', {
       class: 'graph-node'
     })
-    // div.innerHTML as HTMLElement = this.node.model.nodeName
+    div.innerHTML = this.node.model.nodeName as string
     const foreignObject = this.createDom('foreignObject', {
       transform: `translate(${this.node.x}, ${this.node.y})`,
       width: `${this.node.width}`,
       height: `${this.node.height}`,
-      dataType: 'node',
-      dataId: `${this.node.id}`
+      'data-type': 'node',
+      'data-id': `${this.node.id}`
     })
     const g = this.createDom('g')
 
     foreignObject.appendChild(div)
     g.appendChild(foreignObject)
+
+    this.set('foreignObject', foreignObject)
+    this.set('div', div)
   }
 
-  drawSlot() {
-
-  }
+  // drawSlot() {}
 
   initHook() {
-    console.log(this.graph)
+    this.addEvent('dragingnode', this.updateTransform)
+    this.addEvent('nodeselectchange', this.updateSelect)
   }
 
-  update() {
-    const newEdgePath = this.get('newEdgePath')
-    newEdgePath.setAttribute('d', '123123')
+  updateTransform(moveNode: INode[]) {
+    const node = moveNode.find(item => item.id === this.node.id)
+    if (node) {
+      this.node = node
+      const foreignObject = this.get('foreignObject')
+      foreignObject.setAttribute(
+        'transform',
+        `translate(${this.node.x}, ${this.node.y})`
+      )
+    }
+  }
+
+  updateSelect(selelctNodes: INodeModel[]) {
+    const node = selelctNodes.find(item => String(item.id) === this.node.id)
+    const div = this.get('div')
+    if (node) {
+      div.classList.add('graph-node-active')
+    } else {
+      div.classList.remove('graph-node-active')
+    }
   }
 }
 

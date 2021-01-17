@@ -16,9 +16,7 @@ export default class NewEdge extends Element {
     this.set('newEdgePath', newEdgePath)
   }
 
-  initHook() {
-    console.log(this.graph)
-  }
+  initHook() {}
 
   update() {
     const newEdgePath = this.get('newEdgePath')

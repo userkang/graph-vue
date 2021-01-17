@@ -17,6 +17,14 @@ export default class NodeController {
       drection: this.graph.get('drection')
     })
     this.graph.getNodes().push(node)
+
+    // 渲染
+    if (this.graph.get('isRender')) {
+      const nodeView = node.render(this.graph)
+      const nodeGroup = this.graph.get('svg').get('nodeGroup')
+      nodeGroup.add(nodeView)
+    }
+
     return node
   }
 

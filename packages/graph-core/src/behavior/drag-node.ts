@@ -63,6 +63,8 @@ export default class DragNode extends Base {
         const posY = item.y + this.moveY / this.graph.getZoom()
         item.updatePosition(posX, posY)
       })
+
+      this.graph.emit('dragingnode', this.moveNode)
     }
 
     this.startX = x

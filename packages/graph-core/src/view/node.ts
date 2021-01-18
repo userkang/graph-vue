@@ -1,14 +1,17 @@
 import { INode, INodeModel } from '../types'
 import Element from './element'
 import Graph from '../controller/graph'
+import Slot from './slot'
 export default class Node extends Element {
   node!: INode
+  slots!: Slot[]
 
   constructor(node: INode, graph: Graph) {
     super()
     this.node = node
     this.set('graph', graph)
     this.draw()
+    this.drawSlot()
     this.initHook()
   }
 
@@ -29,14 +32,23 @@ export default class Node extends Element {
     foreignObject.appendChild(div)
     g.appendChild(foreignObject)
 
+    this.set('g', g)
     this.set('foreignObject', foreignObject)
     this.set('div', div)
   }
 
-  // drawSlot() {}
+  drawSlot() {
+    const slots = []
+    this.node.slots.forEach(item => {
+      slots.push(new Slot(item, this, this.graph))
+    })
+    this.slots = slots
+  }
 
   initHook() {
     this.addEvent('dragingnode', this.updateTransform)
+    this.addEvent('afterdragnode', this.transform)
+    this.addEvent('afterlayout', this.transform)
     this.addEvent('nodeselectchange', this.updateSelect)
   }
 
@@ -44,12 +56,19 @@ export default class Node extends Element {
     const node = moveNode.find(item => item.id === this.node.id)
     if (node) {
       this.node = node
-      const foreignObject = this.get('foreignObject')
-      foreignObject.setAttribute(
-        'transform',
-        `translate(${this.node.x}, ${this.node.y})`
-      )
+      this.transform()
     }
+  }
+
+  transform() {
+    const foreignObject = this.get('foreignObject')
+    foreignObject.setAttribute(
+      'transform',
+      `translate(${this.node.x}, ${this.node.y})`
+    )
+    this.slots.forEach(item => {
+      item.updateTransform()
+    })
   }
 
   updateSelect(selelctNodes: INodeModel[]) {
@@ -62,26 +81,3 @@ export default class Node extends Element {
     }
   }
 }
-
-// <g>
-//     <foreignObject
-//       :transform="`translate(${node.x}, ${node.y})`"
-//       :width="node.width"
-//       :height="node.height"
-//       data-type="node"
-//       :data-id="node.id"
-//     >
-//       <div
-//         class="graph-node"
-//         :style="{
-//           'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',
-//           background: isNodeSelected
-//             ? 'rgba(185,200,245,0.9)'
-//             : 'rgba(252,252,251,0.9)'
-//         }"
-//       >
-//         {{ node.model.nodeName }}
-//       </div>
-//     </foreignObject>
-//     <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot" />
-//   </g>

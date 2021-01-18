@@ -1,5 +1,5 @@
 <template>
-  <div class="scale-panel" @click="handleChange" v-if="graph">
+  <div class="scale-panel" @click="handleChange">
     <li
       title="撤销"
       id="undo"

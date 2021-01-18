@@ -1,6 +1,6 @@
 import Graph from './graph'
 import Node from '../item/node'
-import { INodeModel } from '../types'
+import { INode, INodeModel } from '../types'
 
 export default class NodeController {
   graph: Graph
@@ -28,11 +28,16 @@ export default class NodeController {
     return node
   }
 
-  deleteNode(id: string) {
+  deleteNode(node: INode) {
     const nodes = this.graph.getNodes()
-    const index = nodes.findIndex(item => item.id === id)
+    const index = nodes.findIndex(item => item.id === node.id)
     if (index > -1) {
       nodes.splice(index, 1)
+    }
+
+    if (this.graph.get('isRender')) {
+      const nodeGroup = this.graph.get('svg').get('nodeGroup')
+      nodeGroup.remove(node.get('view'))
     }
   }
 }

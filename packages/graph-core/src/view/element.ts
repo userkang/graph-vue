@@ -36,6 +36,7 @@ export default abstract class Element extends Base {
   }
 
   remove(element: Element) {
+    element.destory()
     this.el.removeChild(element.el)
   }
 }

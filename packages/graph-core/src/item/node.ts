@@ -149,6 +149,8 @@ export default class Node extends Base {
   }
 
   public render(graph: Graph) {
-    return new nodeView(this, graph)
+    const view = new nodeView(this, graph)
+    this.set('view', view)
+    return view
   }
 }

@@ -1,4 +1,4 @@
-import { IEdgeModel } from '../types'
+import { IEdgeModel, IEdge } from '../types'
 import Graph from '../controller/graph'
 import Edge from '../item/edge'
 export default class EdgeController {
@@ -14,14 +14,26 @@ export default class EdgeController {
     const edge = new Edge(item, fromNode, toNode)
     this.graph.getEdges().push(edge)
 
+    // 渲染
+    if (this.graph.get('isRender')) {
+      const edgeView = edge.render(this.graph)
+      const edgeGroup = this.graph.get('svg').get('edgeGroup')
+      edgeGroup.add(edgeView)
+    }
+
     return edge
   }
 
-  public deleteEdge(id: string) {
+  public deleteEdge(edge: IEdge) {
     const edges = this.graph.getEdges()
-    const index = edges.findIndex(item => item.id === id)
+    const index = edges.findIndex(item => item.id === edge.id)
     if (index > -1) {
       edges.splice(index, 1)
+    }
+
+    if (this.graph.get('isRender')) {
+      const edgeGroup = this.graph.get('svg').get('edgeGroup')
+      edgeGroup.remove(edge.get('view'))
     }
   }
 }

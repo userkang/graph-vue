@@ -138,7 +138,7 @@ export default class Graph extends EventEmitter {
       this.deleteEdge(item, false)
     })
 
-    this.nodeController.deleteNode(node.id)
+    this.nodeController.deleteNode(node)
     this.emit('afterdeletenode', node.model)
 
     return node
@@ -175,7 +175,7 @@ export default class Graph extends EventEmitter {
     }
 
     // 删除数据中的边
-    this.edgeController.deleteEdge(edge.id)
+    this.edgeController.deleteEdge(edge)
 
     this.emit('afterdeleteedge', edge.model)
 
@@ -199,6 +199,13 @@ export default class Graph extends EventEmitter {
   public layout() {
     this.layoutController.layout()
     this.emit('afterlayout')
+  }
+
+  public getTranslate() {
+    return {
+      x: this.viewController.transform.translateX,
+      y: this.viewController.transform.translateY
+    }
   }
 
   public translate(x: number, y: number) {

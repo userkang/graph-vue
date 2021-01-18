@@ -1,6 +1,8 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode } from '../types'
+import edgeView from '../view/edge'
+import Graph from '../controller/graph'
 
 export default class Edge extends Base {
   constructor(model: IEdgeModel, fromNode: INode, toNode: INode) {
@@ -64,5 +66,11 @@ export default class Edge extends Base {
         return true
       }
     })
+  }
+
+  public render(graph: Graph) {
+    const view = new edgeView(this, graph)
+    this.set('view', view)
+    return view
   }
 }

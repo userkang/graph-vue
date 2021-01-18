@@ -1,0 +1,84 @@
+import { IEdge, INode, IEdgeModel } from '../types'
+import Element from './element'
+import Graph from '../controller/graph'
+import { calculateCurve } from './util/util'
+export default class Node extends Element {
+  edge!: IEdge
+
+  constructor(edge: IEdge, graph: Graph) {
+    super()
+    this.edge = edge
+    this.set('graph', graph)
+    this.draw()
+    this.initHook()
+    console.log(edge)
+  }
+
+  draw() {
+    const edgePath = this.createDom('path', {
+      class: 'graph-edge'
+    })
+
+    const edgeWrapperPath = this.createDom('path', {
+      class: 'graph-edge-wrapper',
+      'data-type': 'edge',
+      'data-id': this.edge.id
+    })
+
+    const arrowPath = this.createDom('path', {
+      class: 'graph-arrow'
+    })
+
+    const g = this.createDom('g')
+
+    g.appendChild(edgeWrapperPath)
+    g.appendChild(edgePath)
+    g.appendChild(arrowPath)
+
+    this.set('edgePath', edgePath)
+    this.set('edgeWrapperPath', edgeWrapperPath)
+    this.set('arrowPath', arrowPath)
+
+    this.setPath()
+  }
+
+  initHook() {
+    this.addEvent('dragingnode', this.updatePath)
+    this.addEvent('afterdragnode', this.updatePath)
+    this.addEvent('afterlayout', this.updatePath)
+    this.addEvent('edgeselectchange', this.updateSelect)
+  }
+
+  updatePath() {
+    this.setPath()
+  }
+
+  updateSelect(selectEdges: IEdgeModel[]) {
+    const edge = selectEdges.find(item => String(item.id) === this.edge.id)
+    const edgePath = this.get('edgePath')
+    if (edge) {
+      edgePath.classList.add('graph-edge-active')
+    } else {
+      edgePath.classList.remove('graph-edge-active')
+    }
+  }
+
+  setPath() {
+    console.log(223)
+    const edgePath = this.get('edgePath')
+    const edgeWrapperPath = this.get('edgeWrapperPath')
+    const arrowPath = this.get('arrowPath')
+    const path = calculateCurve(
+      {
+        x1: this.edge.fromSlot.x,
+        y1: this.edge.fromSlot.y,
+        x2: this.edge.toSlot.x,
+        y2: this.edge.toSlot.y
+      },
+      this.graph.get('drection')
+    )
+    edgePath.setAttribute('d', path.line)
+    edgeWrapperPath.setAttribute('d', path.line)
+    arrowPath.setAttribute('d', path.arrow)
+  }
+}

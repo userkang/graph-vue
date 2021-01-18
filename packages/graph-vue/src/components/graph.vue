@@ -1,12 +1,13 @@
 <template>
-  <div
-    class="graph-content-wrap"
-    ref="svg"
-    @dragover="e => e.preventDefault()"
-    @drop="handleDrop"
-    @contextmenu="e => e.preventDefault()"
-  >
-    <!-- <svg
+  <div class="graph-content-wrap">
+    <div
+      class="graph-content-wrap"
+      ref="svg"
+      @dragover="e => e.preventDefault()"
+      @drop="handleDrop"
+      @contextmenu="e => e.preventDefault()"
+    >
+      <!-- <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
@@ -27,10 +28,11 @@
         :d="brushPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
-    </svg>
+    </svg> -->
+    </div>
 
     <ToolBox v-if="graph" />
-    <Menu v-if="graph"></Menu> -->
+    <Menu v-if="graph" />
   </div>
 </template>
 

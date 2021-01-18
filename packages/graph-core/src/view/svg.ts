@@ -6,6 +6,7 @@ import NewEdge from './newEdge'
 import Arrow from './arrow'
 import { insertCss } from './util/dom'
 import content from './css/index'
+import Brushing from './brushing'
 
 export default class Svg extends Element {
   container!: HTMLElement
@@ -19,6 +20,23 @@ export default class Svg extends Element {
     insertCss(content)
     this.initGroup()
     this.initNewEdge()
+    this.initBrushing()
+    this.initHook()
+  }
+
+  initHook() {
+    this.addEvent('afterzoom', this.updateTransform)
+    this.addEvent('aftertranslate', this.updateTransform)
+  }
+
+  updateTransform() {
+    const rootGroup = this.get('rootGroup')
+    const zoom = this.graph.getZoom()
+    const translate = this.graph.getTranslate()
+    rootGroup.el.setAttribute(
+      'style',
+      `transform: scale(${zoom}) translate3D(${translate.x}px, ${translate.y}px, 0)`
+    )
   }
 
   draw() {
@@ -35,7 +53,7 @@ export default class Svg extends Element {
   initGroup() {
     const rootGroup = this.addGroup({
       class: 'root-group',
-      transform: 'matrix(1,0,0,1,0,0)'
+      'transform-origin': 'center'
     })
     const edgeGroup = rootGroup.addGroup({
       class: 'edge-group'
@@ -49,14 +67,19 @@ export default class Svg extends Element {
   }
 
   initNewEdge() {
-    const newEdge = new NewEdge()
-    const arrow = new Arrow()
+    const newEdge = new NewEdge(this.graph)
+    const arrow = new Arrow(this.graph)
     const rootGroup = this.get('rootGroup')
     const newEdgeGroup = rootGroup.addGroup({
       class: 'new-edge-group'
     })
     newEdgeGroup.add(newEdge)
     newEdgeGroup.add(arrow)
+  }
+
+  initBrushing() {
+    const brushing = new Brushing(this.graph)
+    this.add(brushing)
   }
 
   addGroup(attrs) {

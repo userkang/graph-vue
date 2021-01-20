@@ -64,7 +64,8 @@ export default class DragNode extends Base {
         item.updatePosition(posX, posY)
       })
 
-      this.graph.emit('dragingnode', this.moveNode)
+      const moveNodeModel = this.moveNode.map(item => item.model)
+      this.graph.emit('dragingnode', moveNodeModel)
     }
 
     this.startX = x

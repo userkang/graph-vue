@@ -47,14 +47,16 @@ export default class Node extends Element {
 
   initHook() {
     this.addEvent('dragingnode', this.updateTransform)
-    this.addEvent('afterdragnode', this.transform)
+    this.addEvent('afterdragnode', this.updateTransform)
     this.addEvent('afterlayout', this.transform)
     this.addEvent('nodeselectchange', this.updateSelect)
   }
 
-  updateTransform(moveNode: INode[]) {
-    const node = moveNode.find(item => item.id === this.node.id)
-    if (node) {
+  updateTransform(moveNodes: INodeModel[]) {
+    const nodeModel = moveNodes.find(item => String(item.id) === this.node.id)
+
+    if (nodeModel) {
+      const node = this.graph.findNode(nodeModel.id)
       this.node = node
       this.transform()
     }

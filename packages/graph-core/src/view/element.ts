@@ -17,7 +17,7 @@ export default abstract class Element extends Base {
   abstract draw()
 
   createDom(type: string, attrs?: { [key: string]: string }) {
-    const el = createSVGElement(type) as SVGSVGElement
+    const el = createSVGElement(type) as SVGAElement
 
     this.set('el', el)
 

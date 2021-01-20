@@ -50,6 +50,7 @@ export default class Node extends Element {
     this.addEvent('afterdragnode', this.updateTransform)
     this.addEvent('afterlayout', this.transform)
     this.addEvent('nodeselectchange', this.updateSelect)
+    this.addEvent('brushing', this.updateSelect)
   }
 
   updateTransform(moveNodes: INodeModel[]) {
@@ -73,10 +74,9 @@ export default class Node extends Element {
     })
   }
 
-  updateSelect(selelctNodes: INodeModel[]) {
-    const node = selelctNodes.find(item => String(item.id) === this.node.id)
+  updateSelect() {
     const div = this.get('div')
-    if (node) {
+    if (this.node.hasState('selected')) {
       div.classList.add('graph-node-active')
     } else {
       div.classList.remove('graph-node-active')

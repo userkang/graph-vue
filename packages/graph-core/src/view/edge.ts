@@ -1,4 +1,4 @@
-import { IEdge, INode, IEdgeModel, INodeModel } from '../types'
+import { IEdge, INodeModel } from '../types'
 import Element from './element'
 import Graph from '../controller/graph'
 import { calculateCurve } from './util/util'
@@ -59,11 +59,10 @@ export default class Node extends Element {
     }
   }
 
-  updateSelect(selectEdges: IEdgeModel[]) {
-    const edge = selectEdges.find(item => String(item.id) === this.edge.id)
+  updateSelect() {
     const edgePath = this.get('edgePath')
     const arrowPath = this.get('arrowPath')
-    if (edge) {
+    if (this.edge.hasState('selected')) {
       edgePath.classList.add('graph-edge-active')
       arrowPath.classList.add('graph-arrow-active')
     } else {

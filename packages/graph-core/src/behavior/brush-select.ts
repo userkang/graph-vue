@@ -89,6 +89,8 @@ export default class BrushSelect extends Base {
       range.endY
     )
 
+    item.clearState('selected')
+
     if (item.y + item.height < startY) {
       return false
     } else if (item.y > endY) {

@@ -21,7 +21,7 @@ export default class ClickSelect extends Base {
       return
     }
 
-    this.resetSelect(false, true)
+    this.resetEdgeSelect()
     const node = this.graph.findNode(id)
     node.setState('selected')
     this.graph.emit('nodeselectchange', [node.model])
@@ -35,27 +35,37 @@ export default class ClickSelect extends Base {
       return
     }
 
-    this.resetSelect(true, false)
+    this.resetNodeSelect()
     const edge = this.graph.findEdge(id)
     edge.setState('selected')
     this.graph.emit('edgeselectchange', [edge.model])
   }
 
   clickSvg(e: MouseEvent) {
-    this.resetSelect(true, true)
+    this.resetNodeSelect()
+    this.resetEdgeSelect()
   }
 
-  resetSelect(resetNodes = false, resetEdges = false) {
+  resetNodeSelect() {
     const nodes = this.graph.getNodes()
-    const edges = this.graph.getEdges()
     const selectedNodes = []
-    const selectedEdges = []
+
     nodes.forEach(node => {
       if (node.hasState('selected')) {
         selectedNodes.push(node)
         node.clearState('selected')
       }
     })
+
+    if (selectedNodes.length) {
+      this.graph.emit('nodeselectchange', [])
+    }
+  }
+
+  resetEdgeSelect() {
+    const edges = this.graph.getEdges()
+    const selectedEdges = []
+
     edges.forEach(edge => {
       if (edge.hasState('selected')) {
         selectedEdges.push(edge)
@@ -63,11 +73,7 @@ export default class ClickSelect extends Base {
       }
     })
 
-    if (selectedNodes.length && resetNodes) {
-      this.graph.emit('nodeselectchange', [])
-    }
-
-    if (selectedEdges.length && resetEdges) {
+    if (selectedEdges.length) {
       this.graph.emit('edgeselectchange', [])
     }
   }

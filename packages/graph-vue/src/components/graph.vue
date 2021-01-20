@@ -7,7 +7,7 @@
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
     >
-      <!-- <svg
+      <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
@@ -28,7 +28,7 @@
         :d="brushPath"
         style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
       />
-    </svg> -->
+    </svg>
     </div>
 
     <ToolBox v-if="graph" />

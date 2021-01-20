@@ -62,10 +62,13 @@ export default class Node extends Element {
   updateSelect(selectEdges: IEdgeModel[]) {
     const edge = selectEdges.find(item => String(item.id) === this.edge.id)
     const edgePath = this.get('edgePath')
+    const arrowPath = this.get('arrowPath')
     if (edge) {
       edgePath.classList.add('graph-edge-active')
+      arrowPath.classList.add('graph-arrow-active')
     } else {
       edgePath.classList.remove('graph-edge-active')
+      arrowPath.classList.remove('graph-arrow-active')
     }
   }
 

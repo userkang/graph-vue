@@ -10,8 +10,16 @@ export default abstract class Element extends Base {
     return this.get('el')
   }
 
-  get parent() {
+  get parent(): Element {
     return this.get('parent')
+  }
+
+  get children(): Element[] {
+    if (this.get('children')) {
+      return this.get('children')
+    } else {
+      return []
+    }
   }
 
   abstract draw()
@@ -32,11 +40,21 @@ export default abstract class Element extends Base {
 
   add(element: Element) {
     element.set('parent', this)
+    const children = this.children
+    children.push(element)
+    this.set('children', children)
     this.el.appendChild(element.el)
   }
 
-  remove(element: Element) {
-    element.destory()
-    this.el.removeChild(element.el)
+  remove(element?: Element) {
+    if (element) {
+      element.destory()
+      this.el.removeChild(element.el)
+    } else {
+      this.children.forEach(item => {
+        item.destory()
+      })
+      this.el.innerHTML = ''
+    }
   }
 }

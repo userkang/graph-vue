@@ -7,28 +7,29 @@
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
     >
-      <svg
-      version="1.1"
-      xmlns="http://www.w3.org/2000/svg"
-      width="100%"
-      height="100%"
-    >
-      <g
-        :style="{
-          transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
-          transformOrigin: 'center'
-        }"
-        v-if="graph"
+    <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
+      <!-- <svg
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        width="100%"
+        height="100%"
       >
-        <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
-        <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
-        <NewEdge />
-      </g>
-      <path
-        :d="brushPath"
-        style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
-      />
-    </svg>
+        <g
+          :style="{
+            transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
+            transformOrigin: 'center'
+          }"
+          v-if="graph"
+        >
+          <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
+          <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
+          <NewEdge />
+        </g>
+        <path
+          :d="brushPath"
+          style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
+        />
+      </svg> -->
     </div>
 
     <ToolBox v-if="graph" />

@@ -47,6 +47,16 @@ export default class Graph extends EventEmitter {
     this.set('svg', svg)
   }
 
+  private clearItem() {
+    // 清除原有节点和边
+    if (this.get('isRender')) {
+      const nodeGroup = this.get('svg').get('nodeGroup')
+      const edgeGroup = this.get('svg').get('edgeGroup')
+      nodeGroup.remove()
+      edgeGroup.remove()
+    }
+  }
+
   private initController() {
     this.viewController = new ViewController(this)
     this.layoutController = new LayoutController(this)
@@ -260,6 +270,8 @@ export default class Graph extends EventEmitter {
   data(data: IDataModel) {
     this.set('nodes', [])
     this.set('edges', [])
+
+    this.clearItem()
 
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
     data.nodes.forEach((node: INodeModel) => {

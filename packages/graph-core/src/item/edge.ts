@@ -66,6 +66,30 @@ export default class Edge extends Base {
         return true
       }
     })
+
+    if (!this.fromSlot) {
+      this.set(
+        'fromSlot',
+        fromNode.slots.find(item => {
+          if (item.type === 'out') {
+            item.setState('linked')
+            return true
+          }
+        })
+      )
+    }
+
+    if (!this.toSlot) {
+      this.set(
+        'toSlot',
+        toNode.slots.find(item => {
+          if (item.type === 'in') {
+            item.setState('linked')
+            return true
+          }
+        })
+      )
+    }
   }
 
   public render(graph: Graph) {

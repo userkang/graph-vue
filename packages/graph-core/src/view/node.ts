@@ -19,7 +19,7 @@ export default class Node extends Element {
     const div = this.createDom('div', {
       class: 'graph-node'
     })
-    div.innerHTML = this.node.model.nodeName as string
+    div.innerHTML = this.node.model.label as string
     const foreignObject = this.createDom('foreignObject', {
       transform: `translate(${this.node.x}, ${this.node.y})`,
       width: `${this.node.width}`,

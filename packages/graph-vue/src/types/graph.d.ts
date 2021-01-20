@@ -23,7 +23,7 @@ declare interface ISlot {
 declare interface INodeType {
   id: number
   // 组件名称
-  nodeName: string
+  label: string
   width?: number
   height?: number
   // 节点X坐标

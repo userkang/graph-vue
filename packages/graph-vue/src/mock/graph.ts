@@ -2,7 +2,7 @@ export const dagMock = {
   nodes: [
     {
       id: 1,
-      nodeName: '工具栏悬浮有说明',
+      label: '工具栏悬浮有说明',
       x: 455,
       y: 122.5,
       width: 200,
@@ -24,7 +24,7 @@ export const dagMock = {
     },
     {
       id: 2,
-      nodeName: '拖动添加组件',
+      label: '拖动添加组件',
       x: 540,
       y: 407.5,
       width: 210,
@@ -46,7 +46,7 @@ export const dagMock = {
     },
     {
       id: 3,
-      nodeName: '拖动插槽连线',
+      label: '拖动插槽连线',
       x: 641,
       y: 284.5,
       width: 150,
@@ -64,7 +64,7 @@ export const dagMock = {
     },
     {
       id: 4,
-      nodeName: '右键可删除',
+      label: '右键可删除',
       x: 297,
       y: 522.5,
       slots: [
@@ -80,7 +80,7 @@ export const dagMock = {
     },
     {
       id: 5,
-      nodeName: '交互可配置',
+      label: '交互可配置',
       x: 381,
       y: 234.5,
       slots: [
@@ -96,7 +96,7 @@ export const dagMock = {
     },
     {
       id: 6,
-      nodeName: '交互可配置',
+      label: '交互可配置',
       x: 531,
       y: 640.5,
       slots: [
@@ -112,7 +112,7 @@ export const dagMock = {
     },
     {
       id: 7,
-      nodeName: '交互可配置',
+      label: '交互可配置',
       x: 280,
       y: 413.5,
       slots: [

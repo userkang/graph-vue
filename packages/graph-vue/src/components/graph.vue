@@ -7,7 +7,7 @@
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
     >
-    <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
+      <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
       <!-- <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
@@ -99,9 +99,10 @@ export default class GraphContent extends Vue {
     const point = this.graph.getPointByClient(x, y)
 
     this.graph.addNode({
-      nodeName: this.dragingInfo.component.componentName,
+      label: this.dragingInfo.component.componentName,
       x: point.x,
-      y: point.y
+      y: point.y,
+      slots: [{ type: 'in' }, { type: 'out' }, { type: 'out' }]
     })
   }
 

@@ -64,12 +64,25 @@ export default class CreateEdge extends Base {
       // 这里要传 model 下的 id，保证用户数据类型正确
       // 当 model 下无 id 时，再取自生成 id
       const node = this.graph.findNode(slot.nodeId)
-      this.graph.addEdge({
+
+      const edgeInfo = {
         fromNodeId: this.fromNode.model.id || this.fromNode.id,
-        toNodeId: node.model.id,
-        fromSlotId: this.fromSlot.model.id || this.fromSlot.id,
-        toSlotId: slot.model.id
-      })
+        toNodeId: node.model.id
+      }
+
+      if (this.fromNode.model.slots) {
+        Object.assign(edgeInfo, {
+          fromSlotId: this.fromSlot.model.id || this.fromSlot.id
+        })
+      }
+
+      if (node.model.slots) {
+        Object.assign(edgeInfo, {
+          toSlotId: slot.model.id
+        })
+      }
+
+      this.graph.addEdge(edgeInfo)
     }
 
     this.setResetEdge()

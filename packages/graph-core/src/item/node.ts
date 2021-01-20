@@ -96,7 +96,7 @@ export default class Node extends Base {
         }
       })
     } else {
-      model.slots = []
+      // model.slots = []
       inSlots = [{}]
       outSlots = [{}]
     }
@@ -143,8 +143,8 @@ export default class Node extends Base {
     this.get('slots').push(slot)
 
     if (isModelEmpty) {
-      slot.model.type = type
-      ;(this.model.slots as ISlotModel[]).push(slot.model)
+      // slot.model.type = type
+      // ;(this.model.slots as ISlotModel[]).push(slot.model)
     }
   }
 

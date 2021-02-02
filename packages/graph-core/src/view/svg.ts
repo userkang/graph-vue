@@ -43,7 +43,8 @@ export default class Svg extends Element {
     const el = this.createDom('svg', {
       width: '100%',
       height: '100%',
-      xmlns: 'http://www.w3.org/2000/svg'
+      xmlns: 'http://www.w3.org/2000/svg',
+      class: 'graph-svg'
     })
     this.container.innerHTML = ''
     el.id = this.id
@@ -52,14 +53,14 @@ export default class Svg extends Element {
 
   initGroup() {
     const rootGroup = this.addGroup({
-      class: 'root-group',
+      class: 'graph-root-group',
       'transform-origin': 'center'
     })
     const edgeGroup = rootGroup.addGroup({
-      class: 'edge-group'
+      class: 'graph-edge-group'
     })
     const nodeGroup = rootGroup.addGroup({
-      class: 'node-group'
+      class: 'graph-node-group'
     })
     this.set('rootGroup', rootGroup)
     this.set('edgeGroup', edgeGroup)
@@ -71,7 +72,7 @@ export default class Svg extends Element {
     const arrow = new Arrow(this.graph)
     const rootGroup = this.get('rootGroup')
     const newEdgeGroup = rootGroup.addGroup({
-      class: 'new-edge-group'
+      class: 'graph-new-edge-group'
     })
     newEdgeGroup.add(newEdge)
     newEdgeGroup.add(arrow)

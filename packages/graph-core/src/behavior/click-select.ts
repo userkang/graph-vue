@@ -22,6 +22,7 @@ export default class ClickSelect extends Base {
     }
 
     this.resetEdgeSelect()
+    selectedNodes.forEach(item => item.clearState('selected'))
     const node = this.graph.findNode(id)
     node.setState('selected')
     this.graph.emit('nodeselectchange', [node.model])
@@ -36,6 +37,7 @@ export default class ClickSelect extends Base {
     }
 
     this.resetNodeSelect()
+    selectedEdges.forEach(item => item.clearState('selected'))
     const edge = this.graph.findEdge(id)
     edge.setState('selected')
     this.graph.emit('edgeselectchange', [edge.model])

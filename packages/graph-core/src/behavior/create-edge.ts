@@ -87,14 +87,12 @@ export default class CreateEdge extends Base {
 
     this.setResetEdge()
     this.graph.emit('addingedge', null)
-    this.graph.emit('afteraddedge')
   }
 
   mouseUp() {
     if (this.isMoveing) {
       this.setResetEdge()
       this.graph.emit('addingedge', null)
-      this.graph.emit('afteraddedge')
     }
   }
 

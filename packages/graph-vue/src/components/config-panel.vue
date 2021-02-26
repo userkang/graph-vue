@@ -94,19 +94,6 @@ export default class ConfigPanel extends Vue {
     })
   }
 
-  // get content() {
-  //   return JSON.stringify(this.graphConfigState.data, null, ' ')
-  // }
-
-  // set content(v) {
-  //   try {
-  //     const content = JSON.parse(v)
-  //     ;(this.graphState.graph as Graph).data(content)
-  //   } catch (error) {
-  //     console.log('数据格式不正确')
-  //   }
-  // }
-
   beforeDestory() {
     this.editor.destory()
   }

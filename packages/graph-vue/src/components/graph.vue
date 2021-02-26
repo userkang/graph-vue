@@ -121,7 +121,7 @@ export default class GraphContent extends Vue {
       action: this.configState.action
     })
     this.initCustomHooks()
-    this.graph.data(this.configState.data as IDataModel)
+    this.graph.data(this.configState.data)
     GraphStore.state.graph = this.graph
   }
 
@@ -231,7 +231,7 @@ export default class GraphContent extends Vue {
   @Watch('configState.drection')
   handleConfigChange(v: string) {
     this.graph.set('drection', v)
-    this.graph.data(this.configState.data as IDataModel)
+    this.graph.data(this.configState.data)
     this.graph.layout()
   }
 

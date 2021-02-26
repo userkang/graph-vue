@@ -1,7 +1,7 @@
 import Base from './base'
 import Slot from './slot'
 import { uniqueId } from '../util/utils'
-import { INodeModel, ISlot, IEdge, ISlotModel } from '../types'
+import { INodeModel, ISlot, IEdge, ISlotModel, INode } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
 
@@ -14,14 +14,18 @@ export default class Node extends Base {
       this.get('model').id = id
     }
 
+    this.set('cfg', cfg)
+
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
-    this.set('drection', cfg.drection)
-    this.set('width', model.width || cfg.width)
-    this.set('height', model.height || cfg.height)
+    // this.set('drection', cfg.drection)
+    // this.set('width', model.width || cfg.width)
+    // this.set('height', model.height || cfg.height)
 
     this.set('slots', [])
     // 保存与节点相关的边
     this.set('edges', [])
+
+    this.init()
 
     if (model.x && model.y) {
       this.setSlotsPoint()
@@ -52,6 +56,19 @@ export default class Node extends Base {
     return this.get('edges')
   }
 
+  public init() {
+    const cfg = this.get('cfg')
+    const model = this.model
+
+    this.set('drection', cfg.drection)
+    this.set('width', model.width || cfg.width)
+    this.set('height', model.height || cfg.height)
+
+    // if (model.x && model.y) {
+    //   this.setSlotsPoint()
+    // }
+  }
+
   public addEdge(edge: IEdge) {
     this.get('edges').push(edge)
   }
@@ -79,6 +96,20 @@ export default class Node extends Base {
     })
   }
 
+  public update(model: INodeModel) {
+    const view = this.get('view')
+    if (model.x || model.y) {
+      const x = model.x ? model.x : this.x
+      const y = model.y ? model.y : this.y
+      this.updatePosition(x, y)
+    }
+    this.set('model', Object.assign(this.model, model))
+    console.log(JSON.stringify(this.model))
+    this.init()
+
+    view.update(this)
+  }
+
   public setSlotsPoint() {
     const model = this.model
     const width = this.get('width')
@@ -96,7 +127,6 @@ export default class Node extends Base {
         }
       })
     } else {
-      // model.slots = []
       inSlots = [{}]
       outSlots = [{}]
     }
@@ -132,8 +162,6 @@ export default class Node extends Base {
   }
 
   private setSlot(item: ISlotModel, x: number, y: number, type: string) {
-    const isModelEmpty = !Object.keys(item).length
-
     const slot = new Slot(item, {
       x,
       y,
@@ -141,11 +169,6 @@ export default class Node extends Base {
       nodeId: this.id
     })
     this.get('slots').push(slot)
-
-    if (isModelEmpty) {
-      // slot.model.type = type
-      // ;(this.model.slots as ISlotModel[]).push(slot.model)
-    }
   }
 
   public render(graph: Graph) {

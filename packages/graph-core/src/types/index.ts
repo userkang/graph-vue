@@ -24,6 +24,8 @@ export interface INodeModel {
   id?: string
   width?: number
   height?: number
+  x?: number
+  y?: number
   slots?: ISlotModel[]
   [key: string]: unknown
 }

@@ -40,6 +40,7 @@ export default class Graph extends EventEmitter {
     }
 
     this.initController()
+    window.g = this
   }
 
   private render() {
@@ -152,6 +153,11 @@ export default class Graph extends EventEmitter {
     this.emit('afterdeletenode', node.model)
 
     return node
+  }
+
+  updateNode(id: string, model: INodeModel) {
+    const node = this.findNode(id)
+    node.update(model)
   }
 
   deleteEdge(id: string, stack: boolean = true): IEdge {

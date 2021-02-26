@@ -82,4 +82,18 @@ export default class Node extends Element {
       div.classList.remove('graph-node-active')
     }
   }
+
+  updateSlot() {}
+
+  update(node: INode) {
+    this.node = node
+    const foreignObject = this.get('foreignObject')
+    const div = this.get('div')
+    foreignObject.setAttribute('width', this.node.width)
+    foreignObject.setAttribute('height', this.node.height)
+    div.innerHTML = this.node.model.label as string
+
+    this.updateSlot()
+    this.transform()
+  }
 }

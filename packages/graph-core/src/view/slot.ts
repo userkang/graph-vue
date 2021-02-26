@@ -59,9 +59,11 @@ export default class Slot extends Element {
     this.addEvent('beforeaddedge', this.drawStyle)
     this.addEvent('datachange', this.drawStyle)
     this.addEvent('afteraddedge', this.drawStyle)
+    this.addEvent('addingedge', this.drawStyle)
   }
 
   updateTransform() {
+    console.log(this.slot.x)
     const circle = this.get('circle')
     circle.setAttribute(
       'transform',

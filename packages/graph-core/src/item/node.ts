@@ -17,15 +17,13 @@ export default class Node extends Base {
     this.set('cfg', cfg)
 
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
-    // this.set('drection', cfg.drection)
-    // this.set('width', model.width || cfg.width)
-    // this.set('height', model.height || cfg.height)
+    this.set('drection', cfg.drection)
+    this.set('width', model.width || cfg.width)
+    this.set('height', model.height || cfg.height)
 
     this.set('slots', [])
     // 保存与节点相关的边
     this.set('edges', [])
-
-    this.init()
 
     if (model.x && model.y) {
       this.setSlotsPoint()
@@ -54,19 +52,6 @@ export default class Node extends Base {
 
   public get edges(): IEdge[] {
     return this.get('edges')
-  }
-
-  public init() {
-    const cfg = this.get('cfg')
-    const model = this.model
-
-    this.set('drection', cfg.drection)
-    this.set('width', model.width || cfg.width)
-    this.set('height', model.height || cfg.height)
-
-    // if (model.x && model.y) {
-    //   this.setSlotsPoint()
-    // }
   }
 
   public addEdge(edge: IEdge) {
@@ -104,9 +89,9 @@ export default class Node extends Base {
       this.updatePosition(x, y)
     }
     this.set('model', Object.assign(this.model, model))
+    this.set('width', this.model.width)
+    this.set('height', this.model.height)
     console.log(JSON.stringify(this.model))
-    this.init()
-
     view.update(this)
   }
 

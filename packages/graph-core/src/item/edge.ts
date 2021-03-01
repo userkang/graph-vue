@@ -92,7 +92,15 @@ export default class Edge extends Base {
     }
   }
 
-  public update() {
+  public update(model?: IEdgeModel) {
+    if (model) {
+      // 不允许更新边的起始和目标节点
+      delete model.fromNodeId
+      delete model.toNodeId
+      delete model.fromSlotId
+      delete model.toSlotId
+      Object.assign(this.model, model)
+    }
     this.setPoint()
   }
 

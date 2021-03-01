@@ -92,7 +92,7 @@ export default class Node extends Base {
       this.updatePosition(x, y)
     }
 
-    this.set('model', Object.assign(this.model, model))
+    Object.assign(this.model, model)
     this.set('width', this.model.width || this.width)
     this.set('height', this.model.height || this.width)
 

@@ -92,6 +92,15 @@ export default class Edge extends Base {
     }
   }
 
+  public update() {
+    this.setPoint()
+  }
+
+  public refresh() {
+    const view = this.get('view')
+    view.update()
+  }
+
   public render(graph: Graph) {
     const view = new edgeView(this, graph)
     this.set('view', view)

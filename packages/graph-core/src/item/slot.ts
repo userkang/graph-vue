@@ -33,4 +33,9 @@ export default class Slot extends Base {
   get nodeId(): string {
     return this.get('nodeId')
   }
+
+  update(x: number, y: number) {
+    this.set('x', x)
+    this.set('y', y)
+  }
 }

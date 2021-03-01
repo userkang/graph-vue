@@ -71,6 +71,10 @@ export default class Node extends Element {
     }
   }
 
+  update() {
+    this.setPath()
+  }
+
   setPath() {
     const edgePath = this.get('edgePath')
     const edgeWrapperPath = this.get('edgeWrapperPath')

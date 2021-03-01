@@ -63,7 +63,6 @@ export default class Slot extends Element {
   }
 
   updateTransform() {
-    console.log(this.slot.x)
     const circle = this.get('circle')
     circle.setAttribute(
       'transform',

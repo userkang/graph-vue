@@ -81,18 +81,85 @@ export default class Node extends Base {
     })
   }
 
+  /**
+   * 更新节点数据信息
+   * @param model
+   */
   public update(model: INodeModel) {
-    const view = this.get('view')
     if (model.x || model.y) {
       const x = model.x ? model.x : this.x
       const y = model.y ? model.y : this.y
       this.updatePosition(x, y)
     }
+
     this.set('model', Object.assign(this.model, model))
-    this.set('width', this.model.width)
-    this.set('height', this.model.height)
-    console.log(JSON.stringify(this.model))
+    this.set('width', this.model.width || this.width)
+    this.set('height', this.model.height || this.width)
+
+    this.updateSlots()
+
+    this.edges.forEach(edge => {
+      edge.update()
+    })
+  }
+
+  /**
+   * 刷新自渲染节点视图
+   */
+  public refresh() {
+    const view = this.get('view')
     view.update(this)
+
+    this.edges.forEach(edge => {
+      edge.refresh()
+    })
+  }
+
+  /**
+   * 更新节点 slot 位置信息
+   */
+  public updateSlots() {
+    const inSlots: ISlot[] = []
+    const outSlots: ISlot[] = []
+
+    this.slots.forEach(item => {
+      if (item.type && item.type === 'out') {
+        outSlots.push(item)
+      } else {
+        inSlots.push(item)
+      }
+    })
+
+    const inSlotLen = inSlots.length
+    const outSlotLen = outSlots.length
+
+    const width = this.get('width')
+    const height = this.get('height')
+    if (this.get('drection') === 'TB') {
+      inSlots.forEach((item, index) => {
+        const x = this.x + (width / (inSlotLen + 1)) * (index + 1)
+        const y = this.y
+        item.update(x, y)
+      })
+
+      outSlots.forEach((item, index) => {
+        const x = this.x + (width / (outSlotLen + 1)) * (index + 1)
+        const y = this.y + height
+        item.update(x, y)
+      })
+    } else {
+      inSlots.forEach((item, index) => {
+        const x = this.x
+        const y = this.y + (height / (inSlotLen + 1)) * (index + 1)
+        item.update(x, y)
+      })
+
+      outSlots.forEach((item, index) => {
+        const x = this.x + width
+        const y = this.y + (height / (outSlotLen + 1)) * (index + 1)
+        item.update(x, y)
+      })
+    }
   }
 
   public setSlotsPoint() {
@@ -112,6 +179,7 @@ export default class Node extends Base {
         }
       })
     } else {
+      // 默认一进一出
       inSlots = [{}]
       outSlots = [{}]
     }
@@ -156,6 +224,10 @@ export default class Node extends Base {
     this.get('slots').push(slot)
   }
 
+  /**
+   * 节点自渲染
+   * @param graph
+   */
   public render(graph: Graph) {
     const view = new nodeView(this, graph)
     this.set('view', view)

@@ -83,8 +83,6 @@ export default class Node extends Element {
     }
   }
 
-  updateSlot() {}
-
   update(node: INode) {
     this.node = node
     const foreignObject = this.get('foreignObject')
@@ -93,7 +91,6 @@ export default class Node extends Element {
     foreignObject.setAttribute('height', this.node.height)
     div.innerHTML = this.node.model.label as string
 
-    this.updateSlot()
     this.transform()
   }
 }

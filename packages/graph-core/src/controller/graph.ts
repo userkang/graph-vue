@@ -157,12 +157,16 @@ export default class Graph extends EventEmitter {
     const node = this.findNode(id)
     node.update(model)
     this.emit('afternodeupdate', node.model)
+
+    return node
   }
 
   updateEdge(id: string, model: IEdgeModel) {
     const edge = this.findEdge(id)
     edge.update(model)
     this.emit('afteredgeupdate', edge.model)
+
+    return edge
   }
 
   refreshNode(id: string) {

@@ -9,8 +9,18 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel) {
-    const fromNode = this.graph.findNode(item.fromNodeId)
-    const toNode = this.graph.findNode(item.toNodeId)
+    let fromNodeId = item.fromNodeId
+    let toNodeId = item.toNodeId
+    // 如果仅有 slotId，自动补全 nodeId
+    if (item.fromSlotId && !fromNodeId) {
+      fromNodeId = this.graph.findSlot(item.fromSlotId).nodeId
+    }
+    if (item.toSlotId && !toNodeId) {
+      toNodeId = this.graph.findSlot(item.toSlotId).nodeId
+    }
+
+    const fromNode = this.graph.findNode(fromNodeId)
+    const toNode = this.graph.findNode(toNodeId)
     const edge = new Edge(item, fromNode, toNode)
     this.graph.getEdges().push(edge)
 

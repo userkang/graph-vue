@@ -153,7 +153,7 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  updateNode(id: string, model: INodeModel) {
+  updateNode(id: string, model: INodeModel): INode {
     const node = this.findNode(id)
     node.update(model)
     this.emit('afternodeupdate', node.model)
@@ -161,7 +161,7 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  updateEdge(id: string, model: IEdgeModel) {
+  updateEdge(id: string, model: IEdgeModel): IEdge {
     const edge = this.findEdge(id)
     edge.update(model)
     this.emit('afteredgeupdate', edge.model)

@@ -7,7 +7,17 @@ export const dagMock = {
       x: 455,
       y: 122.5,
       width: 200,
-      height: 50
+      height: 50,
+      slots: [
+        {
+          type: 'out',
+          id: 'slot1'
+        },
+        {
+          type: 'out',
+          id: 'slot2'
+        }
+      ]
     },
     {
       id: '2',
@@ -35,7 +45,20 @@ export const dagMock = {
       id: '3',
       label: '拖动插槽连线',
       x: 641,
-      y: 284.5
+      y: 284.5,
+      slots: [
+        {
+          type: 'in',
+          id: 'slot6'
+        },
+        {
+          type: 'in',
+          id: 'slot7'
+        },
+        {
+          type: 'out'
+        }
+      ]
     },
     {
       id: '4',
@@ -77,6 +100,10 @@ export const dagMock = {
     }
   ],
   edges: [
+    // {
+    //   fromSlotId: 'slot2',
+    //   toSlotId: 'slot6'
+    // },
     {
       fromNodeId: '1',
       toNodeId: '5',

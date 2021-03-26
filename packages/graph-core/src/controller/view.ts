@@ -106,9 +106,11 @@ export default class ViewController {
   }
 
   translate(x: number, y: number) {
-    if (this.judgeBoundary(x, y)) {
-      return
-    }
+    // 暂时去掉边界判断
+    // 原因：1、性能考虑 2、在图过长的情况下，会带来图剩余部分显示不全的问题。
+    // if (this.judgeBoundary(x, y)) {
+    //   return
+    // }
 
     this.transform.translateX += x
     this.transform.translateY += y

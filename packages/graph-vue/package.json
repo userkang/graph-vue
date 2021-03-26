@@ -9,7 +9,7 @@
     "test": "echo test"
   },
   "dependencies": {
-    "@datafe/graph-core": "^0.2.9",
+    "@datafe/graph-core": "^0.3.3",
     "axios": "^0.18.0",
     "core-js": "^2.6.11",
     "monaco-editor": "0.21.2",

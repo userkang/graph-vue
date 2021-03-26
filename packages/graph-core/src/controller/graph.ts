@@ -302,12 +302,6 @@ export default class Graph extends EventEmitter {
       this.edgeController.addEdge(edge)
     })
 
-    const edges = this.getEdges()
-    edges.forEach(item => {
-      item.fromSlot.setState('linked')
-      item.toSlot.setState('linked')
-    })
-
     this.emit('datachange')
   }
 

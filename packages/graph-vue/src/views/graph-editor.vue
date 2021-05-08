@@ -41,7 +41,7 @@ interface CopyReturnValue {
 })
 export default class GraphEditor extends Vue {
   created() {
-    GraphStore.getData()
+    // GraphStore.getData()
   }
 }
 </script>

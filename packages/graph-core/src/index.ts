@@ -1,11 +1,11 @@
 import Graph from './controller/graph'
-import Behaivor from './behavior/base'
+import Behavior from './behavior/base'
 
 export * from './types'
 
-export { Graph, Behaivor }
+export { Graph, Behavior }
 
 export default {
   Graph,
-  Behaivor
+  Behavior
 }

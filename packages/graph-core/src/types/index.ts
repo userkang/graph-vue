@@ -64,3 +64,12 @@ export interface IDataStack {
   nodes?: INodeModel[]
   edges?: IEdgeModel[]
 }
+
+export interface ILayout {
+  align?: 'UL' | 'UR' | 'DL' | 'DR'
+  nodesep?: number
+  edgesep?: number
+  ranksep?: number
+  marginx?: number
+  marginy?: number
+}

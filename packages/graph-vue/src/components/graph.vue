@@ -22,12 +22,7 @@
           v-if="graph"
         >
           <Edge v-for="item in edges" :key="item.id" :edge="item" />
-          <Node
-            v-for="item in nodes"
-            :key="item.id"
-            :node="item"
-            :selectedNodes="selectedNodes"
-          />
+          <Node v-for="item in nodes" :key="item.id" :node="item" />
           <NewEdge />
         </g>
         <path
@@ -91,8 +86,6 @@ export default class GraphContent extends Vue {
   }
   brushPath = ''
 
-  selectedNodes = []
-
   get dragingInfo() {
     return this.componentState.dragingInfo
   }
@@ -139,7 +132,6 @@ export default class GraphContent extends Vue {
       aftertranslate: 'aftertranslate',
       afterzoom: 'afterzoom',
       brushing: 'brushing',
-      showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
@@ -187,8 +179,6 @@ export default class GraphContent extends Vue {
   }
 
   nodeselectchange(nodes: INodeModel[]) {
-    this.selectedNodes = nodes
-
     console.log('nodeselectchange', nodes)
   }
 

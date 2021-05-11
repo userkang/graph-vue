@@ -10,22 +10,23 @@ export default class LayoutController {
     this.graph = graph
   }
 
-  init() {
+  init(options) {
     const rankdir = this.graph.get('drection') || 'TB'
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
       width: 0,
       height: 0,
-      rankdir
+      rankdir,
+      ...options
     })
     this.dagre.setDefaultEdgeLabel(() => {
       return {}
     })
   }
 
-  layout() {
-    this.init()
+  layout(options) {
+    this.init(options)
 
     const nodes = this.graph.getNodes()
     const edges = this.graph.getEdges()

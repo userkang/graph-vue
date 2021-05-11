@@ -39,9 +39,6 @@ export default class Node extends Vue {
   })
   node!: any
 
-  @Prop()
-  selectedNodes!: INodeType[]
-
   get graph() {
     return (this.$parent as GraphContent).graph
   }

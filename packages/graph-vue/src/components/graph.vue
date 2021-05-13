@@ -16,7 +16,7 @@
       >
         <g
           :style="{
-            transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
+            transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
             transformOrigin: 'center'
           }"
           v-if="graph"

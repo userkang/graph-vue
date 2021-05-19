@@ -53,8 +53,8 @@ export default class BrushSelect extends Base {
 
   onMouseUp(e: MouseEvent) {
     if (this.moving) {
-      const before = this.beforeSelectedNodes.map(item => item.id)
-      const after = this.afterSelectedNodes.map(item => item.id)
+      const before = this.beforeSelectedNodes.map(item => item.id).toString()
+      const after = this.afterSelectedNodes.map(item => item.id).toString()
       if (String(before) !== String(after)) {
         const nodeModels = this.afterSelectedNodes.map(item => item.model)
         this.graph.emit('nodeselectchange', nodeModels)

@@ -68,14 +68,14 @@ export default class BrushSelect extends Base {
   checkSelected(startX: number, startY: number, endX: number, endY: number) {
     // 处理不同方向框选的情况
     // 将不同方向的框选框都格式化为从左上->右下
-    const range = {
-      startX: Math.min(startX, endX),
-      startY: Math.min(startY, endY),
-      endX: Math.max(startX, endX),
-      endY: Math.max(startY, endY)
+    if (startX > endX) {
+      ;[startX, endX] = [endX, startX]
     }
-    const leftTop = this.graph.getPointByClient(range.startX, range.startY)
-    const rightBottom = this.graph.getPointByClient(range.endX, range.endY)
+    if (startY > endY) {
+      ;[startY, endY] = [endY, startY]
+    }
+    const leftTop = this.graph.getPointByClient(startX, startY)
+    const rightBottom = this.graph.getPointByClient(endX, endY)
     const effectRange = {
       startX: leftTop.x,
       startY: leftTop.y,

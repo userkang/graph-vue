@@ -8,7 +8,8 @@
   "scripts": {
     "start": "yarn --cwd packages/graph-vue start",
     "build": "yarn --cwd packages/graph-vue && export NODE_ENV=production && vue-cli-service build",
-    "biild:doc": "yarn --cwd packages/docs typedoc",
+    "docs:build": "yarn --cwd packages/docs typedoc",
+    "docs:deploy": "yarn --cwd packages/docs node deployDocs.js",
     "vuepress": "yarn --cwd packages/docs vuepress"
   },
   "dependencies": {},

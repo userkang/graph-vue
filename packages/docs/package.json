@@ -1,0 +1,9 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "devDependencies": {
+    "typedoc": "^0.20.36"
+  }
+}

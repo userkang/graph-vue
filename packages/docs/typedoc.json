@@ -1,0 +1,5 @@
+{
+  "entryPoints": ["../graph-core/src/index.ts"],
+  "tsconfig": "../graph-core/tsconfig.json",
+  "out": "docs"
+}

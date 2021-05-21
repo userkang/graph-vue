@@ -86,6 +86,8 @@ export default class ViewController {
 
   // 将g移动到画布中心区域
   translateToCenter() {
+    // 在移动前先更新 svgInfo 信息，比较视图滚动后，svgInfo 需要重新获取
+    this.resize()
     setTimeout(() => {
       // 这里需要到下一个周期获取g变换后的位置信息
       const transformInfo = this.getGroupBox()

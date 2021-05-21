@@ -30,7 +30,6 @@
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
       </svg>
-      <!-- <div id="line" class="line"></div> -->
     </div>
 
     <ToolBox v-if="graph" />
@@ -86,8 +85,6 @@ export default class GraphContent extends Vue {
     translateY: 0
   }
   brushPath = ''
-
-  graphHeight = '500px'
 
   get dragingInfo() {
     return this.componentState.dragingInfo

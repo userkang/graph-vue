@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "scripts": {
+    "typedoc": "typedoc"
+  },
   "devDependencies": {
     "typedoc": "^0.20.36"
   }

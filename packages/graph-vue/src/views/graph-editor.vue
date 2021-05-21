@@ -65,6 +65,7 @@ export default class GraphEditor extends Vue {
     color: #eee;
     text-decoration: none;
     margin-right: 10px;
+    user-select: none;
   }
 }
 .main-wrap {

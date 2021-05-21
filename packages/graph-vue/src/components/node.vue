@@ -8,6 +8,7 @@
       :data-id="node.id"
     >
       <div
+        xmlns="http://www.w3.org/1999/xhtml"
         class="graph-node"
         :style="{
           'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',

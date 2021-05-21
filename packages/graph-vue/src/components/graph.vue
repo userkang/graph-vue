@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-content-wrap">
+  <div class="graph-main">
     <div
       class="graph-content-wrap"
       ref="svg"
@@ -16,7 +16,7 @@
       >
         <g
           :style="{
-            transform: `scale(${transform.scale}) translate3D(${transform.translateX}px, ${transform.translateY}px, 0)`,
+            transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
             transformOrigin: 'center'
           }"
           v-if="graph"
@@ -30,6 +30,7 @@
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
       </svg>
+      <!-- <div id="line" class="line"></div> -->
     </div>
 
     <ToolBox v-if="graph" />
@@ -85,6 +86,8 @@ export default class GraphContent extends Vue {
     translateY: 0
   }
   brushPath = ''
+
+  graphHeight = '500px'
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -255,11 +258,17 @@ export default class GraphContent extends Vue {
     background: #fff;
   }
 }
-.line {
+.graph-main {
   width: 100%;
-  height: 1px;
-  background: #d9dadd;
+  height: 100%;
+  position: relative;
+}
+.line {
   position: absolute;
-  top: 43px;
+  bottom: 0;
+  width: 100%;
+  height: 8px;
+  background: #d9dadd;
+  background: red;
 }
 </style>

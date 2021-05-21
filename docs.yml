@@ -1,0 +1,4 @@
+remove: false
+docs_dir: ./packages/docs
+builder:
+ name: html

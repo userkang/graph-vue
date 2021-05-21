@@ -35,7 +35,7 @@ export default class Svg extends Element {
     const translate = this.graph.getTranslate()
     rootGroup.el.setAttribute(
       'style',
-      `transform: scale(${zoom}) translate3D(${translate.x}px, ${translate.y}px, 0)`
+      `transform: scale(${zoom}) translate(${translate.x}px, ${translate.y}px)`
     )
   }
 

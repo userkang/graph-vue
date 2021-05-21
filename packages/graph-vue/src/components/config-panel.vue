@@ -26,7 +26,6 @@
     <div class="form-item">
       <div class="label">数据</div>
       <div class="data-content" id="dataContent"></div>
-      <!-- <textarea v-model.lazy="content" class="data-content"></textarea> -->
     </div>
   </div>
 </template>

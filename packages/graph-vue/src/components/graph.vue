@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-content-wrap">
+  <div class="graph-main">
     <div
       class="graph-content-wrap"
       ref="svg"
@@ -8,7 +8,7 @@
       @contextmenu="e => e.preventDefault()"
     >
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <!-- <svg
+      <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
@@ -21,15 +21,16 @@
           }"
           v-if="graph"
         >
-          <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
-          <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
+          <Edge v-for="item in edges" :key="item.id" :edge="item" />
+          <Node v-for="item in nodes" :key="item.id" :node="item" />
           <NewEdge />
         </g>
         <path
           :d="brushPath"
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
-      </svg> -->
+      </svg>
+      <!-- <div id="line" class="line"></div> -->
     </div>
 
     <ToolBox v-if="graph" />
@@ -84,9 +85,9 @@ export default class GraphContent extends Vue {
     translateX: 0,
     translateY: 0
   }
-  isBrushing = false
   brushPath = ''
-  createEdge = {}
+
+  graphHeight = '500px'
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -134,7 +135,6 @@ export default class GraphContent extends Vue {
       aftertranslate: 'aftertranslate',
       afterzoom: 'afterzoom',
       brushing: 'brushing',
-      showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
@@ -258,11 +258,17 @@ export default class GraphContent extends Vue {
     background: #fff;
   }
 }
-.line {
+.graph-main {
   width: 100%;
-  height: 1px;
-  background: #d9dadd;
+  height: 100%;
+  position: relative;
+}
+.line {
   position: absolute;
-  top: 43px;
+  bottom: 0;
+  width: 100%;
+  height: 8px;
+  background: #d9dadd;
+  background: red;
 }
 </style>

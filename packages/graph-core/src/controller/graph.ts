@@ -15,7 +15,8 @@ import {
   IEdgeModel,
   IGraphConfig,
   IStack,
-  IDataStack
+  IDataStack,
+  ILayout
 } from '../types/index'
 
 export default class Graph extends EventEmitter {
@@ -227,8 +228,8 @@ export default class Graph extends EventEmitter {
     }
   }
 
-  public layout() {
-    this.layoutController.layout()
+  public layout(options: ILayout = {}) {
+    this.layoutController.layout(options)
     this.emit('afterlayout')
   }
 

@@ -34,6 +34,7 @@
 
     <ToolBox v-if="graph" />
     <Menu v-if="graph" />
+    <Minimap :graph="graph" v-if="graph"/>
   </div>
 </template>
 
@@ -47,6 +48,7 @@ import Edge from '@/components/edge.vue'
 import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
+import Minimap from '@/components/minimap.vue'
 import {
   Graph,
   IDataModel,
@@ -58,6 +60,7 @@ import {
 
 @Component({
   components: {
+    Minimap,
     NewEdge,
     Edge,
     Node,
@@ -120,6 +123,7 @@ export default class GraphContent extends Vue {
       },
       action: this.configState.action
     })
+    window.graph = this.graph
     this.initCustomHooks()
     this.graph.data(this.configState.data)
     GraphStore.state.graph = this.graph

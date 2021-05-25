@@ -30,7 +30,6 @@ export default class Minimap extends Vue {
 
   svgHTML = ''
   width = 320
-  scale = 1
   height = 0
 
   mousedown?: { x: number; y: number }
@@ -42,7 +41,18 @@ export default class Minimap extends Vue {
       this.graph.on('datachange', this.initMinimap)
     }
   }
-
+  get scale() {
+    if (this.graph?.viewController?.svgInfo?.width) {
+      return this.width / this.graph.viewController.svgInfo.width
+    }
+    return 1
+  }
+  get svgInfo() {
+    return this.graph.viewController.svgInfo
+  }
+  get transform() {
+    return this.graph.viewController.transform
+  }
   get rootStyle() {
     return {
       width: `${this.width}px`,
@@ -62,22 +72,28 @@ export default class Minimap extends Vue {
   }
 
   get gStyle() {
-    //   transform: `scale(${this.scale}) translate3D(${-this.padding
-    // .left}px, ${-this.padding.top}px, 0)`
     return {
       transform: `scale(${this.scale}) translate3D(${0}px, ${0}px, 0)`
     }
   }
 
-  get viewportStyle() {
+  get viewportRect() {
     const svgInfo = this.graph.viewController.svgInfo
     const transform = this.graph.viewController.transform
-    const translateX = -transform.translateX * this.scale
-    const translateY = -transform.translateY * this.scale
+    const width = this.width / transform.scale
+    const height = svgInfo.height * this.scale /transform.scale
+
+    const left = (-transform.translateX+(transform.offsetX/transform.scale) )* this.scale
+    const top =( -transform.translateY+(transform.offsetY/transform.scale) )* this.scale
+    return { width, height, left, top }
+  }
+
+  get viewportStyle() {
+    const { width, height, left, top } = this.viewportRect
     return {
-      width: `${this.width}px`,
-      height: `${this.scale * svgInfo.height}px`,
-      transform: `scale(${1}) translate3D(${translateX}px, ${translateY}px, 0)`
+      width: `${width}px`,
+      height: `${height}px`,
+      transform: `translate3D(${left}px, ${top}px, 0)`
     }
   }
 
@@ -85,8 +101,10 @@ export default class Minimap extends Vue {
     if (!this.graph) {
       return
     }
+    // fixme
+    // minimap.vue?5651:88 Uncaught TypeError: Cannot read property 'svgInfo' of undefined
+    // at VueComponent.Minimap.initMinimap (minimap.vue?5651:88)
     const svgInfo = this.graph.viewController.svgInfo
-    this.scale = this.width / svgInfo.width
 
     let maxY = Number.MIN_SAFE_INTEGER
     const nodes = this.graph.getNodes()
@@ -99,26 +117,6 @@ export default class Minimap extends Vue {
     if (g) {
       this.svgHTML = g.innerHTML
     }
-
-    // const svgInfo = this.graph.viewController.svgInfo
-    // this.scale = this.width / svgInfo.width
-    // this.height = this.scale * svgInfo.height
-    // const g = this.graph.viewController.$container.querySelector('g')
-    // if (g) {
-    //   this.svgHTML = g.innerHTML
-    // }
-
-    // const g = this.graph.viewController.$container.querySelector('g')
-    // if (g) {
-    //   const gRect = g.getBoundingClientRect()
-    //   this.scale = this.width / gRect.width
-    //   this.height = this.scale * gRect.height
-    //   // this.svgHTML = this.graph.viewController.$container.innerHTML
-    //   this.svgHTML = g.innerHTML
-    //   if (!(Date.now() % 100)) {
-    //     window.info = {}
-    //   }
-    // }
     window.requestAnimationFrame(this.initMinimap)
   }
 
@@ -133,9 +131,22 @@ export default class Minimap extends Vue {
   }
   onMousemove(e: MouseEvent) {
     const { x, y } = e
-    const dx = (x - this.prevMove.x) / this.scale
-    const dy = (y - this.prevMove.y) / this.scale
-    this.graph.translate(dx, dy)
+    const padding = 8
+    const vpRect = this.viewportRect
+    let dx = (x - this.prevMove.x) / this.scale
+    let dy = (y - this.prevMove.y) / this.scale
+    if (vpRect.left + vpRect.width < padding) {
+      dx = Math.max(dx, 0)
+    } else if (vpRect.left - vpRect.width > -padding) {
+      dx = Math.min(dx, 0)
+    }
+    if (vpRect.top + vpRect.height < padding) {
+      dy = Math.max(dy, 0)
+    } else if (vpRect.top - this.height > -padding) {
+      // console.log(vpRect.top , this.height)
+      dy = Math.min(dy, 0)
+    }
+    this.graph.translate(-dx, -dy)
     Object.assign(this.prevMove, { x, y })
   }
   onMouseup(e: MouseEvent) {
@@ -173,6 +184,7 @@ export default class Minimap extends Vue {
     width: 100px;
     height: 100px;
     cursor: move;
+    transform-origin: center;
   }
   &:hover {
     .viewport {

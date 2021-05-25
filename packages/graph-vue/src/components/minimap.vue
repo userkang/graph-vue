@@ -10,7 +10,9 @@
     >
       <g :style="gStyle" v-html="svgHTML"></g>
     </svg>
-    <div class="viewport" :style="viewportStyle" @mousedown="onMousedown"></div>
+    <div class="viewport" :style="viewportStyle" @mousedown="onMousedown">
+      <div class="viewport-resize" @mousedown.stop="onVpResizedown"></div>
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -34,6 +36,7 @@ export default class Minimap extends Vue {
 
   mousedown?: { x: number; y: number }
   prevMove = { x: 0, y: 0 }
+  prevVpmove?: { x: number; y: number }
 
   @Watch('graph')
   watchGraph() {
@@ -81,10 +84,12 @@ export default class Minimap extends Vue {
     const svgInfo = this.graph.viewController.svgInfo
     const transform = this.graph.viewController.transform
     const width = this.width / transform.scale
-    const height = svgInfo.height * this.scale /transform.scale
+    const height = (svgInfo.height * this.scale) / transform.scale
 
-    const left = (-transform.translateX+(transform.offsetX/transform.scale) )* this.scale
-    const top =( -transform.translateY+(transform.offsetY/transform.scale) )* this.scale
+    const left =
+      (-transform.translateX + transform.offsetX / transform.scale) * this.scale
+    const top =
+      (-transform.translateY + transform.offsetY / transform.scale) * this.scale
     return { width, height, left, top }
   }
 
@@ -101,9 +106,6 @@ export default class Minimap extends Vue {
     if (!this.graph) {
       return
     }
-    // fixme
-    // minimap.vue?5651:88 Uncaught TypeError: Cannot read property 'svgInfo' of undefined
-    // at VueComponent.Minimap.initMinimap (minimap.vue?5651:88)
     const svgInfo = this.graph.viewController.svgInfo
 
     let maxY = Number.MIN_SAFE_INTEGER
@@ -159,6 +161,29 @@ export default class Minimap extends Vue {
     this.onMouseup(e)
   }
 
+  onVpResizedown(e: MouseEvent) {
+    const { x, y } = e
+    this.prevVpmove = { x, y }
+    document.body.addEventListener('mousemove', this.onVpResizemove)
+    document.body.addEventListener('mouseup', this.onVpResizeup)
+    document.body.addEventListener('mouseleave', this.onVpResizeleave)
+  }
+  onVpResizemove(e: MouseEvent) {
+    const { x, y } = e
+    const changeZoom = -(x - this.prevVpmove.x) / this.width + 1
+    const nextZoom = this.transform.scale * changeZoom
+    this.graph.zoom(nextZoom)
+    Object.assign(this.prevVpmove, { x, y })
+  }
+  onVpResizeup(e: MouseEvent) {
+    document.body.removeEventListener('mousemove', this.onVpResizemove)
+    document.body.removeEventListener('mouseup', this.onVpResizeup)
+    document.body.removeEventListener('mouseleave', this.onVpResizeleave)
+  }
+  onVpResizeleave(e: MouseEvent) {
+    this.onVpResizeup(e)
+  }
+
   created() {
     console.log(this.graph)
   }
@@ -185,6 +210,17 @@ export default class Minimap extends Vue {
     height: 100px;
     cursor: move;
     transform-origin: center;
+    .viewport-resize {
+      position: absolute;
+      right: -5px;
+      bottom: -5px;
+      border-radius: 50%;
+      border: 1px solid #fff;
+      width: 10px;
+      height: 10px;
+      background-color: #fff;
+      cursor: nwse-resize;
+    }
   }
   &:hover {
     .viewport {

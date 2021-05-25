@@ -25,6 +25,7 @@ import {
   INode,
   IEdge
 } from '@datafe/graph-core'
+import node from '@/view/css/node'
 @Component
 export default class Minimap extends Vue {
   @Prop()
@@ -37,6 +38,12 @@ export default class Minimap extends Vue {
   mousedown?: { x: number; y: number }
   prevMove = { x: 0, y: 0 }
   prevVpmove?: { x: number; y: number }
+  grect = {
+    width: 0,
+    height: 0,
+    left: Number.MAX_SAFE_INTEGER,
+    top: Number.MAX_SAFE_INTEGER
+  }
 
   @Watch('graph')
   watchGraph() {
@@ -72,6 +79,34 @@ export default class Minimap extends Vue {
       top = Math.min(nodes[index].y, top)
     }
     return { left, top }
+  }
+
+  syncGrect() {
+    if (!this.graph) {
+      return
+    }
+    const nodes = this.graph.getNodes()
+    let [minX, minY, maxX, maxY] = [
+      Number.MAX_SAFE_INTEGER,
+      Number.MAX_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER
+    ]
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i]
+      minX = Math.min(minX, node.x)
+      minY = Math.min(minY, node.y)
+      maxX = Math.max(maxX, node.x + node.width)
+      maxY = Math.max(maxY, node.y + node.height)
+    }
+    Object.assign(this.grect, {
+      width: maxX - minX,
+      height: maxY - minY,
+      left: minX,
+      top: minY
+    })
+    return this.grect
+    // this.height = (maxY + Math.max(svgInfo.y, 0)) * this.scale
   }
 
   get gStyle() {
@@ -119,7 +154,8 @@ export default class Minimap extends Vue {
     if (g) {
       this.svgHTML = g.innerHTML
     }
-    window.requestAnimationFrame(this.initMinimap)
+    window.requestAnimationFrame(this.syncGrect)
+    // window.requestAnimationFrame(this.initMinimap)
   }
 
   onMousedown(e: MouseEvent) {
@@ -145,7 +181,6 @@ export default class Minimap extends Vue {
     if (vpRect.top + vpRect.height < padding) {
       dy = Math.max(dy, 0)
     } else if (vpRect.top - this.height > -padding) {
-      // console.log(vpRect.top , this.height)
       dy = Math.min(dy, 0)
     }
     this.graph.translate(-dx, -dy)

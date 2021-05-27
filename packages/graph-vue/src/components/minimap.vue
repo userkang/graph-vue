@@ -102,48 +102,55 @@ export default class Minimap extends Vue {
     }
     const { minX, minY, maxX, maxY } = this.nodesRect
     let [width, height, left, top] = [maxX - minX, maxY - minY, minX, minY]
+    const scale =
+      Math.min(this.mapRect.width / width, this.mapRect.height / height) * 0.5
 
     return {
       width,
       height,
       left,
-      top
+      top,
+      scale
     }
   }
-
-  get graphScale() {
-    //     if (this.graph?.viewController?.svgInfo?.width) {
-    //   scale = width / this.graph.viewController.svgInfo.width
-    // }
-    const widthScale = this.mapRect.width / (this.graphRect.width)
-    const heightScale = this.mapRect.height / (this.graphRect.height * 1)
-    return Math.min(widthScale, heightScale)
-  }
-
-  get graphStyle() {
-    // graphRect.left + graphRect.width/2 = 
-    let left =
-     (-this.graphRect.left) 
+  get graphStyleData ( ){
+    const  left =
+      -this.graphRect.left +
+      this.mapRect.width / this.graphRect.scale / 2 -
+      this.graphRect.width / 2
     const top =
-     -this.graphRect.top 
+      -this.graphRect.top +
+      this.mapRect.height / this.graphRect.scale / 2 -
+      this.graphRect.height / 2
+      return {
+        left ,top
+      }
+  }
+  get graphStyle() {
+    // const  left =
+    //   -this.graphRect.left +
+    //   this.mapRect.width / this.graphRect.scale / 2 -
+    //   this.graphRect.width / 2
+    // const top =
+    //   -this.graphRect.top +
+    //   this.mapRect.height / this.graphRect.scale / 2 -
+    //   this.graphRect.height / 2
+    const {left, top } = this.graphStyleData
     return {
-      transform: `scale(${this.graphScale}) translate3D(${left}px, ${top}px, 0)`
+      transform: `scale(${this.graphRect.scale}) translate3D(${left}px, ${top}px, 0)`
     }
   }
 
   get viewportRect() {
     const svgInfo = this.graph.viewController.svgInfo
     const transform = this.graph.viewController.transform
-    const width = this.mapRect.width / transform.scale
-    const height = (svgInfo.height * this.graphScale) / transform.scale
+    const graphRect = this.graphRect
+    const width =svgInfo.width *  this.graphRect.scale / transform.scale
+    const height = (svgInfo.height * this.graphRect.scale) / transform.scale
 
-    const left =
-      (-transform.translateX + transform.offsetX / transform.scale) *
-      this.graphScale
-    const top =
-      (-transform.translateY + transform.offsetY / transform.scale) *
-      this.graphScale
-    return { width, height, left, top }
+    const left =(-transform.translateX + transform.offsetX / transform.scale+this.graphStyleData.left) *this.graphRect.scale
+    const top = (-transform.translateY + transform.offsetY / transform.scale+this.graphStyleData.top) *this.graphRect.scale
+    return { width, height, left, top, svgInfo, transform, graphRect }
   }
 
   get viewportStyle() {
@@ -181,8 +188,9 @@ export default class Minimap extends Vue {
     const { x, y } = e
     const padding = 8
     const vpRect = this.viewportRect
-    let dx = (x - this.prevMove.x) / this.graphScale
-    let dy = (y - this.prevMove.y) / this.graphScale
+    let dx = (x - this.prevMove.x) / this.graphRect.scale
+    let dy = (y - this.prevMove.y) / this.graphRect.scale
+    // fixme边界算法有问题
     if (vpRect.left + vpRect.width < padding) {
       dx = Math.max(dx, 0)
     } else if (vpRect.left - vpRect.width > -padding) {
@@ -245,6 +253,7 @@ export default class Minimap extends Vue {
 </script>
 <style lang="scss" scoped>
 .Minimap {
+  box-sizing: border-box;
   position: relative;
   color: #fff;
   border: 1px solid #fff;

@@ -150,7 +150,7 @@ export default class Minimap extends Vue {
 
     const left =(-transform.translateX + transform.offsetX / transform.scale+this.graphStyleData.left) *this.graphRect.scale
     const top = (-transform.translateY + transform.offsetY / transform.scale+this.graphStyleData.top) *this.graphRect.scale
-    return { width, height, left, top, svgInfo, transform, graphRect }
+    return { width, height, left, top }
   }
 
   get viewportStyle() {
@@ -186,14 +186,14 @@ export default class Minimap extends Vue {
   }
   onMousemove(e: MouseEvent) {
     const { x, y } = e
-    const padding = 8
+    const padding = Math.min(this.mapRect.width, this.mapRect.height) * 0.1
     const vpRect = this.viewportRect
     let dx = (x - this.prevMove.x) / this.graphRect.scale
     let dy = (y - this.prevMove.y) / this.graphRect.scale
     // fixme边界算法有问题
     if (vpRect.left + vpRect.width < padding) {
       dx = Math.max(dx, 0)
-    } else if (vpRect.left - vpRect.width > -padding) {
+    } else if (vpRect.left - this.mapRect.width > -padding) {
       dx = Math.min(dx, 0)
     }
     if (vpRect.top + vpRect.height < padding) {

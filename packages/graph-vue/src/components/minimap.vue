@@ -26,58 +26,37 @@ import {
   IEdge,
   ISlotModel
 } from '@datafe/graph-core'
+/**
+ * @todo cursor
+ */
 @Component
 export default class Minimap extends Vue {
   @Prop()
   graph?: Graph
 
   svgHTML = ''
-
-  mousedown?: { x: number; y: number }
-  prevMove = { x: 0, y: 0 }
+  prevMousePosition?: { x: number; y: number }
   prevVpmove?: { x: number; y: number }
-  syncgraphRect = 1
 
-  @Watch('graph')
-  watchGraph() {
-    if (this.graph) {
-      this.graph.on('datachange', this.initMinimap)
-    }
+  get mapRect() {
+    return { width: 320, height: 200 }
   }
+
   get svgInfo() {
     return this.graph.viewController.svgInfo
   }
+
   get transform() {
     return this.graph.viewController.transform
   }
 
-  get mapRect() {
-    const width = 320
-    const height = 200
-
-    return {
-      width,
-      height
-    }
-  }
-
   get rootStyle() {
-    return {
-      width: `${this.mapRect.width}px`,
-      height: `${this.mapRect.height}px`
-    }
+    return `width: ${this.mapRect.width}px;height: ${this.mapRect.height}px;`
   }
 
-  get padding() {
-    let left = Number.MAX_SAFE_INTEGER
-    let top = Number.MAX_SAFE_INTEGER
-    const nodes = this.graph.getNodes()
-    for (let index = nodes.length - 1; index >= 0; index--) {
-      left = Math.min(nodes[index].x, left)
-      top = Math.min(nodes[index].y, top)
-    }
-    return { left, top }
-  }
+  /**
+   * @todo 这里有问题 const nodes = this.graph.getNodes()
+   */
   get nodesRect() {
     const nodes = this.graph.getNodes()
     let [minX, minY, maxX, maxY] = [
@@ -103,7 +82,7 @@ export default class Minimap extends Vue {
     const { minX, minY, maxX, maxY } = this.nodesRect
     let [width, height, left, top] = [maxX - minX, maxY - minY, minX, minY]
     const scale =
-      Math.min(this.mapRect.width / width, this.mapRect.height / height) * 0.5
+      Math.min(this.mapRect.width / width, this.mapRect.height / height) * 0.8
 
     return {
       width,
@@ -113,8 +92,8 @@ export default class Minimap extends Vue {
       scale
     }
   }
-  get graphStyleData ( ){
-    const  left =
+  get graphStyleData() {
+    const left =
       -this.graphRect.left +
       this.mapRect.width / this.graphRect.scale / 2 -
       this.graphRect.width / 2
@@ -122,34 +101,33 @@ export default class Minimap extends Vue {
       -this.graphRect.top +
       this.mapRect.height / this.graphRect.scale / 2 -
       this.graphRect.height / 2
-      return {
-        left ,top
-      }
+    return {
+      left,
+      top
+    }
   }
   get graphStyle() {
-    // const  left =
-    //   -this.graphRect.left +
-    //   this.mapRect.width / this.graphRect.scale / 2 -
-    //   this.graphRect.width / 2
-    // const top =
-    //   -this.graphRect.top +
-    //   this.mapRect.height / this.graphRect.scale / 2 -
-    //   this.graphRect.height / 2
-    const {left, top } = this.graphStyleData
-    return {
-      transform: `scale(${this.graphRect.scale}) translate3D(${left}px, ${top}px, 0)`
-    }
+    const { left, top } = this.graphStyleData
+    return `transform: scale(${this.graphRect.scale}) translate3D(${left}px, ${top}px, 0)`
   }
 
   get viewportRect() {
     const svgInfo = this.graph.viewController.svgInfo
     const transform = this.graph.viewController.transform
     const graphRect = this.graphRect
-    const width =svgInfo.width *  this.graphRect.scale / transform.scale
+    const width = (svgInfo.width * this.graphRect.scale) / transform.scale
     const height = (svgInfo.height * this.graphRect.scale) / transform.scale
 
-    const left =(-transform.translateX + transform.offsetX / transform.scale+this.graphStyleData.left) *this.graphRect.scale
-    const top = (-transform.translateY + transform.offsetY / transform.scale+this.graphStyleData.top) *this.graphRect.scale
+    const left =
+      (transform.offsetX / transform.scale -
+        transform.translateX +
+        this.graphStyleData.left) *
+      this.graphRect.scale
+    const top =
+      (transform.offsetY / transform.scale -
+        transform.translateY +
+        this.graphStyleData.top) *
+      this.graphRect.scale
     return { width, height, left, top }
   }
 
@@ -162,35 +140,28 @@ export default class Minimap extends Vue {
     }
   }
 
-  initMinimap() {
+  onGraphChange() {
     if (!this.graph) {
       return
     }
-
     const g = this.graph.viewController.$container.querySelector('g')
     if (g) {
       this.svgHTML = g.innerHTML
     }
-    // window.requestAnimationFrame(this.syncgraphRect)
-    window.requestAnimationFrame(this.initMinimap)
   }
 
   onMousedown(e: MouseEvent) {
+    this.prevMousePosition = { x: e.x, y: e.y }
     document.body.addEventListener('mousemove', this.onMousemove)
     document.body.addEventListener('mouseup', this.onMouseup)
     document.body.addEventListener('mouseleave', this.onMouseleave)
-    const { x, y } = e
-    this.mousedown = { x, y }
-    this.prevMove = { x, y }
-    console.log(1)
   }
   onMousemove(e: MouseEvent) {
     const { x, y } = e
-    const padding = Math.min(this.mapRect.width, this.mapRect.height) * 0.1
+    const padding = 10
     const vpRect = this.viewportRect
-    let dx = (x - this.prevMove.x) / this.graphRect.scale
-    let dy = (y - this.prevMove.y) / this.graphRect.scale
-    // fixme边界算法有问题
+    let dx = x - this.prevMousePosition.x
+    let dy = y - this.prevMousePosition.y
     if (vpRect.left + vpRect.width < padding) {
       dx = Math.max(dx, 0)
     } else if (vpRect.left - this.mapRect.width > -padding) {
@@ -201,29 +172,27 @@ export default class Minimap extends Vue {
     } else if (vpRect.top - this.mapRect.height > -padding) {
       dy = Math.min(dy, 0)
     }
-    this.graph.translate(-dx, -dy)
-    Object.assign(this.prevMove, { x, y })
+    this.graph.translate(-dx / this.graphRect.scale, -dy / this.graphRect.scale)
+    Object.assign(this.prevMousePosition, { x, y })
   }
   onMouseup(e: MouseEvent) {
     document.body.removeEventListener('mousemove', this.onMousemove)
     document.body.removeEventListener('mouseup', this.onMouseup)
     document.body.removeEventListener('mouseleave', this.onMouseleave)
-    console.log(0)
   }
   onMouseleave(e: MouseEvent) {
-    this.onMouseup(e)
+    return this.onMouseup(e)
   }
 
   onVpResizedown(e: MouseEvent) {
-    const { x, y } = e
-    this.prevVpmove = { x, y }
+    this.prevVpmove = { x: e.x, y: e.y }
     document.body.addEventListener('mousemove', this.onVpResizemove)
     document.body.addEventListener('mouseup', this.onVpResizeup)
     document.body.addEventListener('mouseleave', this.onVpResizeleave)
   }
   onVpResizemove(e: MouseEvent) {
     const { x, y } = e
-    const changeZoom = -(x - this.prevVpmove.x) / this.mapRect.width + 1
+    const changeZoom = 1 - (x - this.prevVpmove.x) / this.mapRect.width
     const nextZoom = this.transform.scale * changeZoom
     this.graph.zoom(nextZoom)
     Object.assign(this.prevVpmove, { x, y })
@@ -234,19 +203,34 @@ export default class Minimap extends Vue {
     document.body.removeEventListener('mouseleave', this.onVpResizeleave)
   }
   onVpResizeleave(e: MouseEvent) {
-    this.onVpResizeup(e)
-  }
-  onDragnode([node]: [INodeModel | IEdgeModel | ISlotModel]) {
-    this.syncgraphRect = ~this.syncgraphRect
+    return this.onVpResizeup(e)
   }
 
-  created() {
-    console.log(this.graph)
+  listenGraphChange() {
+    const eventTypes = [
+      'dragingnode',
+      'brushing',
+      'nodeselectchange',
+      'edgeselectchange',
+      'afterdragnode',
+      'afterlayout',
+      'aftertranslate',
+      'addingedge',
+      'datachange',
+      'afteraddnode',
+      'afterdeletenode',
+      'afteredgeupdate',
+      'stackchange'
+    ]
+    for (let i = eventTypes.length - 1; i >= 0; i--) {
+      this.graph.on(eventTypes[i], this.onGraphChange)
+    }
   }
+
   mounted() {
-    this.initMinimap()
     if (this.graph) {
-      this.graph.on('dragingnode', this.onDragnode)
+      this.onGraphChange()
+      this.listenGraphChange()
     }
   }
 }
@@ -261,30 +245,33 @@ export default class Minimap extends Vue {
   right: 10px;
   top: 50px;
   overflow: hidden;
+  &:hover {
+    .viewport {
+      background-color: rgba($color: #fff, $alpha: 0.1);
+    }
+  }
   .viewport {
     position: absolute;
     left: 0%;
     top: 0%;
-    border: 1px solid #fff;
-    width: 100px;
-    height: 100px;
+    box-shadow: 0px 0px 10px #999 inset;
+    background-color: rgba($color: #999, $alpha: 0.05);
     cursor: move;
     transform-origin: center;
+    &:hover {
+      background-color: rgba($color: #fff, $alpha: 0.15);
+    }
     .viewport-resize {
       position: absolute;
       right: -5px;
       bottom: -5px;
       border-radius: 50%;
-      border: 1px solid #fff;
+      box-shadow: 0px 0px 2px #fff;
       width: 10px;
       height: 10px;
-      background-color: #fff;
+      background-color: #999;
+      border: 1px solid #fff;
       cursor: nwse-resize;
-    }
-  }
-  &:hover {
-    .viewport {
-      background-color: rgba($color: #fff, $alpha: 0.1);
     }
   }
 }

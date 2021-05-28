@@ -39,7 +39,7 @@ export default class Minimap extends Vue {
   @Prop()
   graph?: Graph
 
-  @Prop({ default: [255, 255, 255] })
+  @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
 
   svgHTML = ''

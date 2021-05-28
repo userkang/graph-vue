@@ -97,7 +97,7 @@ export default class Minimap extends Vue {
       Math.min(
         this.mapRect.width / this.nodesRect.width,
         this.mapRect.height / this.nodesRect.height
-      ) * 0.8
+      ) * 0.5
     )
   }
 

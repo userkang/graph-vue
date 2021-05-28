@@ -8,7 +8,11 @@
       id="minimap"
       ref="map"
     >
-      <rect width="100%" height="100%" :style="`fill:rgba(${theme.join(',')}, 0.05);`" />
+      <rect
+        width="100%"
+        height="100%"
+        :style="`fill:rgba(${theme.join(',')}, 0.05);`"
+      />
       <g :style="graphStyle" v-html="svgHTML"></g>
     </svg>
     <div class="viewport" :style="viewportStyle" @mousedown="onMousedown">
@@ -42,6 +46,7 @@ export default class Minimap extends Vue {
   @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
 
+  canGraphChage = true
   svgHTML = ''
   prevMousePosition?: { x: number; y: number }
   prevVpmove?: { x: number; y: number }
@@ -153,15 +158,17 @@ export default class Minimap extends Vue {
   }
 
   onGraphChange() {
-    if (!this.graph) {
+    if (!this.graph || !this.canGraphChage) {
       return
     }
-    const g = this.graph.viewController.$container.querySelector(
-      '.graph-root-group'
-    )
-    if (g) {
-      this.svgHTML = g.innerHTML
-    }
+    this.canGraphChage = false
+    window.requestAnimationFrame(() => {
+      const g = this.graph.viewController.$container.querySelector('g')
+      if (g) {
+        this.svgHTML = g.innerHTML
+      }
+      this.canGraphChage = true
+    })
   }
 
   onMousedown(e: MouseEvent) {

@@ -8,7 +8,11 @@
       id="minimap"
       ref="map"
     >
-      <rect width="100%" height="100%" :style="`fill:rgba(${theme.join(',')}, 0.05);`" />
+      <rect
+        width="100%"
+        height="100%"
+        :style="`fill:rgba(${theme.join(',')}, 0.05);`"
+      />
       <g :style="graphStyle" v-html="svgHTML"></g>
     </svg>
     <div class="viewport" :style="viewportStyle" @mousedown="onMousedown">
@@ -56,7 +60,7 @@ export default class Minimap extends Vue {
   }
 
   get mapRect() {
-    return { width: 320, height: 200 }
+    return { width: 300, height: 180 }
   }
 
   get svgInfo() {
@@ -97,7 +101,7 @@ export default class Minimap extends Vue {
       Math.min(
         this.mapRect.width / this.nodesRect.width,
         this.mapRect.height / this.nodesRect.height
-      ) * 0.5
+      ) * 0.4
     )
   }
 
@@ -156,12 +160,13 @@ export default class Minimap extends Vue {
     if (!this.graph) {
       return
     }
-    const g = this.graph.viewController.$container.querySelector(
-      '.graph-root-group'
-    )
-    if (g) {
-      this.svgHTML = g.innerHTML
-    }
+
+    setTimeout(() => {
+      const g = this.graph.viewController.$container.querySelector('g')
+      if (g) {
+        this.svgHTML = g.innerHTML
+      }
+    })
   }
 
   onMousedown(e: MouseEvent) {
@@ -239,9 +244,8 @@ export default class Minimap extends Vue {
       'aftertranslate',
       'addingedge',
       'datachange',
-      'afteraddnode',
-      'afterdeletenode',
       'afteredgeupdate',
+      'afternodeupdate',
       'stackchange'
     ]
     for (let i = eventTypes.length - 1; i >= 0; i--) {
@@ -262,10 +266,10 @@ export default class Minimap extends Vue {
   box-sizing: border-box;
   position: relative;
   position: absolute;
-  right: 10px;
-  top: 50px;
+  left: 10px;
+  bottom: 10px;
   overflow: hidden;
-  box-shadow: 0px 0px 3px 2px rgb(var(--color-main));
+  user-select: none;
   &:hover > .viewport {
     background-color: rgba(var(--color-main), 0.15);
   }
@@ -273,7 +277,6 @@ export default class Minimap extends Vue {
     position: absolute;
     left: 0%;
     top: 0%;
-    box-shadow: 0px 0px 10px rgb(var(--color-main)) inset;
     background-color: rgba(var(--color-main), 0.1);
     cursor: move;
     transform-origin: center;
@@ -285,7 +288,6 @@ export default class Minimap extends Vue {
       right: -5px;
       bottom: -5px;
       border-radius: 50%;
-      box-shadow: 0px 0px 2px 2px rgb(var(--color-main));
       width: 10px;
       height: 10px;
       background-color: rgb(var(--color-shadow));

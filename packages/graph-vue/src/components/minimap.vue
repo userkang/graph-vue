@@ -285,10 +285,10 @@ export default class Minimap extends Vue {
       right: -5px;
       bottom: -5px;
       border-radius: 50%;
-      box-shadow: 0px 0px 2px 2px rgb(var(--color-shadow));
+      box-shadow: 0px 0px 2px 2px rgb(var(--color-main));
       width: 10px;
       height: 10px;
-      background-color: rgb(var(--color-main));
+      background-color: rgb(var(--color-shadow));
       cursor: nwse-resize;
     }
   }

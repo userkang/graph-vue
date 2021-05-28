@@ -34,7 +34,7 @@
 
     <ToolBox v-if="graph" />
     <Menu v-if="graph" />
-    <Minimap :graph="graph" v-if="graph"/>
+    <Minimap :graph="graph" v-if="graph && minimap"/>
   </div>
 </template>
 
@@ -69,6 +69,9 @@ import {
   }
 })
 export default class GraphContent extends Vue {
+  @Prop({default: true})
+  minimap: boolean
+
   componentState = ComponentListStore.state
   configState = GraphConfigStore.state
 
@@ -123,7 +126,6 @@ export default class GraphContent extends Vue {
       },
       action: this.configState.action
     })
-    window.graph = this.graph
     this.initCustomHooks()
     this.graph.data(this.configState.data)
     GraphStore.state.graph = this.graph

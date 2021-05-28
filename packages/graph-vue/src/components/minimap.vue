@@ -1,5 +1,5 @@
 <template>
-  <div class="Minimap" ref="root" :style="rootStyle">
+  <div class="Minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
     <svg
       :width="mapRect.width"
       :height="mapRect.height"
@@ -8,6 +8,7 @@
       id="minimap"
       ref="map"
     >
+      <rect width="100%" height="100%" :style="`fill:rgba(${theme.join(',')}, 0.05);`" />
       <g :style="graphStyle" v-html="svgHTML"></g>
     </svg>
     <div class="viewport" :style="viewportStyle" @mousedown="onMousedown">
@@ -26,17 +27,33 @@ import {
   IEdge,
   ISlotModel
 } from '@datafe/graph-core'
-/**
- * @todo cursor
- */
+
+const generateCursor = (cursor: string) => {
+  const styleElement = document.createElement('style')
+  styleElement.innerHTML = `body *{cursor: ${cursor} !important;}`
+  return styleElement
+}
+
 @Component
 export default class Minimap extends Vue {
   @Prop()
   graph?: Graph
 
+  @Prop({ default: [255, 255, 255] })
+  theme!: [number, number, number]
+
   svgHTML = ''
   prevMousePosition?: { x: number; y: number }
   prevVpmove?: { x: number; y: number }
+  cursorMove = generateCursor('move')
+  cursorResize = generateCursor('nwse-resize')
+
+  get themeVars() {
+    return {
+      '--color-main': this.theme,
+      '--color-shadow': [200, 200, 200]
+    }
+  }
 
   get mapRect() {
     return { width: 320, height: 200 }
@@ -51,7 +68,10 @@ export default class Minimap extends Vue {
   }
 
   get rootStyle() {
-    return `width: ${this.mapRect.width}px;height: ${this.mapRect.height}px;`
+    return {
+      width: `${this.mapRect.width}px`,
+      height: `${this.mapRect.height}px`
+    }
   }
 
   get nodesRect() {
@@ -146,6 +166,7 @@ export default class Minimap extends Vue {
 
   onMousedown(e: MouseEvent) {
     this.prevMousePosition = { x: e.x, y: e.y }
+    document.head.appendChild(this.cursorMove)
     document.body.addEventListener('mousemove', this.onMousemove)
     document.body.addEventListener('mouseup', this.onMouseup)
     document.body.addEventListener('mouseleave', this.onMouseleave)
@@ -170,6 +191,9 @@ export default class Minimap extends Vue {
     Object.assign(this.prevMousePosition, { x, y })
   }
   onMouseup(e: MouseEvent) {
+    if (this.cursorMove?.parentElement === document.head) {
+      document.head.removeChild(this.cursorMove)
+    }
     document.body.removeEventListener('mousemove', this.onMousemove)
     document.body.removeEventListener('mouseup', this.onMouseup)
     document.body.removeEventListener('mouseleave', this.onMouseleave)
@@ -180,6 +204,7 @@ export default class Minimap extends Vue {
 
   onVpResizedown(e: MouseEvent) {
     this.prevVpmove = { x: e.x, y: e.y }
+    document.head.appendChild(this.cursorResize)
     document.body.addEventListener('mousemove', this.onVpResizemove)
     document.body.addEventListener('mouseup', this.onVpResizeup)
     document.body.addEventListener('mouseleave', this.onVpResizeleave)
@@ -192,6 +217,9 @@ export default class Minimap extends Vue {
     Object.assign(this.prevVpmove, { x, y })
   }
   onVpResizeup(e: MouseEvent) {
+    if (this.cursorResize?.parentElement === document.head) {
+      document.head.removeChild(this.cursorResize)
+    }
     document.body.removeEventListener('mousemove', this.onVpResizemove)
     document.body.removeEventListener('mouseup', this.onVpResizeup)
     document.body.removeEventListener('mouseleave', this.onVpResizeleave)
@@ -233,38 +261,34 @@ export default class Minimap extends Vue {
 .Minimap {
   box-sizing: border-box;
   position: relative;
-  color: #fff;
-  border: 1px solid #fff;
   position: absolute;
   right: 10px;
   top: 50px;
   overflow: hidden;
-  &:hover {
-    .viewport {
-      background-color: rgba($color: #fff, $alpha: 0.1);
-    }
+  box-shadow: 0px 0px 3px 2px rgb(var(--color-main));
+  &:hover > .viewport {
+    background-color: rgba(var(--color-main), 0.15);
   }
   .viewport {
     position: absolute;
     left: 0%;
     top: 0%;
-    box-shadow: 0px 0px 10px #999 inset;
-    background-color: rgba($color: #999, $alpha: 0.05);
+    box-shadow: 0px 0px 10px rgb(var(--color-main)) inset;
+    background-color: rgba(var(--color-main), 0.1);
     cursor: move;
     transform-origin: center;
     &:hover {
-      background-color: rgba($color: #fff, $alpha: 0.15);
+      background-color: rgba(var(--color-main), 0.2);
     }
     .viewport-resize {
       position: absolute;
       right: -5px;
       bottom: -5px;
       border-radius: 50%;
-      box-shadow: 0px 0px 2px #fff;
+      box-shadow: 0px 0px 2px 2px rgb(var(--color-shadow));
       width: 10px;
       height: 10px;
-      background-color: #999;
-      border: 1px solid #fff;
+      background-color: rgb(var(--color-main));
       cursor: nwse-resize;
     }
   }

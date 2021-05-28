@@ -54,9 +54,6 @@ export default class Minimap extends Vue {
     return `width: ${this.mapRect.width}px;height: ${this.mapRect.height}px;`
   }
 
-  /**
-   * @todo 这里有问题 const nodes = this.graph.getNodes()
-   */
   get nodesRect() {
     const nodes = this.graph.getNodes()
     let [minX, minY, maxX, maxY] = [
@@ -72,62 +69,57 @@ export default class Minimap extends Vue {
       maxX = Math.max(maxX, node.x + node.width)
       maxY = Math.max(maxY, node.y + node.height)
     }
-    return { minX, minY, maxX, maxY }
+    return { left: minX, top: minY, width: maxX - minX, height: maxY - minY }
+  }
+
+  get graphScale() {
+    return (
+      Math.min(
+        this.mapRect.width / this.nodesRect.width,
+        this.mapRect.height / this.nodesRect.height
+      ) * 0.8
+    )
   }
 
   get graphRect() {
-    if (!this.graph) {
-      return
-    }
-    const { minX, minY, maxX, maxY } = this.nodesRect
-    let [width, height, left, top] = [maxX - minX, maxY - minY, minX, minY]
-    const scale =
-      Math.min(this.mapRect.width / width, this.mapRect.height / height) * 0.8
-
+    const left =
+      -this.nodesRect.left +
+      this.mapRect.width / this.graphScale / 2 -
+      this.nodesRect.width / 2
+    const top =
+      -this.nodesRect.top +
+      this.mapRect.height / this.graphScale / 2 -
+      this.nodesRect.height / 2
     return {
-      width,
-      height,
       left,
       top,
-      scale
+      width: this.nodesRect.width,
+      height: this.nodesRect.height
     }
   }
-  get graphStyleData() {
-    const left =
-      -this.graphRect.left +
-      this.mapRect.width / this.graphRect.scale / 2 -
-      this.graphRect.width / 2
-    const top =
-      -this.graphRect.top +
-      this.mapRect.height / this.graphRect.scale / 2 -
-      this.graphRect.height / 2
-    return {
-      left,
-      top
-    }
-  }
+
   get graphStyle() {
-    const { left, top } = this.graphStyleData
-    return `transform: scale(${this.graphRect.scale}) translate3D(${left}px, ${top}px, 0)`
+    const { left, top } = this.graphRect
+    return `transform: scale(${this.graphScale}) translate3D(${left}px, ${top}px, 0)`
   }
 
   get viewportRect() {
     const svgInfo = this.graph.viewController.svgInfo
     const transform = this.graph.viewController.transform
-    const graphRect = this.graphRect
-    const width = (svgInfo.width * this.graphRect.scale) / transform.scale
-    const height = (svgInfo.height * this.graphRect.scale) / transform.scale
+    const graphRect = this.nodesRect
+    const width = (svgInfo.width * this.graphScale) / transform.scale
+    const height = (svgInfo.height * this.graphScale) / transform.scale
 
     const left =
       (transform.offsetX / transform.scale -
         transform.translateX +
-        this.graphStyleData.left) *
-      this.graphRect.scale
+        this.graphRect.left) *
+      this.graphScale
     const top =
       (transform.offsetY / transform.scale -
         transform.translateY +
-        this.graphStyleData.top) *
-      this.graphRect.scale
+        this.graphRect.top) *
+      this.graphScale
     return { width, height, left, top }
   }
 
@@ -144,7 +136,9 @@ export default class Minimap extends Vue {
     if (!this.graph) {
       return
     }
-    const g = this.graph.viewController.$container.querySelector('g')
+    const g = this.graph.viewController.$container.querySelector(
+      '.graph-root-group'
+    )
     if (g) {
       this.svgHTML = g.innerHTML
     }
@@ -172,7 +166,7 @@ export default class Minimap extends Vue {
     } else if (vpRect.top - this.mapRect.height > -padding) {
       dy = Math.min(dy, 0)
     }
-    this.graph.translate(-dx / this.graphRect.scale, -dy / this.graphRect.scale)
+    this.graph.translate(-dx / this.graphScale, -dy / this.graphScale)
     Object.assign(this.prevMousePosition, { x, y })
   }
   onMouseup(e: MouseEvent) {

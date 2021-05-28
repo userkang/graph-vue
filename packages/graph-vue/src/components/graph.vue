@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-content-wrap">
+  <div class="graph-main">
     <div
       class="graph-content-wrap"
       ref="svg"
@@ -21,8 +21,8 @@
           }"
           v-if="graph"
         >
-          <Edge v-for="item in edges" :key="item.edgeId" :edge="item" />
-          <Node v-for="item in nodes" :key="item.nodeId" :node="item" />
+          <Edge v-for="item in edges" :key="item.id" :edge="item" />
+          <Node v-for="item in nodes" :key="item.id" :node="item" />
           <NewEdge />
         </g>
         <path
@@ -90,9 +90,7 @@ export default class GraphContent extends Vue {
     translateX: 0,
     translateY: 0
   }
-  isBrushing = false
   brushPath = ''
-  createEdge = {}
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -140,7 +138,6 @@ export default class GraphContent extends Vue {
       aftertranslate: 'aftertranslate',
       afterzoom: 'afterzoom',
       brushing: 'brushing',
-      showmenu: 'showmenu',
       afterdeletenode: 'afterdeletenode',
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
@@ -264,11 +261,17 @@ export default class GraphContent extends Vue {
     background: #fff;
   }
 }
-.line {
+.graph-main {
   width: 100%;
-  height: 1px;
-  background: #d9dadd;
+  height: 100%;
+  position: relative;
+}
+.line {
   position: absolute;
-  top: 43px;
+  bottom: 0;
+  width: 100%;
+  height: 8px;
+  background: #d9dadd;
+  background: red;
 }
 </style>

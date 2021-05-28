@@ -4,8 +4,8 @@ export const dagMock = {
       id: '1',
       label: '工具栏悬浮有说明',
       nodeId: 232,
-      x: 455,
-      y: 122.5,
+      x: 400,
+      y: 100,
       width: 200,
       height: 50
     },

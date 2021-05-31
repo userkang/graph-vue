@@ -76,7 +76,7 @@ export default class BrushSelect extends Base {
     }
     const leftTop = this.graph.getPointByClient(startX, startY)
     const rightBottom = this.graph.getPointByClient(endX, endY)
-    const effectRange = {
+    const range = {
       startX: leftTop.x,
       startY: leftTop.y,
       endX: rightBottom.x,
@@ -86,7 +86,7 @@ export default class BrushSelect extends Base {
     const nodes = this.graph.getNodes()
 
     this.afterSelectedNodes = nodes.filter(item => {
-      return this.checkNodeRange(item, effectRange)
+      return this.checkNodeRange(item, range)
     })
   }
 

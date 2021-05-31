@@ -46,6 +46,7 @@ export default class Minimap extends Vue {
   @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
 
+  canGraphChage = true
   svgHTML = ''
   prevMousePosition?: { x: number; y: number }
   prevVpmove?: { x: number; y: number }
@@ -157,15 +158,16 @@ export default class Minimap extends Vue {
   }
 
   onGraphChange() {
-    if (!this.graph) {
+    if (!this.graph || !this.canGraphChage) {
       return
     }
-
-    setTimeout(() => {
+    this.canGraphChage = false
+    window.requestAnimationFrame(() => {
       const g = this.graph.viewController.$container.querySelector('g')
       if (g) {
         this.svgHTML = g.innerHTML
       }
+      this.canGraphChage = true
     })
   }
 

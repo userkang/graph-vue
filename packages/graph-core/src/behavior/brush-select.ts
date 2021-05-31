@@ -2,12 +2,18 @@ import Graph from '../controller/graph'
 import Node from '../item/node'
 import Base from './base'
 
+interface Range {
+  startX: number
+  startY: number
+  endX: number
+  endY: number
+}
 export default class BrushSelect extends Base {
   originX = 0
   originY = 0
   moving = false
-  beforeSelectedNodes = []
-  afterSelectedNodes = []
+  beforeSelectedNodes: Node[] = []
+  afterSelectedNodes: Node[] = []
 
   constructor(graph: Graph) {
     super(graph)
@@ -47,8 +53,8 @@ export default class BrushSelect extends Base {
 
   onMouseUp(e: MouseEvent) {
     if (this.moving) {
-      const before = this.beforeSelectedNodes.map(item => item.id)
-      const after = this.afterSelectedNodes.map(item => item.id)
+      const before = this.beforeSelectedNodes.map(item => item.id).toString()
+      const after = this.afterSelectedNodes.map(item => item.id).toString()
       if (String(before) !== String(after)) {
         const nodeModels = this.afterSelectedNodes.map(item => item.model)
         this.graph.emit('nodeselectchange', nodeModels)
@@ -62,46 +68,36 @@ export default class BrushSelect extends Base {
   checkSelected(startX: number, startY: number, endX: number, endY: number) {
     // 处理不同方向框选的情况
     // 将不同方向的框选框都格式化为从左上->右下
-    const range = {
-      startX: Math.min(startX, endX),
-      startY: Math.min(startY, endY),
-      endX: Math.max(startX, endX),
-      endY: Math.max(startY, endY)
+    if (startX > endX) {
+      ;[startX, endX] = [endX, startX]
+    }
+    if (startY > endY) {
+      ;[startY, endY] = [endY, startY]
+    }
+    const leftTop = this.graph.getPointByClient(startX, startY)
+    const rightBottom = this.graph.getPointByClient(endX, endY)
+    const effectRange = {
+      startX: leftTop.x,
+      startY: leftTop.y,
+      endX: rightBottom.x,
+      endY: rightBottom.y
     }
 
     const nodes = this.graph.getNodes()
 
     this.afterSelectedNodes = nodes.filter(item => {
-      return this.checkNodeRange(item, range)
+      return this.checkNodeRange(item, effectRange)
     })
   }
 
-  checkNodeRange(
-    item: Node,
-    range: { startX: number; startY: number; endX: number; endY: number }
-  ) {
-    const { x: startX, y: startY } = this.graph.getPointByClient(
-      range.startX,
-      range.startY
+  checkNodeRange(item: Node, range: Range) {
+    const isSelect = !(
+      item.y + item.height < range.startY ||
+      item.y > range.endY ||
+      item.x + item.width < range.startX ||
+      item.x > range.endX
     )
-    const { x: endX, y: endY } = this.graph.getPointByClient(
-      range.endX,
-      range.endY
-    )
-
-    item.clearState('selected')
-
-    if (item.y + item.height < startY) {
-      return false
-    } else if (item.y > endY) {
-      return false
-    } else if (item.x + item.width < startX) {
-      return false
-    } else if (item.x > endX) {
-      return false
-    } else {
-      item.setState('selected')
-      return true
-    }
+    isSelect ? item.setState('selected') : item.clearState('selected')
+    return isSelect
   }
 }

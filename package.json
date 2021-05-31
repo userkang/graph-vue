@@ -7,7 +7,7 @@
   ],
   "scripts": {
     "start": "yarn --cwd packages/graph-vue start",
-    "build": "yarn --cwd packages/graph-vue && export NODE_ENV=production && vue-cli-service build"
+    "build": "yarn --cwd packages/graph-vue build"
   },
   "dependencies": {},
   "devDependencies": {},

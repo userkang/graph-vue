@@ -34,7 +34,7 @@
 
     <ToolBox v-if="graph" />
     <Menu v-if="graph" />
-    <Minimap :graph="graph" v-if="graph && minimap"/>
+    <Minimap :graph="graph" v-if="graph && minimap" />
   </div>
 </template>
 
@@ -57,6 +57,7 @@ import {
   INode,
   IEdge
 } from '@datafe/graph-core'
+import { isIDataModel } from '../../../graph-core/src/util/utils'
 
 @Component({
   components: {
@@ -69,7 +70,7 @@ import {
   }
 })
 export default class GraphContent extends Vue {
-  @Prop({default: true})
+  @Prop({ default: true })
   minimap: boolean
 
   componentState = ComponentListStore.state
@@ -94,6 +95,21 @@ export default class GraphContent extends Vue {
 
   get dragingInfo() {
     return this.componentState.dragingInfo
+  }
+
+  get rootNodes(): INodeModel[] {
+    const isIdata = isIDataModel(this.configState.data)
+    if (!isIdata) {
+      return [this.configState.data]
+    } else {
+      const { nodes, edges } = this.configState.data as IDataModel
+      const nodeMap: { [x: string]: INodeModel } = {}
+      nodes.forEach(node => {
+        nodeMap[node.id] = node
+      })
+      edges.forEach(edge => delete nodeMap[edge.toNodeId])
+      return Object.keys(nodeMap).map(id => nodeMap[id])
+    }
   }
 
   handleDrop(e: DragEvent) {

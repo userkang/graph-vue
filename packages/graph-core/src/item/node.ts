@@ -25,7 +25,7 @@ export default class Node extends Base {
     // 保存与节点相关的边
     this.set('edges', [])
 
-    if (model.x && model.y) {
+    if (model.x !== undefined && model.y !== undefined) {
       this.setSlotsPoint()
     }
   }

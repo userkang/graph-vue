@@ -1,3 +1,5 @@
+import { IDataModel, IEdgeModel, INodeModel } from '../types'
+
 const doc = window.document as any
 export const requestFullScreen = (el: any) => {
   const rfs =
@@ -76,3 +78,51 @@ export const clone = obj => {
   }
   return rst
 }
+
+let nextId = 0
+export const generateTreeNode = (): INodeModel => {
+  const nodeId = nextId++
+  const id = String(nodeId)
+  return {
+    id,
+    label: id,
+    nodeId
+  }
+}
+
+export const generateTreeEdge = (
+  from: INodeModel,
+  to: INodeModel
+): IEdgeModel => {
+  return {
+    fromNodeId: from.id,
+    toNodeId: to.id
+  }
+}
+
+export const preorder = (root: INodeModel): IDataModel => {
+  const nodes: INodeModel[] = []
+  const edges: IEdgeModel[] = []
+  function step(node: INodeModel) {
+    if (!node) {
+      return
+    }
+    nodes.push(node)
+    if (node.children && node.children.length) {
+      for (const child of node.children) {
+        if (child) {
+          edges.push(generateTreeEdge(node, child))
+        }
+      }
+      for (const child of node.children) {
+        step(child)
+      }
+    }
+  }
+  step(root)
+  return { nodes, edges }
+}
+
+export const isIDataModel = (props): props is IDataModel =>
+  typeof (props as IDataModel)['nodes'] !== 'undefined' &&
+  typeof (props as IDataModel)['edges'] !== 'undefined'

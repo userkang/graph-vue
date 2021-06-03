@@ -18,6 +18,7 @@ import {
   IDataStack,
   ILayout
 } from '../types/index'
+import { isIDataModel, preorder } from '../util/utils'
 
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
@@ -289,20 +290,32 @@ export default class Graph extends EventEmitter {
   }
 
   // 加载数据
-  data(data: IDataModel) {
+  data(data: IDataModel | INodeModel) {
     this.set('nodes', [])
     this.set('edges', [])
-
     this.clearItem()
 
+    let imodel: IDataModel = { nodes: [], edges: [] }
+    imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
+    const needLayout = imodel.nodes.every(
+      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
+    )
+    imodel.nodes.forEach(node =>
+      Object.assign(node, {
+        x: node.x || 1,
+        y: node.y || 1
+      })
+    )
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach((node: INodeModel) => {
+    imodel.nodes.forEach((node: INodeModel) => {
       this.nodeController.addNode(node)
     })
-    data.edges.forEach((edge: IEdgeModel) => {
+    imodel.edges.forEach((edge: IEdgeModel) => {
       this.edgeController.addEdge(edge)
     })
-
+    if (needLayout) {
+      this.layout()
+    }
     this.emit('datachange')
   }
 

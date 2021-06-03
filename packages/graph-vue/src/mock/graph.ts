@@ -1,3 +1,4 @@
+import { generateTreeNode } from '../../../graph-core/src/util/utils'
 export const dagMock = {
   nodes: [
     {
@@ -118,3 +119,14 @@ export const dagMock = {
     }
   ]
 }
+
+const treeNodes = new Array(14).fill(1).map(i => generateTreeNode())
+treeNodes[1].children = [treeNodes[2], treeNodes[3], treeNodes[4], treeNodes[5]]
+treeNodes[3].children = [treeNodes[6], treeNodes[7]]
+treeNodes[7].children = [treeNodes[11]]
+treeNodes[11].children = [treeNodes[14]]
+treeNodes[4].children = [treeNodes[8]]
+treeNodes[8].children = [treeNodes[12]]
+treeNodes[5].children = [treeNodes[9], treeNodes[10]]
+treeNodes[9].children = [treeNodes[13]]
+export const treeMock = treeNodes[1]

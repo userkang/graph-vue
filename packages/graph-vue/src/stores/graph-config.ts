@@ -1,9 +1,9 @@
-import { IDataModel } from '@datafe/graph-core'
+import { IDataModel, INodeModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
   drection: 'TB' | 'LR'
   action: string[]
-  data: IDataModel
+  data: IDataModel|INodeModel
 }
 
 class GraphConfig {

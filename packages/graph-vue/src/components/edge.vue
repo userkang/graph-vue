@@ -50,7 +50,7 @@ export default class Edge extends Vue {
         x2: toSlot.x,
         y2: toSlot.y
       },
-      this.graph.get('drection')
+      this.graph.get('direction')
     )
   }
 }

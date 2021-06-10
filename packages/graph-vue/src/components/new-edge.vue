@@ -34,7 +34,7 @@ export default class NewEdge extends Vue {
           x2: toPoint.x,
           y2: toPoint.y
         },
-        this.graph.get('drection')
+        this.graph.get('direction')
       )
     }
   }

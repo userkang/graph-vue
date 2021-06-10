@@ -11,7 +11,7 @@ export default class LayoutController {
   }
 
   init(options) {
-    const rankdir = this.graph.get('drection') || 'TB'
+    const rankdir = this.graph.get('direction') || 'TB'
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({

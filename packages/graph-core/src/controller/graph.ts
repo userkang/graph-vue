@@ -69,7 +69,7 @@ export default class Graph extends EventEmitter {
   private getDefaultCfg() {
     return {
       container: undefined,
-      drection: 'TB',
+      direction: 'TB',
       nodes: [],
       edges: [],
       action: []
@@ -316,6 +316,12 @@ export default class Graph extends EventEmitter {
 
   getEdges(): IEdge[] {
     return this.get('edges')
+  }
+
+  getData(): IDataModel {
+    const nodes = this.getNodes().map(node => node.model)
+    const edges = this.getEdges().map(edge => edge.model) as IEdgeModel[]
+    return { nodes, edges }
   }
 
   addAction(action: string | string[]) {

@@ -4,7 +4,7 @@
 
     <div class="form-item">
       <div class="label">图方向</div>
-      <select v-model="graphConfigState.drection">
+      <select v-model="graphConfigState.direction">
         <option value="TB">TB（自上而下）</option>
         <option value="LR">LR（从左往右）</option>
       </select>

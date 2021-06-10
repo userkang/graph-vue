@@ -86,7 +86,7 @@ export default class Node extends Element {
         x2: this.edge.toSlot.x,
         y2: this.edge.toSlot.y
       },
-      this.graph.get('drection')
+      this.graph.get('direction')
     )
     edgePath.setAttribute('d', path.line)
     edgeWrapperPath.setAttribute('d', path.line)

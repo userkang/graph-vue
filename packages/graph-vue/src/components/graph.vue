@@ -117,7 +117,7 @@ export default class GraphContent extends Vue {
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      drection: this.configState.drection,
+      direction: this.configState.direction,
       nodeInfo: {
         width: this.nodeInfo.width,
         height: this.nodeInfo.height
@@ -156,12 +156,7 @@ export default class GraphContent extends Vue {
   }
 
   refreshGraph() {
-    this.nodes = this.graph.getNodes()
-    this.edges = this.graph.getEdges()
-    const nodes = this.nodes.map(item => item.model)
-    const edges = this.edges.map(item => item.model)
-
-    this.configState.data = { nodes, edges }
+    this.configState.data = this.graph.getData()
   }
 
   afterDragNode(nodes: INodeModel[]) {
@@ -231,9 +226,9 @@ export default class GraphContent extends Vue {
     this.graph.destroy()
   }
 
-  @Watch('configState.drection')
+  @Watch('configState.direction')
   handleConfigChange(v: string) {
-    this.graph.set('drection', v)
+    this.graph.set('direction', v)
     this.graph.data(this.configState.data)
     this.graph.layout()
   }

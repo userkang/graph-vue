@@ -14,7 +14,7 @@ export default class NodeController {
     const node = new Node(item, {
       width,
       height,
-      drection: this.graph.get('drection')
+      direction: this.graph.get('direction')
     })
     this.graph.getNodes().push(node)
 

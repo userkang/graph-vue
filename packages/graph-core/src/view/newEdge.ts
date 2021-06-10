@@ -41,7 +41,7 @@ export default class NewEdge extends Element {
           x2: createEdge.toPoint.x,
           y2: createEdge.toPoint.y
         },
-        this.graph.get('drection')
+        this.graph.get('direction')
       )
 
       newEdgePath.setAttribute('d', path.line)

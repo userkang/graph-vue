@@ -41,7 +41,7 @@ export default class Arrow extends Element {
           x2: createEdge.toPoint.x,
           y2: createEdge.toPoint.y
         },
-        this.graph.get('drection')
+        this.graph.get('direction')
       )
 
       arrowPath.setAttribute('d', path.arrow)

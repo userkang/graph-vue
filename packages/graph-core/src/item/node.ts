@@ -17,7 +17,7 @@ export default class Node extends Base {
     this.set('cfg', cfg)
 
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
-    this.set('drection', cfg.drection)
+    this.set('direction', cfg.direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
 
@@ -135,7 +135,7 @@ export default class Node extends Base {
 
     const width = this.get('width')
     const height = this.get('height')
-    if (this.get('drection') === 'TB') {
+    if (this.get('direction') === 'TB') {
       inSlots.forEach((item, index) => {
         const x = this.x + (width / (inSlotLen + 1)) * (index + 1)
         const y = this.y
@@ -187,7 +187,7 @@ export default class Node extends Base {
     const inSlotLen = inSlots.length
     const outSlotLen = outSlots.length
 
-    if (this.get('drection') === 'TB') {
+    if (this.get('direction') === 'TB') {
       inSlots.forEach((item, index) => {
         const x = Number(model.x) + (width / (inSlotLen + 1)) * (index + 1)
         const y = Number(model.y)

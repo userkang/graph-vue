@@ -1,14 +1,14 @@
 import { IDataModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
-  drection: 'TB' | 'LR'
+  direction: 'TB' | 'LR'
   action: string[]
   data: IDataModel
 }
 
 class GraphConfig {
   public state: GraphConfigState = {
-    drection: 'TB',
+    direction: 'TB',
     action: [
       'drag-svg',
       'drag-node',

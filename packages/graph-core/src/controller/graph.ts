@@ -18,6 +18,7 @@ import {
   IDataStack,
   ILayout
 } from '../types/index'
+import detectDirectedCycle from '../util/acyclic'
 
 export default class Graph extends EventEmitter {
   public cfg: { [key: string]: any }
@@ -251,16 +252,30 @@ export default class Graph extends EventEmitter {
 
   public findNode(id: string | number): INode {
     const _id = String(id)
-    return this.getNodes().find(item => {
+    const node = this.getNodes().find(item => {
       return _id === item.id
     })
+
+    if (!node) {
+      console.warn(`The node with ID ${_id} is not exist`)
+      return null
+    }
+
+    return node
   }
 
   public findEdge(id: string | number): IEdge {
     const _id = String(id)
-    return this.getEdges().find(item => {
+    const edge = this.getEdges().find(item => {
       return _id === item.id
     })
+
+    if (!edge) {
+      console.warn(`The edge with ID ${_id} is not exist`)
+      return null
+    }
+
+    return edge
   }
 
   public findSlot(id: string | number): ISlot {
@@ -368,6 +383,11 @@ export default class Graph extends EventEmitter {
 
   fullScreen(el?: HTMLElement) {
     this.viewController.fullScreen(el)
+  }
+
+  detectDirectedCycle() {
+    console.log(this.getData())
+    return detectDirectedCycle(this.getData())
   }
 
   /**

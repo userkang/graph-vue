@@ -21,6 +21,12 @@ export default class EdgeController {
 
     const fromNode = this.graph.findNode(fromNodeId)
     const toNode = this.graph.findNode(toNodeId)
+
+    if (!fromNode || !toNode) {
+      console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
+      return
+    }
+
     const edge = new Edge(item, fromNode, toNode)
     this.graph.getEdges().push(edge)
 

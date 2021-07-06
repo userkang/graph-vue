@@ -218,7 +218,7 @@ export default class Minimap extends Vue {
   }
   onVpResizemove(e: MouseEvent) {
     const { x, y } = e
-    const changeZoom = 1 - (x - this.prevVpmove.x) / this.mapRect.width
+    const changeZoom = 1 - (x - this.prevVpmove.x + y - this.prevVpmove.y) / 250
     const nextZoom = this.transform.scale * changeZoom
     this.graph.zoom(nextZoom)
     Object.assign(this.prevVpmove, { x, y })

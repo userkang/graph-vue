@@ -53,28 +53,26 @@ export default class ViewController {
 
   // 让g的宽和高适应画布
   fitView() {
-    // 先居中再放大
-    this.translateToCenter()
-    // 变换group的信息
-    setTimeout(() => {
-      const transformInfo = this.getGroupBox()
+    this.fitZoom()
+    this.translateToCenter2()
+  }
 
-      const vScale =
-        (this.svgInfo.width / transformInfo.width) * this.transform.scale
-      const hScale =
-        (this.svgInfo.height / transformInfo.height) * this.transform.scale
-      let scale = vScale < hScale ? vScale : hScale
-
-      if (scale > 2) {
-        scale = 2
-      }
-
-      if (scale < 0.5) {
-        scale = 0.5
-      }
-
-      this.graph.zoom(scale)
-    })
+  get nodesRect() {
+    const nodes = this.graph.getNodes()
+    let [minX, minY, maxX, maxY] = [
+      Number.MAX_SAFE_INTEGER,
+      Number.MAX_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER
+    ]
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i]
+      minX = Math.min(minX, node.x)
+      minY = Math.min(minY, node.y)
+      maxX = Math.max(maxX, node.x + node.width)
+      maxY = Math.max(maxY, node.y + node.height)
+    }
+    return { left: minX, top: minY, width: maxX - minX, height: maxY - minY }
   }
 
   caculateOffset() {
@@ -82,6 +80,29 @@ export default class ViewController {
       (this.svgInfo.width * (this.transform.scale - 1)) / 2
     this.transform.offsetY =
       (this.svgInfo.height * (this.transform.scale - 1)) / 2
+  }
+
+  fitZoom() {
+    const nextZoom =
+      Math.min(
+        this.svgInfo.height / this.nodesRect.height,
+        this.svgInfo.width / this.nodesRect.width
+      ) * 0.95 // 四周留些空间好看些
+    if (nextZoom !== this.graph.getZoom()) {
+      this.graph.zoom(nextZoom)
+    }
+  }
+
+  translateToCenter2() {
+    const dx =
+      -this.transform.translateX -
+      this.nodesRect.left +
+      (this.svgInfo.width - this.nodesRect.width) / 2
+    const dy =
+      -this.transform.translateY -
+      this.nodesRect.top +
+      (this.svgInfo.height - this.nodesRect.height) / 2
+    this.graph.translate(dx, dy)
   }
 
   // 将g移动到画布中心区域

@@ -36,7 +36,6 @@ export default class ViewController {
     this.graph = graph
     this.$container = graph.cfg.container.querySelector('svg')
     this.nodeInfo = graph.cfg.nodeInfo
-    // this.translateToCenter()
     this.resize()
   }
 
@@ -53,28 +52,37 @@ export default class ViewController {
 
   // 让g的宽和高适应画布
   fitView() {
-    // 先居中再放大
+    const fitZoom = () => {
+      const nextZoom =
+        Math.min(
+          this.svgInfo.height / this.nodesBox.height,
+          this.svgInfo.width / this.nodesBox.width
+        ) * 0.95 // 四周留些空间好看些
+      if (nextZoom !== this.graph.getZoom()) {
+        this.graph.zoom(nextZoom)
+      }
+    }
+
     this.translateToCenter()
-    // 变换group的信息
-    setTimeout(() => {
-      const transformInfo = this.getGroupBox()
+    fitZoom()
+  }
 
-      const vScale =
-        (this.svgInfo.width / transformInfo.width) * this.transform.scale
-      const hScale =
-        (this.svgInfo.height / transformInfo.height) * this.transform.scale
-      let scale = vScale < hScale ? vScale : hScale
-
-      if (scale > 2) {
-        scale = 2
-      }
-
-      if (scale < 0.5) {
-        scale = 0.5
-      }
-
-      this.graph.zoom(scale)
-    })
+  get nodesBox() {
+    const nodes = this.graph.getNodes()
+    let [minX, minY, maxX, maxY] = [
+      Number.MAX_SAFE_INTEGER,
+      Number.MAX_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER
+    ]
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i]
+      minX = Math.min(minX, node.x)
+      minY = Math.min(minY, node.y)
+      maxX = Math.max(maxX, node.x + node.width)
+      maxY = Math.max(maxY, node.y + node.height)
+    }
+    return { left: minX, top: minY, width: maxX - minX, height: maxY - minY }
   }
 
   caculateOffset() {
@@ -86,25 +94,22 @@ export default class ViewController {
 
   // 将g移动到画布中心区域
   translateToCenter() {
-    // 在移动前先更新 svgInfo 信息，比较视图滚动后，svgInfo 需要重新获取
-    this.resize()
-    setTimeout(() => {
-      // 这里需要到下一个周期获取g变换后的位置信息
-      const transformInfo = this.getGroupBox()
-
-      // 变换g与画布左方和上方的距离
-      const transformLeft = transformInfo.x - this.svgInfo.x
-      const transformTop = transformInfo.y - this.svgInfo.y
-
-      const translateX =
-        ((this.svgInfo.width - transformInfo.width) / 2 - transformLeft) /
-        this.transform.scale
-      const translateY =
-        ((this.svgInfo.height - transformInfo.height) / 2 - transformTop) /
-        this.transform.scale
-
-      this.graph.translate(translateX, translateY)
-    })
+    const bounding = this.$container.getBoundingClientRect()
+    this.svgInfo = {
+      x: bounding.left,
+      y: bounding.top,
+      width: bounding.width,
+      height: bounding.height
+    }
+    const dx =
+      -this.transform.translateX -
+      this.nodesBox.left +
+      (this.svgInfo.width - this.nodesBox.width) / 2
+    const dy =
+      -this.transform.translateY -
+      this.nodesBox.top +
+      (this.svgInfo.height - this.nodesBox.height) / 2
+    this.graph.translate(dx, dy)
   }
 
   translate(x: number, y: number) {

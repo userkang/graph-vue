@@ -4,8 +4,8 @@
       :transform="`translate(${node.x}, ${node.y})`"
       :width="node.width"
       :height="node.height"
-      data-type="node"
-      :data-id="node.id"
+      graph-type="node"
+      :graph-id="node.id"
     >
       <div
         xmlns="http://www.w3.org/1999/xhtml"

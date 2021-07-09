@@ -41,6 +41,7 @@ export default class Graph extends EventEmitter {
       this.render()
     }
     this.initController()
+    window.g = this
   }
 
   private render() {
@@ -71,8 +72,6 @@ export default class Graph extends EventEmitter {
     return {
       container: undefined,
       direction: 'TB',
-      nodes: [],
-      edges: [],
       action: []
     }
   }
@@ -319,10 +318,6 @@ export default class Graph extends EventEmitter {
     })
 
     this.emit('datachange')
-  }
-
-  getNodeInfo() {
-    return this.viewController.nodeInfo
   }
 
   getNodes(): INode[] {

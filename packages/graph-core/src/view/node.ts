@@ -16,16 +16,15 @@ export default class Node extends Element {
   }
 
   draw() {
-    const div = this.createDom('div', {
-      class: 'graph-node'
-    })
-    div.innerHTML = this.node.model.label as string
+    this.drawDom()
+    const div = this.get('div')
+
     const foreignObject = this.createDom('foreignObject', {
       transform: `translate(${this.node.x}, ${this.node.y})`,
       width: `${this.node.width}`,
       height: `${this.node.height}`,
-      'data-type': 'node',
-      'data-id': `${this.node.id}`
+      'graph-type': 'node',
+      'graph-id': `${this.node.id}`
     })
     const g = this.createDom('g')
 
@@ -34,6 +33,36 @@ export default class Node extends Element {
 
     this.set('g', g)
     this.set('foreignObject', foreignObject)
+  }
+
+  drawDom() {
+    const render = this.node.get('cfg').render
+    const attrs = this.node.get('cfg').attrs
+
+    let div: HTMLElement = document.createElement('div')
+
+    if (render) {
+      const html = render(this.node)
+      if (html) {
+        div.insertAdjacentHTML('afterbegin', html)
+        div = div.firstElementChild as HTMLElement
+      }
+    } else {
+      div.classList.add('graph-node')
+      div.innerHTML = this.node.model.label as string
+    }
+
+    if (attrs) {
+      Object.keys(attrs).forEach(key => {
+        if (!div.getAttribute(key)) {
+          div.setAttribute(key, attrs[key])
+        } else if (key === 'class') {
+          div.classList.add(attrs[key])
+        } else if (key === 'style') {
+        }
+      })
+    }
+
     this.set('div', div)
   }
 
@@ -59,7 +88,7 @@ export default class Node extends Element {
     if (nodeModel) {
       const node = this.graph.findNode(nodeModel.id)
       this.node = node
-      this.transform()
+      this.update(node)
     }
   }
 
@@ -85,11 +114,14 @@ export default class Node extends Element {
 
   update(node: INode) {
     this.node = node
+    this.drawDom()
     const foreignObject = this.get('foreignObject')
     const div = this.get('div')
     foreignObject.setAttribute('width', this.node.width)
     foreignObject.setAttribute('height', this.node.height)
-    div.innerHTML = this.node.model.label as string
+    foreignObject.innerHTML = ''
+    foreignObject.appendChild(div)
+    this.updateSelect()
 
     this.transform()
   }

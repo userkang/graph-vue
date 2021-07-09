@@ -47,9 +47,11 @@ export interface IGraphConfig {
   // 图的方向： LR 从左到右， TB 自上到下
   direction: 'LR' | 'TB'
   // 节点的宽高 单位：px
-  nodeInfo: {
-    width: number
-    height: number
+  nodeConfig?: {
+    width?: number
+    height?: number
+    attrs?: { [key: string]: string }
+    render?: (node: Node) => string
   }
   // 默认的行为配置
   action: string[]

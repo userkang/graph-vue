@@ -61,7 +61,7 @@ export default class Minimap extends Vue {
   }
 
   get mapRect() {
-    return { width: 300, height: 180 }
+    return { width: 240, height: 160 }
   }
 
   get svgInfo() {

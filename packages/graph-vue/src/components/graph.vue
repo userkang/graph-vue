@@ -34,7 +34,7 @@
 
     <ToolBox v-if="graph" />
     <Menu v-if="graph" />
-    <Minimap :graph="graph" v-if="graph && minimap"/>
+    <Minimap :graph="graph" v-if="graph && minimap" />
   </div>
 </template>
 
@@ -69,7 +69,7 @@ import {
   }
 })
 export default class GraphContent extends Vue {
-  @Prop({default: true})
+  @Prop({ default: true })
   minimap: boolean
 
   componentState = ComponentListStore.state
@@ -77,7 +77,7 @@ export default class GraphContent extends Vue {
 
   graph: Graph = null as any
 
-  nodeInfo = {
+  nodeConfig = {
     width: 190,
     height: 35
   }
@@ -118,9 +118,17 @@ export default class GraphContent extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: this.configState.direction,
-      nodeInfo: {
-        width: this.nodeInfo.width,
-        height: this.nodeInfo.height
+      nodeConfig: {
+        width: this.nodeConfig.width,
+        height: 50,
+        attrs: {
+          class: 'custom-class',
+          style: 'text-algin: left',
+          'data-js': 'sdfsdf',
+        },
+        render: node => {
+          return `<div class="xxx" style="color: red">${node.x} ${node.get('cfg').attrs.class}</div>`
+        }
       },
       action: this.configState.action
     })
@@ -156,6 +164,8 @@ export default class GraphContent extends Vue {
   }
 
   refreshGraph() {
+    this.nodes = this.graph.getNodes()
+    this.edges = this.graph.getEdges()
     this.configState.data = this.graph.getData()
   }
 

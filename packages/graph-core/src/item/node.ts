@@ -6,7 +6,7 @@ import nodeView from '../view/node'
 import Graph from '../controller/graph'
 
 export default class Node extends Base {
-  constructor(model: INodeModel, cfg: { [key: string]: unknown }) {
+  constructor(model: INodeModel, cfg: { [key: string]: unknown }, direction: string) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')
@@ -17,7 +17,7 @@ export default class Node extends Base {
     this.set('cfg', cfg)
 
     // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
-    this.set('direction', cfg.direction)
+    this.set('direction', cfg.direction || direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
 

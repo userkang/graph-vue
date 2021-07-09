@@ -19,8 +19,8 @@ export default class Slot extends Element {
   draw() {
     const circle = this.createDom('circle', {
       class: `graph-slot`,
-      'data-type': 'slot',
-      'data-id': this.slot.id,
+      'graph-type': 'slot',
+      'graph-id': this.slot.id,
       r: '4',
       transform: `translate(${this.slot.x}, ${this.slot.y})`
     })

@@ -145,17 +145,17 @@ export default class EventController {
       this.graph.emit(`svg.${eventType}`, e)
     }
 
-    const targetTypes = this.$svg.querySelectorAll('[data-type]')
+    const targetTypes = this.$svg.querySelectorAll('[graph-type]')
     const typeSet: Set<string> = new Set()
     Array.from(targetTypes).forEach(item => {
-      typeSet.add((item as HTMLElement).dataset.type as string)
+      typeSet.add((item as HTMLElement).getAttribute('graph-type'))
     })
 
     typeSet.forEach(type => {
       if (isTarget(e, type)) {
         this.currentItemType = type
         const data = getItemData(e)
-        // 具有 type 类型的元素，第二个参数会带上其dom节点上的 data-type 值。
+        // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
         this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
       }
     })

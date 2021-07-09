@@ -1,7 +1,7 @@
 <template>
   <circle
-    data-type="slot"
-    :data-id="item.id"
+    graph-type="slot"
+    :graph-id="item.id"
     class="slot-style"
     :class="{
       'enable-slot': slotEnableLink,

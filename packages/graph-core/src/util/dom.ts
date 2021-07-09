@@ -3,7 +3,7 @@ export const isTarget = (e: MouseEvent, type: string) => {
   const currentTarget = e.currentTarget
 
   while (target !== currentTarget) {
-    if (target.dataset.type === type) {
+    if (target.getAttribute('graph-type') === type) {
       return true
     }
 
@@ -38,8 +38,16 @@ export const getItemData = (e: MouseEvent) => {
   const currentTarget = e.currentTarget
 
   while (target !== currentTarget) {
-    if (target.dataset.type) {
-      return target.dataset
+    if (target.getAttribute('graph-type')) {
+      const attrNames = target.getAttributeNames()
+      const data = {}
+      attrNames.forEach(item => {
+        if (/graph-(.+)/.test(item)) {
+          const type = item.replace('graph-', '')
+          data[type] = target.getAttribute(item)
+        }
+      })
+      return data
     }
 
     target = target.parentNode as HTMLElement

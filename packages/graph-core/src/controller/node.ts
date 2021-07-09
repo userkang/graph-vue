@@ -2,6 +2,10 @@ import Graph from './graph'
 import Node from '../item/node'
 import { INode, INodeModel } from '../types'
 
+const defaultCfg = {
+  width: 190,
+  height: 35
+}
 export default class NodeController {
   graph: Graph
 
@@ -10,12 +14,10 @@ export default class NodeController {
   }
 
   addNode(item: INodeModel) {
-    const { width, height } = this.graph.getNodeInfo()
-    const node = new Node(item, {
-      width,
-      height,
-      direction: this.graph.get('direction')
-    })
+    const nodeCfg = this.graph.get('nodeConfig') || defaultCfg
+    const direction = this.graph.get('direction')
+
+    const node = new Node(item, nodeCfg, direction)
     this.graph.getNodes().push(node)
 
     // 渲染

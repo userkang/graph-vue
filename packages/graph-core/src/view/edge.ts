@@ -20,8 +20,8 @@ export default class Node extends Element {
 
     const edgeWrapperPath = this.createDom('path', {
       class: 'graph-edge-wrapper',
-      'data-type': 'edge',
-      'data-id': this.edge.id
+      'graph-type': 'edge',
+      'graph-id': this.edge.id
     })
 
     const arrowPath = this.createDom('path', {

@@ -16,24 +16,26 @@ export default `
   fill: none;
   stroke: transparent;
 }
-.graph-edge-wrapper:hover {
-  + .edge-style {
-    stroke: var(--select-color);
-    stroke-width: 2.5;
-    cursor: pointer;
-  }
-  + .arrow-style {
-    stroke: var(--select-color);
-    fill: var(--select-color);
-  }
+/**
+.graph-edge-wrapper:hover +.graph-edge {
+  stroke: var(--select-color);
+  stroke-width: 2.5;
+  cursor: pointer;
 }
+.graph-edge-wrapper:hover +.graph-edge +.graph-arrow {
+  stroke: var(--select-color);
+  fill: var(--select-color);
+}
+*/
 .graph-edge {
   stroke: var(--edge-color);
   stroke-width: 2;
   fill: none;
   stroke-linecap: round;
+  /**
   stroke-dasharray: 5;
   animation: dash 10s linear infinite;
+  */
   pointer-events: none;
 }
 .graph-edge-active {

@@ -3,8 +3,8 @@
     <path
       :d="path.line"
       class="edge-wrapper"
-      data-type="edge"
-      :data-id="edge.id"
+      graph-type="edge"
+      :graph-id="edge.id"
     ></path>
     <path
       :d="path.line"
@@ -73,14 +73,14 @@ $select-color: #4150f6;
   fill: none;
   stroke: transparent;
   &:hover {
-    + .edge-style {
+    +.edge-style {
       stroke: $select-color;
       stroke-width: 2.5;
       cursor: pointer;
-    }
-    + .arrow-style {
-      stroke: $select-color;
-      fill: $select-color;
+      +.arrow-style {
+        stroke: $select-color;
+        fill: $select-color;
+      }
     }
   }
 }

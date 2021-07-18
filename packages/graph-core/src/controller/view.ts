@@ -159,18 +159,6 @@ export default class ViewController {
     this.translateY(y)
   }
 
-  getGroupBox() {
-    const clientRect = this.$container
-      .querySelector('g')
-      .getBoundingClientRect()
-    return {
-      x: clientRect.left,
-      y: clientRect.top,
-      width: clientRect.width,
-      height: clientRect.height
-    }
-  }
-
   getPointByClient(originX: number, originY: number) {
     const posX = originX - this.svgInfo.x
     const posY = originY - this.svgInfo.y

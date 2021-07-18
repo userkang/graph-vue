@@ -223,7 +223,7 @@ export default class Graph extends EventEmitter {
     const zoom = this.getZoom()
     if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
       this.viewController.transform.scale = value
-
+      this.translate(0, 0)
       this.viewController.caculateOffset()
       this.emit('afterzoom', value)
     }

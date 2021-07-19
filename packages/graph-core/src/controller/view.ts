@@ -32,6 +32,8 @@ export default class ViewController {
     offsetY: 0
   }
 
+  public translatePadding = 10
+
   constructor(graph: Graph) {
     this.graph = graph
     this.$container = graph.cfg.container.querySelector('svg')
@@ -112,27 +114,49 @@ export default class ViewController {
     this.graph.translate(dx, dy)
   }
 
-  translate(x: number, y: number) {
-    // 暂时去掉边界判断
-    // 原因：1、性能考虑 2、在图过长的情况下，会带来图剩余部分显示不全的问题。
-    // if (this.judgeBoundary(x, y)) {
-    //   return
-    // }
-
-    this.transform.translateX += x
-    this.transform.translateY += y
+  translateX(x: number) {
+    // 结果正确前提是 transformOrigin:center ，transformOrigin是以svgInfo为基准
+    let nextTranslateX = this.transform.translateX + x
+    const svgCenterX = this.svgInfo.width / 2
+    const leftPart = svgCenterX - this.nodesBox.left
+    // svgCenterX * (1 +- 1/this.transform.scale) - this.nodesBox.left
+    if (nextTranslateX < 0) {
+      const minTranslateX =
+        leftPart -
+        svgCenterX / this.transform.scale -
+        this.nodesBox.width +
+        this.translatePadding
+      nextTranslateX = Math.max(nextTranslateX, minTranslateX)
+    } else if (nextTranslateX > 0) {
+      const maxTranslateX =
+        leftPart + svgCenterX / this.transform.scale - this.translatePadding
+      nextTranslateX = Math.min(nextTranslateX, maxTranslateX)
+    }
+    this.transform.translateX = nextTranslateX
   }
 
-  getGroupBox() {
-    const clientRect = this.$container
-      .querySelector('g')
-      .getBoundingClientRect()
-    return {
-      x: clientRect.left,
-      y: clientRect.top,
-      width: clientRect.width,
-      height: clientRect.height
+  translateY(y: number) {
+    let nextTranslateY = this.transform.translateY + y
+    const svgCenterY = this.svgInfo.height / 2
+    const topPart = svgCenterY - this.nodesBox.top
+    if (nextTranslateY < 0) {
+      const minTranslateY =
+        topPart -
+        svgCenterY / this.transform.scale -
+        this.nodesBox.height +
+        this.translatePadding
+      nextTranslateY = Math.max(nextTranslateY, minTranslateY)
+    } else if (nextTranslateY > 0) {
+      const maxTranslateY =
+        topPart + svgCenterY / this.transform.scale - this.translatePadding
+      nextTranslateY = Math.min(nextTranslateY, maxTranslateY)
     }
+    this.transform.translateY = nextTranslateY
+  }
+
+  translate(x: number, y: number) {
+    this.translateX(x)
+    this.translateY(y)
   }
 
   getPointByClient(originX: number, originY: number) {
@@ -165,29 +189,5 @@ export default class ViewController {
       this.graph.translate(x, y)
       this.caculateOffset()
     }
-  }
-
-  judgeBoundary(x: number, y: number) {
-    const transformInfo = this.getGroupBox()
-
-    const { height: gHeight, width: gWidth, x: gX, y: gY } = transformInfo
-    //  右边界
-    if (gX + 0.5 * gWidth >= this.svgInfo.x + this.svgInfo.width && x > 0) {
-      return true
-    }
-    // 左边界
-    if (gX + gWidth - 0.5 * gWidth <= this.svgInfo.x && x < 0) {
-      return true
-    }
-    // 下边界
-    if (gY + gHeight - 0.5 * gHeight <= this.svgInfo.y && y < 0) {
-      return true
-    }
-    // 上边界
-    if (gY + 0.5 * gHeight >= this.svgInfo.y + this.svgInfo.height && y > 0) {
-      return true
-    }
-
-    return false
   }
 }

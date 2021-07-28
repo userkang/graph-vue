@@ -1,15 +1,15 @@
 type baseType = string | number | boolean | undefined | null | symbol
-type getter = <T = any>() => T
+type getter = () => any
 interface CallbackMap {
   [key: string]: Array<() => void>
 }
 
 let computedCallback: null | (() => void) = null
 
-export const computed = (getter: getter) => {
+export const computed = (getterFunc: getter) => {
   let lastValue
   const onUpdate = () => {
-    lastValue = getter()
+    lastValue = getterFunc()
   }
   computedCallback = onUpdate
   onUpdate()
@@ -23,7 +23,7 @@ export const computed = (getter: getter) => {
 
 const computedMap = new WeakMap<object, CallbackMap>()
 
-const tracker = (target: Object, k) => {
+const tracker = (target: object, k) => {
   if (!computedCallback) {
     return
   }
@@ -34,7 +34,7 @@ const tracker = (target: Object, k) => {
   computedMap.set(target, callbackMap)
 }
 
-const trigger = (target: Object, k) => {
+const trigger = (target: object, k) => {
   const key = String(k)
   if (!(key in target)) {
     return
@@ -58,8 +58,8 @@ export const ref = (value: baseType) => {
       tracker(target, key)
       return res
     },
-    set(target, key, value) {
-      const res = Reflect.set(target, key, value)
+    set(target, key, val) {
+      const res = Reflect.set(target, key, val)
       trigger(target, key)
       return res
     }
@@ -69,19 +69,19 @@ export const ref = (value: baseType) => {
 
 const reactiveMap = new WeakMap<object, object>()
 
-export const reactive = (obj: Object) => {
+export const reactive = <T extends object>(obj: T): T => {
   const existProxy = reactiveMap.get(obj)
   if (existProxy) {
-    return existProxy
+    return existProxy as T
   }
   const proxy = new Proxy(obj, {
     get(target, key) {
       const res = Reflect.get(target, key)
-      tracker(target, key)
+      tracker([target], key)
       return res instanceof Object ? reactive(res) : res
     },
-    set(target, key, value) {
-      const res = Reflect.set(target, key, value)
+    set(target, key, val) {
+      const res = Reflect.set(target, key, val)
       trigger(target, key)
       return res
     }

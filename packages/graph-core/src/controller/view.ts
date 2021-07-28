@@ -19,8 +19,6 @@ export default class ViewController {
     height: 0
   }
 
-  public nodeInfo: NodeInfo
-
   // 画布变换相关值
   public transform = {
     scale: 1,
@@ -35,7 +33,6 @@ export default class ViewController {
   constructor(graph: Graph) {
     this.graph = graph
     this.$svg = graph.cfg.container.querySelector('svg')
-    this.nodeInfo = graph.cfg.nodeInfo
     this.resize()
   }
 

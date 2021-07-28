@@ -311,7 +311,7 @@ export default class Graph extends EventEmitter {
   }
 
   getNodeInfo() {
-    return this.viewController.nodeInfo
+    return this.cfg.nodeInfo
   }
 
   getNodes(): INode[] {

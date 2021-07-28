@@ -12,7 +12,7 @@ export default class WheelZoom extends Base {
   }
 
   onWheel(e: WheelEvent) {
-    if (e.ctrlKey) {
+    if (!e.ctrlKey) {
       e.preventDefault()
       let ratio = this.graph.getZoom()
 

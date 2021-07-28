@@ -113,15 +113,18 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  public addEdge(item: IEdgeModel, stack: boolean = true): IEdge {
+  public addEdge(item: IEdgeModel, stack: boolean = true) {
     const edge = this.edgeController.addEdge(item)
-    this.emit('afteraddedge', item)
-    if (stack) {
-      const data = { edges: [item] }
-      this.pushStack('addEdge', data)
+    if (edge) {
+      this.emit('afteraddedge', item)
+      if (stack) {
+        const data = { edges: [item] }
+        this.pushStack('addEdge', data)
+      }
+      return edge
+    } else {
+      return false
     }
-
-    return edge
   }
 
   public getSvgInfo() {
@@ -163,12 +166,12 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  updateEdge(id: string, model: IEdgeModel): IEdge {
-    const edge = this.findEdge(id)
-    edge.update(model)
-    this.emit('afteredgeupdate', edge.model)
-
-    return edge
+  updateEdge(id: string, model: IEdgeModel) {
+    const edge = this.edgeController.updateEdge(id, model)
+    if (edge) {
+      this.emit('afteredgeupdate', edge.model)
+    }
+    return edge || false
   }
 
   refreshNode(id: string) {
@@ -177,42 +180,17 @@ export default class Graph extends EventEmitter {
     this.emit('afternoderefresh', node.model)
   }
 
-  deleteEdge(id: string, stack: boolean = true): IEdge {
-    const edge = this.findEdge(id)
-    if (!edge) {
-      return
+  deleteEdge(id: string, stack: boolean = true) {
+    const edge = this.edgeController.deleteEdge(id)
+    if (edge) {
+      if (stack) {
+        this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
+      }
+      this.emit('afterdeleteedge', edge.model)
+      return edge
+    } else {
+      return false
     }
-
-    // 先删除前后节点的相关边
-    edge.fromNode.deleteEdge(id)
-    edge.toNode.deleteEdge(id)
-
-    // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    const hasFromSlotLinked = edge.fromNode.edges.find(
-      item => item.fromSlot.id === edge.fromSlot.id
-    )
-    const hasToSlotLinked = edge.toNode.edges.find(
-      item => item.toSlot.id === edge.toSlot.id
-    )
-
-    if (!hasFromSlotLinked) {
-      edge.fromSlot.clearState('linked')
-    }
-
-    if (!hasToSlotLinked) {
-      edge.toSlot.clearState('linked')
-    }
-
-    if (stack) {
-      this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-    }
-
-    // 删除数据中的边
-    this.edgeController.deleteEdge(edge)
-
-    this.emit('afterdeleteedge', edge.model)
-
-    return edge
   }
 
   public getZoom() {
@@ -253,18 +231,8 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  public findEdge(id: string | number): IEdge {
-    const _id = String(id)
-    const edge = this.getEdges().find(item => {
-      return _id === item.id
-    })
-
-    if (!edge) {
-      console.warn(`The edge with ID ${_id} is not exist`)
-      return null
-    }
-
-    return edge
+  public findEdge(id: string | number) {
+    return this.edgeController.findEdge(id)
   }
 
   public findSlot(id: string | number): ISlot {
@@ -295,7 +263,6 @@ export default class Graph extends EventEmitter {
   // 加载数据
   data(data: IDataModel) {
     this.set('nodes', [])
-    this.set('edges', [])
 
     this.clearItem()
 
@@ -303,9 +270,7 @@ export default class Graph extends EventEmitter {
     data.nodes.forEach((node: INodeModel) => {
       this.nodeController.addNode(node)
     })
-    data.edges.forEach((edge: IEdgeModel) => {
-      this.edgeController.addEdge(edge)
-    })
+    this.edgeController.data(data.edges)
 
     this.emit('datachange')
   }
@@ -319,7 +284,7 @@ export default class Graph extends EventEmitter {
   }
 
   getEdges(): IEdge[] {
-    return this.get('edges')
+    return this.edgeController.edges
   }
 
   getData(): IDataModel {

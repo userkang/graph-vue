@@ -7,6 +7,7 @@ import EdgeController from './edge'
 import StackController from './stack'
 import Svg from '../view/svg'
 import {
+  CFG,
   INode,
   IEdge,
   ISlot,
@@ -20,8 +21,15 @@ import {
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 
+const getDefaultConfig = () => ({
+  direction: 'TB',
+  nodes: [],
+  edges: [],
+  action: []
+})
+
 export default class Graph extends EventEmitter {
-  public cfg: { [key: string]: any }
+  public cfg: CFG
 
   public viewController: ViewController
   public layoutController: LayoutController
@@ -31,21 +39,23 @@ export default class Graph extends EventEmitter {
   public stackController: StackController
 
   constructor(config: IGraphConfig) {
+    const container =
+      config.container instanceof HTMLElement
+        ? config.container
+        : document.querySelector(config.container)
+    if (!(container instanceof HTMLElement)) {
+      throw new ReferenceError(`无效的container ${config.container}`)
+    }
     super()
-    this.cfg = Object.assign({}, this.getDefaultCfg(), config)
+    this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
     // 是否触发自带渲染
-    const isRender = !this.get('container').querySelector('svg')
-    this.set('isRender', isRender)
-    if (isRender) {
-      this.render()
+    const svg = container.querySelector('svg')
+    this.set('isRender', !svg)
+    if (!svg) {
+      this.set('svg', new Svg(this))
     }
     this.initController()
-  }
-
-  private render() {
-    const svg = new Svg(this)
-    this.set('svg', svg)
   }
 
   private clearItem() {
@@ -65,16 +75,6 @@ export default class Graph extends EventEmitter {
     this.nodeController = new NodeController(this)
     this.edgeController = new EdgeController(this)
     this.stackController = new StackController(this)
-  }
-
-  private getDefaultCfg() {
-    return {
-      container: undefined,
-      direction: 'TB',
-      nodes: [],
-      edges: [],
-      action: []
-    }
   }
 
   public getPointByClient(

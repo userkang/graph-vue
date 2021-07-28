@@ -55,6 +55,14 @@ export interface IGraphConfig {
   action: string[]
 }
 
+export interface CFG extends IGraphConfig {
+  container: HTMLElement
+  nodes: INode[]
+  edges: IEdge[]
+  action: string[]
+  [key: string]: any
+}
+
 export interface IStack {
   type: string
   data: IDataStack

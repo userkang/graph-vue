@@ -16,5 +16,5 @@
     "types": ["webpack-env"],
     "lib": ["esnext", "dom"]
   },
-  "include": ["src", "shims.d.ts"]
+  "include": ["src", "shims.d.ts", "global.d.ts"]
 }

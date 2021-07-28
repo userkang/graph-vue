@@ -1,9 +1,9 @@
-const doc = window.document as any
-export const requestFullScreen = (el: any) => {
+const doc = window.document
+export const requestFullScreen = (el: Element) => {
   const rfs =
     el.requestFullscreen ||
     el.mozRequestFullScreen ||
-    el.webkitRequestFullScreen ||
+    el.webkitRequestFullscreen ||
     el.msRequestFullscreen
 
   rfs.call(el)

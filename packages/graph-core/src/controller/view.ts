@@ -53,15 +53,23 @@ export default class ViewController {
     }
   }
 
+  private updateSvgInfo() {
+    const bounding = this.$svg.getBoundingClientRect()
+    Object.assign(this.svgInfo, {
+      x: bounding.left,
+      y: bounding.top,
+      width: bounding.width,
+      height: bounding.height
+    })
+  }
+
   fullScreen(el?: HTMLElement) {
     if (isFullScreen()) {
       cancelFullScreen()
     } else {
-      if (!el) {
-        el = this.$svg.parentNode as HTMLElement
-      }
-      requestFullScreen(el)
+      requestFullScreen(el || this.$svg.parentElement)
     }
+    this.updateSvgInfo()
   }
 
   // 让g的宽和高适应画布
@@ -108,13 +116,7 @@ export default class ViewController {
 
   // 将g移动到画布中心区域
   translateToCenter() {
-    const bounding = this.$svg.getBoundingClientRect()
-    this.svgInfo = {
-      x: bounding.left,
-      y: bounding.top,
-      width: bounding.width,
-      height: bounding.height
-    }
+    this.updateSvgInfo()
     const dx =
       -this.transform.translateX -
       this.nodesBox.left +
@@ -191,15 +193,7 @@ export default class ViewController {
   resize() {
     const width = this.svgInfo.width
     const height = this.svgInfo.height
-    const bounding = this.$svg.getBoundingClientRect()
-
-    this.svgInfo = {
-      x: bounding.left,
-      y: bounding.top,
-      width: bounding.width,
-      height: bounding.height
-    }
-
+    this.updateSvgInfo()
     if (width && height) {
       const x = ((this.svgInfo.width - width) * this.transform.scale) / 2
       const y = ((this.svgInfo.height - height) * this.transform.scale) / 2

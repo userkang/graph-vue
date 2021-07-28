@@ -1,3 +1,4 @@
+import { NodeInfo } from '../types/index'
 import {
   isFullScreen,
   requestFullScreen,
@@ -8,7 +9,7 @@ import Graph from './graph'
 export default class ViewController {
   graph: Graph
 
-  public $container!: SVGElement
+  public $svg!: SVGElement
 
   // 画布宽高信息
   public svgInfo = {
@@ -18,10 +19,7 @@ export default class ViewController {
     height: 0
   }
 
-  public nodeInfo = {
-    width: 190,
-    height: 35
-  }
+  public nodeInfo: NodeInfo
 
   // 画布变换相关值
   public transform = {
@@ -36,9 +34,23 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$container = graph.cfg.container.querySelector('svg')
+    this.$svg = graph.cfg.container.querySelector('svg')
     this.nodeInfo = graph.cfg.nodeInfo
     this.resize()
+  }
+
+  public getZoom() {
+    return this.transform.scale
+  }
+
+  public zoom(value: number) {
+    const zoom = this.getZoom()
+    if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
+      this.transform.scale = value
+      this.translate(0, 0)
+      this.caculateOffset()
+      this.graph.emit('afterzoom', value)
+    }
   }
 
   fullScreen(el?: HTMLElement) {
@@ -46,7 +58,7 @@ export default class ViewController {
       cancelFullScreen()
     } else {
       if (!el) {
-        el = this.$container.parentNode as HTMLElement
+        el = this.$svg.parentNode as HTMLElement
       }
       requestFullScreen(el)
     }
@@ -60,8 +72,8 @@ export default class ViewController {
           this.svgInfo.height / this.nodesBox.height,
           this.svgInfo.width / this.nodesBox.width
         ) * 0.95 // 四周留些空间好看些
-      if (nextZoom !== this.graph.getZoom()) {
-        this.graph.zoom(nextZoom)
+      if (nextZoom !== this.getZoom()) {
+        this.zoom(nextZoom)
       }
     }
 
@@ -96,7 +108,7 @@ export default class ViewController {
 
   // 将g移动到画布中心区域
   translateToCenter() {
-    const bounding = this.$container.getBoundingClientRect()
+    const bounding = this.$svg.getBoundingClientRect()
     this.svgInfo = {
       x: bounding.left,
       y: bounding.top,
@@ -111,7 +123,7 @@ export default class ViewController {
       -this.transform.translateY -
       this.nodesBox.top +
       (this.svgInfo.height - this.nodesBox.height) / 2
-    this.graph.translate(dx, dy)
+    this.translate(dx, dy)
   }
 
   translateX(x: number) {
@@ -157,6 +169,11 @@ export default class ViewController {
   translate(x: number, y: number) {
     this.translateX(x)
     this.translateY(y)
+    this.graph.emit(
+      'aftertranslate',
+      this.transform.translateX,
+      this.transform.translateY
+    )
   }
 
   getPointByClient(originX: number, originY: number) {
@@ -174,7 +191,7 @@ export default class ViewController {
   resize() {
     const width = this.svgInfo.width
     const height = this.svgInfo.height
-    const bounding = this.$container.getBoundingClientRect()
+    const bounding = this.$svg.getBoundingClientRect()
 
     this.svgInfo = {
       x: bounding.left,
@@ -186,7 +203,7 @@ export default class ViewController {
     if (width && height) {
       const x = ((this.svgInfo.width - width) * this.transform.scale) / 2
       const y = ((this.svgInfo.height - height) * this.transform.scale) / 2
-      this.graph.translate(x, y)
+      this.translate(x, y)
       this.caculateOffset()
     }
   }

@@ -216,17 +216,11 @@ export default class Graph extends EventEmitter {
   }
 
   public getZoom() {
-    return this.viewController.transform.scale
+    return this.viewController.getZoom()
   }
 
   public zoom(value: number) {
-    const zoom = this.getZoom()
-    if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
-      this.viewController.transform.scale = value
-      this.translate(0, 0)
-      this.viewController.caculateOffset()
-      this.emit('afterzoom', value)
-    }
+    return this.viewController.zoom(value)
   }
 
   public layout(options: ILayout = {}) {
@@ -242,12 +236,7 @@ export default class Graph extends EventEmitter {
   }
 
   public translate(x: number, y: number) {
-    this.viewController.translate(x, y)
-    this.emit(
-      'aftertranslate',
-      this.viewController.transform.translateX,
-      this.viewController.transform.translateY
-    )
+    return this.viewController.translate(x, y)
   }
 
   public findNode(id: string | number): INode {

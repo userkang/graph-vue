@@ -10,10 +10,10 @@ export default class EdgeController {
     this.edges = graph.cfg.edges
   }
 
-  public data(values: IEdgeModel[]) {
+  public data(group: IEdgeModel[]) {
     this.edges = []
-    for (let i = 0; i < values.length; i++) {
-      this.addEdge(values[i])
+    for (const item of group) {
+      this.addEdge(item)
     }
   }
 

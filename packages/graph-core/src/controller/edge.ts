@@ -3,15 +3,19 @@ import Graph from '../controller/graph'
 import Edge from '../item/edge'
 export default class EdgeController {
   graph: Graph
-  edges: Edge[] = []
+  private _edges: Edge[] = []
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.edges = graph.cfg.edges
+    this._edges = graph.cfg.edges
+  }
+
+  get edges() {
+    return this._edges
   }
 
   public data(group: IEdgeModel[]) {
-    this.edges = []
+    this._edges = []
     for (const item of group) {
       this.addEdge(item)
     }
@@ -28,11 +32,12 @@ export default class EdgeController {
       return false
     } else {
       edge.update(model)
+      this.graph.emit('afteredgeupdate', edge.model)
       return edge
     }
   }
 
-  public deleteEdge(id: string): Edge | false {
+  public deleteEdge(id: string, stack = true): Edge | false {
     const edge = this.findEdge(id)
     if (!edge) {
       return false
@@ -63,15 +68,18 @@ export default class EdgeController {
     }
 
     edges.splice(index, 1)
-
     if (this.graph.get('isRender')) {
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.remove(edge.get('view'))
     }
+    this.graph.emit('afterdeleteedge', edge.model)
+    if (stack) {
+      this.graph.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
+    }
     return edge
   }
 
-  public addEdge(item: IEdgeModel): Edge | false {
+  public addEdge(item: IEdgeModel, stack = true): Edge | false {
     if (this.findEdge(item.id)) {
       return false
     }
@@ -101,6 +109,11 @@ export default class EdgeController {
       const edgeView = edge.render(this.graph)
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.add(edgeView)
+    }
+    this.graph.emit('afteraddedge', item)
+    if (stack) {
+      const data = { edges: [item] }
+      this.graph.pushStack('addEdge', data)
     }
 
     return edge

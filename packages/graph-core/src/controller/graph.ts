@@ -96,89 +96,48 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel, stack: boolean = true): INode | false {
-    const node = this.nodeController.addNode(item)
-    if (!node) {
-      return false
-    }
-    this.emit('afteraddnode', item)
-    if (stack) {
-      const data = { nodes: [item] }
-      this.pushStack('addNode', data)
-    }
-    return node
-  }
-
-  public addEdge(item: IEdgeModel, stack: boolean = true) {
-    const edge = this.edgeController.addEdge(item)
-    if (edge) {
-      this.emit('afteraddedge', item)
-      if (stack) {
-        const data = { edges: [item] }
-        this.pushStack('addEdge', data)
-      }
-      return edge
-    } else {
-      return false
-    }
-  }
-
   public getSvgInfo() {
     return this.viewController.svgInfo
   }
 
-  deleteNode(id: string, stack: boolean = true) {
-    const node = this.nodeController.deleteNode(id)
-    if (!node) {
-      return false
-    }
-    if (stack) {
-      const data: IDataStack = {}
-      data.nodes = [node.model]
-      data.edges = node.edges.map(item => {
-        return item.model as IEdgeModel
-      })
-      this.pushStack('deleteNode', data)
-    }
-    this.emit('afterdeletenode', node.model)
-    return node
+  getNodes(): INode[] {
+    return this.nodeController.nodes
   }
 
-  updateNode(id: string, model: INodeModel) {
-    const node = this.nodeController.updateNode(id, model)
-    if (node) {
-      this.emit('afternodeupdate', node.model)
-      return node
-    } else {
-      return false
-    }
-  }
-
-  updateEdge(id: string, model: IEdgeModel) {
-    const edge = this.edgeController.updateEdge(id, model)
-    if (edge) {
-      this.emit('afteredgeupdate', edge.model)
-    }
-    return edge || false
+  public findNode(id: string | number): INode {
+    return this.nodeController.findNode(id)
   }
 
   refreshNode(id: string) {
-    const node = this.findNode(id)
-    node.refresh()
-    this.emit('afternoderefresh', node.model)
+    return this.nodeController.refreshNode(id)
+  }
+
+  deleteNode(id: string, stack = true) {
+    return this.nodeController.deleteNode(id, stack)
+  }
+
+  updateNode(id: string, model: INodeModel) {
+    return this.nodeController.updateNode(id, model)
+  }
+
+  public addNode(item: INodeModel, stack = true): INode | false {
+    return this.nodeController.addNode(item, stack)
+  }
+
+  getEdges(): IEdge[] {
+    return this.edgeController.edges
   }
 
   deleteEdge(id: string, stack: boolean = true) {
-    const edge = this.edgeController.deleteEdge(id)
-    if (edge) {
-      if (stack) {
-        this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-      }
-      this.emit('afterdeleteedge', edge.model)
-      return edge
-    } else {
-      return false
-    }
+    return this.edgeController.deleteEdge(id, stack)
+  }
+
+  updateEdge(id: string, model: IEdgeModel) {
+    return this.edgeController.updateEdge(id, model)
+  }
+
+  public addEdge(item: IEdgeModel, stack: boolean = true) {
+    return this.edgeController.addEdge(item, stack)
   }
 
   public getZoom() {
@@ -203,10 +162,6 @@ export default class Graph extends EventEmitter {
 
   public translate(x: number, y: number) {
     return this.viewController.translate(x, y)
-  }
-
-  public findNode(id: string | number): INode {
-    return this.nodeController.findNode(id)
   }
 
   public findEdge(id: string | number) {
@@ -250,14 +205,6 @@ export default class Graph extends EventEmitter {
 
   getNodeInfo() {
     return this.cfg.nodeInfo
-  }
-
-  getNodes(): INode[] {
-    return this.nodeController.nodes
-  }
-
-  getEdges(): IEdge[] {
-    return this.edgeController.edges
   }
 
   getData(): IDataModel {

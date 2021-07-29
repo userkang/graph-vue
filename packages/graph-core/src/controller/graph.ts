@@ -96,15 +96,11 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel, stack: boolean = true): INode {
-    if (item.id && this.findNode(item.id)) {
-      console.warn(
-        `The node already exists. Make sure the ID %c${item.id}%c  is uniqued`
-      )
-      return
-    }
-
+  public addNode(item: INodeModel, stack: boolean = true): INode | false {
     const node = this.nodeController.addNode(item)
+    if (!node) {
+      return false
+    }
     this.emit('afteraddnode', item)
     if (stack) {
       const data = { nodes: [item] }
@@ -131,12 +127,11 @@ export default class Graph extends EventEmitter {
     return this.viewController.svgInfo
   }
 
-  deleteNode(id: string, stack: boolean = true): INode {
-    const node = this.findNode(id)
+  deleteNode(id: string, stack: boolean = true) {
+    const node = this.nodeController.deleteNode(id)
     if (!node) {
-      return
+      return false
     }
-
     if (stack) {
       const data: IDataStack = {}
       data.nodes = [node.model]
@@ -145,25 +140,18 @@ export default class Graph extends EventEmitter {
       })
       this.pushStack('deleteNode', data)
     }
-
-    // 先删除与节点相关的边
-    const edgeIds = node.edges.map(edge => edge.id)
-    edgeIds.forEach(item => {
-      this.deleteEdge(item, false)
-    })
-
-    this.nodeController.deleteNode(node)
     this.emit('afterdeletenode', node.model)
-
     return node
   }
 
-  updateNode(id: string, model: INodeModel): INode {
-    const node = this.findNode(id)
-    node.update(model)
-    this.emit('afternodeupdate', node.model)
-
-    return node
+  updateNode(id: string, model: INodeModel) {
+    const node = this.nodeController.updateNode(id, model)
+    if (node) {
+      this.emit('afternodeupdate', node.model)
+      return node
+    } else {
+      return false
+    }
   }
 
   updateEdge(id: string, model: IEdgeModel) {
@@ -218,17 +206,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findNode(id: string | number): INode {
-    const _id = String(id)
-    const node = this.getNodes().find(item => {
-      return _id === item.id
-    })
-
-    if (!node) {
-      console.warn(`The node with ID ${_id} is not exist`)
-      return null
-    }
-
-    return node
+    return this.nodeController.findNode(id)
   }
 
   public findEdge(id: string | number) {
@@ -262,14 +240,9 @@ export default class Graph extends EventEmitter {
 
   // 加载数据
   data(data: IDataModel) {
-    this.set('nodes', [])
-
     this.clearItem()
-
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach((node: INodeModel) => {
-      this.nodeController.addNode(node)
-    })
+    this.nodeController.data(data.nodes)
     this.edgeController.data(data.edges)
 
     this.emit('datachange')
@@ -280,7 +253,7 @@ export default class Graph extends EventEmitter {
   }
 
   getNodes(): INode[] {
-    return this.get('nodes')
+    return this.nodeController.nodes
   }
 
   getEdges(): IEdge[] {

@@ -46,8 +46,6 @@ export default `
 }
 .graph-arrow {
   stroke: var(--edge-color);
-  stroke-width: 2;
-  stroke-linecap: round;
   fill: var(--edge-color);
 }
 .graph-arrow-active {

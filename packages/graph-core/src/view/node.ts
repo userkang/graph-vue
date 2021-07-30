@@ -33,34 +33,26 @@ export default class Node extends Element {
 
     this.set('g', g)
     this.set('foreignObject', foreignObject)
+    this.set('el', g)
   }
 
   drawDom() {
-    const render = this.node.get('cfg').render
-    const attrs = this.node.get('cfg').attrs
-
+    const htmlFunction = this.node.get('cfg').html
     let div: HTMLElement = document.createElement('div')
 
-    if (render) {
-      const html = render(this.node)
-      if (html) {
-        div.insertAdjacentHTML('afterbegin', html)
-        div = div.firstElementChild as HTMLElement
+    if (htmlFunction) {
+      const content = htmlFunction(this.node)
+      if (content) {
+        if (typeof content === 'string') {
+          div.insertAdjacentHTML('afterbegin', content)
+          div = div.firstElementChild as HTMLElement
+        } else {
+          div = content
+        }
       }
     } else {
       div.classList.add('graph-node')
       div.innerHTML = this.node.model.label as string
-    }
-
-    if (attrs) {
-      Object.keys(attrs).forEach(key => {
-        if (!div.getAttribute(key)) {
-          div.setAttribute(key, attrs[key])
-        } else if (key === 'class') {
-          div.classList.add(attrs[key])
-        } else if (key === 'style') {
-        }
-      })
     }
 
     this.set('div', div)
@@ -88,7 +80,7 @@ export default class Node extends Element {
     if (nodeModel) {
       const node = this.graph.findNode(nodeModel.id)
       this.node = node
-      this.update(node)
+      this.transform()
     }
   }
 

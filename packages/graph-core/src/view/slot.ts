@@ -27,6 +27,7 @@ export default class Slot extends Element {
 
     this.node.get('g').appendChild(circle)
 
+    this.set('el', circle)
     this.set('circle', circle)
   }
 

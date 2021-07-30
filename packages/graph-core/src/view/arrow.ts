@@ -15,6 +15,7 @@ export default class Arrow extends Element {
       d: ''
     })
 
+    this.set('el', arrowPath)
     this.set('arrowPath', arrowPath)
   }
 

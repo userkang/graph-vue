@@ -1,4 +1,4 @@
-export const createSVGElement = type => {
+export const createSVGElement = (type): HTMLElement | SVGElement => {
   if (type === 'div') {
     return document.createElementNS('http://www.w3.org/1999/xhtml', type)
   }

@@ -24,10 +24,13 @@ export default abstract class Element extends Base {
 
   abstract draw()
 
-  createDom(type: string, attrs?: { [key: string]: string }) {
-    const el = createSVGElement(type) as SVGAElement
+  createDom(
+    type: string,
+    attrs?: { [key: string]: string }
+  ): HTMLElement | SVGElement {
+    const el = createSVGElement(type)
 
-    this.set('el', el)
+    // this.set('el', el)
 
     if (attrs) {
       Object.keys(attrs).forEach(key => {

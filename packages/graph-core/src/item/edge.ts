@@ -5,13 +5,20 @@ import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 
 export default class Edge extends Base {
-  constructor(model: IEdgeModel, fromNode: INode, toNode: INode) {
+  constructor(
+    model: IEdgeModel,
+    cfg: { [key: string]: unknown },
+    fromNode: INode,
+    toNode: INode
+  ) {
     super(model)
     if (!this.id) {
       const id = uniqueId('edge')
       this.set('id', id)
       this.get('model').id = id
     }
+
+    this.set('cfg', cfg)
 
     this.set('fromNode', fromNode)
     this.set('toNode', toNode)

@@ -11,15 +11,7 @@ export const calculateCurve = (
 ) => {
   const { x1, y1, x2, y2 } = position
   let line = ''
-  let arrow = ''
-  const arrowHeight = 10
-  const arrowWidth = 4
-  let lineEndOffset = 4
-  const lineStartOffset = 4
-  const arrowOffset = 6
-  if (showArrow) {
-    lineEndOffset = 11
-  }
+
   if (direction === 'LR') {
     const v = (Math.abs(x2 - x1) / 3) * 2
     const d = v < 20 ? 20 : v
@@ -27,10 +19,7 @@ export const calculateCurve = (
     const qy1 = y1
     const qx2 = x2 - d
     const qy2 = y2
-    line = `M ${x1 + lineStartOffset} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2 -
-      lineEndOffset} ${y2}`
-    arrow = `M ${x2 - arrowHeight}, ${y2 + arrowWidth / 2} L ${x2 -
-      arrowOffset}, ${y2} L ${x2 - arrowHeight}, ${y2 - arrowWidth / 2} Z`
+    line = `M ${x1} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2}`
   } else {
     const v = (Math.abs(y2 - y1) / 3) * 2
     const d = v < 20 ? 20 : v
@@ -38,11 +27,7 @@ export const calculateCurve = (
     const qy1 = y1 + d
     const qx2 = x2
     const qy2 = y2 - d
-    line = `M ${x1} ${y1 +
-      lineStartOffset} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2 -
-      lineEndOffset}`
-    arrow = `M ${x2 - arrowWidth / 2} ${y2 - arrowHeight} L ${x2} ${y2 -
-      arrowOffset} L ${x2 + arrowWidth / 2} ${y2 - arrowHeight} Z`
+    line = `M ${x1} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2}`
   }
-  return { line, arrow: showArrow ? arrow : '' }
+  return line
 }

@@ -10,7 +10,8 @@ export default class Group extends Element {
   }
 
   draw() {
-    this.createDom('g', this.attrs)
+    const group = this.createDom('g', this.attrs)
+    this.set('el', group)
   }
 
   addGroup(attrs?: { [key: string]: string }) {

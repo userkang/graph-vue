@@ -27,7 +27,9 @@ export default class EdgeController {
       return
     }
 
-    const edge = new Edge(item, fromNode, toNode)
+    const edgeCfg = this.graph.get('edgeInfo')
+
+    const edge = new Edge(item, edgeCfg, fromNode, toNode)
     this.graph.getEdges().push(edge)
 
     // 渲染

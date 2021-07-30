@@ -27,10 +27,11 @@ export default class ViewController {
     offsetY: 0
   }
 
+  public translatePadding = 10
+
   constructor(graph: Graph) {
     this.graph = graph
     this.$container = graph.cfg.container.querySelector('svg')
-    // this.translateToCenter()
     this.resize()
   }
 
@@ -47,28 +48,37 @@ export default class ViewController {
 
   // 让g的宽和高适应画布
   fitView() {
-    // 先居中再放大
+    const fitZoom = () => {
+      const nextZoom =
+        Math.min(
+          this.svgInfo.height / this.nodesBox.height,
+          this.svgInfo.width / this.nodesBox.width
+        ) * 0.95 // 四周留些空间好看些
+      if (nextZoom !== this.graph.getZoom()) {
+        this.graph.zoom(nextZoom)
+      }
+    }
+
     this.translateToCenter()
-    // 变换group的信息
-    setTimeout(() => {
-      const transformInfo = this.getGroupBox()
+    fitZoom()
+  }
 
-      const vScale =
-        (this.svgInfo.width / transformInfo.width) * this.transform.scale
-      const hScale =
-        (this.svgInfo.height / transformInfo.height) * this.transform.scale
-      let scale = vScale < hScale ? vScale : hScale
-
-      if (scale > 2) {
-        scale = 2
-      }
-
-      if (scale < 0.5) {
-        scale = 0.5
-      }
-
-      this.graph.zoom(scale)
-    })
+  get nodesBox() {
+    const nodes = this.graph.getNodes()
+    let [minX, minY, maxX, maxY] = [
+      Number.MAX_SAFE_INTEGER,
+      Number.MAX_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER,
+      Number.MIN_SAFE_INTEGER
+    ]
+    for (let i = nodes.length - 1; i >= 0; i--) {
+      const node = nodes[i]
+      minX = Math.min(minX, node.x)
+      minY = Math.min(minY, node.y)
+      maxX = Math.max(maxX, node.x + node.width)
+      maxY = Math.max(maxY, node.y + node.height)
+    }
+    return { left: minX, top: minY, width: maxX - minX, height: maxY - minY }
   }
 
   caculateOffset() {
@@ -80,48 +90,67 @@ export default class ViewController {
 
   // 将g移动到画布中心区域
   translateToCenter() {
-    // 在移动前先更新 svgInfo 信息，比较视图滚动后，svgInfo 需要重新获取
-    this.resize()
-    setTimeout(() => {
-      // 这里需要到下一个周期获取g变换后的位置信息
-      const transformInfo = this.getGroupBox()
+    const bounding = this.$container.getBoundingClientRect()
+    this.svgInfo = {
+      x: bounding.left,
+      y: bounding.top,
+      width: bounding.width,
+      height: bounding.height
+    }
+    const dx =
+      -this.transform.translateX -
+      this.nodesBox.left +
+      (this.svgInfo.width - this.nodesBox.width) / 2
+    const dy =
+      -this.transform.translateY -
+      this.nodesBox.top +
+      (this.svgInfo.height - this.nodesBox.height) / 2
+    this.graph.translate(dx, dy)
+  }
 
-      // 变换g与画布左方和上方的距离
-      const transformLeft = transformInfo.x - this.svgInfo.x
-      const transformTop = transformInfo.y - this.svgInfo.y
+  translateX(x: number) {
+    // 结果正确前提是 transformOrigin:center ，transformOrigin是以svgInfo为基准
+    let nextTranslateX = this.transform.translateX + x
+    const svgCenterX = this.svgInfo.width / 2
+    const leftPart = svgCenterX - this.nodesBox.left
+    // svgCenterX * (1 +- 1/this.transform.scale) - this.nodesBox.left
+    if (nextTranslateX < 0) {
+      const minTranslateX =
+        leftPart -
+        svgCenterX / this.transform.scale -
+        this.nodesBox.width +
+        this.translatePadding
+      nextTranslateX = Math.max(nextTranslateX, minTranslateX)
+    } else if (nextTranslateX > 0) {
+      const maxTranslateX =
+        leftPart + svgCenterX / this.transform.scale - this.translatePadding
+      nextTranslateX = Math.min(nextTranslateX, maxTranslateX)
+    }
+    this.transform.translateX = nextTranslateX
+  }
 
-      const translateX =
-        ((this.svgInfo.width - transformInfo.width) / 2 - transformLeft) /
-        this.transform.scale
-      const translateY =
-        ((this.svgInfo.height - transformInfo.height) / 2 - transformTop) /
-        this.transform.scale
-
-      this.graph.translate(translateX, translateY)
-    })
+  translateY(y: number) {
+    let nextTranslateY = this.transform.translateY + y
+    const svgCenterY = this.svgInfo.height / 2
+    const topPart = svgCenterY - this.nodesBox.top
+    if (nextTranslateY < 0) {
+      const minTranslateY =
+        topPart -
+        svgCenterY / this.transform.scale -
+        this.nodesBox.height +
+        this.translatePadding
+      nextTranslateY = Math.max(nextTranslateY, minTranslateY)
+    } else if (nextTranslateY > 0) {
+      const maxTranslateY =
+        topPart + svgCenterY / this.transform.scale - this.translatePadding
+      nextTranslateY = Math.min(nextTranslateY, maxTranslateY)
+    }
+    this.transform.translateY = nextTranslateY
   }
 
   translate(x: number, y: number) {
-    // 暂时去掉边界判断
-    // 原因：1、性能考虑 2、在图过长的情况下，会带来图剩余部分显示不全的问题。
-    // if (this.judgeBoundary(x, y)) {
-    //   return
-    // }
-
-    this.transform.translateX += x
-    this.transform.translateY += y
-  }
-
-  getGroupBox() {
-    const clientRect = this.$container
-      .querySelector('g')
-      .getBoundingClientRect()
-    return {
-      x: clientRect.left,
-      y: clientRect.top,
-      width: clientRect.width,
-      height: clientRect.height
-    }
+    this.translateX(x)
+    this.translateY(y)
   }
 
   getPointByClient(originX: number, originY: number) {
@@ -154,29 +183,5 @@ export default class ViewController {
       this.graph.translate(x, y)
       this.caculateOffset()
     }
-  }
-
-  judgeBoundary(x: number, y: number) {
-    const transformInfo = this.getGroupBox()
-
-    const { height: gHeight, width: gWidth, x: gX, y: gY } = transformInfo
-    //  右边界
-    if (gX + 0.5 * gWidth >= this.svgInfo.x + this.svgInfo.width && x > 0) {
-      return true
-    }
-    // 左边界
-    if (gX + gWidth - 0.5 * gWidth <= this.svgInfo.x && x < 0) {
-      return true
-    }
-    // 下边界
-    if (gY + gHeight - 0.5 * gHeight <= this.svgInfo.y && y < 0) {
-      return true
-    }
-    // 上边界
-    if (gY + 0.5 * gHeight >= this.svgInfo.y + this.svgInfo.height && y > 0) {
-      return true
-    }
-
-    return false
   }
 }

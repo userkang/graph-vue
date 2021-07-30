@@ -14,6 +14,7 @@
         width="100%"
         height="100%"
       >
+        <Arrow />
         <g
           :style="{
             transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
@@ -49,14 +50,8 @@ import NewEdge from '@/components/new-edge.vue'
 import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
 import Minimap from '@/components/minimap.vue'
-import {
-  Graph,
-  IDataModel,
-  INodeModel,
-  IEdgeModel,
-  INode,
-  IEdge
-} from '@datafe/graph-core'
+import Arrow from '@/components/arrow.vue'
+import { Graph, INodeModel, IEdgeModel } from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -65,7 +60,8 @@ import {
     Edge,
     Node,
     ToolBox,
-    Menu
+    Menu,
+    Arrow
   }
 })
 export default class GraphContent extends Vue {
@@ -76,11 +72,6 @@ export default class GraphContent extends Vue {
   configState = GraphConfigStore.state
 
   graph: Graph = null as any
-
-  nodeConfig = {
-    width: 190,
-    height: 35
-  }
 
   nodes = []
   edges = []
@@ -118,16 +109,29 @@ export default class GraphContent extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: this.configState.direction,
-      nodeConfig: {
-        width: this.nodeConfig.width,
-        height: 50,
-        attrs: {
-          class: 'custom-class',
-          style: 'text-algin: left',
-          'data-js': 'sdfsdf',
-        },
-        render: node => {
-          return `<div class="xxx" style="color: red">${node.x} ${node.get('cfg').attrs.class}</div>`
+      nodeInfo: {
+        width: 180,
+        height: 40,
+        html: node => {
+          return `<div class="graph-node">${node.model.label}</div>`
+        }
+      },
+      edgeInfo: {
+        path: edge => {
+          const { x: x1, y: y1 } = edge.fromSlot
+          const { x: x2, y: y2 } = edge.toSlot
+
+          const deg = Math.atan((y2 - y1) / (x2 - x1))
+          let offsetX = 4 * Math.cos(deg)
+          let offsetY = 4 * Math.sin(deg)
+
+          if (x2 < x1) {
+            offsetX = -offsetX
+            offsetY = -offsetY
+          }
+
+          return `M ${edge.fromSlot.x} ${edge.fromSlot.y}  L ${edge.toSlot.x -
+            offsetX} ${edge.toSlot.y - offsetY}`
         }
       },
       action: this.configState.action
@@ -252,6 +256,8 @@ export default class GraphContent extends Vue {
 </script>
 
 <style lang="scss" scoped>
+$edge-color: #d1d1dd;
+$select-color: #4150f6;
 .graph-content-wrap {
   background: #242424;
   position: relative;
@@ -270,13 +276,5 @@ export default class GraphContent extends Vue {
   width: 100%;
   height: 100%;
   position: relative;
-}
-.line {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 8px;
-  background: #d9dadd;
-  background: red;
 }
 </style>

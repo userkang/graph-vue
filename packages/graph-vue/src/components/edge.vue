@@ -1,20 +1,19 @@
 <template>
   <g>
     <path
-      :d="path.line"
+      :d="path"
       class="edge-wrapper"
       graph-type="edge"
       :graph-id="edge.id"
+      @mouseover="onMouseover"
+      @mouseout="onMouseout"
     ></path>
     <path
-      :d="path.line"
+      ref="edge"
+      :marker-end="isSelected ? `url(#arrow-active)` : 'url(#arrow)'"
+      :d="path"
       class="edge-style"
       :class="{ 'edge-selected-style': isSelected }"
-    ></path>
-    <path
-      :d="path.arrow"
-      class="arrow-style"
-      :class="{ 'arrow-selected': isSelected }"
     ></path>
   </g>
 </template>
@@ -43,15 +42,38 @@ export default class Edge extends Vue {
 
   get path() {
     const { fromSlot, toSlot } = this.edge
+    const direction = this.graph.get('direction')
+    let x2 = toSlot.x
+    let y2 = toSlot.y
+    if (direction === 'LR') {
+      x2 -= 10
+    } else {
+      y2 -= 10
+    }
+
     return calculateCurve(
       {
         x1: fromSlot.x,
         y1: fromSlot.y,
-        x2: toSlot.x,
-        y2: toSlot.y
+        x2,
+        y2
       },
-      this.graph.get('direction')
+      direction
     )
+  }
+
+  onMouseover() {
+    ;(this.$refs.edge as HTMLElement).setAttribute(
+      'marker-end',
+      'url(#arrow-active)'
+    )
+  }
+
+  onMouseout() {
+    if (this.isSelected) {
+      return
+    }
+    ;(this.$refs.edge as HTMLElement).setAttribute('marker-end', 'url(#arrow)')
   }
 }
 </script>
@@ -73,14 +95,10 @@ $select-color: #4150f6;
   fill: none;
   stroke: transparent;
   &:hover {
-    +.edge-style {
+    + .edge-style {
       stroke: $select-color;
       stroke-width: 2.5;
       cursor: pointer;
-      +.arrow-style {
-        stroke: $select-color;
-        fill: $select-color;
-      }
     }
   }
 }
@@ -89,8 +107,8 @@ $select-color: #4150f6;
   stroke-width: 2;
   fill: none;
   stroke-linecap: round;
-  stroke-dasharray: 5;
-  animation: dash 10s linear infinite;
+  // stroke-dasharray: 5;
+  // animation: dash 10s linear infinite;
   pointer-events: none;
 }
 .edge-selected-style {
@@ -98,15 +116,5 @@ $select-color: #4150f6;
   stroke-width: 2.5;
   cursor: pointer;
   stroke-linecap: round;
-}
-.arrow-style {
-  stroke: $edge-color;
-  stroke-width: 2;
-  stroke-linecap: round;
-  fill: $edge-color;
-}
-.arrow-selected {
-  stroke: $select-color;
-  fill: $select-color;
 }
 </style>

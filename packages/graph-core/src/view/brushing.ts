@@ -15,6 +15,7 @@ export default class Brushing extends Element {
       d: ''
     })
 
+    this.set('el', brushingPath)
     this.set('brushingPath', brushingPath)
   }
 

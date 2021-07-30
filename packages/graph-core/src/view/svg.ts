@@ -18,6 +18,7 @@ export default class Svg extends Element {
     this.container = graph.get('container')
     this.draw()
     insertCss(content)
+    this.initDefs()
     this.initGroup()
     this.initNewEdge()
     this.initBrushing()
@@ -49,6 +50,38 @@ export default class Svg extends Element {
     this.container.innerHTML = ''
     el.id = this.id
     this.container.appendChild(el)
+    this.set('el', el)
+  }
+
+  initDefs() {
+    const defs = this.createDom('defs')
+    const marker = this.createDom('marker', {
+      id: 'arrow',
+      orient: 'auto',
+      overflow: 'visible',
+      markerUnits: 'userSpaceOnUse'
+    })
+    const path = this.createDom('path', {
+      d: 'M 0 0 L 7 -3.5 L 5.25 0 L 7 3.5 Z',
+      transform: 'rotate(180)',
+      class: 'graph-arrow'
+    })
+    const markerActive = this.createDom('marker', {
+      id: 'arrow-active',
+      orient: 'auto',
+      overflow: 'visible',
+      markerUnits: 'userSpaceOnUse'
+    })
+    const pathActive = this.createDom('path', {
+      d: 'M 0 0 L 7 -3.5 L 5.25 0 L 7 3.5 Z',
+      transform: 'rotate(180)',
+      class: 'graph-arrow-active'
+    })
+    marker.appendChild(path)
+    defs.appendChild(marker)
+    markerActive.appendChild(pathActive)
+    defs.appendChild(markerActive)
+    this.get('el').appendChild(defs)
   }
 
   initGroup() {

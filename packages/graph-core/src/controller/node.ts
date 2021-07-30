@@ -14,7 +14,7 @@ export default class NodeController {
   }
 
   addNode(item: INodeModel) {
-    const nodeCfg = this.graph.get('nodeConfig') || defaultCfg
+    const nodeCfg = this.graph.get('nodeInfo') || defaultCfg
     const direction = this.graph.get('direction')
 
     const node = new Node(item, nodeCfg, direction)

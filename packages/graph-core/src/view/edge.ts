@@ -34,9 +34,11 @@ export default class Node extends Element {
     g.appendChild(edgePath)
     g.appendChild(arrowPath)
 
+    this.set('g', g)
     this.set('edgePath', edgePath)
     this.set('edgeWrapperPath', edgeWrapperPath)
     this.set('arrowPath', arrowPath)
+    this.set('el', g)
 
     this.setPath()
   }
@@ -62,12 +64,19 @@ export default class Node extends Element {
   updateSelect() {
     const edgePath = this.get('edgePath')
     const arrowPath = this.get('arrowPath')
+    const pathFunction = this.edge.get('cfg')?.path
     if (this.edge.hasState('selected')) {
       edgePath.classList.add('graph-edge-active')
       arrowPath.classList.add('graph-arrow-active')
+      if (pathFunction) {
+        edgePath.setAttribute('marker-end', 'url(#arrow-active)')
+      }
     } else {
       edgePath.classList.remove('graph-edge-active')
       arrowPath.classList.remove('graph-arrow-active')
+      if (pathFunction) {
+        edgePath.setAttribute('marker-end', 'url(#arrow)')
+      }
     }
   }
 
@@ -76,20 +85,31 @@ export default class Node extends Element {
   }
 
   setPath() {
+    const pathFunction = this.edge.get('cfg')?.path
     const edgePath = this.get('edgePath')
     const edgeWrapperPath = this.get('edgeWrapperPath')
     const arrowPath = this.get('arrowPath')
-    const path = calculateCurve(
-      {
-        x1: this.edge.fromSlot.x,
-        y1: this.edge.fromSlot.y,
-        x2: this.edge.toSlot.x,
-        y2: this.edge.toSlot.y
-      },
-      this.graph.get('direction')
-    )
-    edgePath.setAttribute('d', path.line)
-    edgeWrapperPath.setAttribute('d', path.line)
-    arrowPath.setAttribute('d', path.arrow)
+
+    if (pathFunction) {
+      const path = pathFunction(this.edge)
+      edgePath.setAttribute('d', path)
+      edgePath.setAttribute('marker-end', 'url(#arrow)')
+      edgeWrapperPath.setAttribute('d', path)
+    } else {
+      const path = calculateCurve(
+        {
+          x1: this.edge.fromSlot.x,
+          y1: this.edge.fromSlot.y,
+          x2: this.edge.toSlot.x,
+          y2: this.edge.toSlot.y
+        },
+        this.graph.get('direction')
+      )
+      edgePath.setAttribute('d', path.line)
+      edgeWrapperPath.setAttribute('d', path.line)
+      arrowPath.setAttribute('d', path.arrow)
+    }
+
+    this.updateSelect()
   }
 }

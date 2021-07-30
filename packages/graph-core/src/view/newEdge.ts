@@ -16,6 +16,7 @@ export default class NewEdge extends Element {
     })
 
     this.set('newEdgePath', newEdgePath)
+    this.set('el', newEdgePath)
   }
 
   initHook() {

@@ -3,38 +3,30 @@ import Graph from '../controller/graph'
 import Edge from '../item/edge'
 export default class EdgeController {
   graph: Graph
-  private _edges: Edge[] = []
+  private _edges: { [id: string]: IEdge } = {}
 
   constructor(graph: Graph) {
     this.graph = graph
-    this._edges = graph.cfg.edges
+    if (graph.cfg.edges) {
+      this.data(graph.cfg.edges)
+    }
   }
 
   get edges() {
-    return this._edges
+    return Object.keys(this._edges).map(id => this._edges[id])
   }
 
-  public data(group: IEdgeModel[]) {
-    this._edges = []
-    for (const item of group) {
-      this.addEdge(item)
-    }
+  public findEdge(id: string | number): IEdge | undefined {
+    return this._edges[String(id)]
   }
 
-  public findEdge(id: string | number): IEdge | null {
-    const _id = String(id)
-    return this.edges.find(item => item.id === _id)
-  }
-
-  public updateEdge(id: string, model: IEdgeModel): Edge | false {
+  public updateEdge(id: string, model: IEdgeModel): IEdge | false {
     const edge = this.findEdge(id)
     if (!edge) {
       return false
-    } else {
-      edge.update(model)
-      this.graph.emit('afteredgeupdate', edge.model)
-      return edge
     }
+    edge.update(model)
+    return edge
   }
 
   public deleteEdge(id: string, stack = true): Edge | false {
@@ -42,40 +34,24 @@ export default class EdgeController {
     if (!edge) {
       return false
     }
-    const edges = this.edges
-    const index = edges.findIndex(item => item.id === edge.id)
-    if (index === -1) {
-      return false
-    }
     // 先删除前后节点的相关边
-    edge.fromNode.deleteEdge(id)
-    edge.toNode.deleteEdge(id)
+    const { fromNode, toNode, fromSlot, toSlot } = edge
 
     // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    const hasFromSlotLinked = edge.fromNode.edges.find(
-      item => item.fromSlot.id === edge.fromSlot.id
-    )
-    const hasToSlotLinked = edge.toNode.edges.find(
-      item => item.toSlot.id === edge.toSlot.id
-    )
-
-    if (!hasFromSlotLinked) {
-      edge.fromSlot.clearState('linked')
+    if (!fromNode.edges.find(item => item.fromSlot.id === fromSlot.id)) {
+      fromSlot.clearState('linked')
     }
 
-    if (!hasToSlotLinked) {
-      edge.toSlot.clearState('linked')
+    if (!toNode.edges.find(item => item.toSlot.id === toSlot.id)) {
+      toSlot.clearState('linked')
     }
 
-    edges.splice(index, 1)
+    delete this._edges[id]
     if (this.graph.get('isRender')) {
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.remove(edge.get('view'))
     }
-    this.graph.emit('afterdeleteedge', edge.model)
-    if (stack) {
-      this.graph.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-    }
+
     return edge
   }
 
@@ -83,18 +59,12 @@ export default class EdgeController {
     if (this.findEdge(item.id)) {
       return false
     }
-    let fromNodeId = item.fromNodeId
-    let toNodeId = item.toNodeId
+    const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item
     // 如果仅有 slotId，自动补全 nodeId
-    if (item.fromSlotId && !fromNodeId) {
-      fromNodeId = this.graph.findSlot(item.fromSlotId).nodeId
-    }
-    if (item.toSlotId && !toNodeId) {
-      toNodeId = this.graph.findSlot(item.toSlotId).nodeId
-    }
-
-    const fromNode = this.graph.findNode(fromNodeId)
-    const toNode = this.graph.findNode(toNodeId)
+    const fromNode =
+      this.graph.findNode(fromNodeId) || this.graph.findNodeBySlot(fromSlotId)
+    const toNode =
+      this.graph.findNode(toNodeId) || this.graph.findNodeBySlot(toSlotId)
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -102,7 +72,7 @@ export default class EdgeController {
     }
 
     const edge = new Edge(item, fromNode, toNode)
-    this.graph.getEdges().push(edge)
+    this._edges[edge.id] = edge
 
     // 渲染
     if (this.graph.get('isRender')) {
@@ -110,12 +80,14 @@ export default class EdgeController {
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.add(edgeView)
     }
-    this.graph.emit('afteraddedge', item)
-    if (stack) {
-      const data = { edges: [item] }
-      this.graph.pushStack('addEdge', data)
-    }
 
     return edge
+  }
+
+  public data(group: IEdgeModel[]) {
+    this._edges = {}
+    for (const item of group) {
+      this.addEdge(item)
+    }
   }
 }

@@ -1,31 +1,45 @@
 import Graph from './graph'
 import Node from '../item/node'
-import { IDataStack, IEdgeModel, INode, INodeModel } from '../types'
+import { INode, INodeModel } from '../types'
+import Slot from '../item/slot'
 
 export default class NodeController {
   graph: Graph
-  private _nodes: INode[] = []
+  private _nodes: { [id: string]: INode } = {}
 
   constructor(graph: Graph) {
     this.graph = graph
-    this._nodes = graph.cfg.nodes
+    if (graph.cfg.nodes) {
+      this.data(graph.cfg.nodes)
+    }
   }
 
   get nodes() {
-    return this._nodes
+    return Object.keys(this._nodes).map(id => this._nodes[id])
+  }
+
+  get slotsMap() {
+    const res: { [id: string]: Slot } = {}
+    this.nodes.forEach(node => {
+      node.slots.forEach(slot => (res[slot.id] = slot))
+    })
+    return res
   }
 
   public findNode(id: string | number): INode | undefined {
-    const _id = String(id)
-    return this.nodes.find(item => item.id === _id)
+    return this._nodes[String(id)]
   }
 
-  public refreshNode(id: string) {
-    const node = this.findNode(id)
+  public findNodeBySlot(slotId: string): INode | undefined {
+    return this.nodes.find(node => node.slots.find(slot => slot.id === slotId))
+  }
+
+  public refreshNode(id: string): INode | false {
+    const node = this.findNode(id) || false
     if (node) {
       node.refresh()
-      this.graph.emit('afternoderefresh', node.model)
     }
+    return node
   }
 
   public updateNode(id: string, model: INodeModel): INode | false {
@@ -34,7 +48,6 @@ export default class NodeController {
       return false
     }
     node.update(model)
-    this.graph.emit('afternodeupdate', node.model)
     return node
   }
 
@@ -43,37 +56,20 @@ export default class NodeController {
     if (!node) {
       return false
     }
-    if (stack) {
-      const data: IDataStack = {}
-      data.nodes = [node.model]
-      data.edges = node.edges.map(item => {
-        return item.model as IEdgeModel
-      })
-      console.log(data.edges)
-      this.graph.pushStack('deleteNode', data)
-    }
-    const index = this.nodes.findIndex(item => item.id === node.id)
-    if (index > -1) {
-      // 先删除与节点相关的边
-      const edgeIds = node.edges.map(edge => edge.id)
-      edgeIds.forEach(item => {
-        this.graph.deleteEdge(item, false)
-      })
-      this._nodes.splice(index, 1)
-    }
+    // 先删除与节点相关的边
+    node.edges.forEach(edge => this.graph.deleteEdge(edge.id, false))
+    delete this._nodes[node.id]
 
     if (this.graph.get('isRender')) {
       const nodeGroup = this.graph.get('svg').get('nodeGroup')
       nodeGroup.remove(node.get('view'))
     }
-    this.graph.emit('afterdeletenode', node.model)
 
     return node
   }
 
   public addNode(item: INodeModel, stack = true): INode | false {
-    const exist = this.findNode(item.id)
-    if (exist) {
+    if (item.id in this._nodes) {
       return false
     }
     const { width, height } = this.graph.getNodeInfo()
@@ -82,23 +78,20 @@ export default class NodeController {
       height,
       direction: this.graph.get('direction')
     })
-    this._nodes.push(node)
-    if (stack) {
-      const data = { nodes: [item] }
-      this.graph.pushStack('addNode', data)
-    }
+    this._nodes[item.id] = node
+
     // 渲染
     if (this.graph.get('isRender')) {
       const nodeView = node.render(this.graph)
       const nodeGroup = this.graph.get('svg').get('nodeGroup')
       nodeGroup.add(nodeView)
     }
-    this.graph.emit('afteraddnode', item)
+
     return node
   }
 
   public data(group: INodeModel[]) {
-    this._nodes = []
+    this._nodes = {}
     group.forEach(item => this.addNode(item))
   }
 }

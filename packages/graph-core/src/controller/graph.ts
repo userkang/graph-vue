@@ -109,35 +109,80 @@ export default class Graph extends EventEmitter {
   }
 
   refreshNode(id: string) {
-    return this.nodeController.refreshNode(id)
+    const node = this.nodeController.refreshNode(id)
+    if (node) {
+      this.emit('afternoderefresh', node.model)
+    }
+    return node
   }
 
   deleteNode(id: string, stack = true) {
-    return this.nodeController.deleteNode(id, stack)
+    const node = this.nodeController.deleteNode(id, stack)
+    if (node) {
+      this.emit('afterdeletenode', node.model)
+      if (stack) {
+        this.pushStack('deleteNode', {
+          nodes: [node.model],
+          edges: node.edges.map(edge => edge.model as IEdgeModel)
+        })
+      }
+    }
+    return node
   }
 
   updateNode(id: string, model: INodeModel) {
-    return this.nodeController.updateNode(id, model)
+    const node = this.nodeController.updateNode(id, model)
+    if (node) {
+      this.emit('afternodeupdate', node.model)
+    }
+    return node
   }
 
   public addNode(item: INodeModel, stack = true): INode | false {
-    return this.nodeController.addNode(item, stack)
+    const node = this.nodeController.addNode(item, stack)
+    if (node) {
+      this.emit('afteraddnode', item)
+      if (stack) {
+        const data = { nodes: [item] }
+        this.pushStack('addNode', data)
+      }
+    }
+    return node
   }
 
   getEdges(): IEdge[] {
     return this.edgeController.edges
   }
 
-  deleteEdge(id: string, stack: boolean = true) {
-    return this.edgeController.deleteEdge(id, stack)
+  updateEdge(id: string, model: IEdgeModel) {
+    const edge = this.edgeController.updateEdge(id, model)
+    if (edge) {
+      this.emit('afteredgeupdate', edge.model)
+    }
+    return edge
   }
 
-  updateEdge(id: string, model: IEdgeModel) {
-    return this.edgeController.updateEdge(id, model)
+  deleteEdge(id: string, stack: boolean = true) {
+    const edge = this.edgeController.deleteEdge(id, stack)
+    if (edge) {
+      this.emit('afterdeleteedge', edge.model)
+      if (stack) {
+        this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
+      }
+    }
+
+    return edge
   }
 
   public addEdge(item: IEdgeModel, stack: boolean = true) {
-    return this.edgeController.addEdge(item, stack)
+    const edge = this.edgeController.addEdge(item, stack)
+    if (edge) {
+      this.emit('afteraddedge', item)
+      if (stack) {
+        this.pushStack('addEdge', { edges: [item] })
+      }
+    }
+    return edge
   }
 
   public getZoom() {
@@ -168,17 +213,12 @@ export default class Graph extends EventEmitter {
     return this.edgeController.findEdge(id)
   }
 
-  public findSlot(id: string | number): ISlot {
-    const _id = String(id)
-    const nodes = this.getNodes()
-    for (const node of nodes) {
-      const slot = node.slots.find(item => {
-        return item.id === _id
-      })
-      if (slot) {
-        return slot
-      }
-    }
+  public findSlot(id: string | number): ISlot | undefined {
+    return this.nodeController.slotsMap[String(id)]
+  }
+
+  public findNodeBySlot(id: string) {
+    return this.nodeController.findNodeBySlot(id)
   }
 
   public findNodeByState(state: string): INode[] {
@@ -213,9 +253,10 @@ export default class Graph extends EventEmitter {
     return { nodes, edges }
   }
 
-  addAction(action: string | string[]) {
-    const actions = !Array.isArray(action) ? [action] : action
-    this.eventController.addBehavior(actions)
+  addAction(actions: string | string[]) {
+    this.eventController.addBehavior(
+      Array.isArray(actions) ? actions : [actions]
+    )
   }
 
   removeAction(action?: string | string[]) {

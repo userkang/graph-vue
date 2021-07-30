@@ -59,8 +59,8 @@ export interface IGraphConfig {
 
 export interface CFG extends IGraphConfig {
   container: HTMLElement
-  nodes: INode[]
-  edges: IEdge[]
+  nodes: INodeModel[]
+  edges: IEdgeModel[]
   action: string[]
   [key: string]: any
 }

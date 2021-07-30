@@ -12,7 +12,7 @@ export default class WheelMove extends Base {
   }
 
   onWheel(e: WheelEvent) {
-    if (e.ctrlKey) {
+    if (!e.ctrlKey) {
       e.preventDefault()
       const ratio = this.graph.getZoom()
       this.graph.translate(-e.deltaX / ratio, -e.deltaY / ratio)

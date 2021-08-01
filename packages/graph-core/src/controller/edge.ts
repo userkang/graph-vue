@@ -20,19 +20,19 @@ export default class EdgeController {
     return this._edges[String(id)]
   }
 
-  public updateEdge(id: string, model: IEdgeModel): IEdge | false {
+  public updateEdge(id: string, model: IEdgeModel): void {
     const edge = this.findEdge(id)
     if (!edge) {
-      return false
+      return console.warn(`can't find edge where id is '${id}'`)
     }
     edge.update(model)
-    return edge
   }
 
-  public deleteEdge(id: string, stack = true): Edge | false {
+  public deleteEdge(id: string): IEdge | undefined {
     const edge = this.findEdge(id)
     if (!edge) {
-      return false
+      console.warn(`can't find edge where id is '${id}'`)
+      return
     }
     // 先删除前后节点的相关边
     const { fromNode, toNode, fromSlot, toSlot } = edge
@@ -51,13 +51,13 @@ export default class EdgeController {
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.remove(edge.get('view'))
     }
-
     return edge
   }
 
-  public addEdge(item: IEdgeModel, stack = true): Edge | false {
-    if (this.findEdge(item.id)) {
-      return false
+  public addEdge(item: IEdgeModel): Edge | undefined {
+    if (this._edges[item.id]) {
+      console.warn(`exist edge where id is ${item.id}`)
+      return
     }
     const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item
     // 如果仅有 slotId，自动补全 nodeId

@@ -44,7 +44,7 @@ export default class ViewController {
     const zoom = this.getZoom()
     if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
       this.transform.scale = value
-      this.translate(0, 0)
+      this.translateBy(0, 0)
       this.caculateOffset()
       this.graph.emit('afterzoom', value)
     }
@@ -122,10 +122,10 @@ export default class ViewController {
       -this.transform.translateY -
       this.nodesBox.top +
       (this.svgInfo.height - this.nodesBox.height) / 2
-    this.translate(dx, dy)
+    this.translateBy(dx, dy)
   }
 
-  translateX(x: number) {
+  private translateX(x: number) {
     // 结果正确前提是 transformOrigin:center ，transformOrigin是以svgInfo为基准
     let nextTranslateX = this.transform.translateX + x
     const svgCenterX = this.svgInfo.width / 2
@@ -146,7 +146,7 @@ export default class ViewController {
     this.transform.translateX = nextTranslateX
   }
 
-  translateY(y: number) {
+  private translateY(y: number) {
     let nextTranslateY = this.transform.translateY + y
     const svgCenterY = this.svgInfo.height / 2
     const topPart = svgCenterY - this.nodesBox.top
@@ -165,7 +165,7 @@ export default class ViewController {
     this.transform.translateY = nextTranslateY
   }
 
-  translate(x: number, y: number) {
+  public translateBy(x: number, y: number) {
     this.translateX(x)
     this.translateY(y)
     this.graph.emit(
@@ -194,7 +194,7 @@ export default class ViewController {
     if (width && height) {
       const x = ((this.svgInfo.width - width) * this.transform.scale) / 2
       const y = ((this.svgInfo.height - height) * this.transform.scale) / 2
-      this.translate(x, y)
+      this.translateBy(x, y)
       this.caculateOffset()
     }
   }

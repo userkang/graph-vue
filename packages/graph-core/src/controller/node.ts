@@ -34,27 +34,27 @@ export default class NodeController {
     return this.nodes.find(node => node.slots.find(slot => slot.id === slotId))
   }
 
-  public refreshNode(id: string): INode | false {
-    const node = this.findNode(id) || false
-    if (node) {
-      node.refresh()
-    }
-    return node
-  }
-
-  public updateNode(id: string, model: INodeModel): INode | false {
+  public refreshNode(id: string): void {
     const node = this.findNode(id)
     if (!node) {
-      return false
+      return console.warn(`can't find node where id is '${id}'`)
+    }
+    node.refresh()
+  }
+
+  public updateNode(id: string, model: INodeModel): void {
+    const node = this.findNode(id)
+    if (!node) {
+      return console.warn(`can't find node where id is '${id}'`)
     }
     node.update(model)
-    return node
   }
 
-  public deleteNode(id: string, stack = true): INode | false {
+  public deleteNode(id: string): INode | undefined {
     const node = this.findNode(id)
     if (!node) {
-      return false
+      console.warn(`can't find node where id is '${id}'`)
+      return
     }
     // 先删除与节点相关的边
     node.edges.forEach(edge => this.graph.deleteEdge(edge.id, false))
@@ -68,9 +68,10 @@ export default class NodeController {
     return node
   }
 
-  public addNode(item: INodeModel, stack = true): INode | false {
+  public addNode(item: INodeModel): INode | undefined {
     if (item.id in this._nodes) {
-      return false
+      console.warn(`exist node where id is '${item.id}'`)
+      return
     }
     const { width, height } = this.graph.getNodeInfo()
     const node = new Node(item, {

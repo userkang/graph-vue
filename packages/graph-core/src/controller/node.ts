@@ -57,7 +57,10 @@ export default class NodeController {
       return
     }
     // 先删除与节点相关的边
-    node.edges.forEach(edge => this.graph.deleteEdge(edge.id, false))
+    for (let i = node.edges.length - 1; i >= 0; i--) {
+      this.graph.deleteEdge(node.edges[i]?.id, false)
+    }
+
     delete this._nodes[node.id]
 
     if (this.graph.get('isRender')) {

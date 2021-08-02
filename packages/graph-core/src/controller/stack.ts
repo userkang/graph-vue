@@ -101,11 +101,11 @@ export default class Stack {
         break
       case 'deleteNode':
         newData = stack.data
-        stack.data.nodes.forEach(item => {
-          this.graph.deleteNode(item.id, false)
-        })
         stack.data.edges.forEach(item => {
           this.graph.deleteEdge(item.id, false)
+        })
+        stack.data.nodes.forEach(item => {
+          this.graph.deleteNode(item.id, false)
         })
         break
       case 'addEdge':

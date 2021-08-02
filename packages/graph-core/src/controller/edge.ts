@@ -23,7 +23,7 @@ export default class EdgeController {
   public updateEdge(id: string, model: IEdgeModel): void {
     const edge = this.findEdge(id)
     if (!edge) {
-      return console.warn(`can't find edge where id is '${id}'`)
+      return console.warn(`can't update edge where id is '${id}'`)
     }
     edge.update(model)
   }
@@ -31,11 +31,13 @@ export default class EdgeController {
   public deleteEdge(id: string): IEdge | undefined {
     const edge = this.findEdge(id)
     if (!edge) {
-      console.warn(`can't find edge where id is '${id}'`)
+      console.warn(`can't delete edge where id is '${id}'`)
       return
     }
     // 先删除前后节点的相关边
     const { fromNode, toNode, fromSlot, toSlot } = edge
+    edge.fromNode.deleteEdge(id)
+    edge.toNode.deleteEdge(id)
 
     // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
     if (!fromNode.edges.find(item => item.fromSlot.id === fromSlot.id)) {
@@ -56,7 +58,7 @@ export default class EdgeController {
 
   public addEdge(item: IEdgeModel): Edge | undefined {
     if (this._edges[item.id]) {
-      console.warn(`exist edge where id is ${item.id}`)
+      console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }
     const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item

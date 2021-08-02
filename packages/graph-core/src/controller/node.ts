@@ -37,7 +37,7 @@ export default class NodeController {
   public refreshNode(id: string): void {
     const node = this.findNode(id)
     if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
+      return console.warn(`can't refresh node where id is '${id}'`)
     }
     node.refresh()
   }
@@ -45,7 +45,7 @@ export default class NodeController {
   public updateNode(id: string, model: INodeModel): void {
     const node = this.findNode(id)
     if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
+      return console.warn(`can't update node where id is '${id}'`)
     }
     node.update(model)
   }
@@ -53,7 +53,7 @@ export default class NodeController {
   public deleteNode(id: string): INode | undefined {
     const node = this.findNode(id)
     if (!node) {
-      console.warn(`can't find node where id is '${id}'`)
+      console.warn(`can't delete node where id is '${id}'`)
       return
     }
     // 先删除与节点相关的边
@@ -73,7 +73,7 @@ export default class NodeController {
 
   public addNode(item: INodeModel): INode | undefined {
     if (item.id in this._nodes) {
-      console.warn(`exist node where id is '${item.id}'`)
+      console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
     const { width, height } = this.graph.getNodeInfo()

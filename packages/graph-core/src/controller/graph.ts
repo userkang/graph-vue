@@ -124,16 +124,19 @@ export default class Graph extends EventEmitter {
   }
 
   deleteNode(id: string, stack = true): INode | undefined {
-    const node = this.nodeController.deleteNode(id)
+    const node = this.findNode(id)
     if (!node) {
+      console.warn(`can't delete node where id is '${id}'`)
       return
     }
+    const stackData = {
+      nodes: [node.model],
+      edges: node.edges.map(edge => edge.model as IEdgeModel)
+    }
+    this.nodeController.deleteNode(id)
     this.emit('afterdeletenode', node.model)
     if (stack) {
-      this.pushStack('deleteNode', {
-        nodes: [node.model],
-        edges: node.edges.map(edge => edge.model as IEdgeModel)
-      })
+      this.pushStack('deleteNode', stackData)
     }
     return node
   }

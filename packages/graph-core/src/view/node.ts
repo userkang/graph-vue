@@ -106,13 +106,9 @@ export default class Node extends Element {
 
   update(node: INode) {
     this.node = node
-    this.drawDom()
     const foreignObject = this.get('foreignObject')
-    const div = this.get('div')
     foreignObject.setAttribute('width', this.node.width)
     foreignObject.setAttribute('height', this.node.height)
-    foreignObject.innerHTML = ''
-    foreignObject.appendChild(div)
     this.updateSelect()
 
     this.transform()

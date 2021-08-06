@@ -1,0 +1,18 @@
+{
+  "name": "docs",
+  "version": "1.0.0",
+  "private": true,
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "typedoc": "typedoc",
+    "vuepress": "vuepress dev ."
+  },
+  "devDependencies": {
+    "@nibfe/vuepress-theme-rome": "^1.4.3",
+    "typedoc": "^0.20.36",
+    "vue": "^2.6.14",
+    "vue-server-renderer": "^2.6.14",
+    "vuepress": "^1.8.2"
+  }
+}

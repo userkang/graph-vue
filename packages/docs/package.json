@@ -10,7 +10,7 @@
   "devDependencies": {
     "@nibfe/vuepress-theme-rome": "^1.4.3",
     "typedoc": "^0.20.36",
-    "vue": "^2.6.12",
+    "vue": "^2.6.14",
     "vue-server-renderer": "^2.6.12",
     "vuepress": "^1.8.2"
   }

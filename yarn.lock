@@ -10449,10 +10449,15 @@ vue@2.5.22:
   resolved "http://r.npm.sankuai.com/vue/download/vue-2.5.22.tgz#3bf88041af08b8539c37b268b70ca79245e9cc30"
   integrity sha1-O/iAQa8IuFOcN7JotwynkkXpzDA=
 
-vue@^2.6.10, vue@^2.6.12:
+vue@^2.6.10:
   version "2.6.12"
   resolved "http://r.npm.sankuai.com/vue/download/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha1-9evU+mvShpQD4pqJau1JBEVskSM=
+
+vue@^2.6.14:
+  version "2.6.14"
+  resolved "http://r.npm.sankuai.com/vue/download/vue-2.6.14.tgz#e51aa5250250d569a3fbad3a8a5a687d6036e235"
+  integrity sha1-5RqlJQJQ1Wmj+606ilpofWA24jU=
 
 vuepress-html-webpack-plugin@^3.2.0:
   version "3.2.0"

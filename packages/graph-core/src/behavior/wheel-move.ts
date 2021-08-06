@@ -15,7 +15,7 @@ export default class WheelMove extends Base {
     if (!e.ctrlKey) {
       e.preventDefault()
       const ratio = this.graph.getZoom()
-      this.graph.translate(-e.deltaX / ratio, -e.deltaY / ratio)
+      this.graph.translateBy(-e.deltaX / ratio, -e.deltaY / ratio)
     }
   }
 }

@@ -3,24 +3,70 @@ import Graph from '../controller/graph'
 import Edge from '../item/edge'
 export default class EdgeController {
   graph: Graph
+  private _edges: { [id: string]: IEdge } = {}
 
   constructor(graph: Graph) {
     this.graph = graph
+    if (graph.cfg.edges) {
+      this.data(graph.cfg.edges)
+    }
   }
 
-  public addEdge(item: IEdgeModel) {
-    let fromNodeId = item.fromNodeId
-    let toNodeId = item.toNodeId
-    // 如果仅有 slotId，自动补全 nodeId
-    if (item.fromSlotId && !fromNodeId) {
-      fromNodeId = this.graph.findSlot(item.fromSlotId).nodeId
+  get edges() {
+    return Object.keys(this._edges).map(id => this._edges[id])
+  }
+
+  public findEdge(id: string | number): IEdge | undefined {
+    return this._edges[String(id)]
+  }
+
+  public updateEdge(id: string, model: IEdgeModel): void {
+    const edge = this.findEdge(id)
+    if (!edge) {
+      return console.warn(`can't update edge where id is '${id}'`)
     }
-    if (item.toSlotId && !toNodeId) {
-      toNodeId = this.graph.findSlot(item.toSlotId).nodeId
+    edge.update(model)
+  }
+
+  public deleteEdge(id: string): IEdge | undefined {
+    const edge = this.findEdge(id)
+    if (!edge) {
+      console.warn(`can't delete edge where id is '${id}'`)
+      return
+    }
+    // 先删除前后节点的相关边
+    const { fromNode, toNode, fromSlot, toSlot } = edge
+    edge.fromNode.deleteEdge(id)
+    edge.toNode.deleteEdge(id)
+
+    // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
+    if (!fromNode.edges.find(item => item.fromSlot.id === fromSlot.id)) {
+      fromSlot.clearState('linked')
     }
 
-    const fromNode = this.graph.findNode(fromNodeId)
-    const toNode = this.graph.findNode(toNodeId)
+    if (!toNode.edges.find(item => item.toSlot.id === toSlot.id)) {
+      toSlot.clearState('linked')
+    }
+
+    delete this._edges[id]
+    if (this.graph.get('isRender')) {
+      const edgeGroup = this.graph.get('svg').get('edgeGroup')
+      edgeGroup.remove(edge.get('view'))
+    }
+    return edge
+  }
+
+  public addEdge(item: IEdgeModel): Edge | undefined {
+    if (this._edges[item.id]) {
+      console.warn(`can't add edge, exist edge where id is ${item.id}`)
+      return
+    }
+    const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item
+    // 如果仅有 slotId，自动补全 nodeId
+    const fromNode =
+      this.graph.findNode(fromNodeId) || this.graph.findNodeBySlot(fromSlotId)
+    const toNode =
+      this.graph.findNode(toNodeId) || this.graph.findNodeBySlot(toSlotId)
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -28,7 +74,7 @@ export default class EdgeController {
     }
 
     const edge = new Edge(item, fromNode, toNode)
-    this.graph.getEdges().push(edge)
+    this._edges[edge.id] = edge
 
     // 渲染
     if (this.graph.get('isRender')) {
@@ -40,16 +86,10 @@ export default class EdgeController {
     return edge
   }
 
-  public deleteEdge(edge: IEdge) {
-    const edges = this.graph.getEdges()
-    const index = edges.findIndex(item => item.id === edge.id)
-    if (index > -1) {
-      edges.splice(index, 1)
-    }
-
-    if (this.graph.get('isRender')) {
-      const edgeGroup = this.graph.get('svg').get('edgeGroup')
-      edgeGroup.remove(edge.get('view'))
+  public data(group: IEdgeModel[]) {
+    this._edges = {}
+    for (const item of group) {
+      this.addEdge(item)
     }
   }
 }

@@ -7,6 +7,7 @@ import EdgeController from './edge'
 import StackController from './stack'
 import Svg from '../view/svg'
 import {
+  CFG,
   INode,
   IEdge,
   ISlot,
@@ -20,8 +21,15 @@ import {
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 
+const getDefaultConfig = () => ({
+  direction: 'TB',
+  nodes: [],
+  edges: [],
+  action: []
+})
+
 export default class Graph extends EventEmitter {
-  public cfg: { [key: string]: any }
+  public cfg: CFG
 
   public viewController: ViewController
   public layoutController: LayoutController
@@ -31,31 +39,27 @@ export default class Graph extends EventEmitter {
   public stackController: StackController
 
   constructor(config: IGraphConfig) {
+    const container =
+      config.container instanceof HTMLElement
+        ? config.container
+        : document.querySelector(config.container)
+    if (!(container instanceof HTMLElement)) {
+      throw new ReferenceError(`无效的container ${config.container}`)
+    }
     super()
-    this.cfg = Object.assign({}, this.getDefaultCfg(), config)
+    this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
     // 是否触发自带渲染
-    const isRender = !this.get('container').querySelector('svg')
-    this.set('isRender', isRender)
-    if (isRender) {
-      this.render()
+    const svg = container.querySelector('svg')
+    this.set('isRender', !svg)
+    if (!svg) {
+      this.set('svg', new Svg(this))
     }
     this.initController()
   }
 
-  private render() {
-    const svg = new Svg(this)
-    this.set('svg', svg)
-  }
-
-  private clearItem() {
-    // 清除原有节点和边
-    if (this.get('isRender')) {
-      const nodeGroup = this.get('svg').get('nodeGroup')
-      const edgeGroup = this.get('svg').get('edgeGroup')
-      nodeGroup.remove()
-      edgeGroup.remove()
-    }
+  getNodeInfo() {
+    return this.cfg.nodeInfo
   }
 
   private initController() {
@@ -65,23 +69,6 @@ export default class Graph extends EventEmitter {
     this.nodeController = new NodeController(this)
     this.edgeController = new EdgeController(this)
     this.stackController = new StackController(this)
-  }
-
-  private getDefaultCfg() {
-    return {
-      container: undefined,
-      direction: 'TB',
-      nodes: [],
-      edges: [],
-      action: []
-    }
-  }
-
-  public getPointByClient(
-    originX: number,
-    originY: number
-  ): { x: number; y: number } {
-    return this.viewController.getPointByClient(originX, originY)
   }
 
   public set<T = any>(key: string | object, val?: T) {
@@ -96,142 +83,149 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  public addNode(item: INodeModel, stack: boolean = true): INode {
-    if (item.id && this.findNode(item.id)) {
-      console.warn(
-        `The node already exists. Make sure the ID %c${item.id}%c  is uniqued`
-      )
+  public getSvgInfo() {
+    return this.viewController.svgInfo
+  }
+
+  getNodes(): INode[] {
+    return this.nodeController.nodes
+  }
+
+  public findNode(id: string | number): INode {
+    return this.nodeController.findNode(id)
+  }
+
+  public findNodeByState(state: string): INode[] {
+    return this.getNodes().filter(item => {
+      return item.hasState(state)
+    })
+  }
+
+  public findNodeBySlot(id: string) {
+    return this.nodeController.findNodeBySlot(id)
+  }
+
+  refreshNode(id: string): void {
+    const node = this.nodeController.findNode(id)
+    if (!node) {
+      return console.warn(`can't find node where id is '${id}'`)
+    }
+    this.nodeController.refreshNode(id)
+    this.emit('afternoderefresh', node.model)
+  }
+
+  updateNode(id: string, model: INodeModel): void {
+    const node = this.nodeController.findNode(id)
+    if (!node) {
+      return console.warn(`can't find node where id is '${id}'`)
+    }
+    this.nodeController.updateNode(id, model)
+    this.emit('afternodeupdate', model)
+  }
+
+  deleteNode(id: string, stack = true): INode | undefined {
+    const node = this.findNode(id)
+    if (!node) {
+      console.warn(`can't delete node where id is '${id}'`)
       return
     }
+    const stackData = {
+      nodes: [node.model],
+      edges: node.edges.map(edge => edge.model as IEdgeModel)
+    }
+    this.nodeController.deleteNode(id)
+    this.emit('afterdeletenode', node.model)
+    if (stack) {
+      this.pushStack('deleteNode', stackData)
+    }
+    return node
+  }
 
+  public addNode(item: INodeModel, stack = true): INode | undefined {
     const node = this.nodeController.addNode(item)
+    if (!node) {
+      return
+    }
     this.emit('afteraddnode', item)
     if (stack) {
       const data = { nodes: [item] }
       this.pushStack('addNode', data)
     }
+
     return node
   }
 
-  public addEdge(item: IEdgeModel, stack: boolean = true): IEdge {
-    const edge = this.edgeController.addEdge(item)
-    this.emit('afteraddedge', item)
-    if (stack) {
-      const data = { edges: [item] }
-      this.pushStack('addEdge', data)
-    }
-
-    return edge
+  public findSlot(id: string | number): ISlot | undefined {
+    return this.nodeController.slotsMap[String(id)]
   }
 
-  public getSvgInfo() {
-    return this.viewController.svgInfo
+  getEdges(): IEdge[] {
+    return this.edgeController.edges
   }
 
-  deleteNode(id: string, stack: boolean = true): INode {
-    const node = this.findNode(id)
-    if (!node) {
-      return
-    }
+  public findEdge(id: string | number) {
+    return this.edgeController.findEdge(id)
+  }
 
-    if (stack) {
-      const data: IDataStack = {}
-      data.nodes = [node.model]
-      data.edges = node.edges.map(item => {
-        return item.model as IEdgeModel
-      })
-      this.pushStack('deleteNode', data)
-    }
-
-    // 先删除与节点相关的边
-    const edgeIds = node.edges.map(edge => edge.id)
-    edgeIds.forEach(item => {
-      this.deleteEdge(item, false)
+  public findEdgeByState(state: string): IEdge[] {
+    return this.getEdges().filter(item => {
+      return item.hasState(state)
     })
-
-    this.nodeController.deleteNode(node)
-    this.emit('afterdeletenode', node.model)
-
-    return node
   }
 
-  updateNode(id: string, model: INodeModel): INode {
-    const node = this.findNode(id)
-    node.update(model)
-    this.emit('afternodeupdate', node.model)
-
-    return node
-  }
-
-  updateEdge(id: string, model: IEdgeModel): IEdge {
-    const edge = this.findEdge(id)
-    edge.update(model)
+  updateEdge(id: string, model: IEdgeModel): void {
+    const edge = this.edgeController.findEdge(id)
+    if (!edge) {
+      return console.warn(`can't find edge where id is '${id}'`)
+    }
+    this.edgeController.updateEdge(id, model)
     this.emit('afteredgeupdate', edge.model)
-
-    return edge
   }
 
-  refreshNode(id: string) {
-    const node = this.findNode(id)
-    node.refresh()
-    this.emit('afternoderefresh', node.model)
-  }
-
-  deleteEdge(id: string, stack: boolean = true): IEdge {
-    const edge = this.findEdge(id)
+  deleteEdge(id: string, stack: boolean = true): IEdge | undefined {
+    const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
     }
-
-    // 先删除前后节点的相关边
-    edge.fromNode.deleteEdge(id)
-    edge.toNode.deleteEdge(id)
-
-    // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    const hasFromSlotLinked = edge.fromNode.edges.find(
-      item => item.fromSlot.id === edge.fromSlot.id
-    )
-    const hasToSlotLinked = edge.toNode.edges.find(
-      item => item.toSlot.id === edge.toSlot.id
-    )
-
-    if (!hasFromSlotLinked) {
-      edge.fromSlot.clearState('linked')
-    }
-
-    if (!hasToSlotLinked) {
-      edge.toSlot.clearState('linked')
-    }
-
+    this.emit('afterdeleteedge', edge.model)
     if (stack) {
       this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
     }
-
-    // 删除数据中的边
-    this.edgeController.deleteEdge(edge)
-
-    this.emit('afterdeleteedge', edge.model)
-
     return edge
   }
 
-  public getZoom() {
-    return this.viewController.transform.scale
-  }
-
-  public zoom(value: number) {
-    const zoom = this.getZoom()
-    if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
-      this.viewController.transform.scale = value
-      this.translate(0, 0)
-      this.viewController.caculateOffset()
-      this.emit('afterzoom', value)
+  public addEdge(item: IEdgeModel, stack: boolean = true): IEdge | undefined {
+    const edge = this.edgeController.addEdge(item)
+    if (edge) {
+      this.emit('afteraddedge', item)
+      if (stack) {
+        this.pushStack('addEdge', { edges: [item] })
+      }
     }
+    return edge
   }
 
-  public layout(options: ILayout = {}) {
-    this.layoutController.layout(options)
-    this.emit('afterlayout')
+  getData(): IDataModel {
+    const nodes = this.getNodes().map(node => node.model)
+    const edges = this.getEdges().map(edge => edge.model) as IEdgeModel[]
+    return { nodes, edges }
+  }
+
+  // 加载数据
+  data(data: IDataModel) {
+    this.clearItem()
+    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
+    this.nodeController.data(data.nodes)
+    this.edgeController.data(data.edges)
+
+    this.emit('datachange')
+  }
+
+  public getPointByClient(
+    originX: number,
+    originY: number
+  ): { x: number; y: number } {
+    return this.viewController.getPointByClient(originX, originY)
   }
 
   public getTranslate() {
@@ -242,110 +236,60 @@ export default class Graph extends EventEmitter {
   }
 
   public translate(x: number, y: number) {
-    this.viewController.translate(x, y)
-    this.emit(
-      'aftertranslate',
-      this.viewController.transform.translateX,
-      this.viewController.transform.translateY
-    )
+    return this.viewController.translateBy(x, y)
   }
 
-  public findNode(id: string | number): INode {
-    const _id = String(id)
-    const node = this.getNodes().find(item => {
-      return _id === item.id
-    })
-
-    if (!node) {
-      console.warn(`The node with ID ${_id} is not exist`)
-      return null
-    }
-
-    return node
+  public translateBy(x: number, y: number) {
+    return this.viewController.translateBy(x, y)
   }
 
-  public findEdge(id: string | number): IEdge {
-    const _id = String(id)
-    const edge = this.getEdges().find(item => {
-      return _id === item.id
-    })
-
-    if (!edge) {
-      console.warn(`The edge with ID ${_id} is not exist`)
-      return null
-    }
-
-    return edge
+  public getZoom() {
+    return this.viewController.getZoom()
   }
 
-  public findSlot(id: string | number): ISlot {
-    const _id = String(id)
-    const nodes = this.getNodes()
-    for (const node of nodes) {
-      const slot = node.slots.find(item => {
-        return item.id === _id
-      })
-      if (slot) {
-        return slot
-      }
+  public zoom(value: number) {
+    return this.viewController.zoom(value)
+  }
+
+  resize() {
+    this.viewController.resize()
+  }
+
+  fitView() {
+    this.viewController.fitView()
+  }
+
+  fitCenter() {
+    this.viewController.translateToCenter()
+  }
+
+  fullScreen(el?: HTMLElement) {
+    this.viewController.fullScreen(el)
+  }
+
+  private clearItem() {
+    // 清除原有节点和边
+    if (this.get('isRender')) {
+      const nodeGroup = this.get('svg').get('nodeGroup')
+      const edgeGroup = this.get('svg').get('edgeGroup')
+      nodeGroup.remove()
+      edgeGroup.remove()
     }
   }
 
-  public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => {
-      return item.hasState(state)
-    })
-  }
-
-  public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => {
-      return item.hasState(state)
-    })
-  }
-
-  // 加载数据
-  data(data: IDataModel) {
-    this.set('nodes', [])
-    this.set('edges', [])
-
-    this.clearItem()
-
-    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    data.nodes.forEach((node: INodeModel) => {
-      this.nodeController.addNode(node)
-    })
-    data.edges.forEach((edge: IEdgeModel) => {
-      this.edgeController.addEdge(edge)
-    })
-
-    this.emit('datachange')
-  }
-
-  getNodeInfo() {
-    return this.viewController.nodeInfo
-  }
-
-  getNodes(): INode[] {
-    return this.get('nodes')
-  }
-
-  getEdges(): IEdge[] {
-    return this.get('edges')
-  }
-
-  getData(): IDataModel {
-    const nodes = this.getNodes().map(node => node.model)
-    const edges = this.getEdges().map(edge => edge.model) as IEdgeModel[]
-    return { nodes, edges }
-  }
-
-  addAction(action: string | string[]) {
-    const actions = !Array.isArray(action) ? [action] : action
-    this.eventController.addBehavior(actions)
+  public layout(options: ILayout = {}) {
+    this.layoutController.layout(options)
+    this.emit('afterlayout')
   }
 
   removeAction(action?: string | string[]) {
     this.eventController.removeBehavior(action)
+  }
+
+  addAction(actions: string | string[]) {
+    this.eventController.addBehavior(
+      Array.isArray(actions) ? actions : [actions]
+    )
   }
 
   undo() {
@@ -367,22 +311,6 @@ export default class Graph extends EventEmitter {
 
   getRedoStack(): IStack[] {
     return this.stackController.redoStack
-  }
-
-  resize() {
-    this.viewController.resize()
-  }
-
-  fitView() {
-    this.viewController.fitView()
-  }
-
-  fitCenter() {
-    this.viewController.translateToCenter()
-  }
-
-  fullScreen(el?: HTMLElement) {
-    this.viewController.fullScreen(el)
   }
 
   detectDirectedCycle() {

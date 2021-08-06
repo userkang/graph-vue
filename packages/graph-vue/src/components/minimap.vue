@@ -163,7 +163,7 @@ export default class Minimap extends Vue {
     }
     this.canGraphChage = false
     window.requestAnimationFrame(() => {
-      const g = this.graph.viewController.$container.querySelector('g')
+      const g = this.graph.viewController.$svg.querySelector('g')
       if (g) {
         this.svgHTML = g.innerHTML
       }

@@ -37,7 +37,7 @@ const DATACHANGE = [
 export default class EventController {
   private graph: Graph
 
-  $svg: HTMLElement
+  $svg: SVGSVGElement
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
   currentItemType = 'svg'
@@ -49,7 +49,12 @@ export default class EventController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$svg = graph.cfg.container.querySelector('svg')
+    const svg = graph.cfg.container.querySelector('svg')
+    if (svg) {
+      this.$svg = svg
+    } else {
+      throw new ReferenceError(`找不到svg`)
+    }
     this.addBehavior()
     this.defaultEmit()
     this.initEvent()

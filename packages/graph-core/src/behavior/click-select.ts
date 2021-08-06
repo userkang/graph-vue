@@ -39,8 +39,10 @@ export default class ClickSelect extends Base {
     this.resetNodeSelect()
     selectedEdges.forEach(item => item.clearState('selected'))
     const edge = this.graph.findEdge(id)
-    edge.setState('selected')
-    this.graph.emit('edgeselectchange', [edge.model])
+    if (edge) {
+      edge.setState('selected')
+      this.graph.emit('edgeselectchange', [edge.model])
+    }
   }
 
   clickSvg(e: MouseEvent) {

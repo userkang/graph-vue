@@ -1,6 +1,9 @@
 <template>
   <div class="demo">
     <button @click="openGit">view me on sankuai</button>
+    <div align="left">
+      <img src="../../guide/assets/graph.gif" />
+    </div>
   </div>
 </template>
 <script lang="ts">
@@ -15,7 +18,4 @@ export default Vue.extend({
   }
 })
 </script>
-<style scoped>
-.demo {
-}
-</style>
+<style scoped></style>

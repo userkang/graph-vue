@@ -1,5 +1,15 @@
 ## 更新日志
 
+ ## @datafe/graph-core@0.3.10
+
+- 【graph-core】在使用内部渲染时，支持节点和边自定义方式。
+
+- 【graph-core】修复刷新节点状态不更新问题。
+
+- 【graph-core】优化元素查询逻辑和group计算逻辑，性能有较大提升。
+
+- 【graph-core】优化箭头渲染逻辑。
+
 ### @datafe/graph-core@0.3.9
 
 - 【graph-core】node 不传坐标值时默认为 0；

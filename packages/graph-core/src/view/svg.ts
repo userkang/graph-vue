@@ -3,7 +3,6 @@ import { uniqueId } from '../util/utils'
 import Group from './group'
 import Graph from '../controller/graph'
 import NewEdge from './newEdge'
-import Arrow from './arrow'
 import { insertCss } from './util/dom'
 import content from './css/index'
 import Brushing from './brushing'
@@ -102,13 +101,11 @@ export default class Svg extends Element {
 
   initNewEdge() {
     const newEdge = new NewEdge(this.graph)
-    const arrow = new Arrow(this.graph)
     const rootGroup = this.get('rootGroup')
     const newEdgeGroup = rootGroup.addGroup({
       class: 'graph-new-edge-group'
     })
     newEdgeGroup.add(newEdge)
-    newEdgeGroup.add(arrow)
   }
 
   initBrushing() {

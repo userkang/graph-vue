@@ -12,7 +12,8 @@ export default class NewEdge extends Element {
   draw() {
     const newEdgePath = this.createDom('path', {
       class: 'graph-new-edge',
-      d: ''
+      d: '',
+      'marker-end': 'url(#arrow)'
     })
 
     this.set('newEdgePath', newEdgePath)
@@ -35,17 +36,23 @@ export default class NewEdge extends Element {
   }) {
     const newEdgePath = this.get('newEdgePath')
     if (createEdge) {
-      const path = calculateCurve(
-        {
-          x1: createEdge.fromPoint.x,
-          y1: createEdge.fromPoint.y,
-          x2: createEdge.toPoint.x,
-          y2: createEdge.toPoint.y
-        },
-        this.graph.get('direction')
-      )
+      const customPath = this.graph.cfg?.edgeInfo?.path
+      let path = ''
+      if (customPath) {
+        path = customPath(createEdge.fromPoint, createEdge.toPoint)
+      } else {
+        path = calculateCurve(
+          {
+            x1: createEdge.fromPoint.x,
+            y1: createEdge.fromPoint.y,
+            x2: createEdge.toPoint.x,
+            y2: createEdge.toPoint.y
+          },
+          this.graph.get('direction')
+        )
+      }
 
-      newEdgePath.setAttribute('d', path.line)
+      newEdgePath.setAttribute('d', path)
     } else {
       newEdgePath.setAttribute('d', '')
     }

@@ -15,7 +15,8 @@ export default class Node extends Element {
 
   draw() {
     const edgePath = this.createDom('path', {
-      class: 'graph-edge'
+      class: 'graph-edge',
+      'marker-end': 'url(#arrow)'
     })
 
     const edgeWrapperPath = this.createDom('path', {
@@ -24,20 +25,14 @@ export default class Node extends Element {
       'graph-id': this.edge.id
     })
 
-    const arrowPath = this.createDom('path', {
-      class: 'graph-arrow'
-    })
-
     const g = this.createDom('g')
 
     g.appendChild(edgeWrapperPath)
     g.appendChild(edgePath)
-    g.appendChild(arrowPath)
 
     this.set('g', g)
     this.set('edgePath', edgePath)
     this.set('edgeWrapperPath', edgeWrapperPath)
-    this.set('arrowPath', arrowPath)
     this.set('el', g)
 
     this.setPath()
@@ -63,20 +58,12 @@ export default class Node extends Element {
 
   updateSelect() {
     const edgePath = this.get('edgePath')
-    const arrowPath = this.get('arrowPath')
-    const pathFunction = this.edge.get('cfg')?.path
     if (this.edge.hasState('selected')) {
       edgePath.classList.add('graph-edge-active')
-      arrowPath.classList.add('graph-arrow-active')
-      if (pathFunction) {
-        edgePath.setAttribute('marker-end', 'url(#arrow-active)')
-      }
+      edgePath.setAttribute('marker-end', 'url(#arrow-active)')
     } else {
       edgePath.classList.remove('graph-edge-active')
-      arrowPath.classList.remove('graph-arrow-active')
-      if (pathFunction) {
-        edgePath.setAttribute('marker-end', 'url(#arrow)')
-      }
+      edgePath.setAttribute('marker-end', 'url(#arrow)')
     }
   }
 
@@ -85,30 +72,34 @@ export default class Node extends Element {
   }
 
   setPath() {
-    const pathFunction = this.edge.get('cfg')?.path
+    const { edge } = this
+    const pathFunction = edge.get('cfg')?.path
     const edgePath = this.get('edgePath')
     const edgeWrapperPath = this.get('edgeWrapperPath')
-    const arrowPath = this.get('arrowPath')
+    let path = ''
 
     if (pathFunction) {
-      const path = pathFunction(this.edge)
-      edgePath.setAttribute('d', path)
-      edgePath.setAttribute('marker-end', 'url(#arrow)')
-      edgeWrapperPath.setAttribute('d', path)
+      path = pathFunction(edge.fromSlot, edge.toSlot)
     } else {
-      const path = calculateCurve(
-        {
-          x1: this.edge.fromSlot.x,
-          y1: this.edge.fromSlot.y,
-          x2: this.edge.toSlot.x,
-          y2: this.edge.toSlot.y
-        },
-        this.graph.get('direction')
-      )
-      edgePath.setAttribute('d', path.line)
-      edgeWrapperPath.setAttribute('d', path.line)
-      arrowPath.setAttribute('d', path.arrow)
+      const direction = this.graph.get('direction')
+      let x2 = edge.toSlot.x
+      let y2 = edge.toSlot.y
+      if (direction === 'LR') {
+        x2 -= 4
+      } else {
+        y2 -= 4
+      }
+
+      path = calculateCurve({
+        x1: edge.fromSlot.x,
+        y1: edge.fromSlot.y,
+        x2,
+        y2
+      })
     }
+
+    edgePath.setAttribute('d', path)
+    edgeWrapperPath.setAttribute('d', path)
 
     this.updateSelect()
   }

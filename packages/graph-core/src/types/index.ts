@@ -53,7 +53,10 @@ export interface IGraphConfig {
     html?: (node: Node) => HTMLElement | string
   }
   edgeInfo?: {
-    path?: (edge: Edge) => string
+    path?: (
+      from: { x: number; y: number },
+      to: { x: number; y: number }
+    ) => string
   }
   // 默认的行为配置
   action: string[]

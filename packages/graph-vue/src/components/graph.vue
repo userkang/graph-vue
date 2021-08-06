@@ -117,22 +117,18 @@ export default class GraphContent extends Vue {
         }
       },
       edgeInfo: {
-        path: edge => {
-          const { x: x1, y: y1 } = edge.fromSlot
-          const { x: x2, y: y2 } = edge.toSlot
-
+        path: (from, to) => {
+          const { x: x1, y: y1 } = from
+          const { x: x2, y: y2 } = to
           const deg = Math.atan((y2 - y1) / (x2 - x1))
           let offsetX = 4 * Math.cos(deg)
           let offsetY = 4 * Math.sin(deg)
-
           if (x2 < x1) {
             offsetX = -offsetX
             offsetY = -offsetY
           }
-
-          return `M ${edge.fromSlot.x} ${edge.fromSlot.y}  L ${edge.toSlot.x -
-            offsetX} ${edge.toSlot.y - offsetY}`
-        }
+          return `M ${x1} ${y1}  L ${x2 - offsetX} ${y2 - offsetY}`
+        },
       },
       action: this.configState.action
     })

@@ -155,7 +155,9 @@ export default class EventController {
     Array.from(targetTypes).forEach(item => {
       typeSet.add((item as HTMLElement).getAttribute('graph-type'))
     })
-
+    if (eventType === 'contextmenu') {
+      debugger
+    }
     typeSet.forEach(type => {
       if (isTarget(e, type)) {
         this.currentItemType = type

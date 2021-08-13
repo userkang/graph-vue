@@ -56,6 +56,8 @@ export default class Graph extends EventEmitter {
       this.set('svg', new Svg(this))
     }
     this.initController()
+
+    window.g = this
   }
 
   getNodeInfo() {

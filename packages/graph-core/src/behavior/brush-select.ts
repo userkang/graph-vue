@@ -97,7 +97,9 @@ export default class BrushSelect extends Base {
       item.x + item.width < range.startX ||
       item.x > range.endX
     )
-    isSelect ? item.setState('selected') : item.clearState('selected')
+    isSelect && !item.hasState('locked')
+      ? item.setState('selected')
+      : item.clearState('selected')
     return isSelect
   }
 }

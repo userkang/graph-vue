@@ -6,7 +6,11 @@ import nodeView from '../view/node'
 import Graph from '../controller/graph'
 
 export default class Node extends Base {
-  constructor(model: INodeModel, cfg: { [key: string]: unknown }, direction: string) {
+  constructor(
+    model: INodeModel,
+    cfg: { [key: string]: unknown },
+    direction: string
+  ) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')

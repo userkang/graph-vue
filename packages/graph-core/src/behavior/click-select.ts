@@ -16,16 +16,18 @@ export default class ClickSelect extends Base {
   clickNode(e: MouseEvent, data: { id: string }) {
     const { id } = data
     const selectedNodes = this.graph.findNodeByState('selected')
-    const exist = selectedNodes.findIndex(item => item.id === id)
-    if (exist > -1) {
+    const hasSelected = selectedNodes.findIndex(item => item.id === id)
+    if (hasSelected > -1) {
       return
     }
 
     this.resetEdgeSelect()
     selectedNodes.forEach(item => item.clearState('selected'))
     const node = this.graph.findNode(id)
-    node.setState('selected')
-    this.graph.emit('nodeselectchange', [node.model])
+    if (!node.hasState('locked')) {
+      node.setState('selected')
+      this.graph.emit('nodeselectchange', [node.model])
+    }
   }
 
   clickEdge(e: MouseEvent, data: { id: string }) {

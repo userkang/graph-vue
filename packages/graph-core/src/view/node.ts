@@ -106,6 +106,7 @@ export default class Node extends Element {
 
   update(node: INode) {
     this.node = node
+    console.log(node)
     const foreignObject = this.get('foreignObject')
     foreignObject.setAttribute('width', this.node.width)
     foreignObject.setAttribute('height', this.node.height)

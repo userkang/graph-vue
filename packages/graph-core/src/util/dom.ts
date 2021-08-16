@@ -1,15 +1,21 @@
-export const isTarget = (e: MouseEvent, type: string) => {
-  let target = e.target as HTMLElement
-  const currentTarget = e.currentTarget
+export const getEventPath = (event: Event): EventTarget[] => {
+  return event['path'] || (event['composedPath'] && event['composedPath']())
+}
 
-  while (target !== currentTarget) {
-    if (target.getAttribute('graph-type') === type) {
+export const isTarget = (e: MouseEvent, type: string) => {
+  const path = getEventPath(e)
+  for (let i = 0; i < path.length; i++) {
+    const target = path[i]
+    if (
+      target instanceof Element &&
+      target.getAttribute('graph-type') === type
+    ) {
       return true
     }
-
-    target = target.parentNode as HTMLElement
+    if (target instanceof SVGSVGElement) {
+      break
+    }
   }
-
   return false
 }
 

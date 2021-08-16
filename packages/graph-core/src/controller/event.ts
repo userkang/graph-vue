@@ -1,5 +1,10 @@
 import Graph from './graph'
-import { addEventListener, isTarget, getItemData } from '../util/dom'
+import {
+  addEventListener,
+  isTarget,
+  getItemData,
+  getEventPath
+} from '../util/dom'
 import behaviors from '../behavior'
 
 const EVENTS = [
@@ -153,19 +158,29 @@ export default class EventController {
     const targetTypes = this.$svg.querySelectorAll('[graph-type]')
     const typeSet: Set<string> = new Set()
     Array.from(targetTypes).forEach(item => {
-      typeSet.add((item as HTMLElement).getAttribute('graph-type'))
-    })
-    if (eventType === 'contextmenu') {
-      debugger
-    }
-    typeSet.forEach(type => {
-      if (isTarget(e, type)) {
-        this.currentItemType = type
-        const data = getItemData(e)
-        // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
-        this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
+      if (item instanceof Element) {
+        typeSet.add(item.getAttribute('graph-type'))
       }
     })
+    let type = ''
+    const path = getEventPath(e)
+    for (let i = 0; i < path.length; i++) {
+      const target = path[i]
+      const type =
+        target instanceof Element && target.getAttribute('graph-type')
+      if (type) {
+        break
+      }
+      if (target instanceof SVGSVGElement) {
+        break
+      }
+    }
+    if (type) {
+      this.currentItemType = type
+      const data = getItemData(e)
+      // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
+      this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
+    }
 
     this.graph.emit(eventType, e)
   }

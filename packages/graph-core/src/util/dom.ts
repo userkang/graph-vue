@@ -4,8 +4,7 @@ export const getEventPath = (event: Event): EventTarget[] => {
 
 export const isTarget = (e: MouseEvent, type: string) => {
   const path = getEventPath(e)
-  for (let i = 0; i < path.length; i++) {
-    const target = path[i]
+  for (const target of path) {
     if (
       target instanceof Element &&
       target.getAttribute('graph-type') === type

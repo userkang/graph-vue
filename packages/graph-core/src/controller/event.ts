@@ -164,13 +164,9 @@ export default class EventController {
     })
     let type = ''
     const path = getEventPath(e)
-    for (let i = 0; i < path.length; i++) {
-      const target = path[i]
+    for (const target of path) {
       type = target instanceof Element && target.getAttribute('graph-type')
-      if (type) {
-        break
-      }
-      if (target instanceof SVGSVGElement) {
+      if (type || target instanceof SVGSVGElement) {
         break
       }
     }

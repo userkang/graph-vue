@@ -314,7 +314,6 @@ export default class Graph extends EventEmitter {
   }
 
   detectDirectedCycle() {
-    console.log(this.getData())
     return detectDirectedCycle(this.getData())
   }
 

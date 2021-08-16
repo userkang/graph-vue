@@ -154,7 +154,6 @@ export default class EventController {
     if (type) {
       this.currentItemType = type
       const data = getItemData(e)
-      console.log(eventType)
       // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
       this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
     }

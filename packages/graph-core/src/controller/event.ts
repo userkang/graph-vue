@@ -166,8 +166,7 @@ export default class EventController {
     const path = getEventPath(e)
     for (let i = 0; i < path.length; i++) {
       const target = path[i]
-      const type =
-        target instanceof Element && target.getAttribute('graph-type')
+      type = target instanceof Element && target.getAttribute('graph-type')
       if (type) {
         break
       }

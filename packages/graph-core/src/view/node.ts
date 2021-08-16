@@ -106,7 +106,6 @@ export default class Node extends Element {
 
   update(node: INode) {
     this.node = node
-    const cacheDiv = this.get('div')
     this.drawDom()
     const foreignObject = this.get('foreignObject')
     const div = this.get('div')

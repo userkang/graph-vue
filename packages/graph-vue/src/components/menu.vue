@@ -77,9 +77,6 @@ export default class Menu extends Vue {
       y: e.y,
       item: node as any
     }
-
-    node.setState('selected')
-    node.refresh()
   }
 
   showEdgeMenu(e: MouseEvent, data: { id: string }) {

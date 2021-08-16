@@ -38,7 +38,7 @@ export default class DragNode extends Base {
   mouseDown(e: MouseEvent, data: { id: string }) {
     const { id } = data
     this.activeNode = this.graph.findNode(id)
-    this.isMoving = !this.activeNode.hasState('locked')
+    this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
     this.originX = this.startX = e.x
     this.originY = this.startY = e.y
 

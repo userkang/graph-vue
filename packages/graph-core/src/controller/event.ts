@@ -1,10 +1,5 @@
 import Graph from './graph'
-import {
-  addEventListener,
-  isTarget,
-  getItemData,
-  getEventPath
-} from '../util/dom'
+import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
 
 const EVENTS = [
@@ -155,24 +150,11 @@ export default class EventController {
       this.graph.emit(`svg.${eventType}`, e)
     }
 
-    const targetTypes = this.$svg.querySelectorAll('[graph-type]')
-    const typeSet: Set<string> = new Set()
-    Array.from(targetTypes).forEach(item => {
-      if (item instanceof Element) {
-        typeSet.add(item.getAttribute('graph-type'))
-      }
-    })
-    let type = ''
-    const path = getEventPath(e)
-    for (const target of path) {
-      type = target instanceof Element && target.getAttribute('graph-type')
-      if (type || target instanceof SVGSVGElement) {
-        break
-      }
-    }
+    const type = getItemType(e)
     if (type) {
       this.currentItemType = type
       const data = getItemData(e)
+      console.log(eventType)
       // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
       this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
     }

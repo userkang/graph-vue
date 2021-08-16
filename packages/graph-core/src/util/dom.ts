@@ -60,3 +60,16 @@ export const getItemData = (e: MouseEvent) => {
 
   return {}
 }
+
+export const getItemType = (e: MouseEvent) => {
+  let type = ''
+  const path = getEventPath(e)
+  for (const target of path) {
+    type = target instanceof Element && target.getAttribute('graph-type')
+    if (type || target instanceof SVGSVGElement) {
+      break
+    }
+  }
+
+  return type
+}

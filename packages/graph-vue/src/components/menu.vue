@@ -70,10 +70,6 @@ export default class Menu extends Vue {
 
   showNodeMenu(e: MouseEvent, data: { id: string }) {
     const node = this.graph.findNode(data.id)
-
-    node.setState('selected')
-    node.refresh()
-
     this.menu = {
       show: true,
       type: 'node',
@@ -81,6 +77,9 @@ export default class Menu extends Vue {
       y: e.y,
       item: node as any
     }
+
+    node.setState('selected')
+    node.refresh()
   }
 
   showEdgeMenu(e: MouseEvent, data: { id: string }) {

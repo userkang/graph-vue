@@ -27,6 +27,7 @@ export interface INodeModel {
   x?: number
   y?: number
   slots?: ISlotModel[]
+  children?: INodeModel[]
   [key: string]: unknown
 }
 

@@ -20,6 +20,7 @@ import {
   ILayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
+import { isIDataModel, preorder } from '../util/utils'
 
 const getDefaultConfig = () => ({
   direction: 'TB',
@@ -211,16 +212,6 @@ export default class Graph extends EventEmitter {
     return { nodes, edges }
   }
 
-  // 加载数据
-  data(data: IDataModel) {
-    this.clearItem()
-    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    this.nodeController.data(data.nodes)
-    this.edgeController.data(data.edges)
-
-    this.emit('datachange')
-  }
-
   public getPointByClient(
     originX: number,
     originY: number
@@ -257,6 +248,35 @@ export default class Graph extends EventEmitter {
 
   fitView() {
     this.viewController.fitView()
+  }
+  // 加载数据
+  data(data: IDataModel | INodeModel) {
+    this.set('nodes', [])
+    this.set('edges', [])
+    this.clearItem()
+
+    let imodel: IDataModel = { nodes: [], edges: [] }
+    imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
+    const needLayout = imodel.nodes.every(
+      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
+    )
+    imodel.nodes.forEach(node =>
+      Object.assign(node, {
+        x: node.x || 1,
+        y: node.y || 1
+      })
+    )
+    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
+    imodel.nodes.forEach((node: INodeModel) => {
+      this.nodeController.addNode(node)
+    })
+    imodel.edges.forEach((edge: IEdgeModel) => {
+      this.edgeController.addEdge(edge)
+    })
+    if (needLayout) {
+      this.layout()
+    }
+    this.emit('datachange')
   }
 
   fitCenter() {

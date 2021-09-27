@@ -51,7 +51,8 @@ import ToolBox from '@/components/tool-box.vue'
 import Menu from '@/components/menu.vue'
 import Minimap from '@/components/minimap.vue'
 import Arrow from '@/components/arrow.vue'
-import { Graph, INodeModel, IEdgeModel } from '@datafe/graph-core'
+import { Graph, IDataModel, INodeModel, IEdgeModel } from '@datafe/graph-core'
+import { isIDataModel } from '../../../graph-core/src/util/utils'
 
 @Component({
   components: {
@@ -85,6 +86,21 @@ export default class GraphContent extends Vue {
 
   get dragingInfo() {
     return this.componentState.dragingInfo
+  }
+
+  get rootNodes(): INodeModel[] {
+    const isIdata = isIDataModel(this.configState.data)
+    if (!isIdata) {
+      return [this.configState.data]
+    } else {
+      const { nodes, edges } = this.configState.data as IDataModel
+      const nodeMap: { [x: string]: INodeModel } = {}
+      nodes.forEach(node => {
+        nodeMap[node.id] = node
+      })
+      edges.forEach(edge => delete nodeMap[edge.toNodeId])
+      return Object.keys(nodeMap).map(id => nodeMap[id])
+    }
   }
 
   handleDrop(e: DragEvent) {
@@ -128,7 +144,7 @@ export default class GraphContent extends Vue {
             offsetY = -offsetY
           }
           return `M ${x1} ${y1}  L ${x2 - offsetX} ${y2 - offsetY}`
-        },
+        }
       },
       action: this.configState.action
     })

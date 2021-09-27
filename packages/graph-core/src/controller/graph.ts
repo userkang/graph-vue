@@ -267,12 +267,8 @@ export default class Graph extends EventEmitter {
       })
     )
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    imodel.nodes.forEach((node: INodeModel) => {
-      this.nodeController.addNode(node)
-    })
-    imodel.edges.forEach((edge: IEdgeModel) => {
-      this.edgeController.addEdge(edge)
-    })
+    this.nodeController.data(imodel.nodes)
+    this.edgeController.data(imodel.edges)
     if (needLayout) {
       this.layout()
     }

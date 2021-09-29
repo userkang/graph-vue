@@ -14,8 +14,6 @@
       <span>{{ item.componentName }}</span>
     </li>
     <div class="title">模板</div>
-    <!-- <button @click="getDemo('tree')">生成树</button>
-    <button @click="getDemo('default')">生成默认</button> -->
     <ul class="demo">
       <li
         class="demo-item"
@@ -23,10 +21,12 @@
         :key="item.id"
         @click="getDemo(item.type)"
       >
-        <div class="demo-item-wrap">
-          <div v-show="activeTemplate === item.type" class="mask"></div>
-          <img class="image" :src="item.img" />
-        </div>
+        <ToolTip :message="item.desc" placement="right">
+          <div class="demo-item-wrap">
+            <div v-show="activeTemplate === item.type" class="mask"></div>
+            <img class="image" :src="item.img" />
+          </div>
+        </ToolTip>
       </li>
     </ul>
   </div>
@@ -35,11 +35,9 @@
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
 import { ComponentListStore } from '@/stores/component-list'
+import ToolTip from '@/components/tool-tip.vue'
 import GraphStore from '@/stores/graph'
 import bus from '@/utils/bus'
-// import demoDefaultImg from '../../assets/imgs/demo-default'
-// const demoDefaultImg = require('../assets/imgs/demo-default.jpg')
-// const demoTreeImg = require('../assets/imgs/demo-tree.jpg')
 
 const getRandomId = () =>
   Math.random()
@@ -51,7 +49,11 @@ enum demoTypes {
   TREE
 }
 
-@Component
+@Component({
+  components: {
+    ToolTip
+  }
+})
 export default class ComponentPanel extends Vue {
   dragged!: HTMLLIElement
   componentState = ComponentListStore.state

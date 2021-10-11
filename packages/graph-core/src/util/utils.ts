@@ -93,17 +93,6 @@ export const clone = obj => {
   return rst
 }
 
-let nextId = 0
-export const generateTreeNode = (): INodeModel => {
-  const nodeId = nextId++
-  const id = String(nodeId)
-  return {
-    id,
-    label: id,
-    nodeId
-  }
-}
-
 export const generateTreeEdge = (
   from: INodeModel,
   to: INodeModel

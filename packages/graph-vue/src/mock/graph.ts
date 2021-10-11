@@ -1,4 +1,4 @@
-import { generateTreeNode } from '../../../graph-core/src/util/utils'
+import { INodeModel } from '@datafe/graph-core'
 export const dagMock = {
   nodes: [
     {
@@ -120,11 +120,21 @@ export const dagMock = {
   ]
 }
 
+let nextId = 0
+const generateTreeNode = (): INodeModel => {
+  const nodeId = nextId++
+  const id = String(nodeId)
+  return {
+    id,
+    label: id,
+    nodeId
+  }
+}
+
 const treeNodes = new Array(14).fill(1).map(i => generateTreeNode())
 treeNodes[1].children = [treeNodes[2], treeNodes[3], treeNodes[4], treeNodes[5]]
 treeNodes[3].children = [treeNodes[6], treeNodes[7]]
 treeNodes[7].children = [treeNodes[11]]
-treeNodes[11].children = [treeNodes[14]]
 treeNodes[4].children = [treeNodes[8]]
 treeNodes[8].children = [treeNodes[12]]
 treeNodes[5].children = [treeNodes[9], treeNodes[10]]

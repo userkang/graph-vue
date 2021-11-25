@@ -17,7 +17,9 @@
             : 'rgba(252,252,251,0.9)'
         }"
       >
-        {{ node.model.label }}
+        <slot>
+          {{ node.model.label }}
+        </slot>
       </div>
     </foreignObject>
     <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot" />

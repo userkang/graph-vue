@@ -24,7 +24,9 @@
           v-if="graph"
         >
           <Edge v-for="item in edges" :key="item.id" :edge="item" />
-          <Node v-for="item in nodes" :key="item.id" :node="item" />
+          <Node v-for="item in nodes" :key="item.id" :node="item">
+            <slot name="node"></slot>
+          </Node>
           <NewEdge />
         </g>
         <path

@@ -39,9 +39,10 @@ export default class Node extends Element {
   drawDom() {
     const htmlFunction = this.node.get('cfg').html
     let div: HTMLElement = document.createElement('div')
-
+    // TODO: vue 渲染
     if (htmlFunction) {
       const content = htmlFunction(this.node)
+      debugger
       if (content) {
         if (typeof content === 'string') {
           div.insertAdjacentHTML('afterbegin', content)

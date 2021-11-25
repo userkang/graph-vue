@@ -1,4 +1,8 @@
-import { generateDefaultDemo, generateTreeDemo } from '@/mock/graph'
+import {
+  generateDefaultDemo,
+  generateTreeDemo,
+  generateTestDemo
+} from '@/mock/graph'
 import { GraphConfigStore } from './graph-config'
 
 class Graph {
@@ -7,11 +11,12 @@ class Graph {
   }
 
   public getData() {
-    GraphConfigStore.state.data = generateDefaultDemo() // dagMock
+    // GraphConfigStore.state.data = generateDefaultDemo() // dagMock
+    GraphConfigStore.state.data = generateTestDemo() // dagMock
   }
 
   public getTreeData() {
-    GraphConfigStore.state.data = generateTreeDemo() // treeNock
+    GraphConfigStore.state.data = generateDefaultDemo() // treeNock
   }
 }
 

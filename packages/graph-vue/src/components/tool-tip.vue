@@ -125,6 +125,7 @@ export default class ToolTip extends Vue {
 }
 </style>
 
+
 <style lang="scss">
 $main-color: #575c95;
 .tooltip {

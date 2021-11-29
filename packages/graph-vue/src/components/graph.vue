@@ -8,12 +8,11 @@
       @contextmenu="e => e.preventDefault()"
     >
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <!-- <svg
+      <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
         height="100%"
-        class="test"
       >
         <Arrow />
         <g
@@ -31,7 +30,7 @@
           :d="brushPath"
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
-      </svg> -->
+      </svg>
     </div>
 
     <ToolBox v-if="graph" />

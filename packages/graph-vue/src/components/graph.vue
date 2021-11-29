@@ -8,7 +8,7 @@
       @contextmenu="e => e.preventDefault()"
     >
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <!-- <svg
+      <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
@@ -30,7 +30,7 @@
           :d="brushPath"
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
-      </svg> -->
+      </svg>
     </div>
 
     <ToolBox v-if="graph" />
@@ -53,6 +53,7 @@ import Minimap from '@/components/minimap.vue'
 import Arrow from '@/components/arrow.vue'
 import { Graph, IDataModel, INodeModel, IEdgeModel } from '@datafe/graph-core'
 import { isIDataModel } from '../../../graph-core/src/util/utils'
+import bus from '@/utils/bus'
 
 @Component({
   components: {
@@ -70,7 +71,8 @@ export default class GraphContent extends Vue {
   minimap: boolean
 
   componentState = ComponentListStore.state
-  configState = GraphConfigStore.state
+  // configState = GraphConfigStore.state
+  GraphConfigStore = GraphConfigStore
 
   graph: Graph = null as any
 
@@ -83,6 +85,10 @@ export default class GraphContent extends Vue {
     translateY: 0
   }
   brushPath = ''
+
+  get configState() {
+    return this.GraphConfigStore.state
+  }
 
   get dragingInfo() {
     return this.componentState.dragingInfo
@@ -119,6 +125,10 @@ export default class GraphContent extends Vue {
 
   mounted() {
     this.init()
+    bus.on('demo-change', () => {
+      this.graph.data(this.configState.data)
+      this.graph.layout()
+    })
   }
 
   init() {
@@ -171,6 +181,7 @@ export default class GraphContent extends Vue {
 
     Object.keys(hooks).forEach(key => {
       const hook = (hooks as any)[key]
+
       this.graph.on(key, (this as any)[hook])
     })
   }

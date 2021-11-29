@@ -12,7 +12,7 @@
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graphRef" />
+        <Graph ref="graphRef"> </Graph>
       </div>
       <ConfigPanel />
     </div>

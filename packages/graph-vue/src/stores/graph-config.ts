@@ -3,7 +3,7 @@ import { IDataModel, INodeModel } from '@datafe/graph-core'
 interface GraphConfigState {
   direction: 'TB' | 'LR'
   action: string[]
-  data: IDataModel|INodeModel
+  data: IDataModel | INodeModel
 }
 
 class GraphConfig {

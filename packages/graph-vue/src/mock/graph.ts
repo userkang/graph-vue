@@ -1,4 +1,15 @@
-import { generateTreeNode } from '../../../graph-core/src/util/utils'
+import { INodeModel } from '@datafe/graph-core'
+
+let nextId = 0
+const generateTreeNode = (): INodeModel => {
+  const nodeId = nextId++
+  const id = String(nodeId)
+  return {
+    id,
+    label: id,
+    nodeId
+  }
+}
 
 export const generateDefaultDemo = () => {
   const dagMock = {

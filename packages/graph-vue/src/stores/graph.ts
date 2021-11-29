@@ -1,8 +1,4 @@
-import {
-  generateDefaultDemo,
-  generateTreeDemo,
-  generateTestDemo
-} from '@/mock/graph'
+import { generateDefaultDemo, generateTreeDemo } from '@/mock/graph'
 import { GraphConfigStore } from './graph-config'
 
 class Graph {

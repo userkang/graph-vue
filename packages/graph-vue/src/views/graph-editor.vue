@@ -14,7 +14,7 @@
       <div class="main-center-wrap">
         <Graph ref="graphRef"> </Graph>
       </div>
-      <!-- <ConfigPanel /> -->
+      <ConfigPanel />
     </div>
   </div>
 </template>
@@ -22,9 +22,8 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
-// import ConfigPanel from '@/components/config-panel.vue'
+import ConfigPanel from '@/components/config-panel.vue'
 import Graph from '@/components/graph.vue'
-import Node from '@/newComponents/slotComponents/Node.vue'
 
 import GraphStore from '@/stores/graph'
 
@@ -37,7 +36,7 @@ interface CopyReturnValue {
   components: {
     Graph,
     ComponentPanel,
-    Node
+    ConfigPanel
   }
 })
 export default class GraphEditor extends Vue {

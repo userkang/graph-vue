@@ -42,7 +42,6 @@ export default class Node extends Element {
     // TODO: vue 渲染
     if (htmlFunction) {
       const content = htmlFunction(this.node)
-      debugger
       if (content) {
         if (typeof content === 'string') {
           div.insertAdjacentHTML('afterbegin', content)

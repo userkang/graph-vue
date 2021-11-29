@@ -16,7 +16,7 @@ class Graph {
   }
 
   public getTreeData() {
-    GraphConfigStore.state.data = generateDefaultDemo() // treeNock
+    GraphConfigStore.state.data = generateTreeDemo() // treeNock
   }
 }
 

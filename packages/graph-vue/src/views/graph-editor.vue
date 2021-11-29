@@ -12,14 +12,7 @@
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graphRef">
-          <div
-            slot="node"
-            style="background-color: red; width: 100%; height: 100%"
-          >
-            Node内容1
-          </div>
-        </Graph>
+        <Graph ref="graphRef"> </Graph>
       </div>
       <!-- <ConfigPanel /> -->
     </div>

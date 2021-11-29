@@ -8,7 +8,7 @@
       @contextmenu="e => e.preventDefault()"
     >
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <svg
+      <!-- <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
@@ -24,16 +24,14 @@
           v-if="graph"
         >
           <Edge v-for="item in edges" :key="item.id" :edge="item" />
-          <Node v-for="item in nodes" :key="item.id" :node="item">
-            <slot name="node"></slot>
-          </Node>
+          <Node v-for="item in nodes" :key="item.id" :node="item"></Node>
           <NewEdge />
         </g>
         <path
           :d="brushPath"
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
-      </svg>
+      </svg> -->
     </div>
 
     <ToolBox v-if="graph" />

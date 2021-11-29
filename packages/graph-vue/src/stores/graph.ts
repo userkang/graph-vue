@@ -7,7 +7,6 @@ class Graph {
   }
 
   public getData() {
-    // GraphConfigStore.state.data = generateDefaultDemo() // dagMock
     GraphConfigStore.state.data = generateDefaultDemo() // dagMock
   }
 

@@ -107,8 +107,8 @@ $select-color: #4150f6;
   stroke-width: 2;
   fill: none;
   stroke-linecap: round;
-  // stroke-dasharray: 5;
-  // animation: dash 10s linear infinite;
+  stroke-dasharray: 5;
+  animation: dash 10s linear infinite;
   pointer-events: none;
 }
 .edge-selected-style {

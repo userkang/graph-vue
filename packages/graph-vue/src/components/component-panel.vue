@@ -17,13 +17,13 @@
     <ul class="demo">
       <li
         class="demo-item"
+        :class="{ selected: activeTemplate === item.type }"
         v-for="item in demoTemplates"
         :key="item.id"
         @click="getDemo(item.type)"
       >
         <ToolTip :message="item.desc" placement="right">
           <div class="demo-item-wrap">
-            <div v-show="activeTemplate === item.type" class="mask"></div>
             <img class="image" :src="item.img" />
           </div>
         </ToolTip>
@@ -38,6 +38,8 @@ import { ComponentListStore } from '@/stores/component-list'
 import ToolTip from '@/components/tool-tip.vue'
 import GraphStore from '@/stores/graph'
 import bus from '@/utils/bus'
+import demoDefault from '@/assets/imgs/demo-default.jpg'
+import demoTree from '@/assets/imgs/demo-tree.jpg'
 
 const getRandomId = () =>
   Math.random()
@@ -72,13 +74,13 @@ export default class ComponentPanel extends Vue {
       id: getRandomId(),
       type: demoTypes.DEFAULT,
       desc: '默认',
-      img: require('../assets/imgs/demo-default.jpg')
+      img: demoDefault
     },
     {
       id: getRandomId(),
       type: demoTypes.TREE,
       desc: '树型结构',
-      img: require('../assets/imgs/demo-tree.jpg')
+      img: demoTree
     }
   ]
 
@@ -105,7 +107,6 @@ export default class ComponentPanel extends Vue {
   }
 
   getDemo(type: number) {
-    GraphStore.getData()
     this.activeTemplate = type
     switch (type) {
       case demoTypes.TREE:
@@ -175,31 +176,23 @@ export default class ComponentPanel extends Vue {
     margin-left: 10%;
     overflow: hidden;
     box-sizing: border-box;
-    &:hover {
-      border: 1px solid #4e73ff;
-    }
     &-wrap {
       position: relative;
       width: 100%;
       height: 100%;
       transition: all 0.5s;
+      box-sizing: border-box;
       &:hover {
         transform: scale(1.1);
-      }
-      .mask {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 2000;
-        background-color: rgba(0, 0, 255, 0.3);
       }
       .image {
         width: 100%;
         height: 100%;
       }
     }
+  }
+  .selected {
+    border: 1px solid #4e73ff;
   }
 }
 </style>

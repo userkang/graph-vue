@@ -12,3 +12,8 @@ declare module '*.svg' {
   const img: any
   export default img
 }
+
+declare module '*.jpg' {
+  const img: any
+  export default img
+}

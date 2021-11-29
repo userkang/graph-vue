@@ -24,8 +24,8 @@ export default class ToolTip extends Vue {
   tooltip: HTMLDivElement = null
   wrap: HTMLDivElement = null
 
-  showTimer: NodeJS.Timeout = null
-  closeTimer: NodeJS.Timeout = null
+  showTimer = null
+  closeTimer = null
 
   async handleMouseEnter() {
     clearTimeout(this.closeTimer)

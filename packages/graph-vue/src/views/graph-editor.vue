@@ -10,9 +10,32 @@
       >
     </div>
     <div class="main-wrap">
+      <test-slots>
+        <!-- <template v-slot:node="slotProps">{{ slotProps }} </template> -->
+      </test-slots>
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graphRef" />
+        <Graph ref="graphRef">
+          <!-- <template slot="node" slot-scope="user">
+            {{ user }}
+          </template> -->
+
+          <template slot="node" slot-scope="model">
+            <div class="node-container">
+              <div class="left"></div>
+              <div class="right">值为{{ model.label }}</div>
+            </div>
+          </template>
+
+          <!-- <div slot="node"></div> -->
+
+          <!-- <Edge></Edge> -->
+
+          <!-- <Node>
+            <div slot="label"></div>
+            <div ></div>
+            </Node> -->
+        </Graph>
       </div>
       <ConfigPanel />
     </div>
@@ -26,6 +49,10 @@ import ConfigPanel from '@/components/config-panel.vue'
 import Graph from '@/components/graph.vue'
 
 import GraphStore from '@/stores/graph'
+import Node from '@/components/graphSlots/node.vue'
+import Style from '@/components/graphSlots/Style.vue'
+import Edge from '@/components/graphSlots/Edge.vue'
+import TestSlots from './TestSlots.vue'
 
 interface CopyReturnValue {
   graphId: number
@@ -36,7 +63,11 @@ interface CopyReturnValue {
   components: {
     Graph,
     ComponentPanel,
-    ConfigPanel
+    ConfigPanel,
+    Node,
+    Style,
+    Edge,
+    TestSlots
   }
 })
 export default class GraphEditor extends Vue {
@@ -76,5 +107,23 @@ export default class GraphEditor extends Vue {
 }
 .main-center-wrap {
   flex: 1;
+}
+.node-container {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  .left {
+    width: 30%;
+    height: 100%;
+    background-color: orange;
+  }
+  .right {
+    flex: 1;
+    text-align: center;
+  }
 }
 </style>

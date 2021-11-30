@@ -12,7 +12,9 @@
     "docs:deploy": "yarn --cwd packages/docs node deployDocs.js",
     "vuepress": "yarn --cwd packages/docs vuepress"
   },
-  "dependencies": {},
+  "dependencies": {
+    "vue-property-decorator": "^9.1.2"
+  },
   "devDependencies": {},
   "gitHooks": {
     "pre-commit": "lint-staged"

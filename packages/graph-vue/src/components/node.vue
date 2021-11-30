@@ -17,7 +17,14 @@
             : 'rgba(252,252,251,0.9)'
         }"
       >
-        {{ node.model.label }}
+        <div v-if="hasDefaultSlot" class="w-100 h-100">
+          <!-- 有slot -->
+          <slot></slot>
+        </div>
+        <div v-else>
+          <!-- 无slot -->
+          {{ node.model.label }}
+        </div>
       </div>
     </foreignObject>
     <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot" />
@@ -44,8 +51,20 @@ export default class Node extends Vue {
     return (this.$parent as GraphContent).graph
   }
 
+  get hasDefaultSlot() {
+    return (
+      Reflect.has(this.$slots, 'default') ||
+      Reflect.has(this.$scopedSlots, 'default')
+    )
+  }
+
   get isNodeSelected() {
     return this.node.hasState('selected')
+  }
+
+  mounted() {
+    // console.log(this.$slots)
+    // console.log(this.$scopedSlots)
   }
 }
 </script>
@@ -63,5 +82,11 @@ export default class Node extends Vue {
   border-radius: 2px;
   box-sizing: border-box;
   cursor: pointer;
+}
+.w-100 {
+  width: 100%;
+}
+.h-100 {
+  height: 100%;
 }
 </style>

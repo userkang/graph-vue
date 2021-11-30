@@ -7,14 +7,19 @@
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
     >
+      <!-- <slot name="node" :user="user1"></slot><br />
+      <slot name="node" :user="user2"></slot> -->
+
+      hasNodeSlot: {{ hasNodeSlot }}
+
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <!-- <svg
+      <svg
         version="1.1"
         xmlns="http://www.w3.org/2000/svg"
         width="100%"
         height="100%"
       >
-        <Arrow />
+        <Arrow ref="arrow" />
         <g
           :style="{
             transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
@@ -22,15 +27,27 @@
           }"
           v-if="graph"
         >
-          <Edge v-for="item in edges" :key="item.id" :edge="item" />
-          <Node v-for="item in nodes" :key="item.id" :node="item" />
+          <Edge ref="edge" v-for="item in edges" :key="item.id" :edge="item" />
+          <Node
+            ref="node"
+            name="node"
+            v-for="item in nodes"
+            :key="item.id"
+            :node="item"
+          >
+            <slot
+              v-if="hasNodeSlot"
+              name="node"
+              :label="item.model.label"
+            ></slot>
+          </Node>
           <NewEdge />
         </g>
         <path
           :d="brushPath"
           style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
         />
-      </svg> -->
+      </svg>
     </div>
 
     <ToolBox v-if="graph" />
@@ -74,6 +91,15 @@ export default class GraphContent extends Vue {
 
   graph: Graph = null as any
 
+  user1 = {
+    firstName: 'zhang',
+    lastName: 'san'
+  }
+  user2 = {
+    firstName: 'li',
+    lastName: 'si'
+  }
+
   nodes = []
   edges = []
 
@@ -103,6 +129,25 @@ export default class GraphContent extends Vue {
     }
   }
 
+  get hasNodeSlot() {
+    return this.hasSlot('node')
+  }
+
+  get hasEdgeSlot() {
+    return this.hasSlot('edge')
+  }
+
+  get hasArrowSlot() {
+    return this.hasSlot('arrow')
+  }
+
+  hasSlot(slotName: string) {
+    return (
+      Reflect.has(this.$slots, slotName) ||
+      Reflect.has(this.$scopedSlots, slotName)
+    )
+  }
+
   handleDrop(e: DragEvent) {
     e.preventDefault()
     const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
@@ -117,7 +162,22 @@ export default class GraphContent extends Vue {
     })
   }
 
+  // created() {
+  //   const vnodeList = this.$slots.default as Array<VNode>
+  //   console.log(vnodeList)
+  //   const node = vnodeList.find(vnode => vnode.componentOptions.tag === 'Node')
+  //   if (node) {
+  //     const style = node.componentOptions.children.find(
+  //       vnode => vnode.componentOptions.tag === 'Style'
+  //     )
+  //     if (style) {
+  //     }
+  //   }
+  // }
+
   mounted() {
+    console.log(this.$slots)
+    console.log(this.$scopedSlots)
     this.init()
   }
 

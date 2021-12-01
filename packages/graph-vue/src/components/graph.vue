@@ -176,7 +176,6 @@ export default class GraphContent extends Vue {
   // }
 
   mounted() {
-    console.log(this.$slots, this.$scopedSlots)
     this.init()
   }
 

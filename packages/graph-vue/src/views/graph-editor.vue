@@ -10,9 +10,6 @@
       >
     </div>
     <div class="main-wrap">
-      <test-slots>
-        <!-- <template v-slot:node="slotProps">{{ slotProps }} </template> -->
-      </test-slots>
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
         <Graph ref="graphRef">
@@ -71,9 +68,6 @@ import ConfigPanel from '@/components/config-panel.vue'
 import Graph from '@/components/graph.vue'
 
 import GraphStore from '@/stores/graph'
-import Node from '@/components/graphSlots/node.vue'
-import Style from '@/components/graphSlots/Style.vue'
-import Edge from '@/components/graphSlots/Edge.vue'
 import TestSlots from './TestSlots.vue'
 import { INodeModel, IEdgeModel } from '@datafe/graph-core'
 import { calculateCurve } from '@/assets/js/utils'
@@ -87,11 +81,7 @@ interface CopyReturnValue {
   components: {
     Graph,
     ComponentPanel,
-    ConfigPanel,
-    Node,
-    Style,
-    Edge,
-    TestSlots
+    ConfigPanel
   }
 })
 export default class GraphEditor extends Vue {

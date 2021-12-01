@@ -17,17 +17,19 @@
             : 'rgba(252,252,251,0.9)'
         }"
       >
-        <div v-if="hasDefaultSlot" class="w-100 h-100">
-          <!-- 有slot -->
+        <template v-if="hasDefaultSlot">
           <slot></slot>
-        </div>
-        <div v-else>
-          <!-- 无slot -->
+        </template>
+        <template v-else>
           {{ node.model.label }}
-        </div>
+        </template>
       </div>
     </foreignObject>
-    <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot" />
+    <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot">
+      <template v-if="hasSlotSlot">
+        <slot name="linkSlot" :slot="slot"></slot>
+      </template>
+    </LinkSlot>
   </g>
 </template>
 
@@ -55,6 +57,14 @@ export default class Node extends Vue {
     return (
       Reflect.has(this.$slots, 'default') ||
       Reflect.has(this.$scopedSlots, 'default')
+    )
+  }
+
+  get hasSlotSlot() {
+    console.log(this.$slots, this.$scopedSlots)
+    return (
+      Reflect.has(this.$slots, 'linkSlot') ||
+      Reflect.has(this.$scopedSlots, 'linkSlot')
     )
   }
 

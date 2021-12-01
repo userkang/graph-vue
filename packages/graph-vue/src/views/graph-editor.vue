@@ -16,15 +16,27 @@
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
         <Graph ref="graphRef">
-          <!-- <template slot="node" slot-scope="user">
-            {{ user }}
-          </template> -->
-
-          <template slot="node" slot-scope="model">
+          <template #node="{ node }">
             <div class="node-container">
-              <div class="left"></div>
-              <div class="right">值为{{ model.label }}</div>
+              <div
+                class="left"
+                :class="[isLeaf(node.model) ? 'leaf' : '']"
+              ></div>
+              <div class="right">值为{{ node.model.label }}</div>
             </div>
+          </template>
+
+          <template #edge="{ edge, graph }">
+            <path
+              :d="path(edge, graph)"
+              class="edge-wrapper"
+              graph-type="edge"
+              :graph-id="edge.id"
+            ></path>
+          </template>
+
+          <template #linkSlot="{slot}">
+            <div v-if="test(slot)"></div>
           </template>
 
           <!-- <div slot="node"></div> -->
@@ -53,6 +65,8 @@ import Node from '@/components/graphSlots/node.vue'
 import Style from '@/components/graphSlots/Style.vue'
 import Edge from '@/components/graphSlots/Edge.vue'
 import TestSlots from './TestSlots.vue'
+import { INodeModel, IEdgeModel } from '@datafe/graph-core'
+import { calculateCurve } from '@/assets/js/utils'
 
 interface CopyReturnValue {
   graphId: number
@@ -73,6 +87,26 @@ interface CopyReturnValue {
 export default class GraphEditor extends Vue {
   created() {
     GraphStore.getData()
+  }
+
+  test(slot: any) {
+    console.log(slot)
+    return true
+  }
+
+  isLeaf(node: INodeModel) {
+    return !node.children || node.children.length === 0
+  }
+
+  direction = 'TB'
+
+  path(edge: any, graph: any) {
+    const { fromSlot, toSlot } = edge
+    const x2 = toSlot.x
+    const y2 = toSlot.y
+    const direction = graph.get('direction')
+
+    return `M ${fromSlot.x} ${fromSlot.y} L ${x2} ${y2}`
   }
 }
 </script>
@@ -120,10 +154,20 @@ export default class GraphEditor extends Vue {
     width: 30%;
     height: 100%;
     background-color: orange;
+    &.leaf {
+      background-color: green;
+    }
   }
   .right {
     flex: 1;
     text-align: center;
+  }
+}
+.edge-wrapper {
+  stroke: aqua;
+  stroke-width: 2px;
+  &:hover {
+    stroke: blue;
   }
 }
 </style>

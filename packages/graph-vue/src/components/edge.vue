@@ -1,20 +1,25 @@
 <template>
   <g>
-    <path
-      :d="path"
-      class="edge-wrapper"
-      graph-type="edge"
-      :graph-id="edge.id"
-      @mouseover="onMouseover"
-      @mouseout="onMouseout"
-    ></path>
-    <path
-      ref="edge"
-      :marker-end="isSelected ? `url(#arrow-active)` : 'url(#arrow)'"
-      :d="path"
-      class="edge-style"
-      :class="{ 'edge-selected-style': isSelected }"
-    ></path>
+    <template v-if="hasDefaultSlot">
+      <slot></slot>
+    </template>
+    <template v-else>
+      <path
+        :d="path"
+        class="edge-wrapper"
+        graph-type="edge"
+        :graph-id="edge.id"
+        @mouseover="onMouseover"
+        @mouseout="onMouseout"
+      ></path>
+      <path
+        ref="edge"
+        :marker-end="isSelected ? `url(#arrow-active)` : 'url(#arrow)'"
+        :d="path"
+        class="edge-style"
+        :class="{ 'edge-selected-style': isSelected }"
+      ></path>
+    </template>
   </g>
 </template>
 
@@ -31,6 +36,13 @@ export default class Edge extends Vue {
   edge!: any
 
   activeEdgeId = ''
+
+  get hasDefaultSlot() {
+    return (
+      Reflect.has(this.$slots, 'default') ||
+      Reflect.has(this.$scopedSlots, 'default')
+    )
+  }
 
   get graph() {
     return (this.$parent as GraphContent).graph
@@ -75,6 +87,10 @@ export default class Edge extends Vue {
     }
     ;(this.$refs.edge as HTMLElement).setAttribute('marker-end', 'url(#arrow)')
   }
+
+  // mounted() {
+  //   console.log(this.edge)
+  // }
 }
 </script>
 

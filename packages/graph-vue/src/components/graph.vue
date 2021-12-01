@@ -10,8 +10,6 @@
       <!-- <slot name="node" :user="user1"></slot><br />
       <slot name="node" :user="user2"></slot> -->
 
-      hasNodeSlot: {{ hasNodeSlot }}
-
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
       <svg
         version="1.1"
@@ -27,7 +25,20 @@
           }"
           v-if="graph"
         >
-          <Edge ref="edge" v-for="item in edges" :key="item.id" :edge="item" />
+          <Edge
+            class="edge"
+            ref="edge"
+            v-for="item in edges"
+            :key="item.id"
+            :edge="item"
+          >
+            <slot
+              v-if="hasEdgeSlot"
+              name="edge"
+              :edge="item"
+              :graph="graph"
+            ></slot>
+          </Edge>
           <Node
             ref="node"
             name="node"
@@ -35,11 +46,14 @@
             :key="item.id"
             :node="item"
           >
+            <slot v-if="hasNodeSlot" name="node" :node="item"></slot>
             <slot
-              v-if="hasNodeSlot"
-              name="node"
-              :label="item.model.label"
+              v-if="hasSlotSlot"
+              name="linkSlot"
+              slot="linkSlot"
+              :linkSlot="item.slots"
             ></slot>
+            <!-- <div slot="linkSlot"></div> -->
           </Node>
           <NewEdge />
         </g>
@@ -91,15 +105,6 @@ export default class GraphContent extends Vue {
 
   graph: Graph = null as any
 
-  user1 = {
-    firstName: 'zhang',
-    lastName: 'san'
-  }
-  user2 = {
-    firstName: 'li',
-    lastName: 'si'
-  }
-
   nodes = []
   edges = []
 
@@ -141,6 +146,10 @@ export default class GraphContent extends Vue {
     return this.hasSlot('arrow')
   }
 
+  get hasSlotSlot() {
+    return this.hasSlot('linkSlot')
+  }
+
   hasSlot(slotName: string) {
     return (
       Reflect.has(this.$slots, slotName) ||
@@ -176,8 +185,7 @@ export default class GraphContent extends Vue {
   // }
 
   mounted() {
-    console.log(this.$slots)
-    console.log(this.$scopedSlots)
+    console.log(this.$slots, this.$scopedSlots)
     this.init()
   }
 

@@ -8161,10 +8161,10 @@ vue-style-loader@^4.1.0:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"
 
-vue-template-compiler@2.5.22:
-  version "2.5.22"
-  resolved "http://r.npm.sankuai.com/vue-template-compiler/download/vue-template-compiler-2.5.22.tgz#c3d3c02c65f1908205c4fbd3b0ef579e51239955"
-  integrity sha1-w9PALGXxkIIFxPvTsO9XnlEjmVU=
+vue-template-compiler@2.6.12:
+  version "2.6.12"
+  resolved "http://r.npm.sankuai.com/vue-template-compiler/download/vue-template-compiler-2.6.12.tgz#947ed7196744c8a5285ebe1233fe960437fcc57e"
+  integrity sha1-lH7XGWdEyKUoXr4SM/6WBDf8xX4=
   dependencies:
     de-indent "^1.0.2"
     he "^1.1.0"
@@ -8174,10 +8174,10 @@ vue-template-es2015-compiler@^1.9.0:
   resolved "http://r.npm.sankuai.com/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.9.1.tgz#1ee3bc9a16ecbf5118be334bb15f9c46f82f5825"
   integrity sha1-HuO8mhbsv1EYvjNLsV+cRvgvWCU=
 
-vue@2.5.22:
-  version "2.5.22"
-  resolved "http://r.npm.sankuai.com/vue/download/vue-2.5.22.tgz#3bf88041af08b8539c37b268b70ca79245e9cc30"
-  integrity sha1-O/iAQa8IuFOcN7JotwynkkXpzDA=
+vue@2.6.12:
+  version "2.6.12"
+  resolved "http://r.npm.sankuai.com/vue/download/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
+  integrity sha1-9evU+mvShpQD4pqJau1JBEVskSM=
 
 vuex@^3.0.1:
   version "3.6.2"

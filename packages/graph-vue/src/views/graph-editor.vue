@@ -45,15 +45,6 @@
               :transform="`translate(${port.x}, ${port.y})`"
             ></circle>
           </template>
-
-          <!-- <div slot="node"></div> -->
-
-          <!-- <Edge></Edge> -->
-
-          <!-- <Node>
-            <div slot="label"></div>
-            <div ></div>
-            </Node> -->
         </Graph>
       </div>
       <ConfigPanel />

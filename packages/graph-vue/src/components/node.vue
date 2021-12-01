@@ -34,6 +34,7 @@
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import LinkSlot from '@/components/link-slot.vue'
 import GraphContent from './graph.vue'
+import { hasSlot } from '@/assets/js/utils'
 
 @Component({
   components: {
@@ -51,27 +52,15 @@ export default class Node extends Vue {
   }
 
   get hasDefaultSlot() {
-    return (
-      Reflect.has(this.$slots, 'default') ||
-      Reflect.has(this.$scopedSlots, 'default')
-    )
+    return hasSlot.call(this, 'default')
   }
 
   get hasSlotSlot() {
-    console.log(this.$slots, this.$scopedSlots)
-    return (
-      Reflect.has(this.$slots, 'linkSlot') ||
-      Reflect.has(this.$scopedSlots, 'linkSlot')
-    )
+    return hasSlot.call(this, 'linkSlot')
   }
 
   get isNodeSelected() {
     return this.node.hasState('selected')
-  }
-
-  mounted() {
-    // console.log(this.$slots)
-    // console.log(this.$scopedSlots)
   }
 }
 </script>

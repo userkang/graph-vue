@@ -7,9 +7,6 @@
       @drop="handleDrop"
       @contextmenu="e => e.preventDefault()"
     >
-      <!-- <slot name="node" :user="user1"></slot><br />
-      <slot name="node" :user="user2"></slot> -->
-
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
       <svg
         version="1.1"
@@ -47,13 +44,9 @@
             :node="item"
           >
             <slot v-if="hasNodeSlot" name="node" :node="item"></slot>
-            <!-- <slot v-if="hasSlotSlot" name="linkSlot" :slot="item.slots"></slot> -->
             <slot name="linkSlot" slot="linkSlot">
               <LinkSlot v-for="slot in item.slots" :key="slot.id" :item="slot">
                 <slot v-if="hasSlotSlot" name="slot" :linkSlot="slot"></slot>
-                <!-- <template v-if="hasSlotSlot">
-                  <slot name="linkSlot" :linkSlot="slot"></slot>
-                </template> -->
               </LinkSlot>
             </slot>
           </Node>
@@ -87,6 +80,7 @@ import Arrow from '@/components/arrow.vue'
 import { Graph, IDataModel, INodeModel, IEdgeModel } from '@datafe/graph-core'
 import { isIDataModel } from '../../../graph-core/src/util/utils'
 import LinkSlot from '@/components/link-slot.vue'
+import { hasSlot } from '@/assets/js/utils'
 
 @Component({
   components: {
@@ -139,26 +133,19 @@ export default class GraphContent extends Vue {
   }
 
   get hasNodeSlot() {
-    return this.hasSlot('node')
+    return hasSlot.call(this, 'node')
   }
 
   get hasEdgeSlot() {
-    return this.hasSlot('edge')
+    return hasSlot.call(this, 'edge')
   }
 
   get hasArrowSlot() {
-    return this.hasSlot('arrow')
+    return hasSlot.call(this, 'arrow')
   }
 
   get hasSlotSlot() {
-    return this.hasSlot('slot')
-  }
-
-  hasSlot(slotName: string) {
-    return (
-      Reflect.has(this.$slots, slotName) ||
-      Reflect.has(this.$scopedSlots, slotName)
-    )
+    return hasSlot.call(this, 'slot')
   }
 
   handleDrop(e: DragEvent) {

@@ -23,6 +23,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
+import { hasSlot } from '@/assets/js/utils'
 
 @Component
 export default class LinkSlot extends Vue {
@@ -43,14 +44,7 @@ export default class LinkSlot extends Vue {
   }
 
   get hasDefaultSlot() {
-    return (
-      Reflect.has(this.$slots, 'default') ||
-      Reflect.has(this.$scopedSlots, 'default')
-    )
-  }
-
-  mounted() {
-    console.log(this.$slots, this.$scopedSlots)
+    return hasSlot.call(this, 'default')
   }
 }
 </script>

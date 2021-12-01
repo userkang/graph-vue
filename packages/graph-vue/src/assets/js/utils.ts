@@ -1,3 +1,5 @@
+import { Vue } from 'vue-property-decorator'
+
 /**
  * 计算边和箭头路径的的函数
  * @param position 边的起始点坐标 x1 y1 和终点左边 y1 y2
@@ -30,4 +32,11 @@ export const calculateCurve = (
     line = `M ${x1} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2}`
   }
   return line
+}
+
+export function hasSlot(slotName: string): boolean {
+  return (
+    Reflect.has((this as Vue).$slots, slotName) ||
+    Reflect.has((this as Vue).$scopedSlots, slotName)
+  )
 }

@@ -37,10 +37,14 @@
 
           <template #slot="{linkSlot}">
             <circle
+              :style="{
+                stroke: 'blue',
+                fill: 'aqua'
+              }"
               graph-type="slot"
               :graph-id="linkSlot.id"
               class="slot-style"
-              :r="10"
+              :r="6"
               :transform="`translate(${linkSlot.x}, ${linkSlot.y})`"
             ></circle>
           </template>

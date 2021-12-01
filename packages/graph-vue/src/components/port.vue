@@ -1,7 +1,7 @@
 <template>
   <g>
     <template v-if="hasDefaultSlot">
-      <slot :linkSlot="item"></slot>
+      <slot :port="item"></slot>
     </template>
     <template v-else>
       <circle
@@ -26,7 +26,7 @@ import GraphContent from './graph.vue'
 import { hasSlot } from '@/assets/js/utils'
 
 @Component
-export default class LinkSlot extends Vue {
+export default class Port extends Vue {
   @Prop({
     required: true
   })

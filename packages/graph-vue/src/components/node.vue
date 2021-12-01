@@ -26,19 +26,19 @@
       </div>
     </foreignObject>
 
-    <slot name="linkSlot"></slot>
+    <slot name="port"></slot>
   </g>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import LinkSlot from '@/components/link-slot.vue'
+import port from '@/components/port.vue'
 import GraphContent from './graph.vue'
 import { hasSlot } from '@/assets/js/utils'
 
 @Component({
   components: {
-    LinkSlot
+    port
   }
 })
 export default class Node extends Vue {
@@ -56,7 +56,7 @@ export default class Node extends Vue {
   }
 
   get hasSlotSlot() {
-    return hasSlot.call(this, 'linkSlot')
+    return hasSlot.call(this, 'port')
   }
 
   get isNodeSelected() {

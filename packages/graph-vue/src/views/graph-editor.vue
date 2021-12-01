@@ -32,17 +32,17 @@
             ></path>
           </template>
 
-          <template #slot="{linkSlot}">
+          <template #slot="{port}">
             <circle
               :style="{
                 stroke: 'blue',
                 fill: 'aqua'
               }"
               graph-type="slot"
-              :graph-id="linkSlot.id"
+              :graph-id="port.id"
               class="slot-style"
               :r="6"
-              :transform="`translate(${linkSlot.x}, ${linkSlot.y})`"
+              :transform="`translate(${port.x}, ${port.y})`"
             ></circle>
           </template>
 

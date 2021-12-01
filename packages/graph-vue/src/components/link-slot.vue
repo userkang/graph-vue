@@ -48,6 +48,10 @@ export default class LinkSlot extends Vue {
       Reflect.has(this.$scopedSlots, 'default')
     )
   }
+
+  mounted() {
+    console.log(this.$slots, this.$scopedSlots)
+  }
 }
 </script>
 

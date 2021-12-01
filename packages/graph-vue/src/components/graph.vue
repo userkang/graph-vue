@@ -49,11 +49,12 @@
             <slot v-if="hasNodeSlot" name="node" :node="item"></slot>
             <!-- <slot v-if="hasSlotSlot" name="linkSlot" :slot="item.slots"></slot> -->
             <slot name="linkSlot" slot="linkSlot">
-              <LinkSlot
-                v-for="slot in item.slots"
-                :key="slot.id"
-                :item="slot"
-              ></LinkSlot>
+              <LinkSlot v-for="slot in item.slots" :key="slot.id" :item="slot">
+                <slot v-if="hasSlotSlot" name="slot" :linkSlot="slot"></slot>
+                <!-- <template v-if="hasSlotSlot">
+                  <slot name="linkSlot" :linkSlot="slot"></slot>
+                </template> -->
+              </LinkSlot>
             </slot>
           </Node>
           <NewEdge />
@@ -150,7 +151,7 @@ export default class GraphContent extends Vue {
   }
 
   get hasSlotSlot() {
-    return this.hasSlot('linkSlot')
+    return this.hasSlot('slot')
   }
 
   hasSlot(slotName: string) {

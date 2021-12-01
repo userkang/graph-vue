@@ -35,8 +35,14 @@
             ></path>
           </template>
 
-          <template #linkSlot="{slot}">
-            <div v-if="test(slot)"></div>
+          <template #slot="{linkSlot}">
+            <circle
+              graph-type="slot"
+              :graph-id="linkSlot.id"
+              class="slot-style"
+              :r="10"
+              :transform="`translate(${linkSlot.x}, ${linkSlot.y})`"
+            ></circle>
           </template>
 
           <!-- <div slot="node"></div> -->
@@ -87,11 +93,6 @@ interface CopyReturnValue {
 export default class GraphEditor extends Vue {
   created() {
     GraphStore.getData()
-  }
-
-  test(slot: any) {
-    console.log(slot)
-    return true
   }
 
   isLeaf(node: INodeModel) {

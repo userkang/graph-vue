@@ -25,11 +25,13 @@
         </template>
       </div>
     </foreignObject>
-    <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot">
+
+    <!-- <LinkSlot v-for="slot in node.slots" :key="slot.id" :item="slot">
       <template v-if="hasSlotSlot">
-        <slot name="linkSlot" :slot="slot"></slot>
+        <slot name="linkSlot" :linkSlot="slot"></slot>
       </template>
-    </LinkSlot>
+    </LinkSlot> -->
+    <slot name="linkSlot"></slot>
   </g>
 </template>
 

@@ -1,16 +1,23 @@
 <template>
-  <circle
-    graph-type="slot"
-    :graph-id="item.id"
-    class="slot-style"
-    :class="{
-      'enable-slot': slotEnableLink,
-      'active-slot': item.type === 'out',
-      'linked-slot': slotLinked
-    }"
-    :r="slotEnableLink ? highlightCircleR : circleR"
-    :transform="`translate(${item.x}, ${item.y})`"
-  ></circle>
+  <g>
+    <template v-if="hasDefaultSlot">
+      <slot :linkSlot="item"></slot>
+    </template>
+    <template v-else>
+      <circle
+        graph-type="slot"
+        :graph-id="item.id"
+        class="slot-style"
+        :class="{
+          'enable-slot': slotEnableLink,
+          'active-slot': item.type === 'out',
+          'linked-slot': slotLinked
+        }"
+        :r="slotEnableLink ? highlightCircleR : circleR"
+        :transform="`translate(${item.x}, ${item.y})`"
+      ></circle>
+    </template>
+  </g>
 </template>
 
 <script lang="ts">
@@ -33,6 +40,13 @@ export default class LinkSlot extends Vue {
 
   get slotLinked() {
     return this.item.hasState('linked') && !this.slotEnableLink
+  }
+
+  get hasDefaultSlot() {
+    return (
+      Reflect.has(this.$slots, 'default') ||
+      Reflect.has(this.$scopedSlots, 'default')
+    )
   }
 }
 </script>

@@ -47,13 +47,14 @@
             :node="item"
           >
             <slot v-if="hasNodeSlot" name="node" :node="item"></slot>
-            <slot
-              v-if="hasSlotSlot"
-              name="linkSlot"
-              slot="linkSlot"
-              :linkSlot="item.slots"
-            ></slot>
-            <!-- <div slot="linkSlot"></div> -->
+            <!-- <slot v-if="hasSlotSlot" name="linkSlot" :slot="item.slots"></slot> -->
+            <slot name="linkSlot" slot="linkSlot">
+              <LinkSlot
+                v-for="slot in item.slots"
+                :key="slot.id"
+                :item="slot"
+              ></LinkSlot>
+            </slot>
           </Node>
           <NewEdge />
         </g>
@@ -84,6 +85,7 @@ import Minimap from '@/components/minimap.vue'
 import Arrow from '@/components/arrow.vue'
 import { Graph, IDataModel, INodeModel, IEdgeModel } from '@datafe/graph-core'
 import { isIDataModel } from '../../../graph-core/src/util/utils'
+import LinkSlot from '@/components/link-slot.vue'
 
 @Component({
   components: {
@@ -93,7 +95,8 @@ import { isIDataModel } from '../../../graph-core/src/util/utils'
     Node,
     ToolBox,
     Menu,
-    Arrow
+    Arrow,
+    LinkSlot
   }
 })
 export default class GraphContent extends Vue {

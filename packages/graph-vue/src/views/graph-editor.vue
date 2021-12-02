@@ -32,7 +32,7 @@
             ></path>
           </template>
 
-          <template #slot="{port}">
+          <template #port="{port}">
             <circle
               :style="{
                 stroke: 'blue',
@@ -59,9 +59,7 @@ import ConfigPanel from '@/components/config-panel.vue'
 import Graph from '@/components/graph.vue'
 
 import GraphStore from '@/stores/graph'
-import TestSlots from './TestSlots.vue'
 import { INodeModel, IEdgeModel } from '@datafe/graph-core'
-import { calculateCurve } from '@/assets/js/utils'
 
 interface CopyReturnValue {
   graphId: number

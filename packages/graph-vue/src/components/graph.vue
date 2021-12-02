@@ -43,11 +43,16 @@
             :key="item.id"
             :node="item"
           >
-            <slot v-if="hasNodeSlot" name="node" :node="item"></slot>
-            <slot name="port" slot="port">
-              <port v-for="slot in item.slots" :key="slot.id" :item="slot">
-                <slot v-if="hasSlotSlot" name="slot" :port="slot"></slot>
-              </port>
+            <slot
+              v-if="hasNodeSlot"
+              name="node"
+              :node="item"
+              :graph="graph"
+            ></slot>
+            <slot slot="port">
+              <Port v-for="slot in item.slots" :key="slot.id" :item="slot">
+                <slot v-if="hasPortSlot" name="port" :port="slot"></slot>
+              </Port>
             </slot>
           </Node>
           <NewEdge />
@@ -79,7 +84,7 @@ import Minimap from '@/components/minimap.vue'
 import Arrow from '@/components/arrow.vue'
 import { Graph, IDataModel, INodeModel, IEdgeModel } from '@datafe/graph-core'
 import { isIDataModel } from '../../../graph-core/src/util/utils'
-import port from '@/components/port.vue'
+import Port from '@/components/port.vue'
 import { hasSlot } from '@/assets/js/utils'
 
 @Component({
@@ -91,7 +96,7 @@ import { hasSlot } from '@/assets/js/utils'
     ToolBox,
     Menu,
     Arrow,
-    port
+    Port
   }
 })
 export default class GraphContent extends Vue {
@@ -144,8 +149,8 @@ export default class GraphContent extends Vue {
     return hasSlot.call(this, 'arrow')
   }
 
-  get hasSlotSlot() {
-    return hasSlot.call(this, 'slot')
+  get hasPortSlot() {
+    return hasSlot.call(this, 'port')
   }
 
   handleDrop(e: DragEvent) {
@@ -161,19 +166,6 @@ export default class GraphContent extends Vue {
       slots: [{ type: 'in' }, { type: 'out' }, { type: 'out' }]
     })
   }
-
-  // created() {
-  //   const vnodeList = this.$slots.default as Array<VNode>
-  //   console.log(vnodeList)
-  //   const node = vnodeList.find(vnode => vnode.componentOptions.tag === 'Node')
-  //   if (node) {
-  //     const style = node.componentOptions.children.find(
-  //       vnode => vnode.componentOptions.tag === 'Style'
-  //     )
-  //     if (style) {
-  //     }
-  //   }
-  // }
 
   mounted() {
     this.init()

@@ -1,17 +1,23 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
+    "jsx": "preserve",
+    "allowJs": true,
+    "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
+    "types": ["webpack-env"],
     "paths": {
-      "@/*": ["packages/graph-demo/src/*", "packages/graph-core/src/*"]
+      "@/*": ["src/*", "../../packages/*/src"],
+      "@datafe/graph-vue": ["../../packages/graph-vue"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["packages"]
+  "include": ["src"]
 }

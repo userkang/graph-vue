@@ -1,5 +1,4 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-// const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 const path = require('path')
 
@@ -15,20 +14,18 @@ module.exports = {
     loaderOptions: {
       sass: {
         implementation: require('sass'),
-        data: `@import "@/assets/css/variable.scss";`
-      }
-    }
+        data: `@import "@/assets/css/variable.scss";`,
+      },
+    },
   },
   configureWebpack: {
     resolve: {
       alias: {
-        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
-      }
+        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
+        '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue'),
+      },
     },
     plugins: [
-      // new MonacoWebpackPlugin({
-      //   languages: ['json']
-      // }),
       new HtmlWebpackPlugin({
         filename: 'index.html',
         template: htmlPath,
@@ -37,19 +34,19 @@ module.exports = {
         minify: {
           removeComments: true,
           collapseWhitespace: true,
-          removeAttributeQuotes: true
+          removeAttributeQuotes: true,
           // more options:
           // https://github.com/kangax/html-minifier#options-quick-reference
         },
         // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-        chunksSortMode: 'dependency'
-      })
-    ]
+        chunksSortMode: 'dependency',
+      }),
+    ],
   },
   devServer: {
     open: true,
     port: 9000,
     hot: true,
-    disableHostCheck: true
-  }
+    disableHostCheck: true,
+  },
 }

@@ -14,10 +14,15 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["src/*", "../../packages/*/src"],
+      "@/*": ["components/*", "../../packages/*/src"],
       "@datafe/*": ["../../packages/*/src"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["src"]
+  "include": [
+    "shims-vue.d.ts",
+    "shims-tsx.d.ts",
+    "types/**/*.d.ts",
+    "components/**/*"
+  ]
 }

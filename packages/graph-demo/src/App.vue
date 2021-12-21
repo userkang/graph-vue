@@ -1,13 +1,19 @@
 <template>
   <div id="app">
-    <router-view />
+    <Node />
+    <!-- <router-view /> -->
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
+import { Node } from '@datafe/graph-vue'
 
-@Component
+@Component({
+  components: {
+    Node,
+  },
+})
 export default class App extends Vue {}
 </script>
 

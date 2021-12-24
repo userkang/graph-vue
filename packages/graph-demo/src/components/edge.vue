@@ -1,6 +1,6 @@
 <template>
   <g>
-    <template v-if="hasDefaultSlot">
+    <template v-if="$slots.default">
       <slot></slot>
     </template>
     <template v-else>
@@ -31,18 +31,11 @@ import GraphContent from './graph.vue'
 @Component
 export default class Edge extends Vue {
   @Prop({
-    required: true
+    required: true,
   })
   edge!: any
 
   activeEdgeId = ''
-
-  get hasDefaultSlot() {
-    return (
-      Reflect.has(this.$slots, 'default') ||
-      Reflect.has(this.$scopedSlots, 'default')
-    )
-  }
 
   get graph() {
     return (this.$parent as GraphContent).graph
@@ -68,7 +61,7 @@ export default class Edge extends Vue {
         x1: fromSlot.x,
         y1: fromSlot.y,
         x2,
-        y2
+        y2,
       },
       direction
     )
@@ -88,9 +81,9 @@ export default class Edge extends Vue {
     ;(this.$refs.edge as HTMLElement).setAttribute('marker-end', 'url(#arrow)')
   }
 
-  // mounted() {
-  //   console.log(this.edge)
-  // }
+  created() {
+    console.log(this.$slots)
+  }
 }
 </script>
 

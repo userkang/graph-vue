@@ -62,6 +62,10 @@ export default class Node extends Vue {
   get isNodeSelected() {
     return this.node.hasState('selected')
   }
+
+  created() {
+    console.log(this.$slots)
+  }
 }
 </script>
 

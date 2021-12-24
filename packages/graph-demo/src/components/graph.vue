@@ -3,9 +3,9 @@
     <div
       class="graph-content-wrap"
       ref="svg"
-      @dragover="e => e.preventDefault()"
+      @dragover="(e) => e.preventDefault()"
       @drop="handleDrop"
-      @contextmenu="e => e.preventDefault()"
+      @contextmenu="(e) => e.preventDefault()"
     >
       <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
       <svg
@@ -18,7 +18,7 @@
         <g
           :style="{
             transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
-            transformOrigin: 'center'
+            transformOrigin: 'center',
           }"
           v-if="graph"
         >
@@ -59,7 +59,12 @@
         </g>
         <path
           :d="brushPath"
-          style="fill: #4E73FF; stroke: #606BE1; stroke-width:1px; opacity:0.3"
+          style="
+            fill: #4e73ff;
+            stroke: #606be1;
+            stroke-width: 1px;
+            opacity: 0.3;
+          "
         />
       </svg>
     </div>
@@ -96,8 +101,8 @@ import { hasSlot } from '@/assets/js/utils'
     ToolBox,
     Menu,
     Arrow,
-    Port
-  }
+    Port,
+  },
 })
 export default class GraphContent extends Vue {
   @Prop({ default: true })
@@ -114,7 +119,7 @@ export default class GraphContent extends Vue {
   transform = {
     scale: 1,
     translateX: 0,
-    translateY: 0
+    translateY: 0,
   }
   brushPath = ''
 
@@ -129,11 +134,11 @@ export default class GraphContent extends Vue {
     } else {
       const { nodes, edges } = this.configState.data as IDataModel
       const nodeMap: { [x: string]: INodeModel } = {}
-      nodes.forEach(node => {
+      nodes.forEach((node) => {
         nodeMap[node.id] = node
       })
-      edges.forEach(edge => delete nodeMap[edge.toNodeId])
-      return Object.keys(nodeMap).map(id => nodeMap[id])
+      edges.forEach((edge) => delete nodeMap[edge.toNodeId])
+      return Object.keys(nodeMap).map((id) => nodeMap[id])
     }
   }
 
@@ -163,7 +168,7 @@ export default class GraphContent extends Vue {
       label: this.dragingInfo.component.componentName,
       x: point.x,
       y: point.y,
-      slots: [{ type: 'in' }, { type: 'out' }, { type: 'out' }]
+      slots: [{ type: 'in' }, { type: 'out' }, { type: 'out' }],
     })
   }
 
@@ -178,9 +183,9 @@ export default class GraphContent extends Vue {
       nodeInfo: {
         width: 180,
         height: 40,
-        html: node => {
+        html: (node) => {
           return `<div class="graph-node">${node.model.label}</div>`
-        }
+        },
       },
       edgeInfo: {
         path: (from, to) => {
@@ -194,9 +199,9 @@ export default class GraphContent extends Vue {
             offsetY = -offsetY
           }
           return `M ${x1} ${y1}  L ${x2 - offsetX} ${y2 - offsetY}`
-        }
+        },
       },
-      action: this.configState.action
+      action: this.configState.action,
     })
     this.initCustomHooks()
     this.graph.data(this.configState.data)
@@ -216,10 +221,10 @@ export default class GraphContent extends Vue {
       afterdeleteedge: 'afterdeleteedge',
       afterdragnode: 'afterDragNode',
       keyup: 'handleKeyUp',
-      datachange: 'refreshGraph'
+      datachange: 'refreshGraph',
     }
 
-    Object.keys(hooks).forEach(key => {
+    Object.keys(hooks).forEach((key) => {
       const hook = (hooks as any)[key]
       this.graph.on(key, (this as any)[hook])
     })
@@ -285,8 +290,8 @@ export default class GraphContent extends Vue {
         if (selectedNodes.length) {
           const edges = []
           const nodes = []
-          selectedNodes.forEach(item => {
-            item.edges.forEach(edge => {
+          selectedNodes.forEach((item) => {
+            item.edges.forEach((edge) => {
               edges.push(edge.model)
             })
             nodes.push(item.model)

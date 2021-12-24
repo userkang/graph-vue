@@ -7,7 +7,7 @@ export const dagMock = {
       nodeId: 232,
       x: 400,
       y: 100,
-      width: 200,
+      width: 250,
       height: 50
     },
     {
@@ -15,8 +15,6 @@ export const dagMock = {
       label: '拖动添加组件',
       x: 540,
       y: 407.5,
-      width: 210,
-      height: 30,
       slots: [
         {
           type: 'in',

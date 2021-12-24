@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="top-panel">
-      <div class="name">graph-editor</div>
+      <div class="name">graph-demo</div>
       <a
         href="https://km.sankuai.com/page/505696797"
         target="_blank"
@@ -12,7 +12,7 @@
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graphRef">
+        <Graph ref="graph" :data="dataMock" :action="action">
           <template #node="{ node }">
             <div class="node-container">
               <div
@@ -23,31 +23,31 @@
             </div>
           </template>
 
-          <template #edge="{ edge, graph }">
-            <path
-              :d="path(edge, graph)"
-              class="edge-wrapper"
-              graph-type="edge"
-              :graph-id="edge.id"
-            ></path>
+          <template #edge="{ edge }">
+            <path :d="path(edge)" class="edge-wrapper"></path>
+            <text
+              :x="text(edge).x"
+              :y="text(edge).y"
+              style="text-anchor: middle; fill: #999"
+              >tag</text
+            >
           </template>
 
-          <template #port="{port}">
-            <circle
-              :style="{
-                stroke: 'blue',
-                fill: 'aqua'
-              }"
-              graph-type="slot"
-              :graph-id="port.id"
-              class="slot-style"
-              :r="6"
-              :transform="`translate(${port.x}, ${port.y})`"
-            ></circle>
+          <template #port="{ port }">
+            <rect
+              width="10"
+              height="10"
+              :transform="`translate(-5, -5)`"
+              fill="red"
+            ></rect>
           </template>
+
+          <Minimap></Minimap>
+          <div>1234</div>
         </Graph>
       </div>
-      <ConfigPanel />
+
+      <!-- <ConfigPanel /> -->
     </div>
   </div>
 </template>
@@ -56,10 +56,11 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import Graph from '@/components/graph.vue'
+import { Graph, ToolBox, Menu, Minimap } from '@datafe/graph-vue/index'
 
 import GraphStore from '@/stores/graph'
 import { INodeModel, IEdgeModel } from '@datafe/graph-core'
+import { GraphConfigStore } from '@/stores/graph-config'
 
 interface CopyReturnValue {
   graphId: number
@@ -69,13 +70,36 @@ interface CopyReturnValue {
 @Component({
   components: {
     Graph,
+    ToolBox,
+    Menu,
+    Minimap,
     ComponentPanel,
-    ConfigPanel
-  }
+    ConfigPanel,
+  },
 })
 export default class GraphEditor extends Vue {
-  created() {
-    GraphStore.getData()
+  // data: any = []
+  graphConfigState = GraphConfigStore.state
+
+  async created() {
+    await GraphStore.getData()
+    this.graph.on('port.click', this.handelNodeClick)
+  }
+
+  handelNodeClick(e, node) {
+    console.log(e, node)
+  }
+
+  get dataMock() {
+    return this.graphConfigState.data
+  }
+
+  get action() {
+    return this.graphConfigState.action
+  }
+
+  get graph() {
+    return (this.$refs.graph as any).graph as Graph
   }
 
   isLeaf(node: INodeModel) {
@@ -84,13 +108,20 @@ export default class GraphEditor extends Vue {
 
   direction = 'TB'
 
-  path(edge: any, graph: any) {
+  path(edge: any) {
     const { fromSlot, toSlot } = edge
     const x2 = toSlot.x
     const y2 = toSlot.y
-    const direction = graph.get('direction')
 
     return `M ${fromSlot.x} ${fromSlot.y} L ${x2} ${y2}`
+  }
+
+  text(edge) {
+    const { fromSlot, toSlot } = edge
+    return {
+      x: (fromSlot.x + toSlot.x) / 2,
+      y: (fromSlot.y + toSlot.y) / 2,
+    }
   }
 }
 </script>
@@ -129,17 +160,20 @@ export default class GraphEditor extends Vue {
 .node-container {
   width: 100%;
   height: 100%;
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.85);
   color: rgba(0, 0, 0, 0.5);
   display: flex;
   justify-content: flex-start;
   align-items: center;
+  border: 1px solid #fff;
+  box-sizing: border-box;
+  font-size: 12px;
   .left {
-    width: 30%;
+    width: 20%;
     height: 100%;
     background-color: orange;
     &.leaf {
-      background-color: green;
+      background-color: rgb(8, 184, 8);
     }
   }
   .right {
@@ -148,10 +182,10 @@ export default class GraphEditor extends Vue {
   }
 }
 .edge-wrapper {
-  stroke: aqua;
+  stroke: rgb(235, 226, 224);
   stroke-width: 2px;
   &:hover {
-    stroke: blue;
+    stroke: rgb(0, 195, 255);
   }
 }
 </style>

@@ -7,7 +7,7 @@ class Graph {
   }
 
   public getData() {
-    GraphConfigStore.state.data = treeMock // dagMock
+    GraphConfigStore.state.data = dagMock
   }
 }
 

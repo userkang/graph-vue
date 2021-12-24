@@ -22,15 +22,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import {
-  Graph,
-  IDataModel,
-  INodeModel,
-  IEdgeModel,
-  INode,
-  IEdge,
-  ISlotModel
-} from '@datafe/graph-core'
+import { Graph } from '@datafe/graph-core'
 
 const generateCursor = (cursor: string) => {
   const styleElement = document.createElement('style')
@@ -56,7 +48,7 @@ export default class Minimap extends Vue {
   get themeVars() {
     return {
       '--color-main': this.theme,
-      '--color-shadow': [200, 200, 200]
+      '--color-shadow': [200, 200, 200],
     }
   }
 
@@ -75,7 +67,7 @@ export default class Minimap extends Vue {
   get rootStyle() {
     return {
       width: `${this.mapRect.width}px`,
-      height: `${this.mapRect.height}px`
+      height: `${this.mapRect.height}px`,
     }
   }
 
@@ -85,7 +77,7 @@ export default class Minimap extends Vue {
       Number.MAX_SAFE_INTEGER,
       Number.MAX_SAFE_INTEGER,
       Number.MIN_SAFE_INTEGER,
-      Number.MIN_SAFE_INTEGER
+      Number.MIN_SAFE_INTEGER,
     ]
     for (let i = nodes.length - 1; i >= 0; i--) {
       const node = nodes[i]
@@ -119,7 +111,7 @@ export default class Minimap extends Vue {
       left,
       top,
       width: this.nodesRect.width,
-      height: this.nodesRect.height
+      height: this.nodesRect.height,
     }
   }
 
@@ -153,7 +145,7 @@ export default class Minimap extends Vue {
     return {
       width: `${width}px`,
       height: `${height}px`,
-      transform: `translate3D(${left}px, ${top}px, 0)`
+      transform: `translate3D(${left}px, ${top}px, 0)`,
     }
   }
 
@@ -248,7 +240,7 @@ export default class Minimap extends Vue {
       'datachange',
       'afteredgeupdate',
       'afternodeupdate',
-      'stackchange'
+      'stackchange',
     ]
     for (let i = eventTypes.length - 1; i >= 0; i--) {
       this.graph.on(eventTypes[i], this.onGraphChange)

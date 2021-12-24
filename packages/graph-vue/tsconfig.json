@@ -1,9 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
     "jsx": "preserve",
+    "declaration": true,
     "allowJs": true,
     "importHelpers": true,
     "moduleResolution": "node",
@@ -14,15 +14,9 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["components/*", "../../packages/*/src"],
       "@datafe/*": ["../../packages/*/src"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": [
-    "shims-vue.d.ts",
-    "shims-tsx.d.ts",
-    "types/**/*.d.ts",
-    "components/**/*"
-  ]
+  "include": ["shims-vue.d.ts", "types/**/*.d.ts", "components/*", "index.ts"]
 }

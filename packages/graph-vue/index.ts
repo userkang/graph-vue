@@ -1,20 +1,11 @@
-import Node from './components/node'
+import Graph from './components/graph.vue'
+import Node from './components/node.vue'
+import Edge from './components/edge.vue'
+import ToolBox from './components/tool-box.vue'
+import Menu from './components/menu.vue'
+import Port from './components/port.vue'
+import Minimap from './components/minimap.vue'
 
-const components = [Node]
+export { Graph, Node, Edge, ToolBox, Menu, Port, Minimap }
 
-const install = (Vue) => {
-  components.map((component) => {
-    Vue.component(component.name, component)
-  })
-}
-
-if (typeof window !== 'undefined' && window.Vue) {
-  install(window.Vue)
-}
-
-export { Node }
-
-export default {
-  install,
-  Node
-}
+export default Graph

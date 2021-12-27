@@ -1,6 +1,6 @@
 <template>
   <g
-    graph-type="port"
+    graph-type="slot"
     :graph-id="item.id"
     :transform="`translate(${item.x}, ${item.y})`"
   >

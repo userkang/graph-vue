@@ -1,5 +1,5 @@
 <template>
-  <div class="scale-panel" @click="handleChange">
+  <div class="tool-box" @click="handleChange">
     <li
       title="撤销"
       id="undo"
@@ -34,8 +34,6 @@ import GraphContent from './graph.vue'
 @Component
 export default class ToolBox extends Vue {
   isBrushing = false
-
-
   undoEnable = false
   redoEnable = false
 
@@ -112,7 +110,7 @@ export default class ToolBox extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.scale-panel {
+.tool-box {
   position: absolute;
   display: flex;
   right: 10px;

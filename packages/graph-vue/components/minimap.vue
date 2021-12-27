@@ -1,5 +1,5 @@
 <template>
-  <div class="Minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
+  <div class="minimap " ref="root" :style="{ ...rootStyle, ...themeVars }">
     <svg
       :width="mapRect.width"
       :height="mapRect.height"
@@ -33,9 +33,6 @@ const generateCursor = (cursor: string) => {
 
 @Component
 export default class Minimap extends Vue {
-  // @Prop()
-  // graph?: Graph
-
   @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
 
@@ -261,7 +258,7 @@ export default class Minimap extends Vue {
 }
 </script>
 <style lang="scss" scoped>
-.Minimap {
+.minimap {
   box-sizing: border-box;
   position: relative;
   position: absolute;

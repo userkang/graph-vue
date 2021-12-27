@@ -16,7 +16,7 @@
     "paths": {
       "@datafe/*": ["../../packages/*/src"]
     },
-    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
+    "lib": ["ES5", "esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": ["shims-vue.d.ts", "types/**/*.d.ts", "components/*", "index.ts"]
 }

@@ -1,51 +1,45 @@
 <template>
-  <div class="graph-main">
-    <div
-      class="graph-content-wrap"
-      ref="svg"
-      @dragover="e => e.preventDefault()"
-      @drop="handleDrop"
-      @contextmenu="e => e.preventDefault()"
+  <div
+    class="graph-content-wrap"
+    ref="svg"
+    @dragover="e => e.preventDefault()"
+    @drop="handleDrop"
+    @contextmenu="e => e.preventDefault()"
+  >
+    <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
+    <svg
+      version="1.1"
+      xmlns="http://www.w3.org/2000/svg"
+      width="100%"
+      height="100%"
     >
-      <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
-      <svg
-        version="1.1"
-        xmlns="http://www.w3.org/2000/svg"
-        width="100%"
-        height="100%"
+      <Arrow ref="arrow" />
+      <g
+        :style="{
+          transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
+          transformOrigin: 'center'
+        }"
+        v-if="graph"
       >
-        <Arrow ref="arrow" />
-        <g
-          :style="{
-            transform: `scale(${transform.scale}) translate(${transform.translateX}px, ${transform.translateY}px)`,
-            transformOrigin: 'center'
-          }"
-          v-if="graph"
-        >
-          <Edge v-for="item in edges" :key="item.id" :edge="item">
-            <slot name="edge" :edge="item" :graph="graph"></slot>
-          </Edge>
-          <Node v-for="item in nodes" :key="item.id" :node="item">
-            <slot name="node" :node="item" :graph="graph"></slot>
-            <!-- <slot slot="port">
-              <Port v-for="slot in item.slots" :key="slot.id" :item="slot">
-                <slot name="port" :port="slot"></slot>
-              </Port>
-            </slot> -->
-          </Node>
-          <NewEdge />
-        </g>
-        <path
-          :d="brushPath"
-          style="
-            fill: #4e73ff;
-            stroke: #606be1;
-            stroke-width: 1px;
-            opacity: 0.3;
-          "
-        />
-      </svg>
-    </div>
+        <Edge v-for="item in edges" :key="item.id" :edge="item">
+          <slot name="edge" :edge="item"></slot>
+        </Edge>
+        <Node v-for="item in nodes" :key="item.id" :node="item">
+          <slot name="node" :node="item"></slot>
+
+          <template #port="{ port }">
+            <slot name="port" :port="port"></slot>
+          </template>
+        </Node>
+        <NewEdge>
+          <slot name="newEdge"></slot>
+        </NewEdge>
+      </g>
+      <path
+        :d="brushPath"
+        style="fill: #4e73ff; stroke: #606be1; stroke-width: 1px; opacity: 0.3"
+      />
+    </svg>
     <div v-if="graph">
       <slot></slot>
     </div>
@@ -53,10 +47,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-// import { ComponentListStore } from '@/stores/component-list'
-// import { GraphConfigStore } from '@/stores/graph-config'
-// import GraphStore from '@/stores/graph'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import Node from './node.vue'
 import Edge from './edge.vue'
 import NewEdge from './new-edge.vue'
@@ -65,7 +56,7 @@ import Menu from './menu.vue'
 import Minimap from './minimap.vue'
 import Arrow from './arrow.vue'
 import Port from './port.vue'
-import { Graph, IGraphConfig, IDataModel } from '@datafe/graph-core'
+import { Graph, IDataModel } from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -80,9 +71,6 @@ import { Graph, IGraphConfig, IDataModel } from '@datafe/graph-core'
   }
 })
 export default class GraphContent extends Vue {
-  @Prop({ default: 'TB' })
-  direction: IGraphConfig['direction']
-
   @Prop({ default: () => [], type: Array })
   action: Array<string>
 
@@ -94,8 +82,9 @@ export default class GraphContent extends Vue {
   })
   data: IDataModel
 
-  // componentState = ComponentListStore.state
-  // configState = GraphConfigStore.state
+  @Prop({ default: () => {} })
+  layout: unknown
+
   graph: Graph = null as any
 
   nodes = []
@@ -108,23 +97,18 @@ export default class GraphContent extends Vue {
   }
   brushPath = ''
 
-  // get dragingInfo() {
-  //   return this.componentState.dragingInfo
-  // }
-
   handleDrop(e: DragEvent) {
     this.$emit('drop', e)
   }
 
   mounted() {
     this.init()
-    console.log(this.$scopedSlots)
   }
 
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: this.direction,
+      direction: (this.layout as any).rankdir || 'TB',
       nodeInfo: {
         width: 180,
         height: 40
@@ -135,7 +119,8 @@ export default class GraphContent extends Vue {
     this.initCustomHooks()
 
     this.graph.data(this.data)
-    // GraphStore.state.graph = this.graph
+
+    this.graph.layout(this.layout)
   }
 
   initCustomHooks() {
@@ -155,8 +140,8 @@ export default class GraphContent extends Vue {
     ]
 
     hooks.forEach(hook => {
-      this.graph.on(hook, (...arg) => {
-        this.$emit(hook, arg)
+      this.graph.on(hook, (...args) => {
+        this.$emit(hook, ...args)
       })
     })
 
@@ -173,36 +158,7 @@ export default class GraphContent extends Vue {
   refreshGraph() {
     this.nodes = this.graph.getNodes()
     this.edges = this.graph.getEdges()
-    // this.configState.data = this.graph.getData()
   }
-
-  // afterDragNode(nodes: INodeModel[]) {
-  //   console.log('afterdragnode', nodes)
-  // }
-
-  // afteraddnode(item: INodeModel) {
-  //   console.log('afteraddnode', item)
-  // }
-
-  // afteraddedge(item: IEdgeModel) {
-  //   console.log('afteraddedge', item)
-  // }
-
-  // afterdeletenode(item: INodeModel) {
-  //   console.log('afterdeletenode', item)
-  // }
-
-  // afterdeleteedge(item: IEdgeModel) {
-  //   console.log('afterdeleteedge', item)
-  // }
-
-  // nodeselectchange(nodes: INodeModel[]) {
-  //   console.log('nodeselectchange', nodes)
-  // }
-
-  // edgeselectchange(edges: IEdgeModel[]) {
-  //   console.log('edgeselectchange', edges)
-  // }
 
   aftertranslate(x: number, y: number) {
     this.transform.translateX = x
@@ -213,48 +169,9 @@ export default class GraphContent extends Vue {
     this.transform.scale = zoom
   }
 
-  // handleKeyUp(e: KeyboardEvent) {
-  //   e.stopPropagation()
-  //   const tagName = (e.target as HTMLBodyElement).tagName
-  //   if (tagName === 'BODY') {
-  //     if (['Delete', 'Backspace'].includes(e.key)) {
-  //       const selectedNodes = this.graph.findNodeByState('selected')
-  //       const selectedEdges = this.graph.findEdgeByState('selected')
-  //       if (selectedEdges.length) {
-  //         this.graph.deleteEdge(selectedEdges[0].id)
-  //       }
-  //       if (selectedNodes.length) {
-  //         const edges = []
-  //         const nodes = []
-  //         selectedNodes.forEach(item => {
-  //           item.edges.forEach(edge => {
-  //             edges.push(edge.model)
-  //           })
-  //           nodes.push(item.model)
-  //           this.graph.deleteNode(item.id, false)
-  //         })
-  //         this.graph.pushStack('deleteNode', { nodes, edges })
-  //       }
-  //     }
-  //   }
-  // }
-
   beforeDestroy() {
     this.graph.destroy()
   }
-
-  // @Watch('configState.direction')
-  // handleConfigChange(v: string) {
-  //   this.graph.set('direction', v)
-  //   this.graph.data(this.configState.data)
-  //   this.graph.layout()
-  // }
-
-  // @Watch('configState.action')
-  // handleActionChange(v: string[]) {
-  //   this.graph.removeAction()
-  //   this.graph.addAction(v)
-  // }
 }
 </script>
 
@@ -262,22 +179,11 @@ export default class GraphContent extends Vue {
 $edge-color: #d1d1dd;
 $select-color: #4150f6;
 .graph-content-wrap {
-  background: #242424;
-  position: relative;
   width: 100%;
   height: 100%;
+  position: relative;
+  background: #242424;
   overflow: hidden;
   user-select: none;
-  .loading-wrap {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #fff;
-  }
-}
-.graph-main {
-  width: 100%;
-  height: 100%;
-  position: relative;
 }
 </style>

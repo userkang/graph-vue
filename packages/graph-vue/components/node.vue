@@ -12,7 +12,6 @@
       </template>
       <div
         v-else
-        xmlns="http://www.w3.org/1999/xhtml"
         class="graph-node"
         :style="{
           'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',
@@ -24,15 +23,23 @@
         {{ node.model.label }}
       </div>
     </foreignObject>
-    <slot name="port"></slot>
+
+    <Port v-for="port in node.slots" :key="port.id" :item="port">
+      <slot name="port" :port="port"></slot>
+    </Port>
   </g>
 </template>
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { INode } from '@datafe/graph-core'
+import Port from './port.vue'
 
-@Component
+@Component({
+  components: {
+    Port
+  }
+})
 export default class Node extends Vue {
   @Prop({
     required: true

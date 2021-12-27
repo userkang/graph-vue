@@ -4,8 +4,8 @@ import Edge from './components/edge.vue'
 import ToolBox from './components/tool-box.vue'
 import Menu from './components/menu.vue'
 import Port from './components/port.vue'
-import Minimap from './components/minimap.vue'
+import MiniMap from './components/minimap.vue'
 
-export { Graph, Node, Edge, ToolBox, Menu, Port, Minimap }
+export { Graph, Node, Edge, ToolBox, Menu, Port, MiniMap }
 
 export default Graph

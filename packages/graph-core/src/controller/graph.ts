@@ -17,7 +17,7 @@ import {
   IGraphConfig,
   IStack,
   IDataStack,
-  ILayout
+  ILayout,
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -26,7 +26,7 @@ const getDefaultConfig = () => ({
   direction: 'TB',
   nodes: [],
   edges: [],
-  action: []
+  action: [],
 })
 
 export default class Graph extends EventEmitter {
@@ -97,7 +97,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => {
+    return this.getNodes().filter((item) => {
       return item.hasState(state)
     })
   }
@@ -132,7 +132,7 @@ export default class Graph extends EventEmitter {
     }
     const stackData = {
       nodes: [node.model],
-      edges: node.edges.map(edge => edge.model as IEdgeModel)
+      edges: node.edges.map((edge) => edge.model as IEdgeModel),
     }
     this.nodeController.deleteNode(id)
     this.emit('afterdeletenode', node.model)
@@ -169,7 +169,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => {
+    return this.getEdges().filter((item) => {
       return item.hasState(state)
     })
   }
@@ -207,8 +207,8 @@ export default class Graph extends EventEmitter {
   }
 
   getData(): IDataModel {
-    const nodes = this.getNodes().map(node => node.model)
-    const edges = this.getEdges().map(edge => edge.model) as IEdgeModel[]
+    const nodes = this.getNodes().map((node) => node.model)
+    const edges = this.getEdges().map((edge) => edge.model) as IEdgeModel[]
     return { nodes, edges }
   }
 
@@ -222,7 +222,7 @@ export default class Graph extends EventEmitter {
   public getTranslate() {
     return {
       x: this.viewController.transform.translateX,
-      y: this.viewController.transform.translateY
+      y: this.viewController.transform.translateY,
     }
   }
 
@@ -251,6 +251,10 @@ export default class Graph extends EventEmitter {
   }
   // 加载数据
   data(data: IDataModel | INodeModel) {
+    if (Object.keys(data).length === 0) {
+      return
+    }
+
     this.set('nodes', [])
     this.set('edges', [])
     this.clearItem()
@@ -258,12 +262,12 @@ export default class Graph extends EventEmitter {
     let imodel: IDataModel = { nodes: [], edges: [] }
     imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
     const needLayout = imodel.nodes.every(
-      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
+      (node) => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    imodel.nodes.forEach(node =>
+    imodel.nodes.forEach((node) =>
       Object.assign(node, {
         x: node.x || 1,
-        y: node.y || 1
+        y: node.y || 1,
       })
     )
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化

@@ -3,10 +3,10 @@
     <div class="title">组件</div>
     <li
       v-for="item in componentList"
-      :key="item.id"
+      :key="item.componentId"
       ref="component"
       class="component-item"
-      @dragstart="e => handleDragStart(e, item)"
+      @dragstart="(e) => handleDragStart(e, item)"
       @dragend="handleDragEnd"
       draggable
     >
@@ -18,7 +18,7 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { ComponentListStore } from '@/stores/component-list'
+import ComponentListStore from '@/stores/component-list'
 
 @Component
 export default class ComponentPanel extends Vue {

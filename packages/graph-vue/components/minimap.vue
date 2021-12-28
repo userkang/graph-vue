@@ -1,10 +1,9 @@
 <template>
-  <div class="minimap " ref="root" :style="{ ...rootStyle, ...themeVars }">
+  <div class="graph-minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
     <svg
       :width="mapRect.width"
       :height="mapRect.height"
       xmlns="http://www.w3.org/2000/svg"
-      class="graph-svg"
       id="minimap"
       ref="map"
     >
@@ -15,14 +14,17 @@
       />
       <g :style="graphStyle" v-html="svgHTML"></g>
     </svg>
-    <div class="viewport" :style="viewportStyle" @mousedown="onMousedown">
-      <div class="viewport-resize" @mousedown.stop="onVpResizedown"></div>
+    <div
+      class="graph-minimap-viewport"
+      :style="viewportStyle"
+      @mousedown="onMousedown"
+    >
+      <div class="graph-minimap-resize" @mousedown.stop="onVpResizedown"></div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
-import { Graph } from '@datafe/graph-core'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
 
 const generateCursor = (cursor: string) => {
@@ -257,38 +259,3 @@ export default class Minimap extends Vue {
   }
 }
 </script>
-<style lang="scss" scoped>
-.minimap {
-  box-sizing: border-box;
-  position: relative;
-  position: absolute;
-  left: 10px;
-  bottom: 10px;
-  overflow: hidden;
-  user-select: none;
-  &:hover > .viewport {
-    background-color: rgba(var(--color-main), 0.15);
-  }
-  .viewport {
-    position: absolute;
-    left: 0%;
-    top: 0%;
-    background-color: rgba(var(--color-main), 0.1);
-    cursor: move;
-    transform-origin: center;
-    &:hover {
-      background-color: rgba(var(--color-main), 0.2);
-    }
-    .viewport-resize {
-      position: absolute;
-      right: -5px;
-      bottom: -5px;
-      border-radius: 50%;
-      width: 10px;
-      height: 10px;
-      background-color: rgb(var(--color-shadow));
-      cursor: nwse-resize;
-    }
-  }
-}
-</style>

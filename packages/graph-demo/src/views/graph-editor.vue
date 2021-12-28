@@ -12,14 +12,30 @@
     <div class="main-wrap">
       <ComponentPanel class="component-panel" />
       <div class="main-center-wrap">
-        <Graph ref="graph" :data="dataMock" :action="action">
-          <template #node="{ node }">
-            <div class="node-container">
+        <GraphVue
+          ref="graph"
+          :data2="dataMock"
+          :action="action"
+          :layout="layout"
+          @drop="handleDrop"
+          @nodeselectchange="handleNodeSelectChange"
+        >
+          <!-- <template #node="{ node }">
+            <div
+              class="node-container"
+              :style="{
+                'border-color': node.hasState('selected')
+                  ? '#db3737'
+                  : '#DEDFEC',
+              }"
+            >
               <div
                 class="left"
                 :class="[isLeaf(node.model) ? 'leaf' : '']"
               ></div>
-              <div class="right">值为{{ node.model.label }}</div>
+              <div class="right">
+                {{ node.model.label }}
+              </div>
             </div>
           </template>
 
@@ -28,26 +44,33 @@
             <text
               :x="text(edge).x"
               :y="text(edge).y"
-              style="text-anchor: middle; fill: #999"
-              >tag</text
+              style="text-anchor: middle; fill: #aaa; font-size: 12px"
             >
+              tag
+            </text>
           </template>
 
           <template #port="{ port }">
             <rect
-              width="10"
-              height="10"
-              :transform="`translate(-5, -5)`"
-              fill="red"
+              width="8"
+              height="8"
+              :transform="`translate(-4, -4)`"
+              fill="#999"
             ></rect>
-          </template>
+          </template> -->
 
-          <Minimap></Minimap>
-          <div>1234</div>
-        </Graph>
+          <!-- <MiniMap></MiniMap>
+
+          <ToolBox></ToolBox>
+
+          <Menu class="menu" v-model="menuShow">
+            <li @click="deleteItem">删除</li>
+            <li @click="deleteItem">删除</li>
+          </Menu>-->
+        </GraphVue>
       </div>
 
-      <!-- <ConfigPanel /> -->
+      <ConfigPanel />
     </div>
   </div>
 </template>
@@ -56,41 +79,47 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { Graph, ToolBox, Menu, Minimap } from '@datafe/graph-vue/index'
+import {
+  ToolBox,
+  Menu,
+  MiniMap,
+  Graph as GraphVue,
+} from '@datafe/graph-vue/main'
+import { INodeModel, Graph } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
-import { INodeModel, IEdgeModel } from '@datafe/graph-core'
-import { GraphConfigStore } from '@/stores/graph-config'
-
-interface CopyReturnValue {
-  graphId: number
-  graphName: string
-}
+import GraphConfigStore from '@/stores/graph-config'
+import ComponentListStore from '@/stores/component-list'
 
 @Component({
   components: {
-    Graph,
+    GraphVue,
     ToolBox,
     Menu,
-    Minimap,
+    MiniMap,
     ComponentPanel,
     ConfigPanel,
   },
 })
 export default class GraphEditor extends Vue {
-  // data: any = []
   graphConfigState = GraphConfigStore.state
+  componentState = ComponentListStore.state
+  graphState = GraphStore.state
+  menuShow = false
+  activeId = ''
+  dataMock: any = { label: 'asda111111sd' }
 
   async created() {
-    await GraphStore.getData()
-    this.graph.on('port.click', this.handelNodeClick)
+    // this.dataMock = {}
+
+    const a = await GraphStore.getData()
+    console.log(a)
+    this.dataMock = a
   }
 
-  handelNodeClick(e, node) {
-    console.log(e, node)
-  }
-
-  get dataMock() {
+  get dat2a() {
+    this.dataMock = this.graphConfigState.data
+    console.log(this.dataMock)
     return this.graphConfigState.data
   }
 
@@ -99,21 +128,46 @@ export default class GraphEditor extends Vue {
   }
 
   get graph() {
-    return (this.$refs.graph as any).graph as Graph
+    this.graphState.graph = (this.$refs.graph as any).graph
+    return this.graphState.graph as Graph
+  }
+
+  get layout() {
+    return this.graphConfigState.layout
+  }
+
+  get dragingInfo() {
+    return this.componentState.dragingInfo
   }
 
   isLeaf(node: INodeModel) {
     return !node.children || node.children.length === 0
   }
 
-  direction = 'TB'
+  handleNodeSelectChange(node) {
+    console.log(node)
+  }
+
+  handleDrop(e: DragEvent) {
+    e.preventDefault()
+    const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
+    const y = e.y - this.dragingInfo.offsetY * this.graph.getZoom()
+    const point = this.graph.getPointByClient(x, y)
+
+    this.graph.addNode({
+      label: this.dragingInfo.component.componentName,
+      x: point.x,
+      y: point.y,
+    })
+  }
 
   path(edge: any) {
-    const { fromSlot, toSlot } = edge
-    const x2 = toSlot.x
-    const y2 = toSlot.y
-
-    return `M ${fromSlot.x} ${fromSlot.y} L ${x2} ${y2}`
+    const { x: x1, y: y1 } = edge.fromSlot
+    const { x: x2, y: y2 } = edge.toSlot
+    const xc = (y2 - y1) / 2
+    return `M ${x1} ${y1} L ${x1} ${y1 + xc} L ${x1} ${y2 - xc} L ${x2} ${
+      y2 - xc
+    }  L ${x2} ${y2}`
   }
 
   text(edge) {
@@ -122,6 +176,48 @@ export default class GraphEditor extends Vue {
       x: (fromSlot.x + toSlot.x) / 2,
       y: (fromSlot.y + toSlot.y) / 2,
     }
+  }
+
+  handleKeyUp(e: KeyboardEvent) {
+    e.stopPropagation()
+    const tagName = (e.target as HTMLBodyElement).tagName
+    if (tagName === 'BODY') {
+      if (['Delete', 'Backspace'].includes(e.key)) {
+        const selectedNodes = this.graph.findNodeByState('selected')
+        const selectedEdges = this.graph.findEdgeByState('selected')
+        if (selectedEdges.length) {
+          this.graph.deleteEdge(selectedEdges[0].id)
+        }
+        if (selectedNodes.length) {
+          const edges = []
+          const nodes = []
+          selectedNodes.forEach((item) => {
+            item.edges.forEach((edge) => {
+              edges.push(edge.model)
+            })
+            nodes.push(item.model)
+            this.graph.deleteNode(item.id, false)
+          })
+          this.graph.pushStack('deleteNode', { nodes, edges })
+        }
+      }
+    }
+  }
+
+  deleteItem() {
+    if (this.activeId) {
+      this.graph.deleteNode(this.activeId)
+    }
+  }
+
+  handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
+    this.menuShow = true
+    this.activeId = data.id
+  }
+
+  mounted() {
+    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('keyup', this.handleKeyUp)
   }
 }
 </script>
@@ -183,9 +279,22 @@ export default class GraphEditor extends Vue {
 }
 .edge-wrapper {
   stroke: rgb(235, 226, 224);
-  stroke-width: 2px;
+  stroke-width: 1px;
+  stroke-dasharray: 2;
   &:hover {
     stroke: rgb(0, 195, 255);
+  }
+}
+.menu li {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 20px;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  &:hover {
+    color: #333;
+    background: #dbdef3;
   }
 }
 </style>

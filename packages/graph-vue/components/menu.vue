@@ -2,7 +2,7 @@
   <div v-show="value">
     <ul
       ref="menu"
-      class="menu-tips"
+      class="graph-menu-wrapper"
       :style="{ top: menu.y + 2 + 'px', left: menu.x + 2 + 'px' }"
     >
       <slot :item="menu"></slot>
@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import GraphContent from './graph.vue'
 
 @Component
 export default class Menu extends Vue {
@@ -24,10 +23,6 @@ export default class Menu extends Vue {
   menu = {
     x: 0,
     y: 0
-  }
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
   }
 
   @Watch('menu.y')
@@ -45,7 +40,7 @@ export default class Menu extends Vue {
     })
   }
 
-  showMenu(e: MouseEvent, data) {
+  showMenu(e: MouseEvent) {
     this.menu = {
       x: e.x,
       y: e.y
@@ -59,31 +54,13 @@ export default class Menu extends Vue {
   }
 
   mounted() {
-    this.graph.on('contextmenu', this.showMenu)
+    document.addEventListener('contextmenu', this.showMenu)
     document.addEventListener('click', this.hiddenMenu)
   }
 
   beforeDestroy() {
+    document.removeEventListener('contextmenu', this.showMenu)
     document.removeEventListener('click', this.hiddenMenu)
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.menu-mask {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 99;
-}
-.menu-tips {
-  width: 120px;
-  position: fixed;
-  z-index: 100;
-  background: #fff;
-  box-shadow: 0 0 4px 0 rgba(50, 57, 131, 0.25);
-  border-radius: 1px;
-}
-</style>

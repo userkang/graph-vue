@@ -9,11 +9,11 @@
     </template>
     <template v-else>
       <circle
-        class="port-style"
+        class="graph-port"
         :class="{
-          'enable-port': portEnableLink,
-          'active-port': item.type === 'out',
-          'linked-port': portLinked
+          'graph-port-enable': portEnableLink,
+          'graph-port-active': item.type === 'out',
+          'graph-port-linked': portLinked
         }"
         :r="portEnableLink ? highlightCircleR : circleR"
       ></circle>
@@ -44,33 +44,3 @@ export default class Port extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.port-style {
-  stroke: #dddeeb;
-  fill: #fff;
-  stroke-width: 1;
-  cursor: pointer;
-  &.active-port {
-    &:hover {
-      stroke: $d2;
-      stroke-width: 2;
-      fill: #fff;
-    }
-  }
-  &.enable-port {
-    stroke: rgba(96, 107, 225, 0.7);
-    stroke-width: 4;
-    fill: #fff;
-    &:hover {
-      stroke-width: 6;
-      fill: rgba(96, 107, 225);
-    }
-  }
-
-  &.linked-port {
-    fill: $d2;
-    stroke: $d2;
-  }
-}
-</style>

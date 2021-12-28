@@ -6,9 +6,7 @@ export const dagMock = {
       label: '工具栏悬浮有说明',
       nodeId: 232,
       x: 400,
-      y: 100,
-      width: 250,
-      height: 50
+      y: 100
     },
     {
       id: '2',

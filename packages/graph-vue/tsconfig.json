@@ -10,13 +10,13 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
       "@datafe/*": ["../../packages/*/src"]
     },
-    "lib": ["ES5", "esnext", "dom", "dom.iterable", "scripthost"]
+    "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["shims-vue.d.ts", "types/**/*.d.ts", "components/*", "index.ts"]
+  "include": ["*.d.ts", "types/**/*.d.ts", "components/*", "main.ts"]
 }

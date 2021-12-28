@@ -1,7 +1,7 @@
 <template>
   <g>
     <path
-      class="new-edge"
+      class="graph-new-edge"
       :d="path"
       v-if="path"
       marker-end="url(#arrow)"

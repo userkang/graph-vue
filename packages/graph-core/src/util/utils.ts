@@ -127,5 +127,5 @@ export const preorder = (root: INodeModel): IDataModel => {
 }
 
 export const isIDataModel = (props): props is IDataModel =>
-  typeof (props as IDataModel)['nodes'] !== 'undefined' &&
+  typeof (props as IDataModel)['nodes'] === 'undefined' &&
   typeof (props as IDataModel)['edges'] !== 'undefined'

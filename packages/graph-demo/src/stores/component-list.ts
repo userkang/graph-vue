@@ -15,8 +15,8 @@ class ComponentList {
     dragingInfo: {
       component: componentMock,
       offsetX: 0,
-      offsetY: 0
-    }
+      offsetY: 0,
+    },
   }
 
   public async getComponentList() {
@@ -24,4 +24,4 @@ class ComponentList {
   }
 }
 
-export const ComponentListStore = new ComponentList()
+export default new ComponentList()

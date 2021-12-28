@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "packages/graph-*"
+    
   ],
   "scripts": {
     "start": "yarn --cwd packages/graph-demo start",
@@ -12,9 +12,7 @@
     "docs:deploy": "yarn --cwd packages/docs node deployDocs.js",
     "vuepress": "yarn --cwd packages/docs vuepress"
   },
-  "dependencies": {
-    "vue-property-decorator": "^9.1.2"
-  },
+  "dependencies": {},
   "devDependencies": {},
   "gitHooks": {
     "pre-commit": "lint-staged"

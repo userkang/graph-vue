@@ -1,5 +1,5 @@
 <template>
-  <div class="tool-box" @click="handleChange">
+  <div class="graph-tool-box" @click="handleChange">
     <li
       title="撤销"
       id="undo"
@@ -9,7 +9,7 @@
     <li
       title="回撤"
       id="redo"
-      :class="{ disable: !redoEnable }"
+      :class="{ 'graph-tool-box-disable': !redoEnable }"
       class="iconfont iconredo"
     ></li>
     <li title="放大" id="expand" class="iconfont iconfangdasuoxiao_X"></li>
@@ -18,7 +18,7 @@
     <li
       title="框选"
       id="select"
-      :class="{ select: isBrushing }"
+      :class="{ 'graph-tool-box-select': isBrushing }"
       class="iconfont iconkuangxuan"
     ></li>
     <li title="全屏" id="fullScreen" class="iconfont iconquanping2"></li>
@@ -109,41 +109,4 @@ export default class ToolBox extends Vue {
 }
 </script>
 
-<style lang="scss" scoped>
-.tool-box {
-  position: absolute;
-  display: flex;
-  right: 10px;
-  top: 10px;
-  background: #383838;
-  border: 1px solid #222;
-  color: #ddd;
-  font-weight: 400;
-  font-size: 18px;
-  & > li {
-    display: flex;
-    height: 30px;
-    width: 30px;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    &:hover {
-      background: #484848;
-    }
-  }
-  .select {
-    color: #ff9801;
-  }
-  #undo,
-  #redo {
-    font-size: 14px;
-  }
-  .disable {
-    cursor: not-allowed;
-    color: #585858;
-    &:hover {
-      background: none;
-    }
-  }
-}
-</style>
+<style lang="scss" scoped></style>

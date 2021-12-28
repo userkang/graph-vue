@@ -6,6 +6,9 @@ import Menu from './components/menu.vue'
 import Port from './components/port.vue'
 import MiniMap from './components/minimap.vue'
 
-export { Graph, Node, Edge, ToolBox, Menu, Port, MiniMap }
+import content from './css/index'
+import { insertCss } from './utils/dom'
+insertCss(content)
 
+export { Graph, Node, Edge, ToolBox, Menu, Port, MiniMap }
 export default Graph

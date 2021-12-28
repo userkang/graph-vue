@@ -13,12 +13,7 @@
       <div
         v-else
         class="graph-node"
-        :style="{
-          'border-color': isNodeSelected ? '#606BE1' : '#DEDFEC',
-          background: isNodeSelected
-            ? 'rgba(185,200,245,0.9)'
-            : 'rgba(252,252,251,0.9)'
-        }"
+        :class="{ 'graph-node-active': node.hasState('selected') }"
       >
         {{ node.model.label }}
       </div>
@@ -47,29 +42,8 @@ export default class Node extends Vue {
   node!: INode
 
   get isNodeSelected() {
+    console.log(this.node.hasState('selected'))
     return this.node.hasState('selected')
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.graph-node {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  color: #666;
-  border-width: 1px;
-  border-style: solid;
-  border-radius: 2px;
-  box-sizing: border-box;
-  cursor: pointer;
-}
-.w-100 {
-  width: 100%;
-}
-.h-100 {
-  height: 100%;
-}
-</style>

@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  
   "compilerOptions": {
     "target": "es5",
     "module": "esnext",
@@ -15,7 +15,7 @@
     "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*", "../../packages/*/src"],
-      "@datafe/graph-vue": ["../../packages/graph-vue"]
+      // "@datafe/graph-vue": ["../../packages/graph-vue"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

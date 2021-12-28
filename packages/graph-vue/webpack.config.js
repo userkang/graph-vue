@@ -2,7 +2,7 @@ const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
-  entry: path.resolve(__dirname, './index.ts'),
+  entry: path.resolve(__dirname, './main.ts'),
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录

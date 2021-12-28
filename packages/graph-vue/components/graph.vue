@@ -1,12 +1,11 @@
 <template>
   <div
-    class="graph-content-wrap"
+    class="graph-vue-wrapper"
     ref="svg"
     @dragover="e => e.preventDefault()"
     @drop="handleDrop"
     @contextmenu="e => e.preventDefault()"
   >
-    <!-- 注释部分为自定义模版部分，核心库自带渲染层，如无自定义需求，可以不关注 -->
     <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
@@ -47,32 +46,26 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
 import Node from './node.vue'
 import Edge from './edge.vue'
 import NewEdge from './new-edge.vue'
-import ToolBox from './tool-box.vue'
-import Menu from './menu.vue'
-import Minimap from './minimap.vue'
 import Arrow from './arrow.vue'
 import Port from './port.vue'
 import { Graph, IDataModel } from '@datafe/graph-core'
 
 @Component({
   components: {
-    Minimap,
     NewEdge,
     Edge,
     Node,
-    ToolBox,
-    Menu,
     Arrow,
     Port
   }
 })
 export default class GraphContent extends Vue {
   @Prop({ default: () => [], type: Array })
-  action: Array<string>
+  action: string[]
 
   @Prop({
     default: () => {
@@ -80,9 +73,13 @@ export default class GraphContent extends Vue {
     },
     type: Object
   })
-  data: IDataModel
+  data2: IDataModel
 
-  @Prop({ default: () => {} })
+  @Prop({
+    default: () => {
+      return { rankdir: 'TB' }
+    }
+  })
   layout: unknown
 
   graph: Graph = null as any
@@ -96,6 +93,12 @@ export default class GraphContent extends Vue {
     translateY: 0
   }
   brushPath = ''
+
+  // get dat2 (){
+  //   console.log(this.data);
+  //   this.graph.data(this.data)
+  //   return this.data
+  // }
 
   handleDrop(e: DragEvent) {
     this.$emit('drop', e)
@@ -118,7 +121,7 @@ export default class GraphContent extends Vue {
 
     this.initCustomHooks()
 
-    this.graph.data(this.data)
+    this.graph.data(JSON.parse(JSON.stringify(this.data2)))
 
     this.graph.layout(this.layout)
   }
@@ -172,18 +175,11 @@ export default class GraphContent extends Vue {
   beforeDestroy() {
     this.graph.destroy()
   }
+
+  @Watch('data2')
+  dataChange(val: IDataModel) {
+    const a = JSON.parse(JSON.stringify(val))
+    this.graph.data(a)
+  }
 }
 </script>
-
-<style lang="scss" scoped>
-$edge-color: #d1d1dd;
-$select-color: #4150f6;
-.graph-content-wrap {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background: #242424;
-  overflow: hidden;
-  user-select: none;
-}
-</style>

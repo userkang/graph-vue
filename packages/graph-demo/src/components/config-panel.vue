@@ -4,7 +4,7 @@
 
     <div class="form-item">
       <div class="label">图方向</div>
-      <select v-model="graphConfigState.direction">
+      <select v-model="graphConfigState.layout.rankdir">
         <option value="TB">TB（自上而下）</option>
         <option value="LR">LR（从左往右）</option>
       </select>
@@ -32,10 +32,10 @@
 
 <script lang="ts">
 import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
-import { GraphConfigStore } from '@/stores/graph-config'
+import GraphConfigStore from '@/stores/graph-config'
 import GraphStore from '@/stores/graph'
 import { editor } from 'monaco-editor'
-import { Graph } from '@datafe/graph-core'
+import { Graph, ILayout } from '@datafe/graph-core'
 
 @Component
 export default class ConfigPanel extends Vue {
@@ -49,7 +49,7 @@ export default class ConfigPanel extends Vue {
     'create-edge': '创建边',
     'wheel-move': '滚轮移动画布',
     'wheel-zoom': '双指缩放',
-    'brush-select': '框选'
+    'brush-select': '框选',
   }
 
   async mounted() {
@@ -62,10 +62,10 @@ export default class ConfigPanel extends Vue {
       scrollbar: {
         horizontalHasArrows: false,
         verticalScrollbarSize: 4,
-        horizontal: 'hidden'
+        horizontal: 'hidden',
       },
       minimap: {
-        enabled: false
+        enabled: false,
       },
       folding: false,
       contextmenu: false,
@@ -73,12 +73,12 @@ export default class ConfigPanel extends Vue {
       lineDecorationsWidth: 0,
       automaticLayout: true,
       theme: 'vs-dark',
-      renderIndentGuides: false
+      renderIndentGuides: false,
     })
 
     const graph = this.graphState.graph as Graph
 
-    this.editor.onDidBlurEditorText(e => {
+    this.editor.onDidBlurEditorText((e) => {
       try {
         const content = JSON.parse(this.editor.getValue())
         graph.data(content)
@@ -87,14 +87,29 @@ export default class ConfigPanel extends Vue {
       }
     })
     graph.on('datachange', () => {
-      const nodes = graph.getNodes().map(item => item.model)
-      const edges = graph.getEdges().map(item => item.model)
+      const nodes = graph.getNodes().map((item) => item.model)
+      const edges = graph.getEdges().map((item) => item.model)
       this.editor.setValue(JSON.stringify({ nodes, edges }, null, ' '))
     })
   }
 
   beforeDestory() {
     this.editor.destory()
+  }
+
+  @Watch('graphConfigState.action')
+  handelAction(v: string[]) {
+    const graph = this.graphState.graph as Graph
+    graph.removeAction()
+    graph.addAction(v)
+  }
+
+  @Watch('graphConfigState.layout.rankdir')
+  handelRankdir(v: string) {
+    const graph = this.graphState.graph as Graph
+    graph.set('direction', v)
+    graph.data(this.graphConfigState.data)
+    graph.layout({ rankdir: v } as ILayout)
   }
 }
 </script>

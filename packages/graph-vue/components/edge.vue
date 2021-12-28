@@ -8,18 +8,18 @@
     <template v-else>
       <path
         :d="path"
-        class="edge-wrapper"
+        class="graph-edge-wrapper"
         graph-type="edge"
         :graph-id="edge.id"
-        @mouseover="onMouseover"
-        @mouseout="onMouseout"
       ></path>
       <path
         ref="edge"
-        :marker-end="isSelected ? `url(#arrow-active)` : 'url(#arrow)'"
+        :marker-end="
+          edge.hasState('selected') ? `url(#arrow-active)` : 'url(#arrow)'
+        "
         :d="path"
-        class="edge-style"
-        :class="{ 'edge-selected-style': isSelected }"
+        class="graph-edge"
+        :class="{ 'graph-edge-active': edge.hasState('selected') }"
       ></path>
     </template>
   </g>
@@ -43,10 +43,6 @@ export default class Edge extends Vue {
     return (this.$parent as GraphContent).graph
   }
 
-  get isSelected() {
-    return this.edge.hasState('selected')
-  }
-
   get path() {
     const { fromSlot, toSlot } = this.edge
     const direction = this.graph.get('direction')
@@ -68,60 +64,5 @@ export default class Edge extends Vue {
       direction
     )
   }
-
-  onMouseover() {
-    ;(this.$refs.edge as HTMLElement).setAttribute(
-      'marker-end',
-      'url(#arrow-active)'
-    )
-  }
-
-  onMouseout() {
-    if (this.isSelected) {
-      return
-    }
-    ;(this.$refs.edge as HTMLElement).setAttribute('marker-end', 'url(#arrow)')
-  }
 }
 </script>
-
-<style lang="scss" scoped>
-$edge-color: #d1d1dd;
-$select-color: #4150f6;
-
-@keyframes dash {
-  from {
-    stroke-dashoffset: 320;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-.edge-wrapper {
-  stroke-width: 10;
-  fill: none;
-  stroke: transparent;
-  &:hover {
-    + .edge-style {
-      stroke: $select-color;
-      stroke-width: 2.5;
-      cursor: pointer;
-    }
-  }
-}
-.edge-style {
-  stroke: $edge-color;
-  stroke-width: 2;
-  fill: none;
-  stroke-linecap: round;
-  // stroke-dasharray: 5;
-  // animation: dash 10s linear infinite;
-  pointer-events: none;
-}
-.edge-selected-style {
-  stroke: $select-color;
-  stroke-width: 2.5;
-  cursor: pointer;
-  stroke-linecap: round;
-}
-</style>

@@ -1,14 +1,18 @@
 import { IDataModel, INodeModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
-  direction: 'TB' | 'LR'
+  layout: {
+    rankdir: string
+  }
   action: string[]
-  data: IDataModel|INodeModel
+  data: IDataModel | INodeModel
 }
 
 class GraphConfig {
   public state: GraphConfigState = {
-    direction: 'TB',
+    layout: {
+      rankdir: 'TB'
+    },
     action: [
       'drag-svg',
       'drag-node',
@@ -16,13 +20,13 @@ class GraphConfig {
       'create-edge',
       'wheel-move',
       'wheel-zoom',
-      'brush-select'
+      'brush-select',
     ],
     data: {
       nodes: [],
-      edges: []
-    }
+      edges: [],
+    },
   }
 }
 
-export const GraphConfigStore = new GraphConfig()
+export default new GraphConfig()

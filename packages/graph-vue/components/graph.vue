@@ -73,7 +73,7 @@ export default class GraphContent extends Vue {
     },
     type: Object
   })
-  data2: IDataModel
+  data: IDataModel
 
   @Prop({
     default: () => {
@@ -93,12 +93,6 @@ export default class GraphContent extends Vue {
     translateY: 0
   }
   brushPath = ''
-
-  // get dat2 (){
-  //   console.log(this.data);
-  //   this.graph.data(this.data)
-  //   return this.data
-  // }
 
   handleDrop(e: DragEvent) {
     this.$emit('drop', e)
@@ -121,7 +115,7 @@ export default class GraphContent extends Vue {
 
     this.initCustomHooks()
 
-    this.graph.data(JSON.parse(JSON.stringify(this.data2)))
+    this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
     this.graph.layout(this.layout)
   }
@@ -176,7 +170,7 @@ export default class GraphContent extends Vue {
     this.graph.destroy()
   }
 
-  @Watch('data2')
+  @Watch('data')
   dataChange(val: IDataModel) {
     const a = JSON.parse(JSON.stringify(val))
     this.graph.data(a)

@@ -694,11 +694,6 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@datafe/graph-vue@file:packages/graph-vue":
-  version "0.1.1"
-  dependencies:
-    "@datafe/graph-core" "^0.3.12"
-
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.5"
   resolved "http://r.npm.sankuai.com/@discoveryjs/json-ext/download/@discoveryjs/json-ext-0.5.5.tgz#9283c9ce5b289a3c4f61c12757469e59377f81f3"

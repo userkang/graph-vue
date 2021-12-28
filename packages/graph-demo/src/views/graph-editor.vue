@@ -14,13 +14,13 @@
       <div class="main-center-wrap">
         <GraphVue
           ref="graph"
-          :data2="dataMock"
+          :data="dataMock"
           :action="action"
           :layout="layout"
           @drop="handleDrop"
           @nodeselectchange="handleNodeSelectChange"
         >
-          <!-- <template #node="{ node }">
+          <template #node="{ node }">
             <div
               class="node-container"
               :style="{
@@ -40,7 +40,7 @@
           </template>
 
           <template #edge="{ edge }">
-            <path :d="path(edge)" class="edge-wrapper"></path>
+            <path :d="path(edge)" class="graph-custom-edge"></path>
             <text
               :x="text(edge).x"
               :y="text(edge).y"
@@ -57,7 +57,7 @@
               :transform="`translate(-4, -4)`"
               fill="#999"
             ></rect>
-          </template> -->
+          </template>
 
           <!-- <MiniMap></MiniMap>
 
@@ -66,7 +66,7 @@
           <Menu class="menu" v-model="menuShow">
             <li @click="deleteItem">删除</li>
             <li @click="deleteItem">删除</li>
-          </Menu>-->
+          </Menu> -->
         </GraphVue>
       </div>
 
@@ -79,12 +79,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import {
-  ToolBox,
-  Menu,
-  MiniMap,
-  Graph as GraphVue,
-} from '@datafe/graph-vue/main'
+import { ToolBox, Menu, MiniMap, Graph as GraphVue } from '@datafe/graph-vue/main'
 import { INodeModel, Graph } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
@@ -107,19 +102,15 @@ export default class GraphEditor extends Vue {
   graphState = GraphStore.state
   menuShow = false
   activeId = ''
-  dataMock: any = { label: 'asda111111sd' }
+  // dataMock: any = {}
 
   async created() {
-    // this.dataMock = {}
-
     const a = await GraphStore.getData()
-    console.log(a)
-    this.dataMock = a
+    // this.dataMock = a
   }
 
-  get dat2a() {
-    this.dataMock = this.graphConfigState.data
-    console.log(this.dataMock)
+  get dataMock() {
+    // this.dataMock = this.graphConfigState.data
     return this.graphConfigState.data
   }
 
@@ -277,10 +268,11 @@ export default class GraphEditor extends Vue {
     text-align: center;
   }
 }
-.edge-wrapper {
+.graph-custom-edge {
   stroke: rgb(235, 226, 224);
   stroke-width: 1px;
   stroke-dasharray: 2;
+  fill: none;
   &:hover {
     stroke: rgb(0, 195, 255);
   }

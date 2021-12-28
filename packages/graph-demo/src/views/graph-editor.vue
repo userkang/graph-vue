@@ -59,14 +59,14 @@
             ></rect>
           </template>
 
-          <!-- <MiniMap></MiniMap>
+          <MiniMap></MiniMap>
 
           <ToolBox></ToolBox>
 
           <Menu class="menu" v-model="menuShow">
             <li @click="deleteItem">删除</li>
             <li @click="deleteItem">删除</li>
-          </Menu> -->
+          </Menu>
         </GraphVue>
       </div>
 

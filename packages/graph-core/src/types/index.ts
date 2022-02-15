@@ -11,13 +11,13 @@ export interface IDataModel {
   nodes: INodeModel[]
   // 实验连线信息
   edges: IEdgeModel[]
-  [key: string]: unknown
+  [key: string]: any
 }
 
 export interface ISlotModel {
   id?: string
   type?: string
-  [key: string]: unknown
+  [key: string]: any
 }
 
 export interface INodeModel {
@@ -28,7 +28,7 @@ export interface INodeModel {
   y?: number
   slots?: ISlotModel[]
   children?: INodeModel[]
-  [key: string]: unknown
+  [key: string]: any
 }
 
 export interface IEdgeModel {
@@ -39,7 +39,7 @@ export interface IEdgeModel {
   toNodeId: string
   fromSlotId?: string
   toSlotId?: string
-  [key: string]: unknown
+  [key: string]: any
 }
 
 export interface NodeInfo {

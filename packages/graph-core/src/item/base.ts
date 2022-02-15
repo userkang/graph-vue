@@ -5,7 +5,12 @@ export default class Base {
   public _cfg: { [key: string]: unknown } = {
     id: '',
     model: {},
-    states: []
+    states: {
+      selected: false,
+      linked: false,
+      enable: false,
+      locked: false,
+    },
   }
 
   constructor(model: INodeModel | IEdgeModel | ISlotModel) {
@@ -28,6 +33,10 @@ export default class Base {
     return this.get('model')
   }
 
+  public get states() {
+    return this.get('states')
+  }
+
   public get<T = any>(key: string): T {
     return this._cfg[key] as T
   }
@@ -40,13 +49,11 @@ export default class Base {
     if (this.hasState(state)) {
       return
     }
-    const states = this.get('states')
-    states.push(state)
+    this.states[state] = true
   }
 
   public hasState(state: string): boolean {
-    const states = this.get('states')
-    return states.includes(state)
+    return this.states[state] || false
   }
 
   public getStates() {
@@ -54,9 +61,8 @@ export default class Base {
   }
 
   public clearState(state: string) {
-    const states = this.get('states')
-    if (states.indexOf(state) > -1) {
-      states.splice(states.indexOf(state), 1)
+    if (this.hasState(state)) {
+      this.states[state] = false
     }
   }
 }

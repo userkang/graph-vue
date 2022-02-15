@@ -19,7 +19,7 @@
       </div>
     </foreignObject>
 
-    <Port v-for="port in node.slots" :key="port.id" :item="port">
+    <Port v-for="port in node.slots" :key="port.id" :port="port">
       <slot name="port" :port="port"></slot>
     </Port>
   </g>
@@ -40,10 +40,5 @@ export default class Node extends Vue {
     required: true
   })
   node!: INode
-
-  get isNodeSelected() {
-    console.log(this.node.hasState('selected'))
-    return this.node.hasState('selected')
-  }
 }
 </script>

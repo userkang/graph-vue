@@ -1,22 +1,24 @@
 <template>
   <g
     graph-type="slot"
-    :graph-id="item.id"
-    :transform="`translate(${item.x}, ${item.y})`"
+    :graph-id="port.id"
+    :transform="`translate(${port.x}, ${port.y})`"
   >
     <template v-if="$slots.default">
-      <slot :port="item"></slot>
+      <slot :port="port"></slot>
     </template>
     <template v-else>
-      <circle
-        class="graph-port"
-        :class="{
-          'graph-port-enable': portEnableLink,
-          'graph-port-active': item.type === 'out',
-          'graph-port-linked': portLinked
-        }"
-        :r="portEnableLink ? highlightCircleR : circleR"
-      ></circle>
+      <g>
+        <circle
+          class="graph-port"
+          :class="{
+            'graph-port-enable': enable,
+            'graph-port-active': port.type === 'out',
+            'graph-port-linked': linked
+          }"
+          :r="enable ? highlightCircleR : circleR"
+        ></circle>
+      </g>
     </template>
   </g>
 </template>
@@ -30,17 +32,17 @@ export default class Port extends Vue {
   @Prop({
     required: true
   })
-  item: ISlot
+  port: ISlot
 
   circleR = 4
   highlightCircleR = 6
 
-  get portEnableLink() {
-    return this.item.hasState('enable')
+  get enable() {
+    return this.port.hasState('enable')
   }
 
-  get portLinked() {
-    return this.item.hasState('linked') && !this.portEnableLink
+  get linked() {
+    return !this.enable && this.port.hasState('linked')
   }
 }
 </script>

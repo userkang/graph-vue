@@ -59,14 +59,14 @@
             ></rect>
           </template>
 
-          <!-- <MiniMap></MiniMap>
+          <MiniMap></MiniMap>
 
           <ToolBox></ToolBox>
 
           <Menu class="menu" v-model="menuShow">
             <li @click="deleteItem">删除</li>
             <li @click="deleteItem">删除</li>
-          </Menu> -->
+          </Menu>
         </GraphVue>
       </div>
 
@@ -79,12 +79,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import {
-  ToolBox,
-  Menu,
-  MiniMap,
-  Graph as GraphVue,
-} from '@datafe/graph-vue/main'
+import { ToolBox, Menu, MiniMap, Graph as GraphVue } from '@datafe/graph-vue'
 import { INodeModel, Graph } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'

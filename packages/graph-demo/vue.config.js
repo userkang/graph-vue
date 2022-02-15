@@ -22,7 +22,7 @@ module.exports = {
     resolve: {
       alias: {
         '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
-        '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue'),
+        '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue/main.ts'),
       },
     },
     plugins: [

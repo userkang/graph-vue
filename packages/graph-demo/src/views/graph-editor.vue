@@ -62,7 +62,7 @@
           <template #default="{ graph }">
             <MiniMap :graph="graph"></MiniMap>
             <ToolBox :graph="graph" class="tool-box"></ToolBox>
-            <Menu :graph="graph" class="menu" v-model="menuShow">
+            <Menu class="menu" v-model="menuShow">
               <li @click="deleteItem">删除</li>
               <li @click="deleteItem">删除</li>
             </Menu>

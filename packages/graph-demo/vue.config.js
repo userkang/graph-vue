@@ -21,8 +21,8 @@ module.exports = {
   configureWebpack: {
     resolve: {
       alias: {
-        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
-        '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue/main.ts'),
+        // '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
+        // '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue/main.ts'),
       },
     },
     plugins: [

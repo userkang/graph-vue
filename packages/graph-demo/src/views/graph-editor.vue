@@ -59,14 +59,14 @@
             ></rect>
           </template>
 
-          <MiniMap></MiniMap>
-
-          <ToolBox class="tool-box"></ToolBox>
-
-          <Menu class="menu" v-model="menuShow">
-            <li @click="deleteItem">删除</li>
-            <li @click="deleteItem">删除</li>
-          </Menu>
+          <template #default="{ graph }">
+            <MiniMap :graph="graph"></MiniMap>
+            <ToolBox :graph="graph" class="tool-box"></ToolBox>
+            <Menu :graph="graph" class="menu" v-model="menuShow">
+              <li @click="deleteItem">删除</li>
+              <li @click="deleteItem">删除</li>
+            </Menu>
+          </template>
         </GraphVue>
       </div>
 

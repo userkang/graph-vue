@@ -38,16 +38,15 @@ export default class Minimap extends Vue {
   @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
 
+  @Prop()
+  graph!: any
+
   canGraphChage = true
   svgHTML = ''
   prevMousePosition?: { x: number; y: number }
   prevVpmove?: { x: number; y: number }
   cursorMove = generateCursor('move')
   cursorResize = generateCursor('nwse-resize')
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
-  }
 
   get themeVars() {
     return {

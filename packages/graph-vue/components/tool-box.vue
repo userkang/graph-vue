@@ -33,13 +33,12 @@ import GraphContent from './graph.vue'
 
 @Component
 export default class ToolBox extends Vue {
+  @Prop()
+  graph!: any
+
   isBrushing = false
   undoEnable = false
   redoEnable = false
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
-  }
 
   handleChange(e: MouseEvent) {
     const { graph } = this

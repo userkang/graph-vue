@@ -42,9 +42,9 @@
         style="fill: #4e73ff; stroke: #606be1; stroke-width: 1px; opacity: 0.3"
       />
     </svg>
-    <div v-if="graph">
-      <slot></slot>
-    </div>
+    <template v-if="graph">
+      <slot :graph="graph"></slot>
+    </template>
   </div>
 </template>
 

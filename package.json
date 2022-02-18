@@ -2,6 +2,9 @@
   "name": "mlp-graph",
   "version": "0.1.0",
   "private": true,
+  "workspaces": [
+    "packages/graph-*"
+  ],
   "scripts": {
     "start": "yarn --cwd packages/graph-demo start",
     "build": "yarn --cwd packages/graph-demo && export NODE_ENV=production && vue-cli-service build",

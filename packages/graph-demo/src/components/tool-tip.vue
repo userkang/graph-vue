@@ -47,7 +47,6 @@ export default class ToolTip extends Vue {
   created() {
     this.$nextTick(() => {
       const wrap = this.$refs.wrap as HTMLDivElement
-      console.log(wrap)
       const {
         width: wrapWidth,
         height: wrapHeight,

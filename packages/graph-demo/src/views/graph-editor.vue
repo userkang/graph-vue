@@ -20,7 +20,7 @@
           @drop="handleDrop"
           @nodeselectchange="handleNodeSelectChange"
         >
-          <!-- <template #node="{ node }">
+          <template #node="{ node }">
             <div
               class="node-container"
               :style="{
@@ -57,7 +57,7 @@
               :transform="`translate(-4, -4)`"
               fill="#999"
             ></rect>
-          </template> -->
+          </template>
 
           <MiniMap></MiniMap>
 

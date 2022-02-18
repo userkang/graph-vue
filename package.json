@@ -10,14 +10,5 @@
     "vuepress": "yarn --cwd packages/docs vuepress"
   },
   "dependencies": {},
-  "devDependencies": {},
-  "gitHooks": {
-    "pre-commit": "lint-staged"
-  },
-  "lint-staged": {
-    "src/*": [
-      "yarn lint",
-      "git add ."
-    ]
-  }
+  "devDependencies": {}
 }

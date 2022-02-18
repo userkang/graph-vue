@@ -712,8 +712,10 @@
   dependencies:
     dagre "0.8.5"
 
-"@datafe/graph-vue@file:../graph-vue":
-  version "0.1.6"
+"@datafe/graph-vue@0.1.7":
+  version "0.1.7"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.7.tgz#93c63b685ae06e00923cb5f924d986020bff2fa7"
+  integrity sha1-k8Y7aFrgbgCSPLX5JNmGAgv/L6c=
   dependencies:
     "@datafe/graph-core" "^0.3.13-beta.2"
 

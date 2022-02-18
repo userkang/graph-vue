@@ -705,19 +705,19 @@
     "@babel/helper-validator-identifier" "^7.15.7"
     to-fast-properties "^2.0.0"
 
-"@datafe/graph-core@^0.3.12", "@datafe/graph-core@^0.3.9":
-  version "0.3.12"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.12.tgz#ea1e79032c7f3e5eee7d7edaafdd3dcf21388fc2"
-  integrity sha1-6h55Ayx/Pl7ufX7ar909zyE4j8I=
+"@datafe/graph-core@^0.3.13-beta.2":
+  version "0.3.13-beta.2"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.2.tgz#ed1bddb32848508cb08cf81f10a42f4e38a60c7e"
+  integrity sha1-7RvdsyhIUIywjPgfEKQvTjimDH4=
   dependencies:
     dagre "0.8.5"
 
-"@datafe/graph-vue@0.1.4":
-  version "0.1.4"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.4.tgz#00e04050e086afa129363ec2b345f04662456453"
-  integrity sha1-AOBAUOCGr6EpNj7Cs0XwRmJFZFM=
+"@datafe/graph-vue@0.1.6":
+  version "0.1.6"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.6.tgz#21db82b4f2a314646285362a0fdf4da2a9bad490"
+  integrity sha1-IduCtPKjFGRihTYqD99Noqm61JA=
   dependencies:
-    "@datafe/graph-core" "^0.3.12"
+    "@datafe/graph-core" "^0.3.13-beta.2"
 
 "@hapi/address@2.x.x":
   version "2.1.4"

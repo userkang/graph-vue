@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@datafe/graph-core@^0.3.12":
-  version "0.3.12"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.12.tgz#ea1e79032c7f3e5eee7d7edaafdd3dcf21388fc2"
-  integrity sha1-6h55Ayx/Pl7ufX7ar909zyE4j8I=
+"@datafe/graph-core@^0.3.13-beta.2":
+  version "0.3.13-beta.2"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.2.tgz#ed1bddb32848508cb08cf81f10a42f4e38a60c7e"
+  integrity sha1-7RvdsyhIUIywjPgfEKQvTjimDH4=
   dependencies:
     dagre "0.8.5"
 

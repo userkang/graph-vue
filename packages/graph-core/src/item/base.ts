@@ -2,7 +2,7 @@ import { IEdgeModel, INodeModel, ISlotModel } from '../types'
 import { setGlobalId } from '../util/utils'
 
 export default class Base {
-  public _cfg: { [key: string]: unknown } = {
+  private _cfg: { [key: string]: unknown } = {
     id: '',
     model: {},
     states: {

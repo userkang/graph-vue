@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component } from 'vue-property-decorator'
 import GraphContent from './graph.vue'
 import { calculateCurve } from '../utils/calculateCurve'
 
@@ -53,20 +53,3 @@ export default class NewEdge extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped>
-.new-edge {
-  pointer-events: none;
-  stroke-dasharray: 5;
-  stroke-linecap: round;
-  stroke-width: 1.5;
-  stroke: #d1d1d9;
-  fill: transparent;
-}
-.arrow {
-  pointer-events: none;
-  stroke-width: 2;
-  stroke: #d1d1d9;
-  fill: #d1d1d9;
-}
-</style>

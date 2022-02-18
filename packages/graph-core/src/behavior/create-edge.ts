@@ -115,7 +115,7 @@ export default class CreateEdge extends Base {
   isDirectLinked(slot: Slot) {
     let linked = false
 
-    for (const item of this.fromNode.edges) {
+    for (const item of this.fromNode.getEdges()) {
       linked =
         item.fromSlot.id === this.fromSlot.id && item.toSlot.id === slot.id
       if (linked) {

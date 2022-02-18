@@ -20,13 +20,13 @@
           @drop="handleDrop"
           @nodeselectchange="handleNodeSelectChange"
         >
-          <template #node="{ node }">
+          <!-- <template #node="{ node }">
             <div
               class="node-container"
               :style="{
                 'border-color': node.hasState('selected')
                   ? '#db3737'
-                  : '#DEDFEC',
+                  : '#DEDFEC'
               }"
             >
               <div
@@ -50,18 +50,18 @@
             </text>
           </template>
 
-          <template #port="{ port }">
+          <template #port>
             <rect
               width="8"
               height="8"
               :transform="`translate(-4, -4)`"
               fill="#999"
             ></rect>
-          </template>
+          </template> -->
 
           <MiniMap></MiniMap>
 
-          <ToolBox></ToolBox>
+          <ToolBox class="tool-box"></ToolBox>
 
           <Menu class="menu" v-model="menuShow">
             <li @click="deleteItem">删除</li>
@@ -79,7 +79,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, Graph as GraphVue } from '@datafe/graph-vue'
+import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
 import { INodeModel, Graph } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
@@ -93,8 +93,8 @@ import ComponentListStore from '@/stores/component-list'
     Menu,
     MiniMap,
     ComponentPanel,
-    ConfigPanel,
-  },
+    ConfigPanel
+  }
 })
 export default class GraphEditor extends Vue {
   graphConfigState = GraphConfigStore.state
@@ -102,15 +102,12 @@ export default class GraphEditor extends Vue {
   graphState = GraphStore.state
   menuShow = false
   activeId = ''
-  // dataMock: any = {}
 
   async created() {
-    const a = await GraphStore.getData()
-    // this.dataMock = a
+    await GraphStore.getData()
   }
 
   get dataMock() {
-    // this.dataMock = this.graphConfigState.data
     return this.graphConfigState.data
   }
 
@@ -148,7 +145,7 @@ export default class GraphEditor extends Vue {
     this.graph.addNode({
       label: this.dragingInfo.component.componentName,
       x: point.x,
-      y: point.y,
+      y: point.y
     })
   }
 
@@ -165,7 +162,7 @@ export default class GraphEditor extends Vue {
     const { fromSlot, toSlot } = edge
     return {
       x: (fromSlot.x + toSlot.x) / 2,
-      y: (fromSlot.y + toSlot.y) / 2,
+      y: (fromSlot.y + toSlot.y) / 2
     }
   }
 
@@ -182,8 +179,8 @@ export default class GraphEditor extends Vue {
         if (selectedNodes.length) {
           const edges = []
           const nodes = []
-          selectedNodes.forEach((item) => {
-            item.edges.forEach((edge) => {
+          selectedNodes.forEach(item => {
+            item.getEdges().forEach(edge => {
               edges.push(edge.model)
             })
             nodes.push(item.model)
@@ -243,6 +240,8 @@ export default class GraphEditor extends Vue {
 }
 .main-center-wrap {
   flex: 1;
+  position: relative;
+  background: #242424;
 }
 .node-container {
   width: 100%;

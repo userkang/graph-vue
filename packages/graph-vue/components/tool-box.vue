@@ -3,7 +3,7 @@
     <li
       title="撤销"
       id="undo"
-      :class="{ disable: !undoEnable }"
+      :class="{ 'graph-tool-box-disable': !undoEnable }"
       class="iconfont iconundo"
     ></li>
     <li

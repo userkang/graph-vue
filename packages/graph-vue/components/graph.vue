@@ -20,16 +20,19 @@
         }"
         v-if="graph"
       >
-        <Edge v-for="item in edges" :key="item.id" :edge="item">
-          <slot name="edge" :edge="item"></slot>
-        </Edge>
-        <Node v-for="item in nodes" :key="item.id" :node="item">
-          <slot name="node" :node="item"></slot>
+        <EdgeWrapper v-for="edge in edges" :key="edge.id" :edge="edge">
+          <slot v-if="$scopedSlots.edge" name="edge" :edge="edge"></slot>
+          <Edge v-else :edge="edge" :graph="graph" />
+        </EdgeWrapper>
+        <NodeWrapper v-for="node in nodes" :key="node.id" :node="node">
+          <slot v-if="$scopedSlots.node" name="node" :node="node"></slot>
+          <Node v-else :node="node" />
 
           <template #port="{ port }">
-            <slot name="port" :port="port"></slot>
+            <slot v-if="$scopedSlots.port" name="port" :port="port"></slot>
+            <Port v-else :port="port" />
           </template>
-        </Node>
+        </NodeWrapper>
         <NewEdge>
           <slot name="newEdge"></slot>
         </NewEdge>
@@ -47,23 +50,30 @@
 
 <script lang="ts">
 import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import NodeWrapper from './wrapper/node.vue'
+import EdgeWrapper from './wrapper/edge.vue'
+import PortWrapper from './wrapper/port.vue'
 import Node from './node.vue'
 import Edge from './edge.vue'
+import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
-import Port from './port.vue'
+
 import { Graph, IDataModel } from '@datafe/graph-core'
 
 @Component({
   components: {
-    NewEdge,
+    NodeWrapper,
+    EdgeWrapper,
+    PortWrapper,
     Edge,
     Node,
+    Port,
     Arrow,
-    Port
+    NewEdge
   }
 })
-export default class GraphContent extends Vue {
+export default class GrapVue extends Vue {
   @Prop({ default: () => [], type: Array })
   action: string[]
 
@@ -116,8 +126,6 @@ export default class GraphContent extends Vue {
     this.initCustomHooks()
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
-
-    this.graph.layout(this.layout)
   }
 
   initCustomHooks() {
@@ -172,8 +180,19 @@ export default class GraphContent extends Vue {
 
   @Watch('data')
   dataChange(val: IDataModel) {
-    const a = JSON.parse(JSON.stringify(val))
-    this.graph.data(a)
+    const data = JSON.parse(JSON.stringify(val))
+    this.graph.data(data)
+  }
+
+  @Watch('action')
+  handelAction(v: string[]) {
+    this.graph.removeAction()
+    this.graph.addAction(v)
+  }
+
+  @Watch('layout', { deep: true })
+  handelRankdir(v: unknown) {
+    this.graph.layout(v)
   }
 }
 </script>

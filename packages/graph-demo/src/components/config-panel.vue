@@ -81,7 +81,7 @@ export default class ConfigPanel extends Vue {
     this.editor.onDidBlurEditorText((e) => {
       try {
         const content = JSON.parse(this.editor.getValue())
-        graph.data(content)
+        this.graphConfigState.data = content
       } catch (error) {
         console.log('数据格式不正确')
       }
@@ -95,21 +95,6 @@ export default class ConfigPanel extends Vue {
 
   beforeDestory() {
     this.editor.destory()
-  }
-
-  @Watch('graphConfigState.action')
-  handelAction(v: string[]) {
-    const graph = this.graphState.graph as Graph
-    graph.removeAction()
-    graph.addAction(v)
-  }
-
-  @Watch('graphConfigState.layout.rankdir')
-  handelRankdir(v: string) {
-    const graph = this.graphState.graph as Graph
-    graph.set('direction', v)
-    graph.data(this.graphConfigState.data)
-    graph.layout({ rankdir: v } as ILayout)
   }
 }
 </script>

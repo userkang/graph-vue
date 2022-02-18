@@ -1,47 +1,41 @@
 <template>
   <g>
-    <template v-if="$slots.default">
-      <g graph-type="edge" :graph-id="edge.id">
-        <slot></slot>
-      </g>
-    </template>
-    <template v-else>
-      <path
-        :d="path"
-        class="graph-edge-wrapper"
-        graph-type="edge"
-        :graph-id="edge.id"
-      ></path>
-      <path
-        ref="edge"
-        :marker-end="
-          edge.hasState('selected') ? `url(#arrow-active)` : 'url(#arrow)'
-        "
-        :d="path"
-        class="graph-edge"
-        :class="{ 'graph-edge-active': edge.hasState('selected') }"
-      ></path>
-    </template>
+    <path
+      :d="path"
+      class="graph-edge-wrapper"
+      graph-type="edge"
+      :graph-id="edge.id"
+    ></path>
+    <path
+      ref="edge"
+      :marker-end="
+        edge.hasState('selected') ? `url(#arrow-active)` : 'url(#arrow)'
+      "
+      :d="path"
+      class="graph-edge"
+      :class="{ 'graph-edge-active': edge.hasState('selected') }"
+    ></path>
   </g>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import { Vue, Component, Prop } from 'vue-property-decorator'
 import { calculateCurve } from '../utils/calculateCurve'
-import GraphContent from './graph.vue'
+import { Graph, IEdge } from '@datafe/graph-core'
 
 @Component
 export default class Edge extends Vue {
   @Prop({
     required: true
   })
-  edge!: any
+  edge!: IEdge
+
+  @Prop({
+    required: true
+  })
+  graph!: Graph
 
   activeEdgeId = ''
-
-  get graph() {
-    return (this.$parent as GraphContent).graph
-  }
 
   get path() {
     const { fromSlot, toSlot } = this.edge

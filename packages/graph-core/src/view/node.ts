@@ -20,17 +20,22 @@ export default class Node extends Element {
     const div = this.get('div')
 
     const foreignObject = this.createDom('foreignObject', {
-      transform: `translate(${this.node.x}, ${this.node.y})`,
       width: `${this.node.width}`,
       height: `${this.node.height}`,
       'graph-type': 'node',
       'graph-id': `${this.node.id}`
     })
+
+    const nodeWrapper = this.createDom('g', {
+      transform: `translate(${this.node.x}, ${this.node.y})`
+    })
     const g = this.createDom('g')
 
     foreignObject.appendChild(div)
-    g.appendChild(foreignObject)
+    nodeWrapper.appendChild(foreignObject)
+    g.appendChild(nodeWrapper)
 
+    this.set('nodeWrapper', nodeWrapper)
     this.set('g', g)
     this.set('foreignObject', foreignObject)
     this.set('el', g)
@@ -85,8 +90,8 @@ export default class Node extends Element {
   }
 
   transform() {
-    const foreignObject = this.get('foreignObject')
-    foreignObject.setAttribute(
+    const nodeWrapper = this.get('nodeWrapper')
+    nodeWrapper.setAttribute(
       'transform',
       `translate(${this.node.x}, ${this.node.y})`
     )

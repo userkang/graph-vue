@@ -19,7 +19,7 @@ export default class NodeController {
   }
 
   get nodes() {
-    return Object.keys(this._nodes).map(id => this._nodes[id])
+    return Object.values(this._nodes)
   }
 
   get slotsMap() {
@@ -61,8 +61,8 @@ export default class NodeController {
       return
     }
     // 先删除与节点相关的边
-    for (let i = node.edges.length - 1; i >= 0; i--) {
-      this.graph.deleteEdge(node.edges[i]?.id, false)
+    for (let i = node.getEdges().length - 1; i >= 0; i--) {
+      this.graph.deleteEdge(node.getEdges()[i]?.id, false)
     }
 
     delete this._nodes[node.id]

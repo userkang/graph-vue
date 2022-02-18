@@ -17,7 +17,7 @@ import {
   IGraphConfig,
   IStack,
   IDataStack,
-  ILayout,
+  ILayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -26,7 +26,7 @@ const getDefaultConfig = () => ({
   direction: 'TB',
   nodes: [],
   edges: [],
-  action: [],
+  action: []
 })
 
 export default class Graph extends EventEmitter {
@@ -59,7 +59,7 @@ export default class Graph extends EventEmitter {
     this.initController()
   }
 
-  getNodeInfo() {
+  public getNodeInfo() {
     return this.cfg.nodeInfo
   }
 
@@ -88,7 +88,7 @@ export default class Graph extends EventEmitter {
     return this.viewController.svgInfo
   }
 
-  getNodes(): INode[] {
+  public getNodes(): INode[] {
     return this.nodeController.nodes
   }
 
@@ -97,7 +97,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter((item) => {
+    return this.getNodes().filter(item => {
       return item.hasState(state)
     })
   }
@@ -106,7 +106,7 @@ export default class Graph extends EventEmitter {
     return this.nodeController.findNodeBySlot(id)
   }
 
-  refreshNode(id: string): void {
+  public refreshNode(id: string): void {
     const node = this.nodeController.findNode(id)
     if (!node) {
       return console.warn(`can't find node where id is '${id}'`)
@@ -115,7 +115,7 @@ export default class Graph extends EventEmitter {
     this.emit('afternoderefresh', node.model)
   }
 
-  updateNode(id: string, model: INodeModel): void {
+  public updateNode(id: string, model: INodeModel): void {
     const node = this.nodeController.findNode(id)
     if (!node) {
       return console.warn(`can't find node where id is '${id}'`)
@@ -124,7 +124,7 @@ export default class Graph extends EventEmitter {
     this.emit('afternodeupdate', model)
   }
 
-  deleteNode(id: string, stack = true): INode | undefined {
+  public deleteNode(id: string, stack = true): INode | undefined {
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
@@ -132,7 +132,7 @@ export default class Graph extends EventEmitter {
     }
     const stackData = {
       nodes: [node.model],
-      edges: node.edges.map((edge) => edge.model as IEdgeModel),
+      edges: node.getEdges().map(edge => edge.model as IEdgeModel)
     }
     this.nodeController.deleteNode(id)
     this.emit('afterdeletenode', node.model)
@@ -160,7 +160,7 @@ export default class Graph extends EventEmitter {
     return this.nodeController.slotsMap[String(id)]
   }
 
-  getEdges(): IEdge[] {
+  public getEdges(): IEdge[] {
     return this.edgeController.edges
   }
 
@@ -169,12 +169,12 @@ export default class Graph extends EventEmitter {
   }
 
   public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter((item) => {
+    return this.getEdges().filter(item => {
       return item.hasState(state)
     })
   }
 
-  updateEdge(id: string, model: IEdgeModel): void {
+  public updateEdge(id: string, model: IEdgeModel): void {
     const edge = this.edgeController.findEdge(id)
     if (!edge) {
       return console.warn(`can't find edge where id is '${id}'`)
@@ -183,7 +183,7 @@ export default class Graph extends EventEmitter {
     this.emit('afteredgeupdate', edge.model)
   }
 
-  deleteEdge(id: string, stack: boolean = true): IEdge | undefined {
+  public deleteEdge(id: string, stack: boolean = true): IEdge | undefined {
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
@@ -206,9 +206,9 @@ export default class Graph extends EventEmitter {
     return edge
   }
 
-  getData(): IDataModel {
-    const nodes = this.getNodes().map((node) => node.model)
-    const edges = this.getEdges().map((edge) => edge.model) as IEdgeModel[]
+  public getData(): IDataModel {
+    const nodes = this.getNodes().map(node => node.model)
+    const edges = this.getEdges().map(edge => edge.model)
     return { nodes, edges }
   }
 
@@ -222,7 +222,7 @@ export default class Graph extends EventEmitter {
   public getTranslate() {
     return {
       x: this.viewController.transform.translateX,
-      y: this.viewController.transform.translateY,
+      y: this.viewController.transform.translateY
     }
   }
 
@@ -242,15 +242,15 @@ export default class Graph extends EventEmitter {
     return this.viewController.zoom(value)
   }
 
-  resize() {
+  public resize() {
     this.viewController.resize()
   }
 
-  fitView() {
+  public fitView() {
     this.viewController.fitView()
   }
   // 加载数据
-  data(data: IDataModel | INodeModel) {
+  public data(data: IDataModel | INodeModel) {
     if (Object.keys(data).length === 0) {
       return
     }
@@ -262,12 +262,12 @@ export default class Graph extends EventEmitter {
     let imodel: IDataModel = { nodes: [], edges: [] }
     imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
     const needLayout = imodel.nodes.every(
-      (node) => !Number.isFinite(node.x) && !Number.isFinite(node.y)
+      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    imodel.nodes.forEach((node) =>
+    imodel.nodes.forEach(node =>
       Object.assign(node, {
         x: node.x || 1,
-        y: node.y || 1,
+        y: node.y || 1
       })
     )
     // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
@@ -279,11 +279,11 @@ export default class Graph extends EventEmitter {
     this.emit('datachange')
   }
 
-  fitCenter() {
+  public fitCenter() {
     this.viewController.translateToCenter()
   }
 
-  fullScreen(el?: HTMLElement) {
+  public fullScreen(el?: HTMLElement) {
     this.viewController.fullScreen(el)
   }
 
@@ -302,38 +302,38 @@ export default class Graph extends EventEmitter {
     this.emit('afterlayout')
   }
 
-  removeAction(action?: string | string[]) {
+  public removeAction(action?: string | string[]) {
     this.eventController.removeBehavior(action)
   }
 
-  addAction(actions: string | string[]) {
+  public addAction(actions: string | string[]) {
     this.eventController.addBehavior(
       Array.isArray(actions) ? actions : [actions]
     )
   }
 
-  undo() {
+  public undo() {
     this.stackController.undo()
   }
 
-  redo() {
+  public redo() {
     this.stackController.redo()
   }
 
-  pushStack(type: string, data: IDataStack, stackType = 'undo') {
+  public pushStack(type: string, data: IDataStack, stackType = 'undo') {
     this.stackController.pushStack(type, data, stackType)
     this.emit('stackchange')
   }
 
-  getUndoStack(): IStack[] {
+  public getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }
 
-  getRedoStack(): IStack[] {
+  public getRedoStack(): IStack[] {
     return this.stackController.redoStack
   }
 
-  detectDirectedCycle() {
+  public detectDirectedCycle() {
     return detectDirectedCycle(this.getData())
   }
 

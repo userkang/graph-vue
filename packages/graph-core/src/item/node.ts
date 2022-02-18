@@ -56,8 +56,29 @@ export default class Node extends Base {
     return this.get('slots')
   }
 
-  public get edges(): IEdge[] {
+  public getEdges(): IEdge[] {
     return this.get('edges')
+  }
+
+  public getInEdges() {
+    return this.getEdges().filter(edge => edge.toNode.id === this.id)
+  }
+
+  public getOutEdges() {
+    return this.getEdges().filter(edge => edge.fromNode.id === this.id)
+  }
+
+  public getNeighbors() {
+    const nodes = []
+    this.getInEdges().forEach(edge => {
+      nodes.push([edge.fromNode])
+    })
+
+    this.getOutEdges().forEach(edge => {
+      nodes.push([edge.toNode])
+    })
+
+    return nodes
   }
 
   public addEdge(edge: IEdge) {
@@ -65,7 +86,7 @@ export default class Node extends Base {
   }
 
   public deleteEdge(id: string) {
-    const edges = this.edges
+    const edges = this.getEdges()
     const index = edges.findIndex(item => item.id === id)
 
     if (index > -1) {
@@ -104,7 +125,7 @@ export default class Node extends Base {
 
     this.updateSlots()
 
-    this.edges.forEach(edge => {
+    this.getEdges().forEach(edge => {
       edge.update()
     })
   }
@@ -116,7 +137,7 @@ export default class Node extends Base {
     const view = this.get('view')
     view.update(this)
 
-    this.edges.forEach(edge => {
+    this.getEdges().forEach(edge => {
       edge.refresh()
     })
   }

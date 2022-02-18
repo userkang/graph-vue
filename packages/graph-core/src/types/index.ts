@@ -34,9 +34,9 @@ export interface INodeModel {
 export interface IEdgeModel {
   id?: string
   // 源节点ID
-  fromNodeId: string
+  fromNodeId?: string
   // 目标节点ID
-  toNodeId: string
+  toNodeId?: string
   fromSlotId?: string
   toSlotId?: string
   [key: string]: any

@@ -13,7 +13,7 @@ export default class EdgeController {
   }
 
   get edges() {
-    return Object.keys(this._edges).map(id => this._edges[id])
+    return Object.values(this._edges)
   }
 
   public findEdge(id: string | number): IEdge | undefined {
@@ -40,11 +40,11 @@ export default class EdgeController {
     edge.toNode.deleteEdge(id)
 
     // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    if (!fromNode.edges.find(item => item.fromSlot.id === fromSlot.id)) {
+    if (!fromNode.getEdges().find((item) => item.fromSlot.id === fromSlot.id)) {
       fromSlot.clearState('linked')
     }
 
-    if (!toNode.edges.find(item => item.toSlot.id === toSlot.id)) {
+    if (!toNode.getEdges().find((item) => item.toSlot.id === toSlot.id)) {
       toSlot.clearState('linked')
     }
 

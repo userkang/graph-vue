@@ -69,7 +69,7 @@ export default class ComponentPanel extends Vue {
     {
       id: getRandomId(),
       type: demoTypes.DEFAULT,
-      desc: '默认',
+      desc: 'dag 图',
       img: demoDefault
     },
     {

@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Prop, Vue } from 'vue-property-decorator'
 
 @Component
 export default class ToolTip extends Vue {
@@ -61,10 +61,10 @@ export default class ToolTip extends Vue {
       const tooltipShift = 20
       const tooltip = document.createElement('div')
       tooltip.classList.add('tooltip')
-      tooltip.innerHTML = `<span>${this.message}</span>`
+      tooltip.innerHTML = `<div>${this.message}</div>`
 
       tooltip.style.height = `${tooltipHeight}px`
-      tooltip.style.lineHeight = `${tooltipHeight}px`
+      // tooltip.style.lineHeight = `${tooltipHeight}px`
 
       switch (this.placement) {
         case 'top':

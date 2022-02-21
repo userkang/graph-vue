@@ -49,6 +49,7 @@ export default class Menu extends Vue {
 
   hiddenMenu() {
     if (this.value) {
+      console.log(this.value)
       this.$emit('input', false)
     }
   }

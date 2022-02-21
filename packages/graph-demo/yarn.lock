@@ -722,12 +722,14 @@
   dependencies:
     dagre "0.8.5"
 
-"@datafe/graph-vue@0.1.7":
-  version "0.1.7"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.7.tgz#93c63b685ae06e00923cb5f924d986020bff2fa7"
-  integrity sha1-k8Y7aFrgbgCSPLX5JNmGAgv/L6c=
+"@datafe/graph-vue@0.1.8":
+  version "0.1.8"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.8.tgz#8343c22d62fa57bfb0616b10658186b1d6f5b16e"
+  integrity sha1-g0PCLWL6V7+wYWsQZYGGsdb1sW4=
   dependencies:
     "@datafe/graph-core" "^0.3.13-beta.2"
+    vue-class-component "^6.0.0"
+    vue-property-decorator "^7.0.0"
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -8190,11 +8192,6 @@ vue@2.6.12:
   version "2.6.12"
   resolved "http://r.npm.sankuai.com/vue/download/vue-2.6.12.tgz#f5ebd4fa6bd2869403e29a896aed4904456c9123"
   integrity sha1-9evU+mvShpQD4pqJau1JBEVskSM=
-
-vuex@^3.0.1:
-  version "3.6.2"
-  resolved "http://r.npm.sankuai.com/vuex/download/vuex-3.6.2.tgz#236bc086a870c3ae79946f107f16de59d5895e71"
-  integrity sha1-I2vAhqhww655lG8QfxbeWdWJXnE=
 
 watchpack-chokidar2@^2.0.1:
   version "2.0.1"

@@ -3,7 +3,7 @@ import { dagMock, treeMock } from '@/mock/graph'
 
 class Graph {
   public state = {
-    graph: {}
+    graph: null
   }
 
   public getData() {

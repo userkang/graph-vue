@@ -41,7 +41,9 @@ export default class ToolBox extends Vue {
   redoEnable = false
 
   handleChange(e: MouseEvent) {
-    const { graph } = this
+    if (!this.graph) {
+      return
+    }
     const id = (e.target as HTMLElement).id
     switch (id) {
       case 'undo':
@@ -66,7 +68,7 @@ export default class ToolBox extends Vue {
         this.graph.fullScreen()
         break
       case 'layout':
-        graph.layout()
+        this.graph.layout()
         break
       case 'fitView':
         this.graph.fitView()
@@ -107,5 +109,3 @@ export default class ToolBox extends Vue {
   }
 }
 </script>
-
-<style lang="scss" scoped></style>

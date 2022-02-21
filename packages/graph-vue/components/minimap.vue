@@ -25,7 +25,6 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import GraphContent from './graph.vue'
 
 const generateCursor = (cursor: string) => {
   const styleElement = document.createElement('style')

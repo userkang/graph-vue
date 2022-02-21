@@ -18,7 +18,6 @@
           :action="action"
           :layout="layout"
           @drop="handleDrop"
-          @nodeselectchange="handleNodeSelectChange"
         >
           <template #node="{ node }">
             <div
@@ -62,13 +61,14 @@
           <template #default="{ graph }">
             <MiniMap :graph="graph"></MiniMap>
             <ToolBox :graph="graph" class="tool-box"></ToolBox>
-            <Menu class="menu" v-model="menuShow">
-              <li @click="deleteItem">删除</li>
-              <li @click="deleteItem">删除</li>
-            </Menu>
           </template>
         </GraphVue>
       </div>
+
+      <Menu class="menu" v-model="menuShow">
+        <li @click="deleteItem">删除</li>
+        <li @click="deleteItem">删除</li>
+      </Menu>
 
       <ConfigPanel />
     </div>
@@ -107,17 +107,17 @@ export default class GraphEditor extends Vue {
     await GraphStore.getData()
   }
 
+  get graph() {
+    this.graphState.graph = (this.$refs.graph as GraphVue).graph
+    return this.graphState.graph
+  }
+
   get dataMock() {
     return this.graphConfigState.data
   }
 
   get action() {
     return this.graphConfigState.action
-  }
-
-  get graph() {
-    this.graphState.graph = (this.$refs.graph as any).graph
-    return this.graphState.graph as Graph
   }
 
   get layout() {

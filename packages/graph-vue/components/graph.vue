@@ -42,9 +42,8 @@
         style="fill: #4e73ff; stroke: #606be1; stroke-width: 1px; opacity: 0.3"
       />
     </svg>
-    <template v-if="graph">
-      <slot :graph="graph"></slot>
-    </template>
+
+    <slot v-if="graph" :graph="graph"></slot>
   </div>
 </template>
 
@@ -73,7 +72,7 @@ import { Graph, IDataModel } from '@datafe/graph-core'
     NewEdge
   }
 })
-export default class GrapVue extends Vue {
+export default class GraphVue extends Vue {
   @Prop({ default: () => [], type: Array })
   action: string[]
 

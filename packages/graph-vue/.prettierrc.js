@@ -7,14 +7,5 @@ module.exports = {
   singleQuote: true,
   tabWidth: 2,
   useTabs: false,
-  arrowParens: 'avoid',
-  overrides: [
-    {
-      files: ['src/**/*.vue'],
-      options: {
-        printWidth: 80,
-        htmlWhitespaceSensitivity: 'ignore'
-      }
-    }
-  ]
+  arrowParens: 'avoid'
 }

@@ -144,7 +144,6 @@ export const treeMock = () => {
   ]
   treeNodes[3].children = [treeNodes[6], treeNodes[7]]
   treeNodes[7].children = [treeNodes[11]]
-  treeNodes[11].children = [treeNodes[14]]
   treeNodes[4].children = [treeNodes[8]]
   treeNodes[8].children = [treeNodes[12]]
   treeNodes[5].children = [treeNodes[9], treeNodes[10]]

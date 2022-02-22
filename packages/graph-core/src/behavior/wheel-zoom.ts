@@ -22,7 +22,7 @@ export default class WheelZoom extends Base {
         ratio -= ratio * 0.05
       }
 
-      this.graph.zoom(ratio)
+      this.graph.zoom(ratio, e)
     }
   }
 }

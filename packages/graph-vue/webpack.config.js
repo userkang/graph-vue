@@ -45,7 +45,15 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      // '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+      '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+    }
+  },
+  externals: {
+    vue: {
+      root: 'Vue',
+      commonjs: 'vue',
+      commonjs2: 'vue',
+      amd: 'vue'
     }
   },
   plugins: [new VueLoaderPlugin()]

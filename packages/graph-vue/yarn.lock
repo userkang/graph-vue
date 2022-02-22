@@ -3758,7 +3758,7 @@ vm-browserify@^1.0.1:
   resolved "http://r.npm.sankuai.com/vm-browserify/download/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha1-eGQcSIuObKkadfUR56OzKobl3aA=
 
-vue-class-component@^6.0.0, vue-class-component@^6.2.0:
+vue-class-component@^6.2.0:
   version "6.3.2"
   resolved "http://r.npm.sankuai.com/vue-class-component/download/vue-class-component-6.3.2.tgz#e6037e84d1df2af3bde4f455e50ca1b9eec02be6"
   integrity sha1-5gN+hNHfKvO95PRV5Qyhue7AK+Y=

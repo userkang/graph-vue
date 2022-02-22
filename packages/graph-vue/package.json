@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-vue",
-  "version": "0.1.8",
+  "version": "0.1.8-beta.1",
   "scripts": {
     "build": "webpack --config webpack.config.js"
   },
@@ -16,9 +16,7 @@
     "vue": "2.6.12"
   },
   "dependencies": {
-    "@datafe/graph-core": "^0.3.13-beta.2",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0"
+    "@datafe/graph-core": "^0.3.13-beta.2"
   },
   "devDependencies": {
     "lint-staged": "^7.2.2",
@@ -30,6 +28,7 @@
     "ts-loader": "8.2.0",
     "vue": "2.6.12",
     "vue-template-compiler": "2.6.12",
+    "vue-property-decorator": "^7.0.0",
     "webpack": "^4.41.4",
     "webpack-bundle-analyzer": "^3.0.3",
     "webpack-cli": "^4.1.0"

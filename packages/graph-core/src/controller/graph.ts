@@ -238,8 +238,8 @@ export default class Graph extends EventEmitter {
     return this.viewController.getZoom()
   }
 
-  public zoom(value: number) {
-    return this.viewController.zoom(value)
+  public zoom(value: number, e?: WheelEvent) {
+    return this.viewController.zoom(value, e)
   }
 
   public resize() {

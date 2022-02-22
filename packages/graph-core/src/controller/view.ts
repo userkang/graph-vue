@@ -42,13 +42,21 @@ export default class ViewController {
     return this.transform.scale
   }
 
-  public zoom(value: number) {
+  public zoom(value: number, e?: WheelEvent) {
     const zoom = this.getZoom()
     if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
+      let dx = 0
+      let dy = 0
+      if (e) {
+        const svgInfo = this.svgInfo
+        const zoomChange = 1 / zoom - 1 / value
+        dx = (svgInfo.x + svgInfo.width / 2 - e.x) * zoomChange
+        dy = (svgInfo.y + svgInfo.height / 2 - e.y) * zoomChange
+      }
       this.transform.scale = value
-      this.translateBy(0, 0)
+      this.translateBy(dx, dy)
       this.caculateOffset()
-      this.graph.emit('afterzoom', value)
+      this.graph.emit('afterzoom', value, e)
     }
   }
 

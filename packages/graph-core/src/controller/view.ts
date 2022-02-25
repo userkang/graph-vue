@@ -34,7 +34,7 @@ export default class ViewController {
     this.graph = graph
     this.$svg = graph.cfg.container.querySelector('svg')
     ;/Safari/.test(navigator.userAgent)
-      ? setTimeout(() => this.resize())
+      ? setTimeout(() => this.resize(), 3000)
       : this.resize()
   }
 
@@ -183,7 +183,6 @@ export default class ViewController {
       this.transform.translateX,
       this.transform.translateY
     )
-    // this.fixMissView()
   }
 
   fixMissView() {

@@ -183,7 +183,7 @@ export default class ViewController {
       this.transform.translateX,
       this.transform.translateY
     )
-    this.fixMissView()
+    // this.fixMissView()
   }
 
   fixMissView() {

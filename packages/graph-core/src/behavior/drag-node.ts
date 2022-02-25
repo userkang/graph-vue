@@ -40,6 +40,7 @@ export default class DragNode extends Base {
     this.activeNode = this.graph.findNode(id)
     if (this.activeNode) {
       this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
+      this.moveNode = [this.activeNode]
     }
     this.originX = this.startX = e.x
     this.originY = this.startY = e.y
@@ -60,8 +61,9 @@ export default class DragNode extends Base {
       this.moveY = y - this.startY
 
       this.moveNode.forEach(item => {
-        const posX = item.x + this.moveX / this.graph.getZoom()
-        const posY = item.y + this.moveY / this.graph.getZoom()
+        const zoom = this.graph.getZoom()
+        const posX = item.x + this.moveX / zoom
+        const posY = item.y + this.moveY / zoom
         item.updatePosition(posX, posY)
       })
 
@@ -98,7 +100,6 @@ export default class DragNode extends Base {
       return
     }
 
-    this.moveNode = [this.activeNode]
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
     if (this.activeNode.hasState('selected')) {
       const selectedNode = this.graph.findNodeByState('selected')

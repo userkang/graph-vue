@@ -43,7 +43,7 @@ export default class ViewController {
 
   public zoom(value: number, e?: WheelEvent) {
     const zoom = this.getZoom()
-    if ((zoom < value && zoom < 2) || (zoom > value && zoom > 0.5)) {
+    if ((zoom < value && zoom < 5) || (zoom > value && zoom > 0.2)) {
       let dx = 0
       let dy = 0
       if (e) {

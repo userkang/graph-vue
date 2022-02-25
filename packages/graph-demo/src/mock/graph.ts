@@ -1,7 +1,5 @@
-import { INodeModel } from '@datafe/graph-core'
-
 let nextId = 0
-const generateTreeNode = (): INodeModel => {
+const generateTreeNode = () => {
   const nodeId = nextId++
   const id = String(nodeId)
   return {
@@ -141,7 +139,7 @@ export const treeMock = (times: number) => {
   const head = generateTreeNode()
   const stack = [head]
   for (let i = 0; i < times; i++) {
-    const node = stack.shift()
+    const node = stack.shift() as any
     node.children = [generateTreeNode(), generateTreeNode()]
     stack.push(node.children[0], node.children[1])
   }

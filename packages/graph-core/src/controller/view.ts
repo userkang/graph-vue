@@ -183,6 +183,14 @@ export default class ViewController {
       this.transform.translateX,
       this.transform.translateY
     )
+    this.fixMissView()
+  }
+
+  fixMissView() {
+    const visiableDom = this.$svg.querySelector('g[graph-type=slot]')
+    if(visiableDom) {
+      visiableDom.innerHTML = visiableDom.innerHTML
+    }
   }
 
   getPointByClient(originX: number, originY: number) {

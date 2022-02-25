@@ -23,6 +23,7 @@
             <div
               class="node-container"
               :style="{
+                'content-visibility': 'auto',
                 'border-color': node.hasState('selected')
                   ? '#db3737'
                   : '#DEDFEC'
@@ -43,7 +44,7 @@
             <text
               :x="text(edge).x"
               :y="text(edge).y"
-              style="text-anchor: middle; fill: #aaa; font-size: 12px"
+              style="text-anchor: middle; fill: #aaa; font-size: 12px;"
             >
               tag
             </text>

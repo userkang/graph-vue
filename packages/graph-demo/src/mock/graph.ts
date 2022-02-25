@@ -134,19 +134,16 @@ export const dagMock = () => {
   }
 }
 
-export const treeMock = () => {
-  const treeNodes = new Array(14).fill(1).map(i => generateTreeNode())
-  treeNodes[1].children = [
-    treeNodes[2],
-    treeNodes[3],
-    treeNodes[4],
-    treeNodes[5]
-  ]
-  treeNodes[3].children = [treeNodes[6], treeNodes[7]]
-  treeNodes[7].children = [treeNodes[11]]
-  treeNodes[4].children = [treeNodes[8]]
-  treeNodes[8].children = [treeNodes[12]]
-  treeNodes[5].children = [treeNodes[9], treeNodes[10]]
-  treeNodes[9].children = [treeNodes[13]]
-  return treeNodes[1]
+export const treeMock = (times: number) => {
+  if (times <= 1) {
+    return
+  }
+  const head = generateTreeNode()
+  const stack = [head]
+  for (let i = 0; i < times; i++) {
+    const node = stack.shift()
+    node.children = [generateTreeNode(), generateTreeNode()]
+    stack.push(node.children[0], node.children[1])
+  }
+  return head
 }

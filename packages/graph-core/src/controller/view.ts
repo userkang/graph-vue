@@ -34,7 +34,7 @@ export default class ViewController {
     this.graph = graph
     this.$svg = graph.cfg.container.querySelector('svg')
     ;/Safari/.test(navigator.userAgent)
-      ? setTimeout(() => this.resize(), 3000)
+      ? setTimeout(() => this.resize())
       : this.resize()
   }
 

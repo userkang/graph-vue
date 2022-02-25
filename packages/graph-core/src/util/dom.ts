@@ -1,5 +1,7 @@
-export const getEventPath = (event: Event): EventTarget[] => {
-  return event['path'] || (event['composedPath'] && event['composedPath']())
+export const getEventPath = (
+  event: Event & { path?: EventTarget[] }
+): EventTarget[] => {
+  return event.path || (event['composedPath'] && event['composedPath']())
 }
 
 export const isTarget = (e: MouseEvent, type: string) => {
@@ -21,7 +23,7 @@ export const isTarget = (e: MouseEvent, type: string) => {
 export const addEventListener = (
   target: HTMLElement | Window | SVGSVGElement,
   eventType: string,
-  callback: () => void
+  callback: (args: any) => void
 ) => {
   if (target) {
     if (typeof target.addEventListener === 'function') {
@@ -45,7 +47,7 @@ export const getItemData = (e: MouseEvent) => {
   while (target !== currentTarget) {
     if (target.getAttribute('graph-type')) {
       const attrNames = target.getAttributeNames()
-      const data = {}
+      const data: Record<string, string | null> = {}
       attrNames.forEach(item => {
         if (/graph-(.+)/.test(item)) {
           const type = item.replace('graph-', '')
@@ -62,7 +64,7 @@ export const getItemData = (e: MouseEvent) => {
 }
 
 export const getItemType = (e: MouseEvent) => {
-  let type = ''
+  let type: string | null | false = ''
   const path = getEventPath(e)
   for (const target of path) {
     type = target instanceof Element && target.getAttribute('graph-type')

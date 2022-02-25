@@ -1,11 +1,13 @@
 import Element from './element'
 
 export default class Group extends Element {
-  attrs = {}
+  attrs: { [key: string]: string } = {}
 
   constructor(attrs?: { [key: string]: string }) {
     super()
-    this.attrs = attrs
+    if (attrs) {
+      this.attrs = attrs
+    }
     this.draw()
   }
 

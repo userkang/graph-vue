@@ -15,8 +15,13 @@ export default class Stack {
     this.graph = graph
   }
 
+  public clearStack() {
+    this.undoStack = []
+    this.redoStack = []
+  }
+
   public pushStack(type: string, data: IDataStack, stackType = 'undo') {
-    let stack = []
+    let stack: IStack[] = []
     if (stackType === 'undo') {
       stack = this.undoStack
     } else {
@@ -41,42 +46,56 @@ export default class Stack {
     switch (stack.type) {
       case 'addNode':
         newData = stack.data
-        stack.data.nodes.forEach(item => {
-          this.graph.deleteNode(item.id, false)
-        })
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.deleteNode(item.id as string, false)
+          })
+        }
         break
       case 'deleteNode':
         newData = stack.data
-        stack.data.nodes.forEach(item => {
-          this.graph.addNode(item, false)
-        })
-        stack.data.edges.forEach(item => {
-          this.graph.addEdge(item, false)
-        })
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.addNode(item, false)
+          })
+        }
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.addEdge(item, false)
+          })
+        }
         break
       case 'addEdge':
         newData = stack.data
-        stack.data.edges.forEach(item => {
-          this.graph.deleteEdge(item.id, false)
-        })
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.deleteEdge(item.id as string, false)
+          })
+        }
         break
       case 'deleteEdge':
         newData = stack.data
-        stack.data.edges.forEach(item => {
-          this.graph.addEdge(item, false)
-        })
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.addEdge(item, false)
+          })
+        }
         break
       case 'updateNodePosition':
-        stack.data.nodes.forEach(item => {
-          this.graph.getNodes().forEach(node => {
-            if (String(item.id) === node.id) {
-              // 保存位置改变前的位置
-              newData.nodes.push({ ...node.model })
-              const { x, y } = item
-              node.updatePosition(x as number, y as number)
-            }
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.getNodes().forEach(node => {
+              if (String(item.id) === node.id) {
+                // 保存位置改变前的位置
+                if (newData.nodes) {
+                  newData.nodes!.push({ ...node.model })
+                }
+                const { x, y } = item
+                node.updatePosition(x as number, y as number)
+              }
+            })
           })
-        })
+        }
         this.graph.emit('afterdragnode', clone(stack.data.nodes))
         break
     }
@@ -95,42 +114,57 @@ export default class Stack {
     switch (stack.type) {
       case 'addNode':
         newData = stack.data
-        stack.data.nodes.forEach(item => {
-          this.graph.addNode(item, false)
-        })
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.addNode(item, false)
+          })
+        }
         break
       case 'deleteNode':
         newData = stack.data
-        stack.data.edges.forEach(item => {
-          this.graph.deleteEdge(item.id, false)
-        })
-        stack.data.nodes.forEach(item => {
-          this.graph.deleteNode(item.id, false)
-        })
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.deleteEdge(item.id as string, false)
+          })
+        }
+
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.deleteNode(item.id as string, false)
+          })
+        }
         break
       case 'addEdge':
         newData = stack.data
-        stack.data.edges.forEach(item => {
-          this.graph.addEdge(item, false)
-        })
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.addEdge(item, false)
+          })
+        }
         break
       case 'deleteEdge':
         newData = stack.data
-        stack.data.edges.forEach(item => {
-          this.graph.deleteEdge(item.id, false)
-        })
+        if (stack.data.edges) {
+          stack.data.edges.forEach(item => {
+            this.graph.deleteEdge(item.id as string, false)
+          })
+        }
         break
       case 'updateNodePosition':
-        stack.data.nodes.forEach(item => {
-          this.graph.getNodes().forEach(node => {
-            if (String(item.id) === node.id) {
-              // 保存位置改变前的位置
-              newData.nodes.push({ ...node.model })
-              const { x, y } = item
-              node.updatePosition(x as number, y as number)
-            }
+        if (stack.data.nodes) {
+          stack.data.nodes.forEach(item => {
+            this.graph.getNodes().forEach(node => {
+              if (String(item.id) === node.id) {
+                // 保存位置改变前的位置
+                if (newData.nodes) {
+                  newData.nodes.push({ ...node.model })
+                }
+                const { x, y } = item
+                node.updatePosition(x as number, y as number)
+              }
+            })
           })
-        })
+        }
 
         this.graph.emit('afterdragnode', clone(stack.data.nodes))
         break

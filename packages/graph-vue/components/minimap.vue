@@ -42,8 +42,8 @@ export default class Minimap extends Vue {
 
   canGraphChage = true
   svgHTML = ''
-  prevMousePosition?: { x: number; y: number }
-  prevVpmove?: { x: number; y: number }
+  prevMousePosition: { x: number; y: number } = { x: 0, y: 0 }
+  prevVpmove: { x: number; y: number } = { x: 0, y: 0 }
   cursorMove = generateCursor('move')
   cursorResize = generateCursor('nwse-resize')
 

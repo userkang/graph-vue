@@ -8,7 +8,7 @@ export default class DragNode extends Base {
   isMoving = false
 
   // 当前拖动节点
-  activeNode!: Node
+  activeNode!: Node | undefined
   // 移动的节点
   moveNode: Node[] = []
   stackNode: INodeModel[] = []
@@ -38,7 +38,9 @@ export default class DragNode extends Base {
   mouseDown(e: MouseEvent, data: { id: string }) {
     const { id } = data
     this.activeNode = this.graph.findNode(id)
-    this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
+    if (this.activeNode) {
+      this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
+    }
     this.originX = this.startX = e.x
     this.originY = this.startY = e.y
 
@@ -92,6 +94,10 @@ export default class DragNode extends Base {
   }
 
   checkActiveNodeIsSelected() {
+    if (!this.activeNode) {
+      return
+    }
+
     this.moveNode = [this.activeNode]
     // 来确保移动节点独立于选中逻辑，判断当前正在移动节点是否被选中
     if (this.activeNode.hasState('selected')) {

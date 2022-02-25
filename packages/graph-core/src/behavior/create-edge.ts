@@ -1,10 +1,10 @@
+import { INode, ISlot } from '../types'
 import Graph from '../controller/graph'
-import Slot from '../item/slot'
 import Base from './base'
 
 export default class CreateEdge extends Base {
-  fromSlot = null
-  fromNode = null
+  fromSlot!: ISlot
+  fromNode!: INode
   isMoveing = false
   createEdge = {
     fromPoint: {
@@ -33,7 +33,12 @@ export default class CreateEdge extends Base {
     const { id } = data
     // 初始化连线的起点和移动位置
     const slot = this.graph.findSlot(id)
-    if (slot.type === 'in') {
+    if (!slot || slot.type === 'in') {
+      return
+    }
+
+    const fromNode = this.graph.findNode(slot.nodeId)
+    if (!fromNode) {
       return
     }
 
@@ -41,7 +46,7 @@ export default class CreateEdge extends Base {
     this.setNewEdgeStart(x, y)
     this.setNewEdgeMove(x, y)
     this.fromSlot = slot
-    this.fromNode = this.graph.findNode(slot.nodeId)
+    this.fromNode = fromNode
     this.setEnableSlot()
     this.graph.emit('beforeaddedge')
   }
@@ -60,10 +65,18 @@ export default class CreateEdge extends Base {
     const { id } = data
     const slot = this.graph.findSlot(id)
 
+    if (!slot) {
+      return
+    }
+
     if (slot.hasState('enable')) {
       // 这里要传 model 下的 id，保证用户数据类型正确
       // 当 model 下无 id 时，再取自生成 id
       const node = this.graph.findNode(slot.nodeId)
+
+      if (!node) {
+        return
+      }
 
       const edgeInfo = {
         fromNodeId: this.fromNode.model.id || this.fromNode.id,
@@ -112,7 +125,7 @@ export default class CreateEdge extends Base {
     })
   }
 
-  isDirectLinked(slot: Slot) {
+  isDirectLinked(slot: ISlot) {
     let linked = false
 
     for (const item of this.fromNode.getEdges()) {

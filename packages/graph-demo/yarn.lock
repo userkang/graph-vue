@@ -7820,6 +7820,11 @@ tslib@^1.8.0, tslib@^1.8.1, tslib@^1.9.0:
   resolved "http://r.npm.sankuai.com/tslib/download/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
   integrity sha1-zy04vcNKE0vK8QkcQfZhni9nLQA=
 
+tslib@^2.3.1:
+  version "2.3.1"
+  resolved "http://r.npm.sankuai.com/tslib/download/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
+  integrity sha1-6KM1rdXOrlGqJh0ypJAVjvBC7wE=
+
 tslint@^5.15.0:
   version "5.20.1"
   resolved "http://r.npm.sankuai.com/tslint/download/tslint-5.20.1.tgz#e401e8aeda0152bc44dd07e614034f3f80c67b7d"
@@ -7881,10 +7886,10 @@ typedarray@^0.0.6:
   resolved "http://r.npm.sankuai.com/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.1.3:
-  version "3.9.10"
-  resolved "http://r.npm.sankuai.com/typescript/download/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
-  integrity sha1-cPORCselHta+952ngAaQsZv3eLg=
+typescript@^4.5.4:
+  version "4.5.5"
+  resolved "http://r.npm.sankuai.com/typescript/download/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
+  integrity sha1-2MlTgy0okkqePTfHPXKchGxYlvM=
 
 uglify-js@3.4.x:
   version "3.4.10"

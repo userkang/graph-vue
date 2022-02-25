@@ -39,7 +39,7 @@ import { Graph, ILayout } from '@datafe/graph-core'
 
 @Component
 export default class ConfigPanel extends Vue {
-  editor = null
+  editor: editor.IStandaloneCodeEditor = null as any
   graphConfigState = GraphConfigStore.state
   graphState = GraphStore.state
   actionList = {
@@ -49,36 +49,39 @@ export default class ConfigPanel extends Vue {
     'create-edge': '创建边',
     'wheel-move': '滚轮移动画布',
     'wheel-zoom': '双指缩放',
-    'brush-select': '框选',
+    'brush-select': '框选'
   }
 
   async mounted() {
-    this.editor = await editor.create(document.getElementById('dataContent'), {
-      value: JSON.stringify(this.graphConfigState.data, null, ' '),
-      language: 'mysql',
-      lineNumbers: 'off', // 不要行号
-      scrollBeyondLastLine: false, // 去掉最后一行后面的空白
-      overviewRulerBorder: false, // 不要滚动条的边框
-      scrollbar: {
-        horizontalHasArrows: false,
-        verticalScrollbarSize: 4,
-        horizontal: 'hidden',
-      },
-      minimap: {
-        enabled: false,
-      },
-      folding: false,
-      contextmenu: false,
-      tabSize: 1,
-      lineDecorationsWidth: 0,
-      automaticLayout: true,
-      theme: 'vs-dark',
-      renderIndentGuides: false,
-    })
+    this.editor = await editor.create(
+      document.getElementById('dataContent') as HTMLElement,
+      {
+        value: JSON.stringify(this.graphConfigState.data, null, ' '),
+        language: 'mysql',
+        lineNumbers: 'off', // 不要行号
+        scrollBeyondLastLine: false, // 去掉最后一行后面的空白
+        overviewRulerBorder: false, // 不要滚动条的边框
+        scrollbar: {
+          horizontalHasArrows: false,
+          verticalScrollbarSize: 4,
+          horizontal: 'hidden'
+        },
+        minimap: {
+          enabled: false
+        },
+        folding: false,
+        contextmenu: false,
+        tabSize: 1,
+        lineDecorationsWidth: 0,
+        automaticLayout: true,
+        theme: 'vs-dark',
+        renderIndentGuides: false
+      }
+    )
 
     const graph = this.graphState.graph as Graph
 
-    this.editor.onDidBlurEditorText((e) => {
+    this.editor.onDidBlurEditorText(() => {
       try {
         const content = JSON.parse(this.editor.getValue())
         this.graphConfigState.data = content
@@ -87,14 +90,14 @@ export default class ConfigPanel extends Vue {
       }
     })
     graph.on('datachange', () => {
-      const nodes = graph.getNodes().map((item) => item.model)
-      const edges = graph.getEdges().map((item) => item.model)
+      const nodes = graph.getNodes().map(item => item.model)
+      const edges = graph.getEdges().map(item => item.model)
       this.editor.setValue(JSON.stringify({ nodes, edges }, null, ' '))
     })
   }
 
   beforeDestory() {
-    this.editor.destory()
+    this.editor.dispose()
   }
 }
 </script>

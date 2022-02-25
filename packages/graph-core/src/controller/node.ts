@@ -76,7 +76,7 @@ export default class NodeController {
   }
 
   public addNode(item: INodeModel): INode | undefined {
-    if (item.id in this._nodes) {
+    if (item.id && item.id in this._nodes) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
@@ -85,7 +85,7 @@ export default class NodeController {
     const direction = this.graph.get('direction')
 
     const node = new Node(item, nodeCfg, direction)
-    this._nodes[item.id] = node
+    this._nodes[node.id] = node
 
     // 渲染
     if (this.graph.get('isRender')) {
@@ -100,5 +100,10 @@ export default class NodeController {
   public data(group: INodeModel[]) {
     this._nodes = {}
     group.forEach(item => this.addNode(item))
+  }
+
+  public destroy() {
+    ;(this.graph as null | Graph) = null
+    this._nodes = {}
   }
 }

@@ -1,15 +1,24 @@
+import { IDataModel, INodeModel, IEdgeModel } from '../types/index'
+
+interface INodeWithId extends INodeModel {
+  id: string
+}
+interface IEdgeWithId extends IEdgeModel {
+  id: string
+}
+
 // 邻接矩阵
-let graph = {}
+let graph: Record<string, Record<string, number>> = {}
 // 结点个数和边的个数
 // 标记矩阵,0为当前结点未访问,1为访问过,-1表示当前结点后边的结点都被访问过。
-let visited = {}
+let visited: Record<string, number> = {}
 // 是否是DAG（有向无环图）
 let isDAG = true
-let nodes = []
-let edges = []
+let nodes: INodeWithId[] = []
+let edges: IEdgeWithId[] = []
 
 // 图的深度遍历函数
-function DFS(i) {
+function DFS(i: number) {
   visited[nodes[i].id] = 1
   for (let j = 0; j < nodes.length; j++) {
     // 如果当前结点有指向的结点
@@ -44,11 +53,13 @@ const create = () => {
     }
   }
   for (const edge of edges) {
-    graph[edge.fromNodeId][edge.toNodeId] = 1
+    if (edge.fromNodeId && edge.toNodeId) {
+      graph[edge.fromNodeId][edge.toNodeId] = 1
+    }
   }
 }
 
-const detectDirectedCycle = graphData => {
+const detectDirectedCycle = (graphData: IDataModel) => {
   // 邻接矩阵
   graph = {}
   // 结点个数和边的个数
@@ -57,8 +68,8 @@ const detectDirectedCycle = graphData => {
   // 是否是DAG（有向无环图）
   isDAG = true
 
-  nodes = graphData.nodes
-  edges = graphData.edges
+  nodes = graphData.nodes as INodeWithId[]
+  edges = graphData.edges as IEdgeWithId[]
 
   // 创建邻接矩阵
   create()

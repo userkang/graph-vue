@@ -17,6 +17,6 @@ export default class Port extends Vue {
   @Prop({
     required: true
   })
-  port: ISlot
+  port!: ISlot
 }
 </script>

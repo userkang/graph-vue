@@ -1,4 +1,3 @@
-import { NodeInfo } from '../types/index'
 import {
   isFullScreen,
   requestFullScreen,
@@ -32,7 +31,7 @@ export default class ViewController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    this.$svg = graph.cfg.container.querySelector('svg')
+    this.$svg = graph.cfg.container.querySelector('svg') as SVGElement
     ;/Safari/.test(navigator.userAgent)
       ? setTimeout(() => this.resize())
       : this.resize()
@@ -74,7 +73,7 @@ export default class ViewController {
     if (isFullScreen()) {
       cancelFullScreen()
     } else {
-      requestFullScreen(el || this.$svg.parentElement)
+      requestFullScreen(el || (this.$svg.parentElement as HTMLElement))
     }
     this.updateSvgInfo()
   }
@@ -207,5 +206,10 @@ export default class ViewController {
       this.translateBy(x, y)
       this.caculateOffset()
     }
+  }
+
+  destroy() {
+    ;(this.graph as null | Graph) = null
+    ;(this.$svg as SVGElement | null) = null
   }
 }

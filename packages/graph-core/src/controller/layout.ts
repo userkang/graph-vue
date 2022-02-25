@@ -1,16 +1,16 @@
-import { INodeModel } from '../types'
+import { ILayout, INodeModel } from '../types'
 import dagre from 'dagre'
 import Graph from './graph'
 
 export default class LayoutController {
   graph: Graph
-  dagre = null
+  dagre: any = null
 
   constructor(graph: Graph) {
     this.graph = graph
   }
 
-  init(options) {
+  init(options: ILayout) {
     const rankdir = this.graph.get('direction') || 'TB'
 
     this.dagre = new dagre.graphlib.Graph()
@@ -25,7 +25,7 @@ export default class LayoutController {
     })
   }
 
-  layout(options) {
+  layout(options: ILayout) {
     this.init(options)
 
     const nodes = this.graph.getNodes()
@@ -65,5 +65,10 @@ export default class LayoutController {
     this.graph.pushStack('updateNodePosition', { nodes: stackNode })
 
     this.graph.fitCenter()
+  }
+
+  destroy() {
+    this.dagre = null
+    ;(this.graph as null | Graph) = null
   }
 }

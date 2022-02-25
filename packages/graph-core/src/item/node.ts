@@ -69,13 +69,13 @@ export default class Node extends Base {
   }
 
   public getNeighbors() {
-    const nodes = []
+    const nodes: INode[] = []
     this.getInEdges().forEach(edge => {
-      nodes.push([edge.fromNode])
+      nodes.push(edge.fromNode)
     })
 
     this.getOutEdges().forEach(edge => {
-      nodes.push([edge.toNode])
+      nodes.push(edge.toNode)
     })
 
     return nodes

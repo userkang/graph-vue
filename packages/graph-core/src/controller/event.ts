@@ -41,7 +41,7 @@ export default class EventController {
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
   currentItemType = 'svg'
-  behaveInstance = {}
+  behaveInstance: { [key: string]: any } = {}
 
   // 移动前的坐标
   originX = 0
@@ -188,7 +188,10 @@ export default class EventController {
     this.eventQueue.forEach((item: any) => {
       item.remove()
     })
+    this.eventQueue = []
+    this.behaveInstance = []
 
     this.graph.off()
+    ;(this.graph as null | Graph) = null
   }
 }

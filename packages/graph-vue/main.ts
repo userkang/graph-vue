@@ -9,3 +9,4 @@ insertCss(content)
 
 export { GraphVue, ToolBox, Menu, MiniMap }
 export default GraphVue
+export * from '@datafe/graph-core'

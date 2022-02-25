@@ -58,7 +58,7 @@ import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
 
-import { Graph, IDataModel } from '@datafe/graph-core'
+import { Graph, IDataModel, IEdge, ILayout, INode } from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -74,7 +74,7 @@ import { Graph, IDataModel } from '@datafe/graph-core'
 })
 export default class GraphVue extends Vue {
   @Prop({ default: () => [], type: Array })
-  action: string[]
+  action!: string[]
 
   @Prop({
     default: () => {
@@ -82,7 +82,7 @@ export default class GraphVue extends Vue {
     },
     type: Object
   })
-  data: IDataModel
+  data!: IDataModel
 
   @Prop({
     default: () => {
@@ -93,8 +93,8 @@ export default class GraphVue extends Vue {
 
   graph: Graph = null as any
 
-  nodes = []
-  edges = []
+  nodes: INode[] = []
+  edges: IEdge[] = []
 
   transform = {
     scale: 1,
@@ -190,7 +190,7 @@ export default class GraphVue extends Vue {
   }
 
   @Watch('layout', { deep: true })
-  handelRankdir(v: unknown) {
+  handelRankdir(v: ILayout) {
     this.graph.layout(v)
   }
 }

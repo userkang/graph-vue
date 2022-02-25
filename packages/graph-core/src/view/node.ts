@@ -64,7 +64,7 @@ export default class Node extends Element {
   }
 
   drawSlot() {
-    const slots = []
+    const slots: Slot[] = []
     this.node.slots.forEach(item => {
       slots.push(new Slot(item, this, this.graph))
     })

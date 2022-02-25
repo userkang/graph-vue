@@ -22,7 +22,7 @@ export default abstract class Element extends Base {
     }
   }
 
-  abstract draw()
+  abstract draw(): void
 
   createDom(
     type: string,

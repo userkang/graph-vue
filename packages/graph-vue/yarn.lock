@@ -2,10 +2,10 @@
 # yarn lockfile v1
 
 
-"@datafe/graph-core@^0.3.13-beta.2":
-  version "0.3.13-beta.2"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.2.tgz#ed1bddb32848508cb08cf81f10a42f4e38a60c7e"
-  integrity sha1-7RvdsyhIUIywjPgfEKQvTjimDH4=
+"@datafe/graph-core@^0.3.13-beta.3":
+  version "0.3.13-beta.3"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.3.tgz#4083a7e817843695dc2bb928e1df068f972a7b76"
+  integrity sha1-QIOn6BeENpXcK7ko4d8Gj5cqe3Y=
   dependencies:
     dagre "0.8.5"
 
@@ -20,6 +20,11 @@
   integrity sha1-ohEXsZ7pvnDDeewYd1N+8uHGMwE=
   dependencies:
     any-observable "^0.3.0"
+
+"@types/webpack-env@^1.16.3":
+  version "1.16.3"
+  resolved "http://r.npm.sankuai.com/@types/webpack-env/download/@types/webpack-env-1.16.3.tgz#b776327a73e561b71e7881d0cd6d34a1424db86a"
+  integrity sha1-t3YyenPlYbceeIHQzW00oUJNuGo=
 
 "@vue/component-compiler-utils@^3.1.0":
   version "3.3.0"
@@ -3652,10 +3657,10 @@ typedarray@^0.0.6:
   resolved "http://r.npm.sankuai.com/typedarray/download/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha1-hnrHTjhkGHsdPUfZlqeOxciDB3c=
 
-typescript@^3.1.3:
-  version "3.9.10"
-  resolved "http://r.npm.sankuai.com/typescript/download/typescript-3.9.10.tgz#70f3910ac7a51ed6bef79da7800690b19bf778b8"
-  integrity sha1-cPORCselHta+952ngAaQsZv3eLg=
+typescript@^4.4.5:
+  version "4.5.5"
+  resolved "http://r.npm.sankuai.com/typescript/download/typescript-4.5.5.tgz#d8c953832d28924a9e3d37c73d729c846c5896f3"
+  integrity sha1-2MlTgy0okkqePTfHPXKchGxYlvM=
 
 union-value@^1.0.0:
   version "1.0.1"

@@ -1,12 +1,14 @@
 {
   "compilerOptions": {
+    "strict": true,
     "target": "es5",
     "module": "esnext",
-    "jsx": "preserve",
     "declaration": true,
     "allowJs": true,
     "importHelpers": true,
     "moduleResolution": "node",
+    "noImplicitAny": false,
+    "skipLibCheck": true,
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
@@ -14,7 +16,7 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      "@datafe/*": ["../../packages/*/src"]
+      "@datafe/graph-core": ["../../packages/graph-core"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

@@ -1,6 +1,6 @@
 export default class Base {
   public _cfg: { [key: string]: unknown } = {}
-  public eventQueue = []
+  public eventQueue: Array<{ type: string; bindFunc: () => void }> = []
 
   public get id() {
     return this.get('id')

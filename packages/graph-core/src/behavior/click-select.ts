@@ -1,3 +1,4 @@
+import { IEdge, INode } from '../types'
 import Graph from '../controller/graph'
 import Base from './base'
 
@@ -24,7 +25,7 @@ export default class ClickSelect extends Base {
     this.resetEdgeSelect()
     selectedNodes.forEach(item => item.clearState('selected'))
     const node = this.graph.findNode(id)
-    if (!node.hasState('locked')) {
+    if (node && !node.hasState('locked')) {
       node.setState('selected')
       this.graph.emit('nodeselectchange', [node.model])
     }
@@ -54,7 +55,7 @@ export default class ClickSelect extends Base {
 
   resetNodeSelect() {
     const nodes = this.graph.getNodes()
-    const selectedNodes = []
+    const selectedNodes: INode[] = []
 
     nodes.forEach(node => {
       if (node.hasState('selected')) {
@@ -70,7 +71,7 @@ export default class ClickSelect extends Base {
 
   resetEdgeSelect() {
     const edges = this.graph.getEdges()
-    const selectedEdges = []
+    const selectedEdges: IEdge[] = []
 
     edges.forEach(edge => {
       if (edge.hasState('selected')) {

@@ -13,19 +13,19 @@ export default class ToolTip extends Vue {
     type: String,
     default: ''
   })
-  message: string
+  message!: string
 
   @Prop({
     type: String,
     default: 'right'
   })
-  placement: string
+  placement!: string
 
-  tooltip: HTMLDivElement = null
-  wrap: HTMLDivElement = null
+  tooltip!: HTMLDivElement
+  wrap!: HTMLDivElement
 
-  showTimer = null
-  closeTimer = null
+  showTimer = 0
+  closeTimer = 0
 
   async handleMouseEnter() {
     clearTimeout(this.closeTimer)

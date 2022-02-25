@@ -40,11 +40,11 @@ export default class EdgeController {
     edge.toNode.deleteEdge(id)
 
     // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    if (!fromNode.getEdges().find((item) => item.fromSlot.id === fromSlot.id)) {
+    if (!fromNode.getEdges().find(item => item.fromSlot.id === fromSlot.id)) {
       fromSlot.clearState('linked')
     }
 
-    if (!toNode.getEdges().find((item) => item.toSlot.id === toSlot.id)) {
+    if (!toNode.getEdges().find(item => item.toSlot.id === toSlot.id)) {
       toSlot.clearState('linked')
     }
 
@@ -57,16 +57,18 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
-    if (this._edges[item.id]) {
+    if (item.id && this._edges[item.id]) {
       console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }
     const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item
     // 如果仅有 slotId，自动补全 nodeId
     const fromNode =
-      this.graph.findNode(fromNodeId) || this.graph.findNodeBySlot(fromSlotId)
+      (fromNodeId && this.graph.findNode(fromNodeId)) ||
+      (fromSlotId && this.graph.findNodeBySlot(fromSlotId))
     const toNode =
-      this.graph.findNode(toNodeId) || this.graph.findNodeBySlot(toSlotId)
+      (toNodeId && this.graph.findNode(toNodeId)) ||
+      (toSlotId && this.graph.findNodeBySlot(toSlotId))
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -92,5 +94,10 @@ export default class EdgeController {
     for (const item of group) {
       this.addEdge(item)
     }
+  }
+
+  public destroy() {
+    ;(this.graph as null | Graph) = null
+    this._edges = {}
   }
 }

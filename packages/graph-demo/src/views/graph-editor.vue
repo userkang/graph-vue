@@ -79,9 +79,15 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, Graph } from '@datafe/graph-core'
-
+import {
+  ToolBox,
+  Menu,
+  MiniMap,
+  GraphVue,
+  INodeModel,
+  IEdgeModel,
+  IEdge
+} from '@datafe/graph-vue'
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
 import ComponentListStore from '@/stores/component-list'
@@ -109,7 +115,7 @@ export default class GraphEditor extends Vue {
 
   get graph() {
     this.graphState.graph = (this.$refs.graph as GraphVue).graph
-    return this.graphState.graph
+    return (this.$refs.graph as GraphVue).graph
   }
 
   get dataMock() {
@@ -132,10 +138,6 @@ export default class GraphEditor extends Vue {
     return !node.children || node.children.length === 0
   }
 
-  handleNodeSelectChange(node) {
-    console.log(node)
-  }
-
   handleDrop(e: DragEvent) {
     e.preventDefault()
     const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
@@ -149,7 +151,7 @@ export default class GraphEditor extends Vue {
     })
   }
 
-  path(edge: any) {
+  path(edge: IEdge) {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (y2 - y1) / 2
@@ -158,7 +160,7 @@ export default class GraphEditor extends Vue {
     }  L ${x2} ${y2}`
   }
 
-  text(edge) {
+  text(edge: IEdge) {
     const { fromSlot, toSlot } = edge
     return {
       x: (fromSlot.x + toSlot.x) / 2,
@@ -177,8 +179,8 @@ export default class GraphEditor extends Vue {
           this.graph.deleteEdge(selectedEdges[0].id)
         }
         if (selectedNodes.length) {
-          const edges = []
-          const nodes = []
+          const edges: IEdgeModel[] = []
+          const nodes: INodeModel[] = []
           selectedNodes.forEach(item => {
             item.getEdges().forEach(edge => {
               edges.push(edge.model)
@@ -204,8 +206,10 @@ export default class GraphEditor extends Vue {
   }
 
   mounted() {
-    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
-    this.graph.on('keyup', this.handleKeyUp)
+    if (this.graph) {
+      this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+      this.graph.on('keyup', this.handleKeyUp)
+    }
   }
 }
 </script>

@@ -17,7 +17,8 @@ import {
   IGraphConfig,
   IStack,
   IDataStack,
-  ILayout
+  ILayout,
+  NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -32,12 +33,12 @@ const getDefaultConfig = () => ({
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
-  public viewController: ViewController
-  public layoutController: LayoutController
-  public eventController: EventController
-  public nodeController: NodeController
-  public edgeController: EdgeController
-  public stackController: StackController
+  public viewController!: ViewController
+  public layoutController!: LayoutController
+  public eventController!: EventController
+  public nodeController!: NodeController
+  public edgeController!: EdgeController
+  public stackController!: StackController
 
   constructor(config: IGraphConfig) {
     const container =
@@ -57,10 +58,6 @@ export default class Graph extends EventEmitter {
       this.set('svg', new Svg(this))
     }
     this.initController()
-  }
-
-  public getNodeInfo() {
-    return this.cfg.nodeInfo
   }
 
   private initController() {
@@ -88,11 +85,15 @@ export default class Graph extends EventEmitter {
     return this.viewController.svgInfo
   }
 
+  public getNodeInfo(): NodeInfo | undefined {
+    return this.cfg.nodeInfo
+  }
+
   public getNodes(): INode[] {
     return this.nodeController.nodes
   }
 
-  public findNode(id: string | number): INode {
+  public findNode(id: string | number): INode | undefined {
     return this.nodeController.findNode(id)
   }
 
@@ -102,7 +103,7 @@ export default class Graph extends EventEmitter {
     })
   }
 
-  public findNodeBySlot(id: string) {
+  public findNodeBySlot(id: string): INode | undefined {
     return this.nodeController.findNodeBySlot(id)
   }
 
@@ -164,7 +165,7 @@ export default class Graph extends EventEmitter {
     return this.edgeController.edges
   }
 
-  public findEdge(id: string | number) {
+  public findEdge(id: string | number): IEdge | undefined {
     return this.edgeController.findEdge(id)
   }
 
@@ -341,13 +342,17 @@ export default class Graph extends EventEmitter {
    * 销毁
    */
   public destroy() {
+    this.stackController.clearStack()
     this.eventController.destroy()
-
-    delete this.eventController
-    delete this.viewController
-    delete this.layoutController
-    delete this.nodeController
-    delete this.edgeController
-    delete this.stackController
+    this.nodeController.destroy()
+    this.edgeController.destroy()
+    this.viewController.destroy()
+    this.layoutController.destroy()
+    ;(this.stackController as StackController | null) = null
+    ;(this.eventController as EventController | null) = null
+    ;(this.nodeController as NodeController | null) = null
+    ;(this.edgeController as EdgeController | null) = null
+    ;(this.viewController as ViewController | null) = null
+    ;(this.layoutController as LayoutController | null) = null
   }
 }

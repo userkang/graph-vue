@@ -1,4 +1,3 @@
-
 import { IDataModel, IEdgeModel, INodeModel } from '../types'
 
 const doc: Document & {
@@ -45,7 +44,7 @@ export const isFullScreen = () => {
 }
 
 const map: { [key: string]: number } = {}
-const globalId = []
+const globalId: string[] = []
 export const uniqueId = (prefix: string) => {
   if (!map[prefix]) {
     map[prefix] = 1
@@ -81,7 +80,7 @@ export const clone = obj => {
       }
     }
   } else {
-    rst = {}
+    rst = {} as any
     for (const k in obj) {
       if (typeof obj[k] === 'object' && obj[k] != null) {
         rst[k] = clone(obj[k])

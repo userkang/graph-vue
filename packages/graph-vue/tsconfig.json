@@ -20,5 +20,5 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["*.d.ts", "types/**/*.d.ts", "components/**/*"]
+  "include": ["*.d.ts", "types/**/*.d.ts", "components/**/*", "main.ts"]
 }

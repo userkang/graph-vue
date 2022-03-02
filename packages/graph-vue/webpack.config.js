@@ -2,7 +2,9 @@ const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
-  entry: path.resolve(__dirname, './main.ts'),
+  entry: {
+    main: path.resolve(__dirname, './main.ts')
+  },
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录
@@ -15,7 +17,7 @@ module.exports = {
         test: /\.s[ac]ss$/i,
         use: [
           // 将 JS 字符串生成为 style 节点
-          // 'style-loader',
+          'style-loader',
           // 将 CSS 转化成 CommonJS 模块
           'css-loader',
           // 将 Sass 编译成 CSS

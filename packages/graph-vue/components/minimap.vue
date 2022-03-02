@@ -1,5 +1,5 @@
 <template>
-  <div class="graph-minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
+  <div class="graph-vue-minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
     <svg
       :width="mapRect.width"
       :height="mapRect.height"
@@ -15,11 +15,11 @@
       <g :style="graphStyle" v-html="svgHTML"></g>
     </svg>
     <div
-      class="graph-minimap-viewport"
+      class="graph-vue-minimap-viewport"
       :style="viewportStyle"
       @mousedown="onMousedown"
     >
-      <div class="graph-minimap-resize" @mousedown.stop="onVpResizedown"></div>
+      <div class="graph-vue-minimap-resize" @mousedown.stop="onVpResizedown"></div>
     </div>
   </div>
 </template>
@@ -257,3 +257,39 @@ export default class Minimap extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+.graph-vue-minimap {
+  box-sizing: border-box;
+  position: relative;
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  overflow: hidden;
+  user-select: none;
+}
+.graph-vue-minimap:hover > .graph-minimap-viewport {
+  background-color: rgba(var(--color-main), 0.15);
+}
+.graph-vue-minimap-viewport {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  background-color: rgba(var(--color-main), 0.1);
+  cursor: move;
+  transform-origin: center;
+}
+.graph-vue-minimap-viewport:hover {
+  background-color: rgba(var(--color-main), 0.2);
+}
+.graph-vue-minimap-resize {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  background-color: rgb(var(--color-shadow));
+  cursor: nwse-resize;
+}
+</style>

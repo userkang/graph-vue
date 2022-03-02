@@ -1,7 +1,7 @@
 <template>
   <g>
     <path
-      class="graph-new-edge"
+      class="graph-vue-new-edge"
       :d="path"
       v-if="path"
       marker-end="url(#arrow)"
@@ -53,3 +53,14 @@ export default class NewEdge extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+.graph-vue-new-edge {
+  pointer-events: none;
+  stroke-dasharray: 5;
+  stroke-linecap: round;
+  stroke-width: 1.5;
+  stroke: #d1d1d9;
+  fill: transparent;
+}
+</style>

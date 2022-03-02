@@ -14,9 +14,9 @@ module.exports = {
     loaderOptions: {
       sass: {
         implementation: require('sass'),
-        data: `@import "@/assets/css/variable.scss";`,
-      },
-    },
+        data: `@import "@/assets/css/variable.scss";`
+      }
+    }
   },
   configureWebpack: {
     resolve: {
@@ -26,7 +26,7 @@ module.exports = {
         vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
         '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
         '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue/main.ts')
-      },
+      }
     },
     plugins: [
       new HtmlWebpackPlugin({
@@ -37,19 +37,19 @@ module.exports = {
         minify: {
           removeComments: true,
           collapseWhitespace: true,
-          removeAttributeQuotes: true,
+          removeAttributeQuotes: true
           // more options:
           // https://github.com/kangax/html-minifier#options-quick-reference
         },
         // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-        chunksSortMode: 'dependency',
-      }),
-    ],
+        chunksSortMode: 'dependency'
+      })
+    ]
   },
   devServer: {
     open: true,
     port: 9000,
     hot: true,
-    disableHostCheck: true,
-  },
+    disableHostCheck: true
+  }
 }

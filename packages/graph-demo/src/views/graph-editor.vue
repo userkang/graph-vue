@@ -44,7 +44,7 @@
             <text
               :x="text(edge).x"
               :y="text(edge).y"
-              style="text-anchor: middle; fill: #aaa; font-size: 12px;"
+              style="text-anchor: middle; fill: #aaa; font-size: 12px"
             >
               tag
             </text>
@@ -89,6 +89,7 @@ import {
   IEdgeModel,
   IEdge
 } from '@datafe/graph-vue'
+
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
 import ComponentListStore from '@/stores/component-list'
@@ -293,4 +294,19 @@ export default class GraphEditor extends Vue {
     background: #dbdef3;
   }
 }
+</style>
+
+<style lang="scss">
+// @keyframes dash {
+//   from {
+//     stroke-dashoffset: 320;
+//   }
+//   to {
+//     stroke-dashoffset: 0;
+//   }
+// }
+// .graph-vue-edge {
+//   stroke-dasharray: 5;
+//   animation: dash 10s linear infinite;
+// }
 </style>

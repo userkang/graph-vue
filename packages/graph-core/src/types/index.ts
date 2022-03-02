@@ -92,3 +92,13 @@ export interface ILayout {
   marginx?: number
   marginy?: number
 }
+
+export type IAction = Array<
+  | 'brush-select'
+  | 'click-select'
+  | 'create-edge'
+  | 'drag-node'
+  | 'drag-svg'
+  | 'wheel-move'
+  | 'wheel-zoom'
+>

@@ -37,10 +37,7 @@
           <slot name="newEdge"></slot>
         </NewEdge>
       </g>
-      <path
-        :d="brushPath"
-        style="fill: #4e73ff; stroke: #606be1; stroke-width: 1px; opacity: 0.3"
-      />
+      <path :d="brushPath" class="graph-vue-brushing" />
     </svg>
 
     <slot v-if="graph" :graph="graph"></slot>
@@ -89,7 +86,7 @@ export default class GraphVue extends Vue {
       return { rankdir: 'TB' }
     }
   })
-  layout: unknown
+  layout!: ILayout
 
   graph: Graph = null as any
 
@@ -195,3 +192,18 @@ export default class GraphVue extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+.graph-vue-wrapper {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  user-select: none;
+}
+.graph-vue-brushing {
+  fill: #4e73ff;
+  stroke: #606be1;
+  stroke-width: 1px;
+  opacity: 0.3;
+}
+</style>

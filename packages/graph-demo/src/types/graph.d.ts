@@ -7,14 +7,6 @@ declare interface IGraphDataType {
   edges: IEdgeType[]
 }
 
-declare interface ITransform {
-  scale: number
-  translateX: number
-  translateY: number
-  offsetX: number
-  offsetY: number
-}
-
 declare interface ISlot {
   id: number
   type: string

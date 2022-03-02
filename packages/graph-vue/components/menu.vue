@@ -2,7 +2,7 @@
   <div v-show="value">
     <ul
       ref="menu"
-      class="graph-menu-wrapper"
+      class="graph-vue-menu-wrapper"
       :style="{ top: menu.y + 2 + 'px', left: menu.x + 2 + 'px' }"
     >
       <slot :item="menu"></slot>
@@ -65,3 +65,14 @@ export default class Menu extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+.graph-vue-menu-wrapper {
+  width: 120px;
+  position: fixed;
+  z-index: 100;
+  background: #fff;
+  box-shadow: 0 0 4px 0 rgba(50, 57, 131, 0.25);
+  border-radius: 1px;
+}
+</style>

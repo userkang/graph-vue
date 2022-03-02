@@ -3,10 +3,16 @@ import ToolBox from './components/tool-box.vue'
 import Menu from './components/menu.vue'
 import MiniMap from './components/minimap.vue'
 
-import content from './css/index'
-import { insertCss } from './utils/dom'
-insertCss(content)
+const components = { GraphVue, ToolBox, Menu, MiniMap }
 
 export { GraphVue, ToolBox, Menu, MiniMap }
-export default GraphVue
+
 export * from '@datafe/graph-core'
+
+export default {
+  install(Vue) {
+    Object.keys(components).forEach(key => {
+      Vue.component(key, components[key])
+    })
+  }
+}

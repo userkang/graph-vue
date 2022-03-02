@@ -2,18 +2,16 @@
   <g>
     <path
       :d="path"
-      class="graph-edge-wrapper"
+      class="graph-vue-edge-wrapper"
       graph-type="edge"
       :graph-id="edge.id"
     ></path>
     <path
       ref="edge"
-      :marker-end="
-        edge.hasState('selected') ? `url(#arrow-active)` : 'url(#arrow)'
-      "
+      :marker-end="'url(#arrow)'"
       :d="path"
-      class="graph-edge"
-      :class="{ 'graph-edge-active': edge.hasState('selected') }"
+      class="graph-vue-edge"
+      :class="{ 'graph-vue-edge-active': edge.hasState('selected') }"
     ></path>
   </g>
 </template>
@@ -42,11 +40,6 @@ export default class Edge extends Vue {
     const direction = this.graph.get('direction')
     let x2 = toSlot.x
     let y2 = toSlot.y
-    if (direction === 'LR') {
-      x2 -= 4
-    } else {
-      y2 -= 4
-    }
 
     return calculateCurve(
       {
@@ -60,3 +53,28 @@ export default class Edge extends Vue {
   }
 }
 </script>
+
+<style lang="scss">
+:root {
+  --edge-color: #d1d1dd;
+  --select-color: #4150f6;
+}
+.graph-vue-edge-wrapper {
+  stroke-width: 10;
+  fill: none;
+  stroke: transparent;
+}
+.graph-vue-edge {
+  stroke: var(--edge-color);
+  stroke-width: 2;
+  fill: none;
+  stroke-linecap: round;
+  pointer-events: none;
+}
+.graph-vue-edge-active {
+  stroke: var(--select-color);
+  stroke-width: 2.5;
+  cursor: pointer;
+  stroke-linecap: round;
+}
+</style>

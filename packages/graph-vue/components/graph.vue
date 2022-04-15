@@ -122,6 +122,8 @@ export default class GraphVue extends Vue {
     this.initCustomHooks()
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
+
+    this.$emit('init', this.graph)
   }
 
   initCustomHooks() {

@@ -18,6 +18,7 @@
           :action="action"
           :layout="layout"
           @drop="handleDrop"
+          @init="initGraph"
         >
           <template #node="{ node }">
             <div
@@ -87,7 +88,8 @@ import {
   GraphVue,
   INodeModel,
   IEdgeModel,
-  IEdge
+  IEdge,
+  Graph
 } from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
@@ -110,14 +112,10 @@ export default class GraphEditor extends Vue {
   graphState = GraphStore.state
   menuShow = false
   activeId = ''
+  graph!: Graph
 
   async created() {
     await GraphStore.getData()
-  }
-
-  get graph() {
-    this.graphState.graph = (this.$refs.graph as GraphVue).graph
-    return (this.$refs.graph as GraphVue).graph
   }
 
   get dataMock() {
@@ -138,6 +136,17 @@ export default class GraphEditor extends Vue {
 
   isLeaf(node: INodeModel) {
     return !node.children || node.children.length === 0
+  }
+
+  initGraph(graph: Graph) {
+    this.graphState.graph = graph
+    this.graph = graph
+    this.initEvent()
+  }
+
+  initEvent() {
+    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('keyup', this.handleKeyUp)
   }
 
   handleDrop(e: DragEvent) {
@@ -205,13 +214,6 @@ export default class GraphEditor extends Vue {
   handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
     this.menuShow = true
     this.activeId = data.id
-  }
-
-  mounted() {
-    if (this.graph) {
-      this.graph.on('node.contextmenu', this.handleNodeContextMenu)
-      this.graph.on('keyup', this.handleKeyUp)
-    }
   }
 }
 </script>

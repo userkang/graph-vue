@@ -52,13 +52,13 @@
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import GraphContent from './graph.vue'
+import { Vue, Component, InjectReactive } from 'vue-property-decorator'
+import { Graph } from '@datafe/graph-core'
 
 @Component
 export default class ToolBox extends Vue {
-  @Prop()
-  graph!: any
+  @InjectReactive()
+  graph!: Graph
 
   isBrushing = false
   undoEnable = false

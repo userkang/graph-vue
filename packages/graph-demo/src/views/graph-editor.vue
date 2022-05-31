@@ -41,7 +41,7 @@
           </template>
 
           <template #edge="{ edge }">
-            <path :d="path(edge)" class="graph-custom-edge"></path>
+            <path :d="path(edge)" class="graph-custom-edge graph-vue-edge"></path>
             <text
               :x="text(edge).x"
               :y="text(edge).y"
@@ -60,17 +60,14 @@
             ></rect>
           </template>
 
-          <template #default="{ graph }">
-            <MiniMap :graph="graph"></MiniMap>
-            <ToolBox :graph="graph" class="tool-box"></ToolBox>
-          </template>
+          <MiniMap />
+          <ToolBox />
+          <Menu class="menu" v-model="menuShow">
+            <li @click="deleteItem">删除</li>
+            <li @click="deleteItem">删除</li>
+          </Menu>
         </GraphVue>
       </div>
-
-      <Menu class="menu" v-model="menuShow">
-        <li @click="deleteItem">删除</li>
-        <li @click="deleteItem">删除</li>
-      </Menu>
 
       <ConfigPanel />
     </div>
@@ -299,16 +296,16 @@ export default class GraphEditor extends Vue {
 </style>
 
 <style lang="scss">
-// @keyframes dash {
-//   from {
-//     stroke-dashoffset: 320;
-//   }
-//   to {
-//     stroke-dashoffset: 0;
-//   }
-// }
-// .graph-vue-edge {
-//   stroke-dasharray: 5;
-//   animation: dash 10s linear infinite;
-// }
+@keyframes dash {
+  from {
+    stroke-dashoffset: 320;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.graph-vue-edge {
+  stroke-dasharray: 5;
+  animation: dash 10s linear infinite;
+}
 </style>

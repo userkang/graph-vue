@@ -3858,10 +3858,10 @@ vm-browserify@^1.0.1:
   resolved "http://r.npm.sankuai.com/vm-browserify/download/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha1-eGQcSIuObKkadfUR56OzKobl3aA=
 
-vue-class-component@^6.2.0:
-  version "6.3.2"
-  resolved "http://r.npm.sankuai.com/vue-class-component/download/vue-class-component-6.3.2.tgz#e6037e84d1df2af3bde4f455e50ca1b9eec02be6"
-  integrity sha1-5gN+hNHfKvO95PRV5Qyhue7AK+Y=
+vue-class-component@^7.1.0:
+  version "7.2.6"
+  resolved "http://r.npm.sankuai.com/vue-class-component/download/vue-class-component-7.2.6.tgz#8471e037b8e4762f5a464686e19e5afc708502e4"
+  integrity sha1-hHHgN7jkdi9aRkaG4Z5a/HCFAuQ=
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
@@ -3879,12 +3879,12 @@ vue-loader@^15.9.8:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-property-decorator@^7.0.0:
-  version "7.3.0"
-  resolved "http://r.npm.sankuai.com/vue-property-decorator/download/vue-property-decorator-7.3.0.tgz#d50d67f0b0f1c814f9f2fba36d6eeccbcc62dbb6"
-  integrity sha1-1Q1n8LDxyBT58vujbW7sy8xi27Y=
+vue-property-decorator@^8.5.1:
+  version "8.5.1"
+  resolved "http://r.npm.sankuai.com/vue-property-decorator/download/vue-property-decorator-8.5.1.tgz#571a91cf8d2b507f537d79bf8275af3184572fff"
+  integrity sha1-VxqRz40rUH9TfXm/gnWvMYRXL/8=
   dependencies:
-    vue-class-component "^6.2.0"
+    vue-class-component "^7.1.0"
 
 vue-style-loader@^4.1.0:
   version "4.1.3"

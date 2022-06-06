@@ -1,5 +1,9 @@
 <template>
-  <div class="graph-vue-minimap" ref="root" :style="{ ...rootStyle, ...themeVars }">
+  <div
+    class="graph-vue-minimap"
+    ref="root"
+    :style="{ ...rootStyle, ...themeVars }"
+  >
     <svg
       :width="mapRect.width"
       :height="mapRect.height"
@@ -19,12 +23,16 @@
       :style="viewportStyle"
       @mousedown="onMousedown"
     >
-      <div class="graph-vue-minimap-resize" @mousedown.stop="onVpResizedown"></div>
+      <div
+        class="graph-vue-minimap-resize"
+        @mousedown.stop="onVpResizedown"
+      ></div>
     </div>
   </div>
 </template>
 <script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+import { Vue, Component, Prop, InjectReactive } from 'vue-property-decorator'
+import { Graph } from '@datafe/graph-core'
 
 const generateCursor = (cursor: string) => {
   const styleElement = document.createElement('style')
@@ -34,11 +42,11 @@ const generateCursor = (cursor: string) => {
 
 @Component
 export default class Minimap extends Vue {
+  @InjectReactive()
+  graph!: Graph
+
   @Prop({ default: () => [255, 255, 255] })
   theme!: [number, number, number]
-
-  @Prop()
-  graph!: any
 
   canGraphChage = true
   svgHTML = ''

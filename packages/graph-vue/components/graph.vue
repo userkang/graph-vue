@@ -40,12 +40,18 @@
       <path :d="brushPath" class="graph-vue-brushing" />
     </svg>
 
-    <slot v-if="graph" :graph="graph"></slot>
+    <slot v-if="graph"></slot>
   </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component, Prop, Watch } from 'vue-property-decorator'
+import {
+  Vue,
+  Component,
+  Prop,
+  Watch,
+  ProvideReactive
+} from 'vue-property-decorator'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import PortWrapper from './wrapper/port.vue'
@@ -70,6 +76,9 @@ import { Graph, IDataModel, IEdge, ILayout, INode } from '@datafe/graph-core'
   }
 })
 export default class GraphVue extends Vue {
+  @ProvideReactive()
+  graph: Graph = null as any
+
   @Prop({ default: () => [], type: Array })
   action!: string[]
 
@@ -87,8 +96,6 @@ export default class GraphVue extends Vue {
     }
   })
   layout!: ILayout
-
-  graph: Graph = null as any
 
   nodes: INode[] = []
   edges: IEdge[] = []

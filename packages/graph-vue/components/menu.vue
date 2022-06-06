@@ -27,17 +27,14 @@ export default class Menu extends Vue {
 
   @Watch('menu.y')
   handleMenuY() {
-    setTimeout(() => {
-      const menuHeight = (
-        this.$refs.menu as HTMLElement
-      ).getBoundingClientRect().height
-      const clientHeight = document.body.clientHeight
+    const menuHeight = (this.$refs.menu as HTMLElement).getBoundingClientRect()
+      .height
+    const clientHeight = document.body.clientHeight
 
-      // 如果超过下边界，需要往上修正菜单的 y 值
-      if (this.menu.y + menuHeight > clientHeight) {
-        this.menu.y -= menuHeight
-      }
-    })
+    // 如果超过下边界，需要往上修正菜单的 y 值
+    if (this.menu.y + menuHeight > clientHeight) {
+      this.menu.y -= menuHeight
+    }
   }
 
   showMenu(e: MouseEvent) {
@@ -49,7 +46,6 @@ export default class Menu extends Vue {
 
   hiddenMenu() {
     if (this.value) {
-      console.log(this.value)
       this.$emit('input', false)
     }
   }

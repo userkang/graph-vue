@@ -3,7 +3,6 @@
     <ComponentPanel />
     <GraphVue
       ref="graph"
-      class="graph"
       :data="dataMock"
       :action="action"
       :layout="layout"
@@ -44,16 +43,13 @@
           fill="#999"
         ></rect>
       </template>
-
-      <template #default="{ graph }">
-        <MiniMap :graph="graph"></MiniMap>
-        <ToolBox :graph="graph" class="tool-box"></ToolBox>
-      </template>
+      <MiniMap />
+      <ToolBox />
+      <Menu class="menu" v-model="menuShow">
+        <li @click="deleteItem">删除</li>
+        <li @click="deleteItem">删除</li>
+      </Menu>
     </GraphVue>
-    <Menu class="menu" v-model="menuShow">
-      <li @click="deleteItem">删除</li>
-      <li @click="deleteItem">删除</li>
-    </Menu>
   </div>
 </template>
 

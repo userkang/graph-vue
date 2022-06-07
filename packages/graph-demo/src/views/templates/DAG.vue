@@ -82,7 +82,7 @@ import ComponentListStore from '@/stores/component-list'
     ConfigPanel
   }
 })
-export default class GraphEditor extends Vue {
+export default class DAG extends Vue {
   graphConfigState = GraphConfigStore.state
   componentState = ComponentListStore.state
   graphState = GraphStore.state

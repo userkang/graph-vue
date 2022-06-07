@@ -18,7 +18,7 @@ class GraphConfig {
       'drag-node',
       'click-select',
       'create-edge',
-      'wheel-move',
+      // 'wheel-move',
       'wheel-zoom',
       'brush-select',
     ],

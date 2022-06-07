@@ -11,7 +11,7 @@ class Graph {
   }
 
   public getTreeData() {
-    GraphConfigStore.state.data = treeMock(50) as any
+    GraphConfigStore.state.data = treeMock(5) as any
   }
 }
 

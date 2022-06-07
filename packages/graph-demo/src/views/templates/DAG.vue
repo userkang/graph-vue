@@ -25,7 +25,7 @@
       </template>
 
       <template #edge="{ edge }">
-        <path :d="path(edge)" class="graph-custom-edge"></path>
+        <path :d="path(edge)" class="graph-custom-edge graph-vue-edge"></path>
         <text
           :x="text(edge).x"
           :y="text(edge).y"
@@ -236,5 +236,18 @@ export default class DAG extends Vue {
     color: #333;
     background: #dbdef3;
   }
+}
+
+@keyframes dash {
+  from {
+    stroke-dashoffset: 320;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.graph-vue-edge {
+  stroke-dasharray: 3;
+  animation: dash 15s linear infinite;
 }
 </style>

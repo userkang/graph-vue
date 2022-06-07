@@ -67,18 +67,3 @@ export default class GraphEditor extends Vue {}
   background: #242424;
 }
 </style>
-
-<style lang="scss">
-@keyframes dash {
-  from {
-    stroke-dashoffset: 320;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-.graph-vue-edge {
-  stroke-dasharray: 5;
-  animation: dash 10s linear infinite;
-}
-</style>

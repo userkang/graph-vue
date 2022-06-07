@@ -57,16 +57,8 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import {
-  ToolBox,
-  Menu,
-  MiniMap,
-  GraphVue,
-  INodeModel,
-  IEdgeModel,
-  IEdge,
-  Graph
-} from '@datafe/graph-vue'
+import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
+import { INodeModel, IEdgeModel, IEdge, Graph } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -166,7 +158,7 @@ export default class Tree extends Vue {
           const nodes: INodeModel[] = []
           selectedNodes.forEach(item => {
             item.getEdges().forEach(edge => {
-              edges.push(edge.model)
+              edges.push(edge.model as IEdgeModel)
             })
             nodes.push(item.model)
             this.graph.deleteNode(item.id, false)

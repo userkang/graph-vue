@@ -5,17 +5,17 @@
       :data="dataMock"
       :action="action"
       :layout="layout"
-      @drop="handleDrop"
       @init="initGraph"
     >
       <template #node="{ node }">
-        <div class="node-container" v-if="node.model.isShow">
+        <div class="node-container">
           <div class="text-container">
             <p
               class="node-text"
               v-if="!(isEditText && node.hasState('selected'))"
             >
               {{ node.model.label }}
+              {{ node.model.isCollapsed }}
             </p>
             <mtd-input
               v-else
@@ -31,20 +31,26 @@
           <div class="add-icon">
             <mtd-icon
               name="mtdicon mtdicon-success-o"
-              @click="addNode($event, node.model)"
+              @click="addNode($event, node)"
             ></mtd-icon>
           </div>
           <div class="unopen-icon">
             <mtd-icon
+              v-if="node.model.isCollapsed"
               name="mtdicon mtdicon-checkbox-indetermina-o"
-              @click="hideNode(node.model)"
+              @click="showNode(node)"
+            ></mtd-icon>
+            <mtd-icon
+              v-else
+              name="mtdicon mtdicon-checkbox-indetermina"
+              @click="hideNode(node)"
             ></mtd-icon>
           </div>
         </div>
       </template>
-      <!-- <template #edge="{ edge }">
+      <template #edge="{ edge }">
         <path :d="path(edge)" class="graph-custom-edge"></path>
-      </template> -->
+      </template>
       <template #port></template>
       <ToolBox />
     </GraphVue>
@@ -56,7 +62,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
 import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph } from '@datafe/graph-core'
+import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -113,72 +119,32 @@ export default class DAG extends Vue {
     this.graph.on('keyup', this.handleKeyUp)
   }
 
-  addNode(e: DragEvent, nodeData) {
+  addNode(e: MouseEvent, parentNode: INode) {
     e.preventDefault()
-    !this.dataMock?.children && (this.dataMock.children = [])
-    if (this.dataMock.id === nodeData.id) {
-      this.dataMock.children.push({
-        id: String(Date.now()),
-        label: '新节点',
-        isShow: true
-      })
-    } else {
-      this.addChildNode(this.dataMock, nodeData.id)
-    }
-    this.graph.data(this.dataMock)
+
+    const node = this.graph.addNode({
+      label: '新节点'
+    })
+    this.graph.addEdge({
+      fromNodeId: parentNode.id,
+      toNodeId: node.id
+    })
+
+    this.showNode(parentNode)
+  }
+
+  showNode(node: Inode) {
+    node.model.isCollapsed = false
+    node.getAllChildren().forEach(item => {
+      item.show()
+    })
     this.graph.layout()
   }
 
-  addChildNode(grandpaNode: INodeModel, nodeId: string) {
-    !grandpaNode?.children && (grandpaNode.children = [])
-    grandpaNode.children.find(item => {
-      const isRealParent = item.id === nodeId
-      !item?.children && isRealParent && (item.children = [])
-      isRealParent &&
-        item.children.push({
-          id: String(Date.now()),
-          label: '新节点',
-          children: [],
-          isShow: true
-        })
-      !isRealParent && this.addChildNode(item, nodeId)
-      return isRealParent
-    })
-  }
-
-  async hideNode(node: INodeModel) {
-    await this.hideNode2(node)
-    this.graph.data(this.dataMock)
-  }
-
-  hideNode2(node: INodeModel) {
-    if (this.dataMock.id === node.id) {
-      this.dataMock.children.forEach(item => {
-        item.isShow = false
-        this.hideChildNode(item)
-      })
-    }
-  }
-
-  hideChildNode(parentNode) {
-    parentNode?.children &&
-      parentNode.children.forEach(item => {
-        item.isShow = false
-        this.hideChildNode(item)
-      })
-  }
-
-  handleDrop(e: DragEvent) {
-    e.preventDefault()
-    const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
-    const y = e.y - this.dragingInfo.offsetY * this.graph.getZoom()
-    const point = this.graph.getPointByClient(x, y)
-    console.log(this.graph)
-
-    this.graph.addNode({
-      label: this.dragingInfo.component.componentName,
-      x: point.x,
-      y: point.y
+  hideNode(node: INode) {
+    node.model.isCollapsed = true
+    node.getAllChildren().forEach(item => {
+      item.hide()
     })
   }
 
@@ -236,10 +202,8 @@ export default class DAG extends Vue {
   path(edge: IEdge) {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
-    const xc = (y2 - y1) / 2
-    return `M ${x1} ${y1} L ${x1} ${y1 + xc} L ${x1} ${y2 - xc} L ${x2} ${
-      y2 - xc
-    }  L ${x2} ${y2}`
+    const xc = (x1 - x2) / 3
+    return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${x1 - 2*xc} ${y2} L ${x2} ${y2}`
   }
 
   async created() {

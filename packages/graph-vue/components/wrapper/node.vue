@@ -1,5 +1,5 @@
 <template>
-  <g>
+  <g v-if="!node.hasState('hide')">
     <g :transform="`translate(${node.x}, ${node.y})`">
       <foreignObject
         :width="node.width"

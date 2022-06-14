@@ -715,21 +715,19 @@
     "@babel/helper-validator-identifier" "^7.16.7"
     to-fast-properties "^2.0.0"
 
-"@datafe/graph-core@^0.3.13-beta.2":
-  version "0.3.13-beta.2"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.2.tgz#ed1bddb32848508cb08cf81f10a42f4e38a60c7e"
-  integrity sha1-7RvdsyhIUIywjPgfEKQvTjimDH4=
+"@datafe/graph-core@^0.3.13-beta.3":
+  version "0.3.13-beta.3"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-0.3.13-beta.3.tgz#4083a7e817843695dc2bb928e1df068f972a7b76"
+  integrity sha1-QIOn6BeENpXcK7ko4d8Gj5cqe3Y=
   dependencies:
     dagre "0.8.5"
 
-"@datafe/graph-vue@0.1.8":
-  version "0.1.8"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.8.tgz#8343c22d62fa57bfb0616b10658186b1d6f5b16e"
-  integrity sha1-g0PCLWL6V7+wYWsQZYGGsdb1sW4=
+"@datafe/graph-vue@0.1.9":
+  version "0.1.9"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-vue/download/@datafe/graph-vue-0.1.9.tgz#3f9fe5369dfcf2fbe56591d8aa3db2304c4688b2"
+  integrity sha1-P5/lNp388vvlZZHYqj2yMExGiLI=
   dependencies:
-    "@datafe/graph-core" "^0.3.13-beta.2"
-    vue-class-component "^6.0.0"
-    vue-property-decorator "^7.0.0"
+    "@datafe/graph-core" "^0.3.13-beta.3"
 
 "@hapi/address@2.x.x":
   version "2.1.4"
@@ -8139,10 +8137,10 @@ vm-browserify@^1.0.1:
   resolved "http://r.npm.sankuai.com/vm-browserify/download/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha1-eGQcSIuObKkadfUR56OzKobl3aA=
 
-vue-class-component@^6.0.0, vue-class-component@^6.2.0:
-  version "6.3.2"
-  resolved "http://r.npm.sankuai.com/vue-class-component/download/vue-class-component-6.3.2.tgz#e6037e84d1df2af3bde4f455e50ca1b9eec02be6"
-  integrity sha1-5gN+hNHfKvO95PRV5Qyhue7AK+Y=
+vue-class-component@^7.2.6:
+  version "7.2.6"
+  resolved "http://r.npm.sankuai.com/vue-class-component/download/vue-class-component-7.2.6.tgz#8471e037b8e4762f5a464686e19e5afc708502e4"
+  integrity sha1-hHHgN7jkdi9aRkaG4Z5a/HCFAuQ=
 
 vue-hot-reload-api@^2.3.0:
   version "2.3.4"
@@ -8160,12 +8158,10 @@ vue-loader@^15.7.0:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-property-decorator@^7.0.0:
-  version "7.3.0"
-  resolved "http://r.npm.sankuai.com/vue-property-decorator/download/vue-property-decorator-7.3.0.tgz#d50d67f0b0f1c814f9f2fba36d6eeccbcc62dbb6"
-  integrity sha1-1Q1n8LDxyBT58vujbW7sy8xi27Y=
-  dependencies:
-    vue-class-component "^6.2.0"
+vue-property-decorator@^9.0.2:
+  version "9.1.2"
+  resolved "http://r.npm.sankuai.com/vue-property-decorator/download/vue-property-decorator-9.1.2.tgz#266a2eac61ba6527e2e68a6933cfb98fddab5457"
+  integrity sha1-JmourGG6ZSfi5oppM8+5j92rVFc=
 
 vue-router@3.0.7:
   version "3.0.7"

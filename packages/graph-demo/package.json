@@ -9,7 +9,7 @@
     "test": "echo test"
   },
   "dependencies": {
-    "@datafe/graph-vue": "0.1.8",
+    "@datafe/graph-vue": "0.1.9",
     "@ss/mtd-vue": "^0.3.28",
     "axios": "^0.18.0",
     "core-js": "^2.6.11",
@@ -17,8 +17,8 @@
     "monaco-editor-webpack-plugin": "^2.0.0",
     "url-loader": "^2.2.0",
     "vue": "2.6.12",
-    "vue-class-component": "^6.0.0",
-    "vue-property-decorator": "^7.0.0",
+    "vue-property-decorator": "^9.0.2",
+    "vue-class-component": "^7.2.6",
     "vue-router": "3.0.7"
   },
   "devDependencies": {

@@ -96,7 +96,7 @@ export default class ViewController {
   }
 
   get nodesBox() {
-    const nodes = this.graph.getNodes()
+    const nodes = this.graph.getNodes().filter(item => !item.hasState('hide'))
     let [minX, minY, maxX, maxY] = [
       Number.MAX_SAFE_INTEGER,
       Number.MAX_SAFE_INTEGER,
@@ -186,7 +186,7 @@ export default class ViewController {
 
   fixMissView() {
     const visiableDom = this.$svg.querySelector('g[graph-type=slot]')
-    if(visiableDom) {
+    if (visiableDom) {
       visiableDom.innerHTML = visiableDom.innerHTML
     }
   }

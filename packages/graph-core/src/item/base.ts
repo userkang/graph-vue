@@ -10,7 +10,8 @@ export default class Base {
       linked: false,
       enable: false,
       locked: false,
-    },
+      hide: false
+    }
   }
 
   constructor(model: INodeModel | IEdgeModel | ISlotModel) {

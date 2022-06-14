@@ -68,17 +68,73 @@ export default class Node extends Base {
     return this.getEdges().filter(edge => edge.fromNode.id === this.id)
   }
 
-  public getNeighbors() {
+  public show() {
+    this.clearState('hide')
+    this.getEdges().forEach(edge => {
+      edge.clearState('hide')
+    })
+  }
+
+  public hide() {
+    this.setState('hide')
+    this.getEdges().forEach(edge => {
+      edge.setState('hide')
+    })
+  }
+
+  public getParent() {
     const nodes: INode[] = []
     this.getInEdges().forEach(edge => {
       nodes.push(edge.fromNode)
     })
+    return nodes
+  }
 
+  public getChildren() {
+    const nodes: INode[] = []
     this.getOutEdges().forEach(edge => {
       nodes.push(edge.toNode)
     })
 
     return nodes
+  }
+
+  public getAllParent() {
+    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const tempNodes: INode[] = this.getParent()
+
+    let i = 0
+
+    while (i < tempNodes.length) {
+      const node = tempNodes[i]
+      if (nodes[node.id]) {
+        continue
+      }
+      nodes[node.id] = true
+      tempNodes.push(...tempNodes[i].getParent())
+      i++
+    }
+
+    return tempNodes
+  }
+
+  public getAllChildren() {
+    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const tempNodes: INode[] = this.getChildren()
+
+    let i = 0
+
+    while (i < tempNodes.length) {
+      const node = tempNodes[i]
+      if (nodes[node.id]) {
+        continue
+      }
+      nodes[node.id] = true
+      tempNodes.push(...tempNodes[i].getChildren())
+      i++
+    }
+
+    return tempNodes
   }
 
   public addEdge(edge: IEdge) {

@@ -17,17 +17,13 @@ export const dagMock = () => {
         label: '工具栏悬浮有说明',
         nodeId: 232,
         x: 400,
-        y: 100,
-        width: 200,
-        height: 50
+        y: 100
       },
       {
         id: '2',
         label: '拖动添加组件',
         x: 540,
         y: 407.5,
-        width: 210,
-        height: 30,
         slots: [
           {
             type: 'in',
@@ -144,4 +140,49 @@ export const treeMock = (times: number) => {
     stack.push(node.children[0], node.children[1])
   }
   return head
+}
+
+const showNode = data => {
+  data?.children.forEach(item => {
+    item.isShow = true
+    showChildNode(item)
+  })
+}
+
+const showChildNode = parentNode => {
+  parentNode?.children.forEach(item => {
+    item.isShow = true
+    showChildNode(item)
+  })
+}
+
+export const mindMapMock = () => {
+  const dataMock = {
+    id: '1',
+    label: '工具栏悬浮有说明',
+    isShow: true,
+    nodeId: 232,
+    slots: [{ type: 'out', id: 'slot1' }],
+    children: [
+      {
+        id: '2',
+        label: '拖动添加组件',
+        isShow: true
+      },
+      {
+        id: '3',
+        label: '拖动插槽连线',
+        isShow: true
+      },
+      {
+        id: '4',
+        label: '交互可配置',
+        isShow: true
+      }
+    ]
+  }
+  // showNode(dataMock)
+  console.log(dataMock)
+
+  return dataMock
 }

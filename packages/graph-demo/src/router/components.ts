@@ -15,3 +15,9 @@ export const Tree = () =>
     /* webpackChunkName: "tree"*/
     '../views/templates/Tree.vue'
   )
+
+export const MindMap = () =>
+  import(
+    /* webpackChunkName: "mindMap"*/
+    '../views/templates/MindMap.vue'
+  )

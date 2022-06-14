@@ -181,7 +181,7 @@ export default class DAG extends Vue {
   }
 
   async created() {
-    await GraphStore.getData()
+    await GraphStore.getDagData()
   }
 }
 </script>
@@ -204,7 +204,7 @@ export default class DAG extends Vue {
   box-sizing: border-box;
   font-size: 12px;
   .left {
-    width: 20%;
+    width: 9%;
     height: 100%;
     background-color: orange;
     &.leaf {

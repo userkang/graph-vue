@@ -30,13 +30,15 @@
           </div>
           <div class="add-icon">
             <mtd-icon
-              name="mtdicon mtdicon-success-o"
+              name="mtdicon mtdicon-error-o"
+              style="transform: rotate(45deg)"
               @click="addNode($event, node.model)"
             ></mtd-icon>
           </div>
-          <div class="unopen-icon">
+          <div class="hide-icon">
             <mtd-icon
-              name="mtdicon mtdicon-checkbox-indetermina-o"
+              name="mtdicon mtdicon-nosign"
+              style="transform: rotate(-45deg)"
               @click="hideNode(node.model)"
             ></mtd-icon>
           </div>
@@ -272,11 +274,9 @@ export default class DAG extends Vue {
   background-color: transparent;
   font-size: 17px;
 }
-.unopen-icon {
-  z-index: 10000;
+.hide-icon {
   position: absolute;
-  right: -8px;
-  // display: none;
+  right: -18px;
   color: white;
   background-color: red;
   font-size: 17px;

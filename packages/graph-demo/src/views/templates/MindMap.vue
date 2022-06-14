@@ -38,12 +38,30 @@
               @click="addNode($event, node.model)"
             ></mtd-icon>
           </div>
-          <div class="hide-icon">
+          <div
+            class="hide-icon"
+            v-if="
+              node.model.children &&
+              node.model.children.length &&
+              node.model.isChildShow
+            "
+          >
             <mtd-icon
               name="mtdicon mtdicon-nosign"
               style="transform: rotate(-45deg)"
               @click="handleHideNode(node.model)"
             ></mtd-icon>
+          </div>
+          <div
+            class="show-icon"
+            v-if="
+              node.model.children &&
+              node.model.children.length &&
+              !node.model.isChildShow
+            "
+            @click="handleShowNode(node.model)"
+          >
+            {{ node.model.children && node.model.children.length }}
           </div>
         </div>
       </template>
@@ -122,7 +140,8 @@ export default class DAG extends Vue {
       this.dataMock.children.push({
         id: String(Date.now()),
         label: '新节点',
-        isShow: true
+        isShow: true,
+        isChildShow: true
       })
     } else {
       this.addChildNode(this.dataMock, nodeData.id)
@@ -137,11 +156,12 @@ export default class DAG extends Vue {
       const isRealParent = item.id === nodeId
       !item?.children && isRealParent && (item.children = [])
       isRealParent &&
-        item.children.push({
+        item.children?.push({
           id: String(Date.now()),
           label: '新节点',
           children: [],
-          isShow: true
+          isShow: true,
+          isChildShow: true
         })
       !isRealParent && this.addChildNode(item, nodeId)
       return isRealParent
@@ -149,30 +169,37 @@ export default class DAG extends Vue {
   }
 
   async handleHideNode(node: INodeModel) {
-    await this.hideNode(node)
+    await this.hideOrShowNode(node, false)
     this.graph.data(this.dataMock)
   }
 
-  hideNode(node: INodeModel) {
+  async handleShowNode(node: INodeModel) {
+    await this.hideOrShowNode(node, true)
+    this.graph.data(this.dataMock)
+  }
+
+  hideOrShowNode(node: INodeModel, isShow: boolean) {
     if (this.dataMock.id === node.id) {
+      this.dataMock.isChildShow = isShow
       this.dataMock.children.forEach(item => {
-        item.isShow = false
-        this.hideChildNode(item)
+        item.isShow = isShow
+        this.hideOrShowChildNode(item, isShow)
       })
     } else {
       this.dataMock.children.forEach(item => {
         if (item.id === node.id) {
-          this.hideChildNode(item)
+          item.isChildShow = isShow
+          this.hideOrShowChildNode(item, isShow)
         }
       })
     }
   }
 
-  hideChildNode(parentNode) {
+  hideOrShowChildNode(parentNode, isShow: boolean) {
     parentNode?.children &&
       parentNode.children.forEach(item => {
-        item.isShow = false
-        this.hideChildNode(item)
+        item.isShow = isShow
+        this.hideOrShowChildNode(item, isShow)
       })
   }
 
@@ -281,11 +308,27 @@ export default class DAG extends Vue {
   font-size: 17px;
 }
 .hide-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  justify-content: center;
   position: absolute;
   // right: -18px;
   color: white;
   background-color: red;
   font-size: 17px;
+}
+.show-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  color: white;
+  background-color: red;
+  font-size: 16px;
 }
 .text-container {
   background-color: #333;

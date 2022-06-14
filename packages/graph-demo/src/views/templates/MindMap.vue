@@ -7,9 +7,6 @@
       :layout="layout"
       @init="initGraph"
     >
-      <!-- <template #edge="{ edge }">
-        <path :d="path(edge)" class="graph-custom-edge"></path>
-      </template> -->
       <template #node="{ node }">
         <div class="node-container">
           <div class="text-container">
@@ -18,7 +15,6 @@
               v-if="!(isEditText && node.hasState('selected'))"
             >
               {{ node.model.label }}
-              {{ node.model.isCollapsed }}
             </p>
             <mtd-input
               v-else
@@ -33,7 +29,8 @@
           </div>
           <div class="add-icon">
             <mtd-icon
-              name="mtdicon mtdicon-success-o"
+              name="mtdicon mtdicon-error-o"
+              style="transform: rotate(45deg)"
               @click="addNode($event, node)"
             ></mtd-icon>
           </div>
@@ -42,17 +39,12 @@
             v-if="
               node.model.children &&
               node.model.children.length &&
-              node.model.isChildShow
+              !node.model.isCollapsed
             "
           >
             <mtd-icon
-              v-if="node.model.isCollapsed"
-              name="mtdicon mtdicon-checkbox-indetermina-o"
-              @click="showNode(node)"
-            ></mtd-icon>
-            <mtd-icon
-              v-else
-              name="mtdicon mtdicon-checkbox-indetermina"
+              name="mtdicon mtdicon-nosign"
+              style="transform: rotate(-45deg)"
               @click="hideNode(node)"
             ></mtd-icon>
           </div>
@@ -61,9 +53,9 @@
             v-if="
               node.model.children &&
               node.model.children.length &&
-              !node.model.isChildShow
+              node.model.isCollapsed
             "
-            @click="handleShowNode(node.model)"
+            @click="showNode(node)"
           >
             {{ node.model.children && node.model.children.length }}
           </div>
@@ -224,7 +216,9 @@ export default class DAG extends Vue {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (x1 - x2) / 3
-    return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${x1 - 2*xc} ${y2} L ${x2} ${y2}`
+    return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
+      x1 - 2 * xc
+    } ${y2} L ${x2} ${y2}`
   }
 
   async created() {
@@ -266,6 +260,7 @@ export default class DAG extends Vue {
   // right: -18px;
   color: white;
   background-color: red;
+  border-radius: 50%;
   font-size: 17px;
 }
 .show-icon {

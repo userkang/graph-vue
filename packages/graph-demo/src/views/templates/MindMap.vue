@@ -7,6 +7,9 @@
       :layout="layout"
       @init="initGraph"
     >
+      <!-- <template #edge="{ edge }">
+        <path :d="path(edge)" class="graph-custom-edge"></path>
+      </template> -->
       <template #node="{ node }">
         <div class="node-container">
           <div class="text-container">
@@ -34,7 +37,14 @@
               @click="addNode($event, node)"
             ></mtd-icon>
           </div>
-          <div class="unopen-icon">
+          <div
+            class="hide-icon"
+            v-if="
+              node.model.children &&
+              node.model.children.length &&
+              node.model.isChildShow
+            "
+          >
             <mtd-icon
               v-if="node.model.isCollapsed"
               name="mtdicon mtdicon-checkbox-indetermina-o"
@@ -45,6 +55,17 @@
               name="mtdicon mtdicon-checkbox-indetermina"
               @click="hideNode(node)"
             ></mtd-icon>
+          </div>
+          <div
+            class="show-icon"
+            v-if="
+              node.model.children &&
+              node.model.children.length &&
+              !node.model.isChildShow
+            "
+            @click="handleShowNode(node.model)"
+          >
+            {{ node.model.children && node.model.children.length }}
           </div>
         </div>
       </template>
@@ -236,14 +257,28 @@ export default class DAG extends Vue {
   background-color: transparent;
   font-size: 17px;
 }
-.unopen-icon {
-  z-index: 10000;
+.hide-icon {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  justify-content: center;
   position: absolute;
-  right: -8px;
-  // display: none;
+  // right: -18px;
   color: white;
   background-color: red;
   font-size: 17px;
+}
+.show-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  position: absolute;
+  color: white;
+  background-color: red;
+  font-size: 16px;
 }
 .text-container {
   background-color: #333;

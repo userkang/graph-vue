@@ -161,23 +161,27 @@ export const mindMapMock = () => {
     id: '1',
     label: '工具栏悬浮有说明',
     isShow: true,
+    isChildShow: true,
     nodeId: 232,
     slots: [{ type: 'out', id: 'slot1' }],
     children: [
       {
         id: '2',
         label: '拖动添加组件',
-        isShow: true
+        isShow: true,
+        isChildShow: true
       },
       {
         id: '3',
         label: '拖动插槽连线',
-        isShow: true
+        isShow: true,
+        isChildShow: true
       },
       {
         id: '4',
         label: '交互可配置',
-        isShow: true
+        isShow: true,
+        isChildShow: true
       }
     ]
   }

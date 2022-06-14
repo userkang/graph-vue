@@ -8,6 +8,9 @@
       @drop="handleDrop"
       @init="initGraph"
     >
+      <!-- <template #edge="{ edge }">
+        <path :d="path(edge)" class="graph-custom-edge"></path>
+      </template> -->
       <template #node="{ node }">
         <div class="node-container" v-if="node.model.isShow">
           <div class="text-container">
@@ -39,14 +42,11 @@
             <mtd-icon
               name="mtdicon mtdicon-nosign"
               style="transform: rotate(-45deg)"
-              @click="hideNode(node.model)"
+              @click="handleHideNode(node.model)"
             ></mtd-icon>
           </div>
         </div>
       </template>
-      <!-- <template #edge="{ edge }">
-        <path :d="path(edge)" class="graph-custom-edge"></path>
-      </template> -->
       <template #port></template>
       <ToolBox />
     </GraphVue>
@@ -148,16 +148,22 @@ export default class DAG extends Vue {
     })
   }
 
-  async hideNode(node: INodeModel) {
-    await this.hideNode2(node)
+  async handleHideNode(node: INodeModel) {
+    await this.hideNode(node)
     this.graph.data(this.dataMock)
   }
 
-  hideNode2(node: INodeModel) {
+  hideNode(node: INodeModel) {
     if (this.dataMock.id === node.id) {
       this.dataMock.children.forEach(item => {
         item.isShow = false
         this.hideChildNode(item)
+      })
+    } else {
+      this.dataMock.children.forEach(item => {
+        if (item.id === node.id) {
+          this.hideChildNode(item)
+        }
       })
     }
   }
@@ -276,7 +282,7 @@ export default class DAG extends Vue {
 }
 .hide-icon {
   position: absolute;
-  right: -18px;
+  // right: -18px;
   color: white;
   background-color: red;
   font-size: 17px;

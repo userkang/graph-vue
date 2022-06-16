@@ -274,7 +274,7 @@ export default class DAG extends Vue {
     const len = Math.ceil(
       e.target.value.replace(/[^\x00-\xff]/g, '**').length / 2
     )
-    const col = Math.ceil(len / 11)
+    const col = Math.ceil(len / 11) > 0 ? Math.ceil(len / 11) : 1
     this.rows = col
     node.update({
       width: 180,

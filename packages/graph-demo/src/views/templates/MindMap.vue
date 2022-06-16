@@ -146,7 +146,7 @@ export default class DAG extends Vue {
     this.showNode(parentNode)
   }
 
-  showNode(node: Inode) {
+  showNode(node: INode) {
     node.model.isCollapsed = false
     node.getAllChildren().forEach(item => {
       item.show()

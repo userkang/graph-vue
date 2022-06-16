@@ -33,12 +33,12 @@ const getDefaultConfig = () => ({
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
-  public viewController!: ViewController
-  public layoutController!: LayoutController
-  public eventController!: EventController
-  public nodeController!: NodeController
-  public edgeController!: EdgeController
-  public stackController!: StackController
+  private viewController!: ViewController
+  private layoutController!: LayoutController
+  private eventController!: EventController
+  private nodeController!: NodeController
+  private edgeController!: EdgeController
+  private stackController!: StackController
 
   constructor(config: IGraphConfig) {
     const container =
@@ -58,6 +58,7 @@ export default class Graph extends EventEmitter {
       this.set('svg', new Svg(this))
     }
     this.initController()
+    console.log(333333)
   }
 
   private initController() {

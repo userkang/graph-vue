@@ -9,7 +9,13 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["packages/graph-demo/src/*", "packages/graph-core/src/*"]
+      "@/*": [
+        "packages/graph-demo/src/*",
+        "packages/graph-core/src/*",
+        "packages/graph-vue/**"
+      ],
+      "@datafe/graph-core": ["packages/graph-core/src/index.ts"],
+      "@datafe/graph-vue": ["packages/graph-vue"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

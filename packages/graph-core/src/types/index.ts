@@ -11,7 +11,6 @@ export interface IDataModel {
   nodes: INodeModel[]
   // 实验连线信息
   edges: IEdgeModel[]
-  [key: string]: any
 }
 
 export interface ISlotModel {
@@ -27,8 +26,11 @@ export interface INodeModel {
   x?: number
   y?: number
   slots?: ISlotModel[]
-  children?: INodeModel[]
   [key: string]: any
+}
+
+export interface ITreeDataModel extends INodeModel {
+  children?: ITreeDataModel[]
 }
 
 export interface IEdgeModel {

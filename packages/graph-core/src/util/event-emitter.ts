@@ -1,7 +1,7 @@
 export default class EventEmitter {
-  _events: { [key: string]: Array<() => void> } = {}
+  private _events: { [key: string]: Array<() => void> } = {}
 
-  on(evt: string | string[], callback: (...args: any[]) => void) {
+  public on(evt: string | string[], callback: (...args: any[]) => void) {
     const bind = (e: string) => {
       if (!this._events[e]) {
         this._events[e] = []
@@ -18,7 +18,7 @@ export default class EventEmitter {
     }
   }
 
-  emit(evt: string, ...args: unknown[]) {
+  public emit(evt: string, ...args: unknown[]) {
     if (!this._events[evt]) {
       return
     }
@@ -28,7 +28,7 @@ export default class EventEmitter {
     })
   }
 
-  off(evt?: string, callback?: (...args: any[]) => void) {
+  public off(evt?: string, callback?: (...args: any[]) => void) {
     if (!evt) {
       // evt 为空全部清除
       this._events = {}

@@ -9,11 +9,7 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "packages/graph-demo/src/*",
-        "packages/graph-core/src/*",
-        "packages/graph-vue/**"
-      ],
+      "@/*": ["packages/graph-demo/src/*", "packages/graph-core/src/*"],
       "@datafe/graph-core": ["packages/graph-core/src/index.ts"],
       "@datafe/graph-vue": ["packages/graph-vue"]
     },

@@ -372,6 +372,7 @@ export default class DAG extends Vue {
   margin: 5px;
   padding: 5px;
   user-select: text;
+  resize: none;
   text-align: center;
   line-height: 1.5;
   font-size: 12px;

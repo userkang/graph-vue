@@ -286,7 +286,7 @@ export default class DAG extends Vue {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (x1 - x2) / 3
-    return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
+    return `M ${x1 - 15} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc
     } ${y2} L ${x2} ${y2}`
   }

@@ -338,7 +338,7 @@ export default class DAG extends Vue {
   width: 16px;
   height: 16px;
   color: white;
-  background-color: red;
+  background-color: transparent;
   border-radius: 50%;
   font-size: 17px;
   pointer-events: visible;
@@ -352,7 +352,8 @@ export default class DAG extends Vue {
   height: 16px;
   border-radius: 50%;
   color: white;
-  background-color: red;
+  border: 1px solid white;
+  background-color: transparent;
   font-size: 16px;
 }
 .text-container {

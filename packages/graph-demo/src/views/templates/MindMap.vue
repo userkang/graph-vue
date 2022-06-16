@@ -9,28 +9,25 @@
       <template #node="{ node }">
         <div class="node-container">
           <div class="left text-container" ref="nodeContainer">
-            <p
-              v-if="!isEditText"
-              class="node-text"
-              :class="{
-                'node-text-selected': node.hasState('selected')
-              }"
-            >
-              {{ node.model.label }}
-            </p>
             <textarea
               ref="textarea"
-              v-else-if="isEditText && node.hasState('selected')"
+              v-if="isEditText && node.hasState('selected')"
               v-model="node.model.label"
               @input="handleInput($event, node)"
               @blur="handleNodeBlur"
-              :rows="rows"
+              :rows="rows(node)"
               class="node-text"
               :class="{
                 'node-text-edited': isEditText && node.hasState('selected')
               }"
             ></textarea>
-            <p v-else class="node-text">
+            <p
+              v-else
+              class="node-text"
+              :class="{
+                'node-text-selected': node.hasState('selected')
+              }"
+            >
               {{ node.model.label }}
             </p>
           </div>
@@ -129,7 +126,6 @@ export default class DAG extends Vue {
   isEditText = false
   isShowAddIcon = false
   activeId = ''
-  rows = 1
 
   get action() {
     return action
@@ -265,15 +261,17 @@ export default class DAG extends Vue {
   }
 
   handleInput(e, node) {
-    const len = Math.ceil(
-      e.target.value.replace(/[^\x00-\xff]/g, '**').length / 2
-    )
-    const col = Math.ceil(len / 11) > 0 ? Math.ceil(len / 11) : 1
-    this.rows = col
     node.update({
       width: 180,
-      height: 40 + 18 * (col - 1)
+      height: 40 + 18 * (this.rows(node) - 1)
     })
+  }
+
+  rows(node: INode) {
+    const len = Math.ceil(
+      node.model.label.replace(/[^\x00-\xff]/g, '**').length / 2
+    )
+    return Math.ceil(len / 11) > 0 ? Math.ceil(len / 11) : 1
   }
 
   path(edge: IEdge) {
@@ -371,6 +369,7 @@ export default class DAG extends Vue {
   text-align: center;
   line-height: 1.5;
   font-size: 12px;
+  word-break: break-all;
 }
 .node-container:hover {
   .hide-icon {

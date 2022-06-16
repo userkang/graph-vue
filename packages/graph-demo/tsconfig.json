@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  // "extends": "../../tsconfig.json",
   "compilerOptions": {
     "strict": true,
     "target": "es5",
@@ -16,11 +16,11 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      // "@/*": ["src/*"],
+      "@/*": ["src/*"]
       // "@datafe/graph-vue": ["../../packages/graph-vue"],
       // "@datafe/graph-core": ["../../packages/graph-core/src"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
-  }
-  // "include": ["src"]
+  },
+  "include": ["src"]
 }

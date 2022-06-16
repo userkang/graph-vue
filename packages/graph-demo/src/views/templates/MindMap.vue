@@ -246,12 +246,6 @@ export default class DAG extends Vue {
     this.handleNodeDblClick()
   }
 
-  deleteItem() {
-    if (this.activeId) {
-      this.graph.deleteNode(this.activeId)
-    }
-  }
-
   handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
     this.menuShow = true
     this.activeId = data.id

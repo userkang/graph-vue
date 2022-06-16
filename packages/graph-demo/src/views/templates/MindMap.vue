@@ -160,7 +160,7 @@ export default class DAG extends Vue {
     })
     this.graph.addEdge({
       fromNodeId: parentNode.id,
-      toNodeId: node.id
+      toNodeId: node?.id
     })
 
     this.showNode(parentNode)
@@ -226,10 +226,10 @@ export default class DAG extends Vue {
           label: '新节点',
           isCollapsed: false
         })
-        node.setState('selected')
+        node?.setState('selected')
         this.graph.addEdge({
           fromNodeId: item.id,
-          toNodeId: node.id
+          toNodeId: node?.id
         })
         this.showNode(item)
         item.clearState('selected')

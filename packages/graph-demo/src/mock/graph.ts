@@ -142,51 +142,29 @@ export const treeMock = (times: number) => {
   return head
 }
 
-const showNode = data => {
-  data?.children.forEach(item => {
-    item.isShow = true
-    showChildNode(item)
-  })
-}
-
-const showChildNode = parentNode => {
-  parentNode?.children.forEach(item => {
-    item.isShow = true
-    showChildNode(item)
-  })
-}
-
 export const mindMapMock = () => {
-  const dataMock = {
+  return {
     id: '1',
     label: '工具栏悬浮有说明',
-    isShow: true,
-    isChildShow: true,
     nodeId: 232,
     slots: [{ type: 'out', id: 'slot1' }],
+    isCollapsed: false,
     children: [
       {
         id: '2',
         label: '拖动添加组件',
-        isShow: true,
-        isChildShow: true
+        isCollapsed: false
       },
       {
         id: '3',
         label: '拖动插槽连线',
-        isShow: true,
-        isChildShow: true
+        isCollapsed: false
       },
       {
         id: '4',
         label: '交互可配置',
-        isShow: true,
-        isChildShow: true
+        isCollapsed: false
       }
     ]
   }
-  // showNode(dataMock)
-  console.log(dataMock)
-
-  return dataMock
 }

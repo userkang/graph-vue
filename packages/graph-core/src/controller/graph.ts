@@ -58,7 +58,6 @@ export default class Graph extends EventEmitter {
       this.set('svg', new Svg(this))
     }
     this.initController()
-    console.log(333333)
   }
 
   private initController() {
@@ -80,6 +79,10 @@ export default class Graph extends EventEmitter {
 
   public get(key: string) {
     return this.cfg[key]
+  }
+
+  public getContainer() {
+    return this.cfg.container
   }
 
   public getSvgInfo() {

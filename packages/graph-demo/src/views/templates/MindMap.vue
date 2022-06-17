@@ -154,9 +154,11 @@ export default class MindMap extends Vue {
     this.graph.on('node.dblclick', this.handleNodeDblClick)
     this.graph.on('keyup', this.handleKeyUp)
 
-    this.graph.on('node.mousedown', (e: MouseEvent, data: { id: string }) => {
-      const node = this.graph.findNode(data.id)
-      node?.toFront()
+    this.graph.on('nodeselectchange', (nodes: INodeModel[]) => {
+      nodes.forEach((item: INodeModel) => {
+        const node = this.graph.findNode(String(item.id))
+        node?.toFront()
+      })
     })
   }
 

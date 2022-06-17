@@ -197,9 +197,14 @@ export default class Node extends Base {
     }
 
     Object.assign(this.model, model)
-    this.set('width', this.model.width || this.width)
-    this.set('height', this.model.height || this.height)
 
+    if (model.width || model.height) {
+      this.set('width', this.model.width || this.width)
+      this.set('height', this.model.height || this.height)
+      this.model.width = this.width
+      this.model.height = this.height
+    }
+    
     this.updateSlots()
 
     this.getEdges().forEach(edge => {

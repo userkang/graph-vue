@@ -4,8 +4,8 @@ import { INode, INodeModel } from '../types'
 import Slot from '../item/slot'
 
 const defaultCfg = {
-  width: 190,
-  height: 35
+  width: 180,
+  height: 40
 }
 export default class NodeController {
   graph: Graph

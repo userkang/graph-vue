@@ -13,6 +13,7 @@
             v-if="isEditText && node.hasState('selected')"
             v-model="node.model.label"
             @input="handleInput($event, node)"
+            @focus="handleNodeFocus"
             @blur="handleNodeBlur(node)"
             :rows="rows(node)"
             class="node-text"
@@ -128,6 +129,7 @@ export default class DAG extends Vue {
   graph!: Graph
   dataMock = mindMapMock()
   graphState = GraphStore.state
+  nodeEditedDom: HTMLElement | null = null
   menuShow = false
   isEditText = false
   isShowAddIcon = false
@@ -253,11 +255,15 @@ export default class DAG extends Vue {
     this.activeId = data.id
   }
 
+  handleNodeFocus() {
+    this.nodeEditedDom = document.querySelector('.node-text-edited')
+      .parentElement as HTMLElement
+  }
+
   handleNodeBlur(node: INode) {
     this.isEditText = false
-    const nodeDom = document.querySelector('.node-container') as HTMLElement
     this.$nextTick(() => {
-      const height = nodeDom.getBoundingClientRect().height
+      const height = this.nodeEditedDom.getBoundingClientRect().height
       node.update({
         width: 180,
         height

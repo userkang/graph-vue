@@ -31,7 +31,8 @@ const DATACHANGE = [
   'afterdeletenode',
   'afterdeleteedge',
   'afterdragnode',
-  'afterlayout'
+  'afterlayout',
+  'node:update'
 ]
 
 export default class EventController {

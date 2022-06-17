@@ -42,7 +42,7 @@ export default class Node extends Element {
   }
 
   drawDom() {
-    const htmlFunction = this.node.get('cfg').html
+    const htmlFunction = this.node.cfg.html
     let div: HTMLElement = document.createElement('div')
     // TODO: vue 渲染
     if (htmlFunction) {

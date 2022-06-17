@@ -73,7 +73,7 @@ export default class Node extends Element {
 
   setPath() {
     const { edge } = this
-    const pathFunction = edge.get('cfg')?.path
+    const pathFunction = edge.cfg?.path
     const edgePath = this.get('edgePath')
     const edgeWrapperPath = this.get('edgeWrapperPath')
     let path = ''

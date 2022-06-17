@@ -24,6 +24,7 @@ export default class Node extends Base {
     this.set('direction', cfg.direction || direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
+    this.set('zIndex', model.zIndex || 0)
 
     this.set('slots', [])
     // 保存与节点相关的边
@@ -34,6 +35,10 @@ export default class Node extends Base {
     model.y = model.y ? model.y : 0
 
     this.setSlotsPoint()
+  }
+
+  public get cfg() {
+    return this.get('cfg')
   }
 
   public get x() {
@@ -54,6 +59,18 @@ export default class Node extends Base {
 
   public get slots(): ISlot[] {
     return this.get('slots')
+  }
+
+  public get zIndex(): number {
+    return this.get('zIndex')
+  }
+
+  public set zIndex(value: number) {
+    this.set('zIndex', value)
+  }
+
+  public get view() {
+    return this.get('view')
   }
 
   public getEdges(): IEdge[] {
@@ -80,6 +97,11 @@ export default class Node extends Base {
     this.getEdges().forEach(edge => {
       edge.setState('hide')
     })
+  }
+
+  public toFront() {
+    this.set('zIndex', 1000)
+    this.emit('toFront', this)
   }
 
   public getParent() {
@@ -159,8 +181,7 @@ export default class Node extends Base {
     this.model.y = y
     // slot 位置更新
     this.slots.forEach(slot => {
-      slot.set('x', slot.x + moveX)
-      slot.set('y', slot.y + moveY)
+      slot.update(slot.x + moveX, slot.y + moveY)
     })
   }
 

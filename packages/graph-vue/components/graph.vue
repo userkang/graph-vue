@@ -119,10 +119,6 @@ export default class GraphVue extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: (this.layout as any).rankdir || 'TB',
-      nodeInfo: {
-        width: 180,
-        height: 40
-      },
       action: this.action
     })
 

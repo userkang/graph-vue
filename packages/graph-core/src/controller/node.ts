@@ -19,7 +19,7 @@ export default class NodeController {
   }
 
   get nodes() {
-    return Object.values(this._nodes)
+    return this.sortByZIndex()
   }
 
   get slotsMap() {
@@ -69,7 +69,7 @@ export default class NodeController {
 
     if (this.graph.get('isRender')) {
       const nodeGroup = this.graph.get('svg').get('nodeGroup')
-      nodeGroup.remove(node.get('view'))
+      nodeGroup.remove(node.view)
     }
 
     return node
@@ -87,6 +87,8 @@ export default class NodeController {
     const node = new Node(item, nodeCfg, direction)
     this._nodes[node.id] = node
 
+    this.watchNodeUpdate(node)
+
     // 渲染
     if (this.graph.get('isRender')) {
       const nodeView = node.render(this.graph)
@@ -97,9 +99,32 @@ export default class NodeController {
     return node
   }
 
-  public data(group: INodeModel[]) {
+  public watchNodeUpdate(node: INode) {
+    node.on('toFront', (item: INode) => {
+      this.graph.emit('node:update', item)
+    })
+  }
+
+  public sortByZIndex() {
+    const nodes = Object.values(this._nodes)
+    const zIndexMap: Record<number, INode[]> = {}
+    nodes.forEach(node => {
+      zIndexMap[node.zIndex] = zIndexMap[node.zIndex] || []
+      zIndexMap[node.zIndex].push(node)
+      node.zIndex = node.model.zIndex || 0
+    })
+
+    const nodeList: INode[] = []
+    Object.keys(zIndexMap).forEach(zIndex => {
+      nodeList.push(...zIndexMap[zIndex])
+    })
+
+    return nodeList
+  }
+
+  public data(nodes: INodeModel[]) {
     this._nodes = {}
-    group.forEach(item => this.addNode(item))
+    nodes.forEach(item => this.addNode(item))
   }
 
   public destroy() {

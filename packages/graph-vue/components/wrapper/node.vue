@@ -2,6 +2,7 @@
   <g v-if="!node.hasState('hide')">
     <g :transform="`translate(${node.x}, ${node.y})`">
       <foreignObject
+        overflow="visible"
         :width="node.width"
         :height="node.height"
         graph-type="node"

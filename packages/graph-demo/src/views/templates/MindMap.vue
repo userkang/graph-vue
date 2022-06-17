@@ -8,13 +8,13 @@
     >
       <template #node="{ node }">
         <div class="node-container">
-          <div class="left text-container" ref="nodeContainer">
+          <div class="text-container" ref="nodeContainer">
             <textarea
               ref="textarea"
               v-if="isEditText && node.hasState('selected')"
               v-model="node.model.label"
               @input="handleInput($event, node)"
-              @blur="handleNodeBlur"
+              @blur="handleNodeBlur(node)"
               :rows="rows(node)"
               class="node-text"
               :class="{
@@ -247,9 +247,15 @@ export default class DAG extends Vue {
     this.activeId = data.id
   }
 
-  handleNodeBlur() {
+  handleNodeBlur(node: INode) {
     this.isEditText = false
-    this.graph.layout()
+    node.update({
+      width: 180,
+      height: 40 + 18 * (this.rows(node) - 1)
+    })
+    this.$nextTick(() => {
+      this.graph.layout()
+    })
   }
 
   handleNodeDblClick() {
@@ -261,10 +267,10 @@ export default class DAG extends Vue {
   }
 
   handleInput(e, node) {
-    node.update({
-      width: 180,
-      height: 40 + 18 * (this.rows(node) - 1)
-    })
+    // node.update({
+    //   width: 180,
+    //   height: 40 + 18 * (this.rows(node) - 1)
+    // })
   }
 
   rows(node: INode) {
@@ -296,6 +302,7 @@ export default class DAG extends Vue {
   background: #333;
 }
 .node-container {
+  position: relative;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -303,18 +310,16 @@ export default class DAG extends Vue {
   background-color: transparent;
   color: rgba(0, 0, 0, 0.5);
   font-size: 12px;
-  .left {
-    flex-grow: 1;
-  }
   .right {
+    position: absolute;
+    right: -20px;
+    top: 50%;
+    transform: translateY(-10px);
     display: flex;
     align-items: center;
-    width: 17px;
-    min-width: 17px;
-    max-width: 17px;
-    height: 100%;
-    min-height: 40px;
-    flex-grow: 0;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
   }
 }
 .add-icon {

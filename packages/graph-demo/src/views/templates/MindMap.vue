@@ -125,7 +125,7 @@ const mindMapMock = () => {
     ConfigPanel
   }
 })
-export default class DAG extends Vue {
+export default class MindMap extends Vue {
   graph!: Graph
   dataMock = mindMapMock()
   graphState = GraphStore.state
@@ -256,14 +256,14 @@ export default class DAG extends Vue {
   }
 
   handleNodeFocus() {
-    this.nodeEditedDom = document.querySelector('.node-text-edited')
-      .parentElement as HTMLElement
+    this.nodeEditedDom =
+      document.querySelector('.node-text-edited')?.parentElement || null
   }
 
   handleNodeBlur(node: INode) {
     this.isEditText = false
     this.$nextTick(() => {
-      const height = this.nodeEditedDom.getBoundingClientRect().height
+      const height = this.nodeEditedDom?.getBoundingClientRect().height
       node.update({
         width: 180,
         height

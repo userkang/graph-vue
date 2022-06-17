@@ -8,33 +8,36 @@
     >
       <template #node="{ node }">
         <div class="node-container">
-          <div class="text-container" ref="nodeContainer">
-            <textarea
-              ref="textarea"
-              v-if="isEditText && node.hasState('selected')"
-              v-model="node.model.label"
-              @input="handleInput($event, node)"
-              @blur="handleNodeBlur(node)"
-              :rows="rows(node)"
-              class="node-text"
-              :class="{
-                'node-text-edited': isEditText && node.hasState('selected')
-              }"
-            ></textarea>
-            <p
-              v-else
-              class="node-text"
-              :class="{
-                'node-text-selected': node.hasState('selected')
-              }"
-            >
-              {{ node.model.label }}
-            </p>
-          </div>
+          <textarea
+            ref="textarea"
+            v-if="isEditText && node.hasState('selected')"
+            v-model="node.model.label"
+            @input="handleInput($event, node)"
+            @focus="handleNodeFocus"
+            @blur="handleNodeBlur(node)"
+            :rows="rows(node)"
+            class="node-text"
+            :class="{
+              'node-text-edited': isEditText && node.hasState('selected')
+            }"
+          ></textarea>
+          <p
+            v-else
+            class="node-text"
+            :class="{
+              'node-text-selected': node.hasState('selected')
+            }"
+          >
+            {{ node.model.label }}
+          </p>
           <div class="right">
             <div
               class="hide-icon"
-              v-if="node.getAllChildren().length && !node.model.isCollapsed"
+              v-if="
+                node.getAllChildren().length &&
+                !node.model.isCollapsed &&
+                !isEditText
+              "
             >
               <mtd-icon
                 name="mtdicon mtdicon-nosign"
@@ -44,7 +47,11 @@
             </div>
             <div
               class="show-icon"
-              v-if="node.getAllChildren().length && node.model.isCollapsed"
+              v-if="
+                node.getAllChildren().length &&
+                node.model.isCollapsed &&
+                !isEditText
+              "
               @click="showNode(node)"
             >
               {{ node.getAllChildren().length }}
@@ -118,10 +125,11 @@ const mindMapMock = () => {
     ConfigPanel
   }
 })
-export default class DAG extends Vue {
+export default class MindMap extends Vue {
   graph!: Graph
   dataMock = mindMapMock()
   graphState = GraphStore.state
+  nodeEditedDom: HTMLElement | null = null
   menuShow = false
   isEditText = false
   isShowAddIcon = false
@@ -252,13 +260,19 @@ export default class DAG extends Vue {
     this.activeId = data.id
   }
 
+  handleNodeFocus() {
+    this.nodeEditedDom =
+      document.querySelector('.node-text-edited')?.parentElement || null
+  }
+
   handleNodeBlur(node: INode) {
     this.isEditText = false
-    node.update({
-      width: 180,
-      height: 40 + 18 * (this.rows(node) - 1)
-    })
     this.$nextTick(() => {
+      const height = this.nodeEditedDom?.getBoundingClientRect().height
+      node.update({
+        width: 180,
+        height
+      })
       this.graph.layout()
     })
   }
@@ -289,7 +303,7 @@ export default class DAG extends Vue {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (x1 - x2) / 3
-    return `M ${x1 - 15} ${y1} L ${x1 - xc} ${y1}  L ${
+    return `M ${x1 - 10} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc
     } ${y2} L ${x2} ${y2}`
   }
@@ -369,8 +383,8 @@ export default class DAG extends Vue {
   justify-content: center;
   align-items: center;
   border-radius: 5px;
-  min-width: 150px;
-  min-height: 30px;
+  width: 100%;
+  height: 100%;
   background: #30e3ca;
   margin: 5px;
   padding: 5px;

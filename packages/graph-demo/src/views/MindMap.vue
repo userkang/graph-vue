@@ -256,7 +256,7 @@ export default class MindMap extends Vue {
   handleNodeDrag(e: MouseEvent, data: { id: string }) {
     const node = this.graph.findNode(String(data.id))
     node?.setState('selected')
-    node?.toFront()
+    node?.setZIndex(1000)
   }
 
   handleNodeFocus() {

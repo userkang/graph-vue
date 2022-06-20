@@ -12,7 +12,6 @@
             ref="textarea"
             v-if="isEditText && node.hasState('selected')"
             v-model="node.model.label"
-            @input="handleInput($event, node)"
             @focus="handleNodeFocus"
             @blur="handleNodeBlur(node)"
             :rows="rows(node)"
@@ -72,7 +71,7 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
+import { ToolBox, MiniMap, GraphVue } from '@datafe/graph-vue'
 import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
@@ -119,7 +118,6 @@ const mindMapMock = () => {
   components: {
     GraphVue,
     ToolBox,
-    Menu,
     MiniMap,
     ComponentPanel,
     ConfigPanel
@@ -285,13 +283,6 @@ export default class MindMap extends Vue {
       const textareaDom = this.$refs.textarea as any
       textareaDom?.select()
     })
-  }
-
-  handleInput(e, node) {
-    // node.update({
-    //   width: 180,
-    //   height: 40 + 18 * (this.rows(node) - 1)
-    // })
   }
 
   rows(node: INode) {

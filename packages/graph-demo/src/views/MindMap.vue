@@ -148,7 +148,7 @@ export default class MindMap extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('node.mousedown', this.handleNodeDrag)
     this.graph.on('node.dblclick', this.handleNodeDblClick)
     this.graph.on('keyup', this.handleKeyUp)
 
@@ -176,7 +176,6 @@ export default class MindMap extends Vue {
   }
 
   showNode(node: INode) {
-    // node.clearState('isCollapsed')
     node.update({ isCollapsed: false })
     node.getAllChildren().forEach(item => {
       item.update({ isCollapsed: false })
@@ -186,7 +185,6 @@ export default class MindMap extends Vue {
   }
 
   hideNode(node: INode) {
-    // node.setState('isCollapsed')
     node.update({ isCollapsed: true })
     node.getAllChildren().forEach(item => {
       item.update({ isCollapsed: true })
@@ -255,9 +253,10 @@ export default class MindMap extends Vue {
     this.handleNodeDblClick()
   }
 
-  handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
-    this.menuShow = true
-    this.activeId = data.id
+  handleNodeDrag(e: MouseEvent, data: { id: string }) {
+    const node = this.graph.findNode(String(data.id))
+    node?.setState('selected')
+    node?.setZIndex(1000)
   }
 
   handleNodeFocus() {

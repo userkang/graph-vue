@@ -30,6 +30,7 @@ export interface INodeModel {
 }
 
 export interface ITreeDataModel extends INodeModel {
+  collapsed?: boolean
   children?: ITreeDataModel[]
 }
 

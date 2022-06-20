@@ -15,7 +15,6 @@
         <div class="main-center-wrap">
           <router-view />
         </div>
-        <ConfigPanel />
       </div>
     </div>
   </div>

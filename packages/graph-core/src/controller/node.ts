@@ -121,8 +121,8 @@ export default class NodeController {
     })
 
     const nodeList: INode[] = []
-    Object.keys(zIndexMap).forEach(zIndex => {
-      nodeList.push(...zIndexMap[zIndex])
+    Object.values(zIndexMap).forEach((items: INode[]) => {
+      nodeList.push(...items)
     })
 
     return nodeList

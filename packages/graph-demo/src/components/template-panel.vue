@@ -68,8 +68,8 @@ export default class ComponentPanel extends Vue {
   }
 
   initActiveTemplate() {
-    const routePath = this.$route.path
-    const templateType = routePath.split('/')[2]
+    const hash = location.hash
+    const templateType = hash.split('/')[1]
     this.activeTemplate = templateType
   }
 

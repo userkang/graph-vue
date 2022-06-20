@@ -287,6 +287,7 @@ export default class MindMap extends Vue {
 
   rows(node: INode) {
     const len = Math.ceil(
+      // eslint-disable-next-line no-control-regex
       node.model.label.replace(/[^\x00-\xff]/g, '**').length / 2
     )
     return Math.ceil(len / 11) > 0 ? Math.ceil(len / 11) : 1

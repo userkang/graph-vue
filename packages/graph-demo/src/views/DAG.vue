@@ -1,7 +1,8 @@
 <template>
-  <div class="dag_component">
+  <div class="dag-container">
     <ComponentPanel />
     <GraphVue
+      class="graph-wrapper"
       ref="graph"
       :data="dataMock"
       :action="action"
@@ -27,22 +28,22 @@
       <template #edge="{ edge }">
         <path :d="path(edge)" class="graph-custom-edge graph-vue-edge"></path>
         <text
+          :id="edge.id"
           :x="text(edge).x"
           :y="text(edge).y"
-          style="text-anchor: middle; fill: #aaa; font-size: 12px"
+          style="text-anchor: middle; fill: #aaa; font-size: 14px"
+          >tag</text
         >
-          tag
-        </text>
       </template>
 
-      <template #port>
+      <!-- <template #port>
         <rect
           width="8"
           height="8"
           :transform="`translate(-4, -4)`"
           fill="#999"
         ></rect>
-      </template>
+      </template> -->
       <MiniMap />
       <ToolBox />
       <Menu class="menu" v-model="menuShow">
@@ -50,6 +51,7 @@
         <li @click="deleteItem">删除</li>
       </Menu>
     </GraphVue>
+    <ConfigPanel />
   </div>
 </template>
 
@@ -111,7 +113,7 @@ export default class DAG extends Vue {
   initEvent() {
     this.graph.on('node.contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
-    this.graph.on('node.mousedown', (e, data: {id: string}) => {
+    this.graph.on('node.mousedown', (e, data: { id: string }) => {
       const node = this.graph.findNode(data.id)
       node?.setZIndex(1000)
     })
@@ -191,10 +193,14 @@ export default class DAG extends Vue {
 </script>
 
 <style lang="scss" scoped>
-.dag_component {
-  position: relative;
+.dag-container {
   width: 100%;
   height: 100%;
+  display: flex;
+}
+.graph-wrapper {
+  position: relative;
+  flex: 1;
 }
 .node-container {
   width: 100%;
@@ -222,7 +228,7 @@ export default class DAG extends Vue {
 }
 .graph-custom-edge {
   stroke: rgb(235, 226, 224);
-  stroke-width: 1px;
+  stroke-width: 1.5;
   stroke-dasharray: 2;
   fill: none;
   &:hover {

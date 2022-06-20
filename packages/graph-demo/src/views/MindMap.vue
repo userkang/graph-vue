@@ -155,7 +155,7 @@ export default class MindMap extends Vue {
     this.graph.on('nodeselectchange', (nodes: INodeModel[]) => {
       nodes.forEach((item: INodeModel) => {
         const node = this.graph.findNode(String(item.id))
-        node?.toFront()
+        node?.setZIndex(1000)
       })
     })
   }

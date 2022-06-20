@@ -61,7 +61,7 @@ export default class Node extends Base {
     return this.get('slots')
   }
 
-  public get zIndex(): number {
+  public get zIndex() {
     return this.get('zIndex')
   }
 
@@ -69,8 +69,13 @@ export default class Node extends Base {
     this.set('zIndex', value)
   }
 
-  public get view() {
-    return this.get('view')
+  public getZIndex() {
+    return this.get('zIndex')
+  }
+
+  public setZIndex(value: number) {
+    this.set('zIndex', value)
+    this.emit('change:zIndex', this)
   }
 
   public getEdges(): IEdge[] {
@@ -85,6 +90,14 @@ export default class Node extends Base {
     return this.getEdges().filter(edge => edge.fromNode.id === this.id)
   }
 
+  public lock() {
+    this.setState('locked', true)
+  }
+
+  public unlock() {
+    this.setState('locaked', false)
+  }
+
   public show() {
     this.clearState('hide')
     this.getEdges().forEach(edge => {
@@ -97,11 +110,6 @@ export default class Node extends Base {
     this.getEdges().forEach(edge => {
       edge.setState('hide')
     })
-  }
-
-  public toFront() {
-    this.set('zIndex', 1000)
-    this.emit('toFront', this)
   }
 
   public getParent() {
@@ -204,12 +212,14 @@ export default class Node extends Base {
       this.model.width = this.width
       this.model.height = this.height
     }
-    
+
     this.updateSlots()
 
     this.getEdges().forEach(edge => {
       edge.update()
     })
+
+    this.emit('update', this)
   }
 
   /**

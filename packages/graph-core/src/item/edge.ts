@@ -34,10 +34,6 @@ export default class Edge extends Base {
     return this.get('cfg')
   }
 
-  public get view() {
-    return this.get('view')
-  }
-
   public get fromNode(): INode {
     return this.get('fromNode')
   }

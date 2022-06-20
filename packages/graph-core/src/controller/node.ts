@@ -100,8 +100,14 @@ export default class NodeController {
   }
 
   public watchNodeUpdate(node: INode) {
-    node.on('toFront', (item: INode) => {
-      this.graph.emit('node:update', item)
+    node.on('change:zIndex', (changeItem: INode) => {
+      const nodes = Object.values(this._nodes)
+      nodes.forEach(item => {
+        if (item.id !== changeItem.id) {
+          item.zIndex = item.model.zIndex || 0
+        }
+      })
+      this.graph.emit('node:update', changeItem)
     })
   }
 
@@ -109,9 +115,9 @@ export default class NodeController {
     const nodes = Object.values(this._nodes)
     const zIndexMap: Record<number, INode[]> = {}
     nodes.forEach(node => {
-      zIndexMap[node.zIndex] = zIndexMap[node.zIndex] || []
-      zIndexMap[node.zIndex].push(node)
-      node.zIndex = node.model.zIndex || 0
+      const zIndex = node.getZIndex()
+      zIndexMap[zIndex] = zIndexMap[zIndex] || []
+      zIndexMap[zIndex].push(node)
     })
 
     const nodeList: INode[] = []

@@ -111,6 +111,10 @@ export default class DAG extends Vue {
   initEvent() {
     this.graph.on('node.contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
+    this.graph.on('node.mousedown', (e, data: {id: string}) => {
+      const node = this.graph.findNode(data.id)
+      node?.setZIndex(1000)
+    })
   }
 
   handleDrop(e: DragEvent) {

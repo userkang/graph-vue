@@ -147,7 +147,7 @@ export default class MindMap extends Vue {
   initEvent() {
     this.graph.on('node.mousedown', this.handleNodeDrag)
     this.graph.on('node.dblclick', this.handleNodeDblClick)
-    this.graph.on('keyup', this.handleKeyUp)
+    this.graph.on('keydown', this.handleKeyDown)
 
     this.graph.on('nodeselectchange', (nodes: INodeModel[]) => {
       nodes.forEach((item: INodeModel) => {
@@ -190,7 +190,7 @@ export default class MindMap extends Vue {
     this.graph.emit('datachange')
   }
 
-  handleKeyUp(e: KeyboardEvent) {
+  handleKeyDown(e: KeyboardEvent) {
     e.stopPropagation()
     this.handleDeleteKey(e)
     this.handleTabKey(e)
@@ -224,6 +224,7 @@ export default class MindMap extends Vue {
 
   handleTabKey(e: KeyboardEvent) {
     if (['Tab'].includes(e.key)) {
+      e.preventDefault()
       const selectedNodes = this.graph.findNodeByState('selected') || []
       selectedNodes.forEach(item => {
         const node = this.graph.addNode({

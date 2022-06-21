@@ -6,29 +6,29 @@
       :layout="layout"
       @init="initGraph"
     >
-      <template #node="{ node }">
+      <template v-slot:node="{ node }">
         <div class="node-container">
-          <textarea
+          <div
             ref="textarea"
+            contenteditable
             v-if="isEditText && node.hasState('selected')"
-            v-model="node.model.label"
             @focus="handleNodeFocus"
-            @blur="handleNodeBlur(node)"
-            :rows="rows(node)"
+            @blur="handleNodeBlur($event, node)"
             class="node-text"
             :class="{
               'node-text-edited': isEditText && node.hasState('selected')
             }"
-          ></textarea>
-          <p
+          >
+            <span>{{ node.model.label }}</span>
+          </div>
+          <span
             v-else
             class="node-text"
             :class="{
               'node-text-selected': node.hasState('selected')
             }"
+            >{{ node.model.label }}</span
           >
-            {{ node.model.label }}
-          </p>
           <div class="right">
             <div
               class="hide-icon"
@@ -128,10 +128,7 @@ export default class MindMap extends Vue {
   dataMock = mindMapMock()
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
-  menuShow = false
   isEditText = false
-  isShowAddIcon = false
-  activeId = ''
 
   get action() {
     return action
@@ -244,7 +241,7 @@ export default class MindMap extends Vue {
     }
   }
 
-  handleBlankSpaceKey(e) {
+  handleBlankSpaceKey(e: KeyboardEvent) {
     const tagName = (e.target as HTMLBodyElement).tagName
     const isBlankSpace = e.key === ' '
     if (tagName !== 'BODY' || !isBlankSpace) {
@@ -264,8 +261,15 @@ export default class MindMap extends Vue {
       document.querySelector('.node-text-edited')?.parentElement || null
   }
 
-  handleNodeBlur(node: INode) {
+  handleNodeBlur(e, node: INode) {
+    e.preventDefault()
     this.isEditText = false
+    node.update({
+      label: e.target
+        .querySelector('span')
+        .innerText.replace(/<br\/?>/gi, '\n')
+        .trim()
+    })
     this.$nextTick(() => {
       const height = this.nodeEditedDom?.getBoundingClientRect().height
       node.update({
@@ -279,17 +283,18 @@ export default class MindMap extends Vue {
   handleNodeDblClick() {
     this.isEditText = true
     this.$nextTick(() => {
-      const textareaDom = this.$refs.textarea as any
-      textareaDom?.select()
+      const textareaDom = this.$refs.textarea as HTMLElement
+      this.textFocus(textareaDom)
     })
   }
 
-  rows(node: INode) {
-    const len = Math.ceil(
-      // eslint-disable-next-line no-control-regex
-      node.model.label.replace(/[^\x00-\xff]/g, '**').length / 2
-    )
-    return Math.ceil(len / 11) > 0 ? Math.ceil(len / 11) : 1
+  textFocus(el: HTMLElement) {
+    const range = document.createRange()
+    range.selectNodeContents(el)
+    range.collapse(false)
+    const sel = window.getSelection()
+    sel?.removeAllRanges()
+    sel?.addRange(range)
   }
 
   path(edge: IEdge) {
@@ -378,6 +383,7 @@ export default class MindMap extends Vue {
   border-radius: 5px;
   width: 100%;
   height: 100%;
+  min-height: 30px;
   background: #30e3ca;
   margin: 5px;
   padding: 5px;
@@ -387,6 +393,8 @@ export default class MindMap extends Vue {
   line-height: 1.5;
   font-size: 12px;
   word-break: break-all;
+  word-wrap: break-word;
+  white-space: pre-line;
 }
 .node-container:hover {
   .hide-icon {

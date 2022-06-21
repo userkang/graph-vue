@@ -1,4 +1,4 @@
-import { IEdge, INode } from '../types'
+import { IEdge, IGraphEvent, INode } from '../types'
 import Graph from '../controller/graph'
 import Base from './base'
 
@@ -9,46 +9,42 @@ export default class ClickSelect extends Base {
   }
 
   init() {
-    this.addEvent('node.click', this.clickNode)
-    this.addEvent('edge.click', this.clickEdge)
-    this.addEvent('svg.click', this.clickSvg)
+    this.addEvent('node:click', this.clickNode)
+    this.addEvent('edge:click', this.clickEdge)
+    this.addEvent('blank:click', this.clickBlank)
   }
 
-  clickNode(e: MouseEvent, data: { id: string }) {
-    const { id } = data
+  clickNode({ target }: IGraphEvent) {
     const selectedNodes = this.graph.findNodeByState('selected')
-    const hasSelected = selectedNodes.findIndex(item => item.id === id)
+    const hasSelected = selectedNodes.findIndex(item => item.id === target?.id)
     if (hasSelected > -1) {
       return
     }
 
     this.resetEdgeSelect()
     selectedNodes.forEach(item => item.clearState('selected'))
-    const node = this.graph.findNode(id)
-    if (node && !node.hasState('locked')) {
-      node.setState('selected')
-      this.graph.emit('nodeselectchange', [node.model])
+    if (target && !target.hasState('locked')) {
+      target.setState('selected')
+      this.graph.emit('node:change:selected', [target])
     }
   }
 
-  clickEdge(e: MouseEvent, data: { id: string }) {
-    const { id } = data
+  clickEdge({ target }: IGraphEvent) {
     const selectedEdges = this.graph.findEdgeByState('selected')
-    const exist = selectedEdges.findIndex(item => item.id === id)
+    const exist = selectedEdges.findIndex(item => item.id === target?.id)
     if (exist > -1) {
       return
     }
 
     this.resetNodeSelect()
     selectedEdges.forEach(item => item.clearState('selected'))
-    const edge = this.graph.findEdge(id)
-    if (edge) {
-      edge.setState('selected')
-      this.graph.emit('edgeselectchange', [edge.model])
+    if (target) {
+      target.setState('selected')
+      this.graph.emit('edge:change:selected', [target])
     }
   }
 
-  clickSvg(e: MouseEvent) {
+  clickBlank(e: MouseEvent) {
     this.resetNodeSelect()
     this.resetEdgeSelect()
   }
@@ -65,7 +61,7 @@ export default class ClickSelect extends Base {
     })
 
     if (selectedNodes.length) {
-      this.graph.emit('nodeselectchange', [])
+      this.graph.emit('node:change:selected', [])
     }
   }
 
@@ -81,7 +77,7 @@ export default class ClickSelect extends Base {
     })
 
     if (selectedEdges.length) {
-      this.graph.emit('edgeselectchange', [])
+      this.graph.emit('edge:change:selected', [])
     }
   }
 }

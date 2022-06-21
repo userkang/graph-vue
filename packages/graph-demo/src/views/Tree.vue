@@ -13,7 +13,7 @@
           class="node-container"
           :style="{
             'content-visibility': 'auto',
-            'border-color': node.hasState('selected') ? '#db3737' : '#DEDFEC'
+            'border-color': node.hasState('selected') ? '#606be1' : '#DEDFEC'
           }"
         >
           <div class="left" :class="[isLeaf(node.model) ? 'leaf' : '']"></div>
@@ -25,23 +25,9 @@
 
       <template #edge="{ edge }">
         <path :d="path(edge)" class="graph-custom-edge"></path>
-        <text
-          :x="text(edge).x"
-          :y="text(edge).y"
-          style="text-anchor: middle; fill: #aaa; font-size: 12px"
-        >
-          tag
-        </text>
       </template>
 
-      <template #port>
-        <rect
-          width="8"
-          height="8"
-          :transform="`translate(-4, -4)`"
-          fill="#999"
-        ></rect>
-      </template>
+      <template #port> </template>
 
       <MiniMap />
       <ToolBox />
@@ -58,7 +44,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
 import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph } from '@datafe/graph-core'
+import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -109,7 +95,7 @@ export default class Tree extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('node:contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
   }
 
@@ -130,9 +116,12 @@ export default class Tree extends Vue {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (y2 - y1) / 2
-    return `M ${x1} ${y1} L ${x1} ${y1 + xc} L ${x1} ${y2 - xc} L ${x2} ${
-      y2 - xc
-    }  L ${x2} ${y2}`
+    return `
+        M ${x1} ${y1}
+        L ${x1} ${y1 + xc}
+        L ${x1} ${y2 - xc}
+        C ${x2} ${y2 - xc} ${x2} ${y2 - xc} ${x2} ${y2}
+    `
   }
 
   text(edge: IEdge) {
@@ -171,13 +160,22 @@ export default class Tree extends Vue {
 
   deleteItem() {
     if (this.activeId) {
+      const node = this.graph.findNode(this.activeId)
+      const children = node?.getAllChildren()
+
+      if (children) {
+        children.forEach(item => {
+          this.graph.deleteNode(item.id)
+        })
+      }
+
       this.graph.deleteNode(this.activeId)
     }
   }
 
-  handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
+  handleNodeContextMenu({ target }: { target: INode }) {
     this.menuShow = true
-    this.activeId = data.id
+    this.activeId = target.id
   }
 
   async created() {
@@ -197,11 +195,12 @@ export default class Tree extends Vue {
   background-color: rgba(255, 255, 255, 0.85);
   color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: center;
-  border: 1px solid #fff;
+  border: 2px solid #fff;
   box-sizing: border-box;
-  font-size: 12px;
+  font-size: 14px;
+  border-radius: 10px;
   .left {
     width: 20%;
     height: 100%;
@@ -217,8 +216,7 @@ export default class Tree extends Vue {
 }
 .graph-custom-edge {
   stroke: rgb(235, 226, 224);
-  stroke-width: 1px;
-  stroke-dasharray: 2;
+  stroke-width: 1.5;
   fill: none;
   &:hover {
     stroke: rgb(0, 195, 255);

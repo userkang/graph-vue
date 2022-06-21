@@ -24,15 +24,16 @@ const MOVE_DEVIATION = 2
 const EXTENDEVENTS = ['keyup', 'keydown']
 
 const DATACHANGE = [
-  'afteraddnode',
-  'afteraddedge',
-  'nodeselectchange',
-  'edgeselectchange',
-  'afterdeletenode',
-  'afterdeleteedge',
-  'afterdragnode',
-  'afterlayout',
-  'node:update'
+  'node:added',
+  'edge:added',
+  'node:change:selected',
+  'edge:change:selected',
+  'node:deleted',
+  'edge:deleted',
+  'node:draged',
+  'layout',
+  'node:change',
+  'edge:change'
 ]
 
 export default class EventController {
@@ -146,20 +147,40 @@ export default class EventController {
   }
 
   emitMouseEvent(e: MouseEvent, eventType: string) {
+    const { x, y } = this.graph.getPointByClient(e.x, e.y)
+
     if (e.target === this.$svg) {
-      this.currentItemType = 'svg'
-      this.graph.emit(`svg.${eventType}`, e)
+      this.currentItemType = 'blank'
+      this.graph.emit(`blank:${eventType}`, { e, x, y })
     }
 
     const type = getItemType(e)
     if (type) {
       this.currentItemType = type
       const data = getItemData(e)
-      // 具有 type 类型的元素，第二个参数会带上其dom节点上的 graph-type 值。
-      this.graph.emit(`${this.currentItemType}.${eventType}`, e, data)
+      const target = this.findItem(type, data.id as string)
+
+      // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
+      this.graph.emit(`${this.currentItemType}:${eventType}`, {
+        e,
+        x,
+        y,
+        data,
+        target
+      })
     }
 
     this.graph.emit(eventType, e)
+  }
+
+  findItem(type: string, id: string) {
+    if (type === 'node') {
+      return this.graph.findNode(id)
+    } else if (type === 'edge') {
+      return this.graph.findEdge(id)
+    } else if (type === 'port' || type === 'slot') {
+      return this.graph.findSlot(id)
+    }
   }
 
   handleExtendEvents(e: MouseEvent) {

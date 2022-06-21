@@ -107,7 +107,7 @@ export default class NodeController {
           item.zIndex = item.model.zIndex || 0
         }
       })
-      this.graph.emit('node:update', changeItem)
+      this.graph.emit('node:change:zIndex', changeItem)
     })
   }
 

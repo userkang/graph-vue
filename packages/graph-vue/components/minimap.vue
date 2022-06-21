@@ -237,15 +237,7 @@ export default class Minimap extends Vue {
   }
 
   listenGraphChange() {
-    const eventTypes = [
-      'brushing',
-      'aftertranslate',
-      'addingedge',
-      'datachange',
-      'afteredgeupdate',
-      'afternodeupdate',
-      'stackchange'
-    ]
+    const eventTypes = ['brushing', 'translate', 'datachange', 'stackchange']
     for (let i = eventTypes.length - 1; i >= 0; i--) {
       this.graph.on(eventTypes[i], this.onGraphChange)
     }

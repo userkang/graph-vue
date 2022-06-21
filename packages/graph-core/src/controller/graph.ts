@@ -58,6 +58,7 @@ export default class Graph extends EventEmitter {
       this.set('svg', new Svg(this))
     }
     this.initController()
+    ;(window as any).graph = this
   }
 
   private initController() {
@@ -117,7 +118,7 @@ export default class Graph extends EventEmitter {
       return console.warn(`can't find node where id is '${id}'`)
     }
     this.nodeController.refreshNode(id)
-    this.emit('afternoderefresh', node.model)
+    this.emit('node:refresh', node)
   }
 
   public updateNode(id: string, model: INodeModel): void {
@@ -126,7 +127,7 @@ export default class Graph extends EventEmitter {
       return console.warn(`can't find node where id is '${id}'`)
     }
     this.nodeController.updateNode(id, model)
-    this.emit('afternodeupdate', model)
+    this.emit('node:change', node)
   }
 
   public deleteNode(id: string, stack = true): INode | undefined {
@@ -140,7 +141,7 @@ export default class Graph extends EventEmitter {
       edges: node.getEdges().map(edge => edge.model as IEdgeModel)
     }
     this.nodeController.deleteNode(id)
-    this.emit('afterdeletenode', node.model)
+    this.emit('node:deleted', node.model)
     if (stack) {
       this.pushStack('deleteNode', stackData)
     }
@@ -152,7 +153,7 @@ export default class Graph extends EventEmitter {
     if (!node) {
       return
     }
-    this.emit('afteraddnode', item)
+    this.emit('node:added', item)
     if (stack) {
       const data = { nodes: [item] }
       this.pushStack('addNode', data)
@@ -185,7 +186,7 @@ export default class Graph extends EventEmitter {
       return console.warn(`can't find edge where id is '${id}'`)
     }
     this.edgeController.updateEdge(id, model)
-    this.emit('afteredgeupdate', edge.model)
+    this.emit('edge:change', edge)
   }
 
   public deleteEdge(id: string, stack: boolean = true): IEdge | undefined {
@@ -193,7 +194,7 @@ export default class Graph extends EventEmitter {
     if (!edge) {
       return
     }
-    this.emit('afterdeleteedge', edge.model)
+    this.emit('edge:deleted', edge.model)
     if (stack) {
       this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
     }
@@ -203,7 +204,7 @@ export default class Graph extends EventEmitter {
   public addEdge(item: IEdgeModel, stack: boolean = true): IEdge | undefined {
     const edge = this.edgeController.addEdge(item)
     if (edge) {
-      this.emit('afteraddedge', item)
+      this.emit('edge:added', item)
       if (stack) {
         this.pushStack('addEdge', { edges: [item] })
       }
@@ -211,10 +212,15 @@ export default class Graph extends EventEmitter {
     return edge
   }
 
-  public getData(): IDataModel {
+  public getDataModel(): IDataModel {
     const nodes = this.getNodes().map(node => node.model)
     const edges = this.getEdges().map(edge => edge.model)
     return { nodes, edges }
+  }
+
+  public getTreeDataModel() {
+    const nodes = this.getNodes().map(node => node.model)
+    return nodes[0]
   }
 
   public getPointByClient(
@@ -304,7 +310,7 @@ export default class Graph extends EventEmitter {
 
   public layout(options: ILayout = {}) {
     this.layoutController.layout(options)
-    this.emit('afterlayout')
+    this.emit('layout')
   }
 
   public removeAction(action?: string | string[]) {
@@ -339,7 +345,7 @@ export default class Graph extends EventEmitter {
   }
 
   public detectDirectedCycle() {
-    return detectDirectedCycle(this.getData())
+    return detectDirectedCycle(this.getDataModel())
   }
 
   /**

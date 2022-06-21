@@ -77,10 +77,10 @@ import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 import GraphStore from '@/stores/graph'
 
 const action = [
-  'drag-svg',
+  'drag-blank',
   'drag-node',
   'click-select',
-  'create-edge',
+  'connect-edge',
   'wheel-zoom',
   'brush-select'
 ]
@@ -148,14 +148,13 @@ export default class MindMap extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node.mousedown', this.handleNodeDrag)
-    this.graph.on('node.dblclick', this.handleNodeDblClick)
+    this.graph.on('node:mousedown', this.handleNodeDrag)
+    this.graph.on('node:dblclick', this.handleNodeDblClick)
     this.graph.on('keyup', this.handleKeyUp)
 
-    this.graph.on('nodeselectchange', (nodes: INodeModel[]) => {
-      nodes.forEach((item: INodeModel) => {
-        const node = this.graph.findNode(String(item.id))
-        node?.setZIndex(1000)
+    this.graph.on('node:change:selected', (nodes: INode[]) => {
+      nodes.forEach((item: INode) => {
+        item?.setZIndex(1000)
       })
     })
   }
@@ -253,10 +252,9 @@ export default class MindMap extends Vue {
     this.handleNodeDblClick()
   }
 
-  handleNodeDrag(e: MouseEvent, data: { id: string }) {
-    const node = this.graph.findNode(String(data.id))
-    node?.setState('selected')
-    node?.setZIndex(1000)
+  handleNodeDrag({ target }: { target: INode }) {
+    target?.setState('selected')
+    target?.setZIndex(1000)
   }
 
   handleNodeFocus() {

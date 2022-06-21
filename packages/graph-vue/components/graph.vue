@@ -6,7 +6,7 @@
     @drop="handleDrop"
     @contextmenu="e => e.preventDefault()"
   >
-    <svg
+    <!-- <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
@@ -38,7 +38,7 @@
         </NewEdge>
       </g>
       <path :d="brushPath" class="graph-vue-brushing" />
-    </svg>
+    </svg> -->
 
     <slot v-if="graph"></slot>
   </div>
@@ -131,8 +131,8 @@ export default class GraphVue extends Vue {
 
   initCustomHooks() {
     const hooks = [
-      'afteraddnode',
-      'afteraddedge',
+      'node:added',
+      'edge:added',
       'nodeselectchange',
       'edgeselectchange',
       'aftertranslate',
@@ -152,8 +152,8 @@ export default class GraphVue extends Vue {
     })
 
     this.graph.on('datachange', this.refreshGraph)
-    this.graph.on('aftertranslate', this.aftertranslate)
-    this.graph.on('afterzoom', this.afterzoom)
+    this.graph.on('translate', this.aftertranslate)
+    this.graph.on('zoom', this.afterzoom)
     this.graph.on('brushing', this.brushing)
   }
 

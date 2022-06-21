@@ -21,7 +21,7 @@ export default class NewEdge extends Element {
   }
 
   initHook() {
-    this.addEvent('addingedge', this.update)
+    this.addEvent('edge:connecting', this.update)
   }
 
   update(createEdge: {

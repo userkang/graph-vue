@@ -25,8 +25,8 @@ export default class Svg extends Element {
   }
 
   initHook() {
-    this.addEvent('afterzoom', this.updateTransform)
-    this.addEvent('aftertranslate', this.updateTransform)
+    this.addEvent('zoom', this.updateTransform)
+    this.addEvent('translate', this.updateTransform)
   }
 
   updateTransform() {

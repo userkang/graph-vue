@@ -1,4 +1,4 @@
-import { IEdge, INodeModel } from '../types'
+import { IEdge, INode } from '../types'
 import Element from './element'
 import Graph from '../controller/graph'
 import { calculateCurve } from './util/util'
@@ -39,13 +39,13 @@ export default class Node extends Element {
   }
 
   initHook() {
-    this.addEvent('dragingnode', this.updatePath)
-    this.addEvent('afterdragnode', this.updatePath)
-    this.addEvent('afterlayout', this.setPath)
-    this.addEvent('edgeselectchange', this.updateSelect)
+    this.addEvent('node:draging', this.updatePath)
+    this.addEvent('node:draged', this.updatePath)
+    this.addEvent('layout', this.setPath)
+    this.addEvent('edge:change:selected', this.updateSelect)
   }
 
-  updatePath(moveNodes: INodeModel[]) {
+  updatePath(moveNodes: INode[]) {
     const node = moveNodes.find(
       item =>
         String(item.id) === this.edge.fromNode.id ||

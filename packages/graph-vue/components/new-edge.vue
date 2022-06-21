@@ -23,7 +23,7 @@ export default class NewEdge extends Vue {
   }
 
   mounted() {
-    this.graph.on('addingedge', this.handlePath)
+    this.graph.on('edge:connecting', this.handlePath)
   }
 
   handlePath(createEdge: any) {

@@ -60,7 +60,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
 import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph } from '@datafe/graph-core'
+import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -111,11 +111,10 @@ export default class DAG extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('node:contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
-    this.graph.on('node.mousedown', (e, data: { id: string }) => {
-      const node = this.graph.findNode(data.id)
-      node?.setZIndex(1000)
+    this.graph.on('node:mousedown', ({ target }: { target: INode }) => {
+      target?.setZIndex(1000)
     })
   }
 
@@ -181,7 +180,7 @@ export default class DAG extends Vue {
     }
   }
 
-  handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
+  handleNodeContextMenu({ data }: { data: { id: string } }) {
     this.menuShow = true
     this.activeId = data.id
   }

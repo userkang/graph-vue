@@ -27,6 +27,14 @@ export default class Base extends EventEmitter {
     }
   }
 
+  protected get<T = any>(key: string): T {
+    return this._cfg[key] as T
+  }
+
+  protected set(key: string, val: unknown) {
+    this._cfg[key] = val
+  }
+
   public get id() {
     return this.get('id')
   }
@@ -37,18 +45,6 @@ export default class Base extends EventEmitter {
 
   public get view() {
     return this.get('view')
-  }
-
-  protected get<T = any>(key: string): T {
-    return this._cfg[key] as T
-  }
-
-  protected set(key: string, val: unknown) {
-    this._cfg[key] = val
-  }
-
-  public getModel(): INodeModel | IEdgeModel | ISlotModel {
-    return this.get('model')
   }
 
   public setState(state: string, value?: string | boolean) {

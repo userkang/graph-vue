@@ -55,7 +55,7 @@ export default class ViewController {
       this.transform.scale = value
       this.translateBy(dx, dy)
       this.caculateOffset()
-      this.graph.emit('afterzoom', value, e)
+      this.graph.emit('zoom', value, e)
     }
   }
 
@@ -178,7 +178,7 @@ export default class ViewController {
     this.translateX(x)
     this.translateY(y)
     this.graph.emit(
-      'aftertranslate',
+      'translate',
       this.transform.translateX,
       this.transform.translateY
     )

@@ -99,9 +99,18 @@ export interface ILayout {
 export type IAction = Array<
   | 'brush-select'
   | 'click-select'
-  | 'create-edge'
+  | 'connect-edge'
   | 'drag-node'
-  | 'drag-svg'
+  | 'drag-blank'
   | 'wheel-move'
   | 'wheel-zoom'
 >
+
+export interface IGraphEvent {
+  e: MouseEvent
+  x: number
+  y: number
+  data: Record<string, string | null>
+  target: Node | Edge | Slot | undefined
+  [key: string]: any
+}

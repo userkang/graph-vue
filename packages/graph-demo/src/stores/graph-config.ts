@@ -14,10 +14,10 @@ class GraphConfig {
       rankdir: 'TB'
     },
     action: [
-      'drag-svg',
+      'drag-blank',
       'drag-node',
       'click-select',
-      'create-edge',
+      'connect-edge',
       // 'wheel-move',
       'wheel-zoom',
       'brush-select'

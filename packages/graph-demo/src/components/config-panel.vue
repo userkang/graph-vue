@@ -42,10 +42,10 @@ export default class ConfigPanel extends Vue {
   graphConfigState = GraphConfigStore.state
   graphState = GraphStore.state
   actionList = {
-    'drag-svg': '拖动画布',
+    'drag-blank': '拖动画布',
     'drag-node': '拖动节点',
     'click-select': '点击选中',
-    'create-edge': '创建边',
+    'connect-edge': '连接边',
     'wheel-move': '滚轮移动画布',
     'wheel-zoom': '双指缩放',
     'brush-select': '框选'

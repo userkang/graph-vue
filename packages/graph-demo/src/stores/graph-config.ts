@@ -1,11 +1,11 @@
-import { IDataModel, INodeModel } from '@datafe/graph-core'
+import { IDataModel, ITreeDataModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
   layout: {
     rankdir: string
   }
   action: string[]
-  data: IDataModel | INodeModel
+  data: IDataModel | ITreeDataModel
 }
 
 class GraphConfig {
@@ -20,12 +20,12 @@ class GraphConfig {
       'create-edge',
       // 'wheel-move',
       'wheel-zoom',
-      'brush-select',
+      'brush-select'
     ],
     data: {
       nodes: [],
-      edges: [],
-    },
+      edges: []
+    }
   }
 }
 

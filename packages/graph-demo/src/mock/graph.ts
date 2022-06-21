@@ -5,7 +5,9 @@ const generateTreeNode = () => {
   return {
     id,
     label: id,
-    nodeId
+    nodeId,
+    width: 60,
+    height: 60
   }
 }
 

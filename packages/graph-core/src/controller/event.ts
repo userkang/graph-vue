@@ -2,7 +2,7 @@ import Graph from './graph'
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
 
-const EVENTS = [
+const MOUSEEVENTS = [
   'mousedown',
   'mouseup',
   'dblclick',
@@ -63,7 +63,7 @@ export default class EventController {
   }
 
   initEvent() {
-    EVENTS.forEach(eventType => {
+    MOUSEEVENTS.forEach(eventType => {
       this.eventQueue.push(
         addEventListener(this.$svg, eventType, this.handleMouseEvent.bind(this))
       )

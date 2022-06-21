@@ -6,7 +6,7 @@
     @drop="handleDrop"
     @contextmenu="e => e.preventDefault()"
   >
-    <!-- <svg
+    <svg
       version="1.1"
       xmlns="http://www.w3.org/2000/svg"
       width="100%"
@@ -38,7 +38,7 @@
         </NewEdge>
       </g>
       <path :d="brushPath" class="graph-vue-brushing" />
-    </svg> -->
+    </svg>
 
     <slot v-if="graph"></slot>
   </div>

@@ -161,7 +161,7 @@ export default class Tree extends Vue {
   deleteItem() {
     if (this.activeId) {
       const node = this.graph.findNode(this.activeId)
-      const children = node?.getAllChildren()
+      const children = node?.getAllTargetNodes()
 
       if (children) {
         children.forEach(item => {

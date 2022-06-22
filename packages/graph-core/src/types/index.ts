@@ -25,12 +25,13 @@ export interface INodeModel {
   height?: number
   x?: number
   y?: number
+  parentId?: string
+  collapsed?: boolean
   slots?: ISlotModel[]
   [key: string]: any
 }
 
 export interface ITreeDataModel extends INodeModel {
-  collapsed?: boolean
   children?: ITreeDataModel[]
 }
 

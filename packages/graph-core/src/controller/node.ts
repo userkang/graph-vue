@@ -101,12 +101,6 @@ export default class NodeController {
 
   public watchNodeUpdate(node: INode) {
     node.on('change:zIndex', (changeItem: INode) => {
-      const nodes = Object.values(this._nodes)
-      nodes.forEach(item => {
-        if (item.id !== changeItem.id) {
-          item.zIndex = item.model.zIndex || 0
-        }
-      })
       this.graph.emit('node:change:zIndex', changeItem)
     })
   }
@@ -115,7 +109,7 @@ export default class NodeController {
     const nodes = Object.values(this._nodes)
     const zIndexMap: Record<number, INode[]> = {}
     nodes.forEach(node => {
-      const zIndex = node.getZIndex()
+      const zIndex = node.zIndex
       zIndexMap[zIndex] = zIndexMap[zIndex] || []
       zIndexMap[zIndex].push(node)
     })
@@ -129,8 +123,28 @@ export default class NodeController {
   }
 
   public data(nodes: INodeModel[]) {
+    const childNodes: INode[] = []
+
     this._nodes = {}
-    nodes.forEach(item => this.addNode(item))
+    nodes.forEach(item => {
+      const node = this.addNode(item)
+      if (item.parentId && node) {
+        childNodes.push(node)
+      }
+    })
+
+    childNodes.forEach(childNode => {
+      const parentNode = this.findNode(childNode.parentId)
+      if (parentNode) {
+        parentNode.addChild(childNode)
+        childNode.zIndex = 1
+        childNode.setParent(parentNode)
+      } else {
+        console.warn(
+          `node id '${childNode.id}' can't find parentNode where id is '${childNode.parentId}'`
+        )
+      }
+    })
   }
 
   public destroy() {

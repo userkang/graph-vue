@@ -49,6 +49,7 @@ export default class EdgeController {
     }
 
     delete this._edges[id]
+
     if (this.graph.get('isRender')) {
       const edgeGroup = this.graph.get('svg').get('edgeGroup')
       edgeGroup.remove(edge.view)

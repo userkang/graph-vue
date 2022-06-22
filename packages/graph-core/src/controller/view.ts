@@ -1,3 +1,4 @@
+import { INode } from '../types'
 import {
   isFullScreen,
   requestFullScreen,
@@ -96,15 +97,20 @@ export default class ViewController {
   }
 
   get nodesBox() {
-    const nodes = this.graph.getNodes().filter(item => !item.hasState('hide'))
+    return this.getNodesBBox()
+  }
+
+  getNodesBBox(value?: INode[]) {
+    const nodes = value || this.graph.getNodes()
+    const filterNodes = nodes.filter(item => !item.hasState('hide'))
     let [minX, minY, maxX, maxY] = [
       Number.MAX_SAFE_INTEGER,
       Number.MAX_SAFE_INTEGER,
       Number.MIN_SAFE_INTEGER,
       Number.MIN_SAFE_INTEGER
     ]
-    for (let i = nodes.length - 1; i >= 0; i--) {
-      const node = nodes[i]
+    for (let i = filterNodes.length - 1; i >= 0; i--) {
+      const node = filterNodes[i]
       minX = Math.min(minX, node.x)
       minY = Math.min(minY, node.y)
       maxX = Math.max(maxX, node.x + node.width)

@@ -4,6 +4,7 @@
     "target": "es5",
     "module": "esnext",
     "allowJs": true,
+    "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,

@@ -18,7 +18,8 @@ import {
   IStack,
   IDataStack,
   ILayout,
-  NodeInfo
+  NodeInfo,
+  ITreeDataModel
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -321,6 +322,10 @@ export default class Graph extends EventEmitter {
     this.eventController.addBehavior(
       Array.isArray(actions) ? actions : [actions]
     )
+  }
+
+  public getNodesBBox(nodes: INode[]) {
+    return this.viewController.getNodesBBox(nodes)
   }
 
   public undo() {

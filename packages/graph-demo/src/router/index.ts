@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import { DAG, Tree, MindMap } from './components'
+import { DAG, Tree, MindMap, NodeCell } from './components'
 
 Vue.use(Router)
 
@@ -9,7 +9,7 @@ export default new Router({
   routes: [
     {
       path: '/',
-      redirect: '/dag'
+      redirect: '/nodeGroup'
     },
     {
       path: '/dag',
@@ -25,6 +25,11 @@ export default new Router({
       path: '/mindMap',
       name: 'mindMap',
       component: MindMap
+    },
+    {
+      path: '/nodeCell',
+      name: 'nodeCell',
+      component: NodeCell
     }
   ]
 })

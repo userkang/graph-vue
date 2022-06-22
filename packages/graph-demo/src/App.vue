@@ -13,7 +13,7 @@
       <div class="main-wrap">
         <TemplatePanel />
         <div class="main-center-wrap">
-          <router-view />
+          <router-view></router-view>
         </div>
       </div>
     </div>
@@ -23,12 +23,10 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import TemplatePanel from '@/components/template-panel.vue'
-import ConfigPanel from '@/components/config-panel.vue'
 
 @Component({
   components: {
-    TemplatePanel,
-    ConfigPanel
+    TemplatePanel
   }
 })
 export default class App extends Vue {}

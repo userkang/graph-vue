@@ -47,6 +47,10 @@ export default class Base extends EventEmitter {
     return this.get('view')
   }
 
+  public get states() {
+    return this.get('states')
+  }
+
   public setState(state: string, value?: string | boolean) {
     this.getStates()[state] = value || true
   }

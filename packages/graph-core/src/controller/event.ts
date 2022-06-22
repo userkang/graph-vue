@@ -2,7 +2,7 @@ import Graph from './graph'
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
 
-const MOUSEEVENTS = [
+export const MOUSEEVENTS = [
   'mousedown',
   'mouseup',
   'dblclick',

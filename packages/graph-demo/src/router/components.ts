@@ -15,3 +15,9 @@ export const MindMap = () =>
     /* webpackChunkName: "mindMap"*/
     '../views/MindMap.vue'
   )
+
+export const NodeCell = () =>
+  import(
+    /* webpackChunkName: "nodeCell"*/
+    '../views/NodeCell.vue'
+  )

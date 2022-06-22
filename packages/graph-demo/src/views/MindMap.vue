@@ -33,7 +33,7 @@
             <div
               class="hide-icon"
               v-if="
-                node.getAllChildren().length &&
+                node.getAllTargetNodes().length &&
                 !node.model.isCollapsed &&
                 !isEditText
               "
@@ -47,13 +47,13 @@
             <div
               class="show-icon"
               v-if="
-                node.getAllChildren().length &&
+                node.getAllTargetNodes().length &&
                 node.model.isCollapsed &&
                 !isEditText
               "
               @click="showNode(node)"
             >
-              {{ node.getAllChildren().length }}
+              {{ node.getAllTargetNodes().length }}
             </div>
           </div>
         </div>
@@ -173,7 +173,7 @@ export default class MindMap extends Vue {
 
   showNode(node: INode) {
     node.update({ isCollapsed: false })
-    node.getAllChildren().forEach(item => {
+    node.getAllTargetNodes().forEach(item => {
       item.update({ isCollapsed: false })
       item.show()
     })
@@ -182,7 +182,7 @@ export default class MindMap extends Vue {
 
   hideNode(node: INode) {
     node.update({ isCollapsed: true })
-    node.getAllChildren().forEach(item => {
+    node.getAllTargetNodes().forEach(item => {
       item.update({ isCollapsed: true })
       item.hide()
     })
@@ -251,7 +251,6 @@ export default class MindMap extends Vue {
   }
 
   handleNodeDrag({ target }: { target: INode }) {
-    target?.setState('selected')
     target?.setZIndex(1000)
   }
 

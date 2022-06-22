@@ -20,15 +20,16 @@ export default class Node extends Base {
 
     this.set('cfg', cfg)
 
-    // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
     this.set('direction', cfg.direction || direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
     this.set('zIndex', model.zIndex || 0)
+    this.set('parentId', model.parentId && String(model.parentId))
 
     this.set('slots', [])
     // 保存与节点相关的边
     this.set('edges', [])
+    this.set('children', [])
 
     // 如果没有传坐标，默认为0
     model.x = model.x ? model.x : 0
@@ -41,12 +42,16 @@ export default class Node extends Base {
     return this.get('cfg')
   }
 
-  public get x() {
-    return this.model.x as number
+  public get parentId(): string {
+    return this.get('parentId')
   }
 
-  public get y() {
-    return this.model.y as number
+  public get x(): number {
+    return this.model.x
+  }
+
+  public get y(): number {
+    return this.model.y
   }
 
   public get width(): number {
@@ -61,7 +66,7 @@ export default class Node extends Base {
     return this.get('slots')
   }
 
-  public get zIndex() {
+  public get zIndex(): number {
     return this.get('zIndex')
   }
 
@@ -69,11 +74,10 @@ export default class Node extends Base {
     this.set('zIndex', value)
   }
 
-  public getZIndex() {
-    return this.get('zIndex')
-  }
-
   public setZIndex(value: number) {
+    if (this.model.zIndex) {
+      this.model.zIndex = value
+    }
     this.set('zIndex', value)
     this.emit('change:zIndex', this)
   }
@@ -82,11 +86,11 @@ export default class Node extends Base {
     return this.get('edges')
   }
 
-  public getInEdges() {
+  public getInEdges(): IEdge[] {
     return this.getEdges().filter(edge => edge.toNode.id === this.id)
   }
 
-  public getOutEdges() {
+  public getOutEdges(): IEdge[] {
     return this.getEdges().filter(edge => edge.fromNode.id === this.id)
   }
 
@@ -112,7 +116,31 @@ export default class Node extends Base {
     })
   }
 
-  public getParent() {
+  public addChild(node: INode) {
+    this.get('children').push(node)
+  }
+
+  public deleteChild(id: string) {
+    const childNodes = this.getChildren()
+    const index = childNodes.findIndex(item => item.id === id)
+    if (index > -1) {
+      this.getChildren().splice(index, 1)
+    }
+  }
+
+  public getChildren(): INode[] {
+    return this.get('children')
+  }
+
+  public setParent(node: INode) {
+    this.set('parent', node)
+  }
+
+  public getParent(): INode {
+    return this.get('parent')
+  }
+
+  public getSourceNodes(): INode[] {
     const nodes: INode[] = []
     this.getInEdges().forEach(edge => {
       nodes.push(edge.fromNode)
@@ -120,7 +148,7 @@ export default class Node extends Base {
     return nodes
   }
 
-  public getChildren() {
+  public getTargetNodes() {
     const nodes: INode[] = []
     this.getOutEdges().forEach(edge => {
       nodes.push(edge.toNode)
@@ -129,38 +157,38 @@ export default class Node extends Base {
     return nodes
   }
 
-  public getAllParent() {
+  public getAllSourceNodes() {
     const nodes: { [key: string | number]: boolean } = { [this.id]: true }
-    const tempNodes: INode[] = this.getParent()
+    const tempNodes: INode[] = this.getSourceNodes()
 
     let i = 0
 
     while (i < tempNodes.length) {
       const node = tempNodes[i]
       if (nodes[node.id]) {
-        continue
+        break
       }
       nodes[node.id] = true
-      tempNodes.push(...tempNodes[i].getParent())
+      tempNodes.push(...tempNodes[i].getSourceNodes())
       i++
     }
 
     return tempNodes
   }
 
-  public getAllChildren() {
+  public getAllTargetNodes() {
     const nodes: { [key: string | number]: boolean } = { [this.id]: true }
-    const tempNodes: INode[] = this.getChildren()
+    const tempNodes: INode[] = this.getTargetNodes()
 
     let i = 0
 
     while (i < tempNodes.length) {
       const node = tempNodes[i]
       if (nodes[node.id]) {
-        continue
+        break
       }
       nodes[node.id] = true
-      tempNodes.push(...tempNodes[i].getChildren())
+      tempNodes.push(...tempNodes[i].getTargetNodes())
       i++
     }
 

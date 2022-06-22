@@ -30,7 +30,8 @@ const getRandomId = () => Math.random().toString().slice(2)
 enum demoTypes {
   DEFAULT = 'dag',
   TREE = 'tree',
-  MINDMAP = 'mindMap'
+  MINDMAP = 'mindMap',
+  NODEGROUP = 'nodeCell'
 }
 
 @Component({
@@ -58,6 +59,12 @@ export default class ComponentPanel extends Vue {
       id: getRandomId(),
       type: demoTypes.MINDMAP,
       desc: '思维导图',
+      img: demoTree
+    },
+    {
+      id: getRandomId(),
+      type: demoTypes.NODEGROUP,
+      desc: '节点组',
       img: demoTree
     }
   ]

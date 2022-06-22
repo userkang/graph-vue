@@ -28,23 +28,21 @@ export default class LayoutController {
   layout(options: ILayout) {
     this.init(options)
 
-    const nodes = this.graph.getNodes()
+    const nodes = this.graph
+      .getNodes()
+      .filter(node => !node.hasState('skipLayout'))
     const edges = this.graph.getEdges()
 
     nodes.forEach(item => {
-      if (!item.hasState('hide')) {
-        this.dagre.setNode(item.id, {
-          label: '',
-          width: item.width,
-          height: item.height
-        })
-      }
+      this.dagre.setNode(item.id, {
+        label: '',
+        width: item.width,
+        height: item.height
+      })
     })
 
     edges.forEach(item => {
-      if (!item.hasState('hide')) {
-        this.dagre.setEdge(item.fromNode.id, item.toNode.id)
-      }
+      this.dagre.setEdge(item.fromNode.id, item.toNode.id)
     })
 
     dagre.layout(this.dagre)
@@ -55,7 +53,7 @@ export default class LayoutController {
 
     this.dagre.nodes().forEach((v: string) => {
       nodes.forEach(item => {
-        if (item.id === v && !item.hasState('hide')) {
+        if (item.id === v) {
           const { x, y } = this.dagre.node(v)
           // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
           const posX = x - (item.width + group.width - svgInfo.width) / 2

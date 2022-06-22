@@ -72,8 +72,8 @@ export default class Node extends Element {
   }
 
   initHook() {
-    this.addEvent('node:draging', this.updateTransform)
-    this.addEvent('node:draged', this.updateTransform)
+    this.addEvent('node:moving', this.updateTransform)
+    this.addEvent('node:moved', this.updateTransform)
     this.addEvent('layout', this.transform)
     this.addEvent('node:change:selected', this.updateSelect)
     this.addEvent('brushing', this.updateSelect)

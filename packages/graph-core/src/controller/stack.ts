@@ -99,7 +99,7 @@ export default class Stack {
         const nodes = stack.data.nodes?.map((item: INodeModel) =>
           this.graph.findNode(item.id as string)
         )
-        this.graph.emit('node:draged', nodes)
+        this.graph.emit('node:moved', nodes)
         break
     }
 
@@ -172,7 +172,7 @@ export default class Stack {
         const nodes = stack.data.nodes?.map((item: INodeModel) =>
           this.graph.findNode(item.id as string)
         )
-        this.graph.emit('node:draged', nodes)
+        this.graph.emit('node:moved', nodes)
         break
     }
 

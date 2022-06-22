@@ -66,7 +66,7 @@ export default class DragNode extends Base {
         item.updatePosition(posX, posY)
       })
 
-      this.graph.emit('node:draging', this.moveNode)
+      this.graph.emit('node:moving', this.moveNode)
     }
 
     this.startX = x
@@ -83,9 +83,9 @@ export default class DragNode extends Base {
       e.button === 0
     )
 
-    // 没有移动的情况下，不触发 node:draged 事件
+    // 没有移动的情况下，不触发 node:moved 事件
     if (this.isMoving && hasMove) {
-      this.graph.emit('node:draged', this.moveNode)
+      this.graph.emit('node:moved', this.moveNode)
       this.graph.pushStack('updateNodePosition', { nodes: this.stackNode })
       this.stackNode = []
     }

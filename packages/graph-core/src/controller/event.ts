@@ -14,7 +14,8 @@ const MOUSEEVENTS = [
   'mouseleave',
   'drag',
   'dragover',
-  'dragout',
+  'dragenter',
+  'dragleave',
   'drop',
   'wheel'
 ]
@@ -28,9 +29,10 @@ const DATACHANGE = [
   'edge:added',
   'node:change:selected',
   'edge:change:selected',
+  'node:change:zIndex',
   'node:deleted',
   'edge:deleted',
-  'node:draged',
+  'node:moved',
   'layout',
   'node:change',
   'edge:change'
@@ -159,7 +161,6 @@ export default class EventController {
       this.currentItemType = type
       const data = getItemData(e)
       const target = this.findItem(type, data.id as string)
-
       // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
       this.graph.emit(`${this.currentItemType}:${eventType}`, {
         e,

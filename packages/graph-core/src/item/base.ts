@@ -11,7 +11,8 @@ export default class Base extends EventEmitter {
       linked: false,
       enable: false,
       locked: false,
-      hide: false
+      hide: false,
+      skipLayout: false
     }
   }
 
@@ -51,8 +52,8 @@ export default class Base extends EventEmitter {
     return this.get('states')
   }
 
-  public setState(state: string, value?: string | boolean) {
-    this.getStates()[state] = value || true
+  public setState(state: string) {
+    this.getStates()[state] = true
   }
 
   public hasState(state: string): boolean {

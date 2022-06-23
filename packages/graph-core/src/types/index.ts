@@ -89,6 +89,13 @@ export interface IDataStack {
 }
 
 export interface ILayout {
+  type?: string
+  options?: IDagreLayout
+  data?: { nodes: INode[]; edges: IEdge[] }
+}
+
+export interface IDagreLayout {
+  rankdir?: 'LR' | 'TB'
   align?: 'UL' | 'UR' | 'DL' | 'DR'
   nodesep?: number
   edgesep?: number

@@ -1,11 +1,6 @@
 <template>
   <div class="container">
-    <GraphVue
-      :data="dataMock"
-      :action="action"
-      :layout="layout"
-      @init="initGraph"
-    >
+    <GraphVue :data="dataMock" :action="action" @init="initGraph">
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">
           <button v-if="node.model.collapsed" @click="showChildren(node)">
@@ -13,20 +8,14 @@
           </button>
           <button v-else @click="hideChildren(node)">隐藏</button>
         </div>
-        <div v-else class="normal-node"></div>
+        <div v-else class="normal-node">{{ node.model.label }}</div>
       </template>
 
-      <template #port="{ port }">
-        <template v-if="port.model.isGroup">
-          <circle
-            graph-type="port"
-            graph-id="slot3"
-            :x="port.x"
-            :y="port.y"
-          ></circle>
-        </template>
-      </template>
+      <template #port></template>
       <ToolBox />
+      <button style="position: absolute; left: 10px; top: 10px" @click="layout">
+        整理
+      </button>
     </GraphVue>
   </div>
 </template>
@@ -36,13 +25,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
 import { ToolBox, MiniMap, GraphVue } from '@datafe/graph-vue'
-import {
-  INodeModel,
-  IEdgeModel,
-  Graph,
-  INode,
-  IDataModel
-} from '@datafe/graph-core'
+import { Graph, INode, IDataModel, IEdge } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 
@@ -55,52 +38,50 @@ const action = [
   'brush-select'
 ]
 
-const layout = { rankdir: 'TB' }
-
 const nodeCellMock = (): IDataModel => {
   return {
     nodes: [
       {
-        id: '2',
+        id: '1',
         label: 'children',
+        parentId: '4',
         x: 300,
         y: 400
       },
       {
-        id: '3',
+        id: '2',
         label: 'children',
         parentId: '5',
         x: 300,
         y: 500
       },
       {
-        id: '4',
+        id: '3',
         label: 'children',
         parentId: '5',
         x: 300,
         y: 600
       },
       {
-        id: '5',
+        id: '4',
         label: 'parent',
         type: 'group',
-        width: 500,
-        height: 600,
-        collapsed: false,
-        slots: [
-          { type: 'in', isGroup: true },
-          { type: 'out', isGroup: true }
-        ]
+        collapsed: true
+      },
+      {
+        id: '5',
+        label: 'parent',
+        type: 'group'
       }
     ],
     edges: [
       {
-        fromNodeId: '3',
-        toNodeId: '4'
+        fromNodeId: '4',
+        toNodeId: '5'
       },
       {
         fromNodeId: '2',
-        toNodeId: '5'
+        toNodeId: '3'
       }
     ]
   }
@@ -126,43 +107,24 @@ export default class NodeCell extends Vue {
     return action
   }
 
-  get layout() {
-    return layout
-  }
-
-  getGroup(port) {}
-
-  getPorts(port: ISlot) {
-    const node = this.graph.findNodeBySlot(String(port.id))
-    const slots = node?.getChildren().map(item => {
-      return [...item.slots]
-    })
-  }
-
   hideChildren(node: INode) {
     const children = node.getChildren()
     children.forEach(child => {
       child.hide()
-      child.setState('skipLayout', true)
     })
     node.model.collapsed = true
     node.update({
       width: 180,
       height: 40
     })
-    node.setState('skipLayout', false)
-
-    this.handleEdge(node)
   }
 
   showChildren(node: INode) {
     const children = node.getChildren()
     children.forEach(child => {
       child.show()
-      child.setState('skipLayout', false)
     })
     node.model.collapsed = false
-    node.setState('skipLayout', true)
     this.resizeGroup(node)
   }
 
@@ -174,10 +136,6 @@ export default class NodeCell extends Vue {
     this.initGroups()
   }
 
-  handleEdge(node: INode) {
-    const children = node.getChildren()
-  }
-
   initEvent() {
     this.graph.on('node:moving', this.handleNodeMoving)
     this.graph.on('layout', this.afterLayout)
@@ -185,7 +143,7 @@ export default class NodeCell extends Vue {
 
   afterLayout() {
     this.$nextTick(() => {
-      this.initGroups()
+      // this.initGroups()
     })
   }
 
@@ -203,8 +161,35 @@ export default class NodeCell extends Vue {
       .getNodes()
       .filter(item => item.model.type === 'group')
     groups.forEach(group => {
-      group.setState('skipLayout', !group.model.collapsed)
-      this.resizeGroup(group)
+      if (group.model.collapsed) {
+        this.hideChildren(group)
+      } else {
+        this.showChildren(group)
+      }
+    })
+
+    // this.graph.layout()
+  }
+
+  layout() {
+    const groups = this.graph
+      .getNodes()
+      .filter(item => item.model.type === 'group')
+    const edges: Record<string, IEdge> = {}
+    const children = []
+
+    groups.forEach(item => {
+      item.getEdges().forEach(edge => {
+        if (!edges[edge.id]) {
+          edges[edge.id] = edge
+        }
+      })
+
+      item.getChildren()
+    })
+
+    this.graph.layout({
+      data: { nodes: groups, edges: Object.values(edges) }
     })
   }
 

@@ -95,11 +95,11 @@ export default class Node extends Base {
   }
 
   public lock() {
-    this.setState('locked', true)
+    this.setState('locked')
   }
 
   public unlock() {
-    this.setState('locaked', false)
+    this.clearState('locaked')
   }
 
   public show() {

@@ -310,8 +310,9 @@ export default class Graph extends EventEmitter {
   }
 
   public layout(options: ILayout = {}) {
-    this.layoutController.layout(options)
+    const layoutData = this.layoutController.layout(options)
     this.emit('layout')
+    return layoutData
   }
 
   public removeAction(action?: string | string[]) {

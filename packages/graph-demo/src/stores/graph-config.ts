@@ -2,7 +2,9 @@ import { IDataModel, ITreeDataModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
   layout: {
-    rankdir: string
+    options: {
+      rankdir: string
+    }
   }
   action: string[]
   data: IDataModel | ITreeDataModel
@@ -11,7 +13,9 @@ interface GraphConfigState {
 class GraphConfig {
   public state: GraphConfigState = {
     layout: {
-      rankdir: 'TB'
+      options: {
+        rankdir: 'TB'
+      }
     },
     action: [
       'drag-blank',

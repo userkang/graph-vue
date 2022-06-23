@@ -85,7 +85,10 @@ const action = [
   'brush-select'
 ]
 
-const layout = { rankdir: 'LR' }
+const layout = {
+  type: 'dagre',
+  options: { rankdir: 'LR' }
+}
 
 const mindMapMock = () => {
   return {

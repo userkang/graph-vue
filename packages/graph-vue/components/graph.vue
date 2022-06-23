@@ -92,7 +92,7 @@ export default class GraphVue extends Vue {
 
   @Prop({
     default: () => {
-      return { rankdir: 'TB' }
+      return { options: { type: 'dagre', rankdir: 'TB' } }
     }
   })
   layout!: ILayout
@@ -118,7 +118,7 @@ export default class GraphVue extends Vue {
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: (this.layout as any).rankdir || 'TB',
+      direction: (this.layout as ILayout).options?.rankdir || 'TB',
       action: this.action
     })
 

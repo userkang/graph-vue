@@ -29,6 +29,8 @@ import { Graph, INode, IDataModel, IEdge } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 
+const groupPadding = 25
+
 const action = [
   'drag-blank',
   'drag-node',
@@ -44,23 +46,17 @@ const nodeCellMock = (): IDataModel => {
       {
         id: '1',
         label: 'children',
-        parentId: '4',
-        x: 300,
-        y: 400
+        parentId: '4'
       },
       {
         id: '2',
         label: 'children',
-        parentId: '5',
-        x: 300,
-        y: 500
+        parentId: '5'
       },
       {
         id: '3',
         label: 'children',
-        parentId: '5',
-        x: 300,
-        y: 600
+        parentId: '5'
       },
       {
         id: '4',
@@ -71,7 +67,12 @@ const nodeCellMock = (): IDataModel => {
       {
         id: '5',
         label: 'parent',
-        type: 'group'
+        type: 'group',
+        collapsed: true
+      },
+      {
+        id: '6',
+        label: 'start'
       }
     ],
     edges: [
@@ -82,6 +83,10 @@ const nodeCellMock = (): IDataModel => {
       {
         fromNodeId: '2',
         toNodeId: '3'
+      },
+      {
+        fromNodeId: '6',
+        toNodeId: '5'
       }
     ]
   }
@@ -112,11 +117,12 @@ export default class NodeCell extends Vue {
     children.forEach(child => {
       child.hide()
     })
-    node.model.collapsed = true
     node.update({
       width: 180,
-      height: 40
+      height: 40,
+      collapsed: true
     })
+    this.layout()
   }
 
   showChildren(node: INode) {
@@ -124,8 +130,12 @@ export default class NodeCell extends Vue {
     children.forEach(child => {
       child.show()
     })
-    node.model.collapsed = false
+    node.update({
+      collapsed: false
+    })
+
     this.resizeGroup(node)
+    this.layout()
   }
 
   initGraph(graph: Graph) {
@@ -138,13 +148,6 @@ export default class NodeCell extends Vue {
 
   initEvent() {
     this.graph.on('node:moving', this.handleNodeMoving)
-    this.graph.on('layout', this.afterLayout)
-  }
-
-  afterLayout() {
-    this.$nextTick(() => {
-      // this.initGroups()
-    })
   }
 
   handleNodeMoving(nodes: INode[]) {
@@ -157,6 +160,8 @@ export default class NodeCell extends Vue {
   }
 
   initGroups() {
+    this.layout()
+
     const groups = this.graph
       .getNodes()
       .filter(item => item.model.type === 'group')
@@ -167,29 +172,46 @@ export default class NodeCell extends Vue {
         this.showChildren(group)
       }
     })
-
-    // this.graph.layout()
   }
 
   layout() {
-    const groups = this.graph
-      .getNodes()
-      .filter(item => item.model.type === 'group')
+    const rootNodes = this.graph.getNodes().filter(item => !item.model.parentId)
     const edges: Record<string, IEdge> = {}
-    const children = []
 
-    groups.forEach(item => {
+    rootNodes.forEach(item => {
       item.getEdges().forEach(edge => {
         if (!edges[edge.id]) {
           edges[edge.id] = edge
         }
       })
-
-      item.getChildren()
     })
 
     this.graph.layout({
-      data: { nodes: groups, edges: Object.values(edges) }
+      data: { nodes: rootNodes, edges: Object.values(edges) }
+    })
+
+    rootNodes.forEach(item => {
+      const childrenEdges: Record<string, IEdge> = {}
+      const children = item.getChildren()
+      children.forEach(child => {
+        child.getEdges().forEach(edge => {
+          if (!childrenEdges[edge.id]) {
+            childrenEdges[edge.id] = edge
+          }
+        })
+      })
+
+      const dagre = this.graph.layout({
+        data: { nodes: children, edges: Object.values(childrenEdges) }
+      })
+
+      dagre.nodes().forEach((v: string) => {
+        const childNode = this.graph.findNode(v) as INode
+        const { x, y } = dagre.node(v)
+        const posX = item.x + x - childNode.width / 2 + groupPadding
+        const posY = item.y + y - childNode.height / 2 + groupPadding
+        childNode.updatePosition(posX, posY)
+      })
     })
   }
 
@@ -197,10 +219,10 @@ export default class NodeCell extends Vue {
     const children = node.getChildren()
     const bbox = this.graph.getNodesBBox(children)
     node.update({
-      width: bbox.width + 50,
-      height: bbox.height + 50,
-      x: bbox.left - 25,
-      y: bbox.top - 25
+      width: bbox.width + 2 * groupPadding,
+      height: bbox.height + 2 * groupPadding,
+      x: bbox.left - groupPadding,
+      y: bbox.top - groupPadding
     })
   }
 }

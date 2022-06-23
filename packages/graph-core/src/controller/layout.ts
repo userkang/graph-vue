@@ -65,7 +65,7 @@ export default class LayoutController {
 
     this.graph.pushStack('updateNodePosition', { nodes: stackNode })
 
-    // this.graph.fitCenter()
+    this.graph.fitCenter()
 
     return this.dagre
   }

@@ -63,7 +63,6 @@ const nodeCellMock = (): IDataModel => {
       {
         id: '2',
         label: 'children',
-        parentId: '1',
         x: 300,
         y: 400
       },
@@ -101,7 +100,7 @@ const nodeCellMock = (): IDataModel => {
       },
       {
         fromNodeId: '2',
-        toNodeId: '3'
+        toNodeId: '5'
       }
     ]
   }

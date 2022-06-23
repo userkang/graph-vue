@@ -1,6 +1,7 @@
-import { ILayout, INodeModel } from '../types'
+import { ILayout, INode, INodeModel } from '../types'
 import dagre from 'dagre'
 import Graph from './graph'
+console.log('dagre', dagre)
 
 export default class LayoutController {
   graph: Graph
@@ -42,7 +43,6 @@ export default class LayoutController {
     edges.forEach(item => {
       this.dagre.setEdge(item.fromNode.id, item.toNode.id)
     })
-
     dagre.layout(this.dagre)
 
     const group = this.dagre.graph()
@@ -60,6 +60,43 @@ export default class LayoutController {
           item.updatePosition(posX, posY)
         }
       })
+    })
+
+    this.graph.pushStack('updateNodePosition', { nodes: stackNode })
+
+    this.graph.fitCenter()
+  }
+
+  layovt(options: ILayout) {
+    this.init(options)
+
+    const nodeMap: { [id: number]: INode } = {}
+    this.graph.getNodes().forEach(node => {
+      const { id, width, height } = node
+      nodeMap[id] = node
+      this.dagre.setNode(id, { label: '', width, height })
+    })
+
+    this.graph.getEdges().forEach(edge => {
+      this.dagre.setEdge(edge.fromNode.id, edge.toNode.id)
+    })
+
+    dagre.layout(this.dagre)
+
+    const group = this.dagre.graph()
+    const svgInfo = this.graph.getSvgInfo()
+    const stackNode: INodeModel[] = []
+
+    this.dagre.nodes().forEach((id: string) => {
+      const node = nodeMap[id]
+      if (node) {
+        stackNode.push({ ...node.model })
+        const { x, y } = this.dagre.node(id)
+        // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
+        const posX = x - (node.width + group.width - svgInfo.width) / 2
+        const posY = y - (node.height + group.height - svgInfo.height) / 2
+        node.updatePosition(posX, posY)
+      }
     })
 
     this.graph.pushStack('updateNodePosition', { nodes: stackNode })

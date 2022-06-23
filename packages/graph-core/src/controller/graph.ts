@@ -303,6 +303,11 @@ export default class Graph extends EventEmitter {
     this.emit('afterlayout')
   }
 
+  public layovt(options: ILayout = {}) {
+    this.layoutController.layovt(options)
+    this.emit('afterlayovt')
+  }
+
   public removeAction(action?: string | string[]) {
     this.eventController.removeBehavior(action)
   }

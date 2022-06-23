@@ -44,6 +44,11 @@
       class="graph-vue-tool-box-item iconfont iconzidongpaiban"
     ></li>
     <li
+      title="layovt"
+      id="layovt"
+      class="graph-vue-tool-box-item iconfont iconzidongpaiban"
+    ></li>
+    <li
       title="适应画布"
       id="fitView"
       class="graph-vue-tool-box-item iconfont iconshiyinghuabu"
@@ -93,6 +98,9 @@ export default class ToolBox extends Vue {
         break
       case 'layout':
         this.graph.layout()
+        break
+      case 'layovt':
+        this.graph.layovt()
         break
       case 'fitView':
         this.graph.fitView()

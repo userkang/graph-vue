@@ -104,9 +104,7 @@ export default class Tree extends Vue {
     this.graph = graph
     this.initEvent()
 
-    setTimeout(() => {
-      this.circleLayout()
-    }, 2000)
+    this.circleLayout()
   }
 
   initEvent() {

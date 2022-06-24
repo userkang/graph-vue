@@ -32,10 +32,10 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@datafe/graph-core@^1.0.0":
-  version "1.0.0"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-1.0.0.tgz#ab1376ef53a3934e35763771fca1e6c9cdbcf77e"
-  integrity sha1-qxN271Ojk041djdx/KHmyc28934=
+"@datafe/graph-core@^1.0.0-beta0.1":
+  version "1.0.0-beta0.1"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-1.0.0-beta0.1.tgz#48beb1fe3bdc8d1b5ac82a7464325455b606586a"
+  integrity sha1-SL6x/jvcjRtayCp0ZDJUVbYGWGo=
   dependencies:
     dagre "0.8.5"
 

@@ -18,7 +18,8 @@ import {
   IStack,
   IDataStack,
   ILayout,
-  NodeInfo
+  NodeInfo,
+  ICircleLayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -312,11 +313,6 @@ export default class Graph extends EventEmitter {
     const layoutData = this.layoutController.layout(options, stack)
     this.emit('layout')
     return layoutData
-  }
-
-  public circleLayout(options: ILayout = {}) {
-    this.layoutController.circleLayout(options)
-    this.emit('layout')
   }
 
   public removeAction(action?: string | string[]) {

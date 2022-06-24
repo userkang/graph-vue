@@ -4,8 +4,7 @@
       ref="graph"
       :data="dataMock"
       :action="action"
-      :layout="layout"
-      @drop="handleDrop"
+      :layout="layout" 
       @init="initGraph"
     >
       <template #node="{ node }">
@@ -43,8 +42,17 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
+import {
+  ToolBox,
+  Menu,
+  MiniMap,
+  GraphVue,
+  INodeModel,
+  IEdgeModel,
+  IEdge,
+  Graph,
+  INode
+} from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -97,19 +105,6 @@ export default class Tree extends Vue {
   initEvent() {
     this.graph.on('node:contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
-  }
-
-  handleDrop(e: DragEvent) {
-    e.preventDefault()
-    const x = e.x - this.dragingInfo.offsetX * this.graph.getZoom()
-    const y = e.y - this.dragingInfo.offsetY * this.graph.getZoom()
-    const point = this.graph.getPointByClient(x, y)
-
-    this.graph.addNode({
-      label: this.dragingInfo.component.componentName,
-      x: point.x,
-      y: point.y
-    })
   }
 
   path(edge: IEdge) {

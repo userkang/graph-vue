@@ -17,3 +17,8 @@ declare module '*.jpg' {
   const img: any
   export default img
 }
+
+declare module '*.png' {
+  const img: any
+  export default img
+}

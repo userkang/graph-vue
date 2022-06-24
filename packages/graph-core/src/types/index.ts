@@ -90,7 +90,7 @@ export interface IDataStack {
 
 export interface ILayout {
   type?: string
-  options?: IDagreLayout
+  options?: IDagreLayout | ICircleLayout
   data?: { nodes: INode[]; edges: IEdge[] }
 }
 
@@ -102,6 +102,12 @@ export interface IDagreLayout {
   ranksep?: number
   marginx?: number
   marginy?: number
+}
+
+export interface ICircleLayout {
+  clockwise?: boolean
+  startAngle?: number
+  addRadius?: number
 }
 
 export type IAction = Array<

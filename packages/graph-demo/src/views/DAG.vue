@@ -59,8 +59,17 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
+import {
+  ToolBox,
+  Menu,
+  MiniMap,
+  GraphVue,
+  INode,
+  INodeModel,
+  IEdgeModel,
+  IEdge,
+  Graph
+} from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -108,6 +117,8 @@ export default class DAG extends Vue {
     this.graphState.graph = graph
     this.graph = graph
     this.initEvent()
+
+    this.graph.layout()
   }
 
   initEvent() {
@@ -209,9 +220,10 @@ export default class DAG extends Vue {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  border: 1px solid #fff;
+  border: 2px solid #fff;
   box-sizing: border-box;
   font-size: 12px;
+  border-radius: 10px;
   .left {
     width: 9%;
     height: 100%;

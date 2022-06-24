@@ -30,7 +30,6 @@
       <template #port> </template>
 
       <MiniMap />
-      <ToolBox />
       <Menu class="menu" v-model="menuShow">
         <li @click="deleteItem">删除</li>
         <li @click="deleteItem">删除</li>
@@ -46,8 +45,17 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
+import {
+  ToolBox,
+  Menu,
+  MiniMap,
+  GraphVue,
+  INodeModel,
+  IEdgeModel,
+  IEdge,
+  Graph,
+  INode
+} from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -95,6 +103,10 @@ export default class Tree extends Vue {
     this.graphState.graph = graph
     this.graph = graph
     this.initEvent()
+
+    setTimeout(() => {
+      this.circleLayout()
+    }, 2000)
   }
 
   initEvent() {
@@ -118,13 +130,7 @@ export default class Tree extends Vue {
   path(edge: IEdge) {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
-    const xc = (y2 - y1) / 2
-    return `
-        M ${x1} ${y1}
-        L ${x1} ${y1 + xc}
-        L ${x1} ${y2 - xc}
-        C ${x2} ${y2 - xc} ${x2} ${y2 - xc} ${x2} ${y2}
-    `
+    return `M ${x1} ${y1} L ${x2} ${y2}`
   }
 
   text(edge: IEdge) {
@@ -182,8 +188,11 @@ export default class Tree extends Vue {
   }
 
   circleLayout() {
-    const cfg = { clockwise: false, startAngle: -2, addRadius: 20 }
-    this.graph.circleLayout(cfg)
+    const options = { clockwise: false, startAngle: -2, addRadius: 80 }
+    this.graph.layout({
+      options,
+      type: 'circle'
+    })
   }
 
   async created() {

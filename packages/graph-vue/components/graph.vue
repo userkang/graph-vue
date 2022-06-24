@@ -61,7 +61,14 @@ import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
 
-import { Graph, IDataModel, IEdge, ILayout, INode } from '@datafe/graph-core'
+import {
+  Graph,
+  IDataModel,
+  IEdge,
+  ILayout,
+  INode,
+  IDagreLayout
+} from '@datafe/graph-core'
 
 @Component({
   components: {
@@ -118,7 +125,7 @@ export default class GraphVue extends Vue {
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: (this.layout as ILayout).options?.rankdir || 'TB',
+      direction: (this.layout.options as IDagreLayout)?.rankdir,
       action: this.action
     })
 

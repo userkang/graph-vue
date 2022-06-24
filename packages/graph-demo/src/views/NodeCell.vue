@@ -24,8 +24,15 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { Graph, INode, IDataModel, IEdge } from '@datafe/graph-core'
+import {
+  ToolBox,
+  MiniMap,
+  GraphVue,
+  Graph,
+  INode,
+  IDataModel,
+  IEdge
+} from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 
@@ -257,5 +264,6 @@ export default class NodeCell extends Vue {
 }
 .group-node {
   background: rgba(134, 244, 106, 0.654);
+  transition: all 0.2s linear;
 }
 </style>

@@ -71,8 +71,14 @@
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
-import { ToolBox, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
+import {
+  ToolBox,
+  MiniMap,
+  GraphVue,
+  IEdge,
+  Graph,
+  INode
+} from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 

@@ -1,4 +1,10 @@
-import { IDagreLayout, ILayout, INode, INodeModel } from '../types'
+import {
+  ICircleLayout,
+  IDagreLayout,
+  ILayout,
+  INode,
+  INodeModel
+} from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
 import Graph from './graph'
@@ -33,10 +39,17 @@ export default class LayoutController {
   }
 
   layout(cfg: ILayout, stack: boolean) {
-    this.initDagre(cfg.options)
+    if (cfg.type === 'circle') {
+      return this.circleLayout(cfg, stack)
+    } else {
+      return this.dagreLayout(cfg, stack)
+    }
+  }
+
+  dagreLayout(cfg: ILayout, stack: boolean) {
+    this.initDagre(cfg.options as IDagreLayout)
 
     const nodes = cfg.data?.nodes || this.graph.getNodes()
-
     const edges = cfg.data?.edges || this.graph.getEdges()
 
     nodes.forEach(item => {
@@ -75,11 +88,8 @@ export default class LayoutController {
     return this.dagre
   }
 
-  circleLayout(
-    cfg: Partial<
-      ILayout & { clockwise?: boolean; startAngle?: number; addRadius?: number }
-    >
-  ) {
+  circleLayout(cfg: ILayout, stack: boolean) {
+    const options = cfg.options as ICircleLayout
     const svgInfo = this.graph.getSvgInfo()
     const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
       node => !node.parentId
@@ -87,20 +97,24 @@ export default class LayoutController {
 
     const radius =
       Math.max(...nodes.map(node => node.width + node.height)) +
-      (cfg.addRadius || 0)
+      (options.addRadius || 0)
 
     const stackNode: INodeModel[] = nodes.map(node => ({ ...node.model }))
 
-    const dTheta = getDTheta(nodes.length) * (cfg.clockwise === false ? -1 : 1)
+    const dTheta =
+      getDTheta(nodes.length) * (options.clockwise === false ? -1 : 1)
 
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
-      const theta = i * dTheta + (cfg.startAngle || 0)
+      const theta = i * dTheta + (options.startAngle || 0)
       const posX = radius * Math.cos(theta) + svgInfo.width / 2
       const posY = radius * Math.sin(theta) + svgInfo.height / 2
       node.updatePosition(posX, posY)
     }
-    this.graph.pushStack('updateNodePosition', { nodes: stackNode })
+
+    if (stack) {
+      this.graph.pushStack('updateNodePosition', { nodes: stackNode })
+    }
   }
 
   destroy() {

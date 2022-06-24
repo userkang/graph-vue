@@ -24,6 +24,7 @@ import { Component, Vue } from 'vue-property-decorator'
 import ToolTip from '@/components/tool-tip.vue'
 import demoDefault from '@/assets/imgs/demo-default.jpg'
 import demoTree from '@/assets/imgs/demo-tree.jpg'
+import demoCircle from '@/assets/imgs/circle-layout.png'
 
 const getRandomId = () => Math.random().toString().slice(2)
 
@@ -72,7 +73,7 @@ export default class ComponentPanel extends Vue {
       id: getRandomId(),
       type: demoTypes.CIRCLE_LAYOUT,
       desc: '圆形布局',
-      img: demoTree
+      img: demoCircle
     }
   ]
 

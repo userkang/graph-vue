@@ -44,8 +44,8 @@
       class="graph-vue-tool-box-item iconfont iconzidongpaiban"
     ></li>
     <li
-      title="layovt"
-      id="layovt"
+      title="layoutCircle"
+      id="layoutCircle"
       class="graph-vue-tool-box-item iconfont iconzidongpaiban"
     ></li>
     <li
@@ -99,8 +99,8 @@ export default class ToolBox extends Vue {
       case 'layout':
         this.graph.layout()
         break
-      case 'layovt':
-        this.graph.layovt()
+      case 'layoutCircle':
+        this.graph.layoutCircle()
         break
       case 'fitView':
         this.graph.fitView()

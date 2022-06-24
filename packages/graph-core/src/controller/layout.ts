@@ -1,7 +1,30 @@
-import { ILayout, INode, INodeModel } from '../types'
+import { ILayout, INodeModel } from '../types'
 import dagre from 'dagre'
 import Graph from './graph'
-console.log('dagre', dagre)
+
+const getDTheta = (nodesLength: number) => {
+  const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
+  const dTheta = sweep / Math.max(1, nodesLength - 1)
+  return dTheta
+}
+
+const getCircle = (
+  rect: {
+    x: number
+    y: number
+    width: number
+    height: number
+  },
+  padding: number = 0
+) => {
+  const halfWidth = rect.width / 2
+  const halfHeight = rect.height / 2
+  return {
+    x: rect.x + halfWidth,
+    y: rect.y + halfHeight,
+    radius: Math.min(rect.width / 2, rect.height / 2) - padding / 2
+  }
+}
 
 export default class LayoutController {
   graph: Graph
@@ -67,38 +90,26 @@ export default class LayoutController {
     this.graph.fitCenter()
   }
 
-  layovt(options: ILayout) {
-    this.init(options)
+  layoutCircle(options: ILayout) {
+    this.init({ ...options })
 
-    const nodeMap: { [id: number]: INode } = {}
-    this.graph.getNodes().forEach(node => {
-      const { id, width, height } = node
-      nodeMap[id] = node
-      this.dagre.setNode(id, { label: '', width, height })
-    })
+    const nodes = this.graph.getNodes()
+    const circle = getCircle(
+      this.graph.getSvgInfo(),
+      Math.max(nodes[0].width, nodes[0].height)
+    )
 
-    this.graph.getEdges().forEach(edge => {
-      this.dagre.setEdge(edge.fromNode.id, edge.toNode.id)
-    })
+    const stackNode: INodeModel[] = nodes.map(node => ({ ...node.model }))
 
-    dagre.layout(this.dagre)
+    const dTheta = getDTheta(nodes.length)
 
-    const group = this.dagre.graph()
-    const svgInfo = this.graph.getSvgInfo()
-    const stackNode: INodeModel[] = []
-
-    this.dagre.nodes().forEach((id: string) => {
-      const node = nodeMap[id]
-      if (node) {
-        stackNode.push({ ...node.model })
-        const { x, y } = this.dagre.node(id)
-        // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-        const posX = x - (node.width + group.width - svgInfo.width) / 2
-        const posY = y - (node.height + group.height - svgInfo.height) / 2
-        node.updatePosition(posX, posY)
-      }
-    })
-
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      const theta = i * dTheta
+      const posX = circle.x + circle.radius * Math.cos(theta)
+      const posY = circle.y + circle.radius * Math.sin(theta)
+      node.updatePosition(posX, posY)
+    }
     this.graph.pushStack('updateNodePosition', { nodes: stackNode })
 
     this.graph.fitCenter()

@@ -93,10 +93,9 @@ export default class LayoutController {
     return this.dagre
   }
 
-  layoutCircle(options: ILayout) {
-    this.init({ ...options })
-
-    const nodes = this.graph.getNodes()
+  layoutCircle(cfg: ILayout) {
+    const nodes = cfg.data?.nodes || this.graph.getNodes()
+ 
     const circle = getCircle(
       this.graph.getSvgInfo(),
       Math.max(nodes[0].width, nodes[0].height)

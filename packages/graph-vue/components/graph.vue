@@ -125,7 +125,7 @@ export default class GraphVue extends Vue {
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: (this.layout.options as IDagreLayout)?.rankdir,
+      direction: (this.layout.options as IDagreLayout)?.rankdir || 'TB',
       action: this.action
     })
 

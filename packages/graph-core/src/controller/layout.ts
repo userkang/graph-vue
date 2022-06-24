@@ -93,7 +93,7 @@ export default class LayoutController {
     return this.dagre
   }
 
-  layoutCircle(cfg: ILayout) {
+  circleLayout(cfg: ILayout) {
     const nodes = cfg.data?.nodes || this.graph.getNodes()
  
     const circle = getCircle(

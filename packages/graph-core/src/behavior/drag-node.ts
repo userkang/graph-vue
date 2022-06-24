@@ -29,15 +29,14 @@ export default class DragNode extends Base {
   }
 
   init() {
-    this.addEvent('node.mousedown', this.mouseDown)
+    this.addEvent('node:mousedown', this.mouseDown)
     this.addEvent('mousemove', this.mouseMove)
     this.addEvent('mouseup', this.mouseUp)
     this.addEvent('mouseleave', this.mouseUp)
   }
 
-  mouseDown(e: MouseEvent, data: { id: string }) {
-    const { id } = data
-    this.activeNode = this.graph.findNode(id)
+  mouseDown({ e, target }: { e: MouseEvent; target: Node }) {
+    this.activeNode = target
     if (this.activeNode) {
       this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
       this.moveNode = [this.activeNode]
@@ -65,10 +64,17 @@ export default class DragNode extends Base {
         const posX = item.x + this.moveX / zoom
         const posY = item.y + this.moveY / zoom
         item.updatePosition(posX, posY)
+
+        if (item.getChildren().length) {
+          item.getChildren().forEach(child => {
+            const childPosX = child.x + this.moveX / zoom
+            const childposY = child.y + this.moveY / zoom
+            child.updatePosition(childPosX, childposY)
+          })
+        }
       })
 
-      const moveNodeModel = this.moveNode.map(item => item.model)
-      this.graph.emit('dragingnode', moveNodeModel)
+      this.graph.emit('node:moving', this.moveNode)
     }
 
     this.startX = x
@@ -85,10 +91,9 @@ export default class DragNode extends Base {
       e.button === 0
     )
 
-    // 没有移动的情况下，不触发 afterdragnode 事件
+    // 没有移动的情况下，不触发 node:moved 事件
     if (this.isMoving && hasMove) {
-      const moveNodeModel = this.moveNode.map(item => item.model)
-      this.graph.emit('afterdragnode', moveNodeModel)
+      this.graph.emit('node:moved', this.moveNode)
       this.graph.pushStack('updateNodePosition', { nodes: this.stackNode })
       this.stackNode = []
     }

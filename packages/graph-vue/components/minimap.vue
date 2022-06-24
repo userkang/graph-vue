@@ -67,11 +67,15 @@ export default class Minimap extends Vue {
   }
 
   get svgInfo() {
-    return this.graph.viewController.svgInfo
+    return this.graph.getSvgInfo()
   }
 
-  get transform() {
-    return this.graph.viewController.transform
+  get scale() {
+    return this.graph.getZoom()
+  }
+
+  get translate() {
+    return this.graph.getTranslate()
   }
 
   get rootStyle() {
@@ -131,21 +135,16 @@ export default class Minimap extends Vue {
   }
 
   get viewportRect() {
-    const svgInfo = this.graph.viewController.svgInfo
-    const transform = this.graph.viewController.transform
-    const graphRect = this.nodesRect
-    const width = (svgInfo.width * this.graphScale) / transform.scale
-    const height = (svgInfo.height * this.graphScale) / transform.scale
+    const width = (this.svgInfo.width * this.graphScale) / this.scale
+    const height = (this.svgInfo.height * this.graphScale) / this.scale
+    const offsetX = (this.svgInfo.width * (this.scale - 1)) / 2
+    const offsetY = (this.svgInfo.height * (this.scale - 1)) / 2
 
     const left =
-      (transform.offsetX / transform.scale -
-        transform.translateX +
-        this.graphRect.left) *
+      (offsetX / this.scale - this.translate.x + this.graphRect.left) *
       this.graphScale
     const top =
-      (transform.offsetY / transform.scale -
-        transform.translateY +
-        this.graphRect.top) *
+      (offsetY / this.scale - this.translate.y + this.graphRect.top) *
       this.graphScale
     return { width, height, left, top }
   }
@@ -165,7 +164,7 @@ export default class Minimap extends Vue {
     }
     this.canGraphChage = false
     window.requestAnimationFrame(() => {
-      const g = this.graph.viewController.$svg.querySelector('g')
+      const g = this.graph.getContainer().querySelector('g')
       if (g) {
         this.svgHTML = g.innerHTML
       }
@@ -221,7 +220,7 @@ export default class Minimap extends Vue {
   onVpResizemove(e: MouseEvent) {
     const { x, y } = e
     const changeZoom = 1 - (x - this.prevVpmove.x + y - this.prevVpmove.y) / 250
-    const nextZoom = this.transform.scale * changeZoom
+    const nextZoom = this.scale * changeZoom
     this.graph.zoom(nextZoom)
     Object.assign(this.prevVpmove, { x, y })
   }
@@ -238,20 +237,7 @@ export default class Minimap extends Vue {
   }
 
   listenGraphChange() {
-    const eventTypes = [
-      'dragingnode',
-      'brushing',
-      'nodeselectchange',
-      'edgeselectchange',
-      'afterdragnode',
-      'afterlayout',
-      'aftertranslate',
-      'addingedge',
-      'datachange',
-      'afteredgeupdate',
-      'afternodeupdate',
-      'stackchange'
-    ]
+    const eventTypes = ['brushing', 'translate', 'datachange', 'stackchange']
     for (let i = eventTypes.length - 1; i >= 0; i--) {
       this.graph.on(eventTypes[i], this.onGraphChange)
     }

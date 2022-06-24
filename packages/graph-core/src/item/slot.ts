@@ -18,19 +18,19 @@ export default class Slot extends Base {
     this.set('type', cfg.type)
   }
 
-  get x(): number {
+  public get x(): number {
     return this.get('x')
   }
 
-  get y(): number {
+  public get y(): number {
     return this.get('y')
   }
 
-  get type(): string {
+  public get type(): string {
     return this.get('type')
   }
 
-  get nodeId(): string {
+  public get nodeId(): string {
     return this.get('nodeId')
   }
 

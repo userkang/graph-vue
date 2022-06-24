@@ -38,8 +38,8 @@ export default class Edge extends Vue {
   get path() {
     const { fromSlot, toSlot } = this.edge
     const direction = this.graph.get('direction')
-    let x2 = toSlot.x
-    let y2 = toSlot.y
+    const x2 = toSlot.x
+    const y2 = toSlot.y
 
     return calculateCurve(
       {

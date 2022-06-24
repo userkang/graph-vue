@@ -19,7 +19,7 @@ export default class Slot extends Element {
   draw() {
     const circle = this.createDom('circle', {
       class: `graph-slot`,
-      'graph-type': 'slot',
+      'graph-type': 'port',
       'graph-id': this.slot.id,
       r: '4',
       transform: `translate(${this.slot.x}, ${this.slot.y})`
@@ -57,9 +57,9 @@ export default class Slot extends Element {
   }
 
   initHook() {
-    this.addEvent('beforeaddedge', this.drawStyle)
+    this.addEvent('edge:connect', this.drawStyle)
     this.addEvent('datachange', this.drawStyle)
-    this.addEvent('afteraddedge', this.drawStyle)
+    this.addEvent('edge:added', this.drawStyle)
     this.addEvent('mouseup', this.drawStyle)
   }
 

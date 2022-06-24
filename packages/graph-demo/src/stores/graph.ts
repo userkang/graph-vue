@@ -1,17 +1,22 @@
 import GraphConfigStore from './graph-config'
-import { dagMock, treeMock } from '@/mock/graph'
+import { Graph as GraphType } from '@datafe/graph-core'
+import { dagMock, treeMock, mindMapMock } from '@/mock/graph'
 
 class Graph {
   public state = {
-    graph: {}
+    graph: null as GraphType | null
   }
 
-  public getData() {
+  public getDagData() {
     GraphConfigStore.state.data = dagMock()
   }
 
   public getTreeData() {
     GraphConfigStore.state.data = treeMock(5) as any
+  }
+
+  public getMindMapData() {
+    GraphConfigStore.state.data = mindMapMock()
   }
 }
 

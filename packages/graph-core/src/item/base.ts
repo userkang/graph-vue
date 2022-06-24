@@ -1,7 +1,8 @@
+import EventEmitter from '../util/event-emitter'
 import { IEdgeModel, INodeModel, ISlotModel } from '../types'
 import { setGlobalId } from '../util/utils'
 
-export default class Base {
+export default class Base extends EventEmitter {
   private _cfg: { [key: string]: unknown } = {
     id: '',
     model: {},
@@ -10,12 +11,14 @@ export default class Base {
       linked: false,
       enable: false,
       locked: false,
-    },
+      hide: false,
+      skipLayout: false
+    }
   }
 
   constructor(model: INodeModel | IEdgeModel | ISlotModel) {
+    super()
     this.set('model', model)
-
     if (model.id !== undefined) {
       this.set('id', String(model.id))
       // 如果节点保存了之前自动生成的 id，需要累积，解决自动生成 id 重复的问题
@@ -23,6 +26,14 @@ export default class Base {
         setGlobalId(model.id)
       }
     }
+  }
+
+  protected get<T = any>(key: string): T {
+    return this._cfg[key] as T
+  }
+
+  protected set(key: string, val: unknown) {
+    this._cfg[key] = val
   }
 
   public get id() {
@@ -33,27 +44,20 @@ export default class Base {
     return this.get('model')
   }
 
+  public get view() {
+    return this.get('view')
+  }
+
   public get states() {
     return this.get('states')
   }
 
-  public get<T = any>(key: string): T {
-    return this._cfg[key] as T
-  }
-
-  public set(key: string, val: unknown) {
-    this._cfg[key] = val
-  }
-
   public setState(state: string) {
-    if (this.hasState(state)) {
-      return
-    }
-    this.states[state] = true
+    this.getStates()[state] = true
   }
 
   public hasState(state: string): boolean {
-    return this.states[state] || false
+    return this.getStates()[state] || false
   }
 
   public getStates() {
@@ -62,7 +66,7 @@ export default class Base {
 
   public clearState(state: string) {
     if (this.hasState(state)) {
-      this.states[state] = false
+      this.getStates()[state] = false
     }
   }
 }

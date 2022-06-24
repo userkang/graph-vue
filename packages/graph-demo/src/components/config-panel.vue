@@ -31,11 +31,10 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue, Watch } from 'vue-property-decorator'
+import { Component, Vue } from 'vue-property-decorator'
 import GraphConfigStore from '@/stores/graph-config'
 import GraphStore from '@/stores/graph'
 import { editor } from 'monaco-editor'
-import { Graph, ILayout } from '@datafe/graph-core'
 
 @Component
 export default class ConfigPanel extends Vue {
@@ -43,13 +42,17 @@ export default class ConfigPanel extends Vue {
   graphConfigState = GraphConfigStore.state
   graphState = GraphStore.state
   actionList = {
-    'drag-svg': '拖动画布',
+    'drag-blank': '拖动画布',
     'drag-node': '拖动节点',
     'click-select': '点击选中',
-    'create-edge': '创建边',
+    'connect-edge': '连接边',
     'wheel-move': '滚轮移动画布',
     'wheel-zoom': '双指缩放',
     'brush-select': '框选'
+  }
+
+  get graph() {
+    return this.graphState.graph
   }
 
   async mounted() {
@@ -79,19 +82,18 @@ export default class ConfigPanel extends Vue {
       }
     )
 
-    const graph = this.graphState.graph as Graph
-
     this.editor.onDidBlurEditorText(() => {
       try {
         const content = JSON.parse(this.editor.getValue())
         this.graphConfigState.data = content
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.log('数据格式不正确')
       }
     })
-    graph.on('datachange', () => {
-      const nodes = graph.getNodes().map(item => item.model)
-      const edges = graph.getEdges().map(item => item.model)
+    this.graph?.on('datachange', () => {
+      const nodes = this.graph?.getNodes().map(item => item.model)
+      const edges = this.graph?.getEdges().map(item => item.model)
       this.editor.setValue(JSON.stringify({ nodes, edges }, null, ' '))
     })
   }

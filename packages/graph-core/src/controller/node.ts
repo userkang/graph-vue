@@ -4,8 +4,8 @@ import { INode, INodeModel } from '../types'
 import Slot from '../item/slot'
 
 const defaultCfg = {
-  width: 190,
-  height: 35
+  width: 180,
+  height: 40
 }
 export default class NodeController {
   graph: Graph
@@ -19,7 +19,7 @@ export default class NodeController {
   }
 
   get nodes() {
-    return Object.values(this._nodes)
+    return this.sortByZIndex()
   }
 
   get slotsMap() {
@@ -69,7 +69,7 @@ export default class NodeController {
 
     if (this.graph.get('isRender')) {
       const nodeGroup = this.graph.get('svg').get('nodeGroup')
-      nodeGroup.remove(node.get('view'))
+      nodeGroup.remove(node.view)
     }
 
     return node
@@ -87,6 +87,8 @@ export default class NodeController {
     const node = new Node(item, nodeCfg, direction)
     this._nodes[node.id] = node
 
+    this.watchNodeUpdate(node)
+
     // 渲染
     if (this.graph.get('isRender')) {
       const nodeView = node.render(this.graph)
@@ -97,9 +99,52 @@ export default class NodeController {
     return node
   }
 
-  public data(group: INodeModel[]) {
+  public watchNodeUpdate(node: INode) {
+    node.on('change:zIndex', (changeItem: INode) => {
+      this.graph.emit('node:change:zIndex', changeItem)
+    })
+  }
+
+  public sortByZIndex() {
+    const nodes = Object.values(this._nodes)
+    const zIndexMap: Record<number, INode[]> = {}
+    nodes.forEach(node => {
+      const zIndex = node.zIndex
+      zIndexMap[zIndex] = zIndexMap[zIndex] || []
+      zIndexMap[zIndex].push(node)
+    })
+
+    const nodeList: INode[] = []
+    Object.values(zIndexMap).forEach((items: INode[]) => {
+      nodeList.push(...items)
+    })
+
+    return nodeList
+  }
+
+  public data(nodes: INodeModel[]) {
+    const childNodes: INode[] = []
+
     this._nodes = {}
-    group.forEach(item => this.addNode(item))
+    nodes.forEach(item => {
+      const node = this.addNode(item)
+      if (item.parentId && node) {
+        childNodes.push(node)
+      }
+    })
+
+    childNodes.forEach(childNode => {
+      const parentNode = this.findNode(childNode.parentId)
+      if (parentNode) {
+        parentNode.addChild(childNode)
+        childNode.zIndex = 1
+        childNode.setParent(parentNode)
+      } else {
+        console.warn(
+          `node id '${childNode.id}' can't find parentNode where id is '${childNode.parentId}'`
+        )
+      }
+    })
   }
 
   public destroy() {

@@ -1,7 +1,8 @@
 <template>
-  <div class="dag_component">
+  <div class="dag-container">
     <ComponentPanel />
     <GraphVue
+      class="graph-wrapper"
       ref="graph"
       :data="dataMock"
       :action="action"
@@ -27,22 +28,22 @@
       <template #edge="{ edge }">
         <path :d="path(edge)" class="graph-custom-edge graph-vue-edge"></path>
         <text
+          :id="edge.id"
           :x="text(edge).x"
           :y="text(edge).y"
-          style="text-anchor: middle; fill: #aaa; font-size: 12px"
+          style="text-anchor: middle; fill: #aaa; font-size: 14px"
+          >tag</text
         >
-          tag
-        </text>
       </template>
 
-      <template #port>
+      <!-- <template #port>
         <rect
           width="8"
           height="8"
           :transform="`translate(-4, -4)`"
           fill="#999"
         ></rect>
-      </template>
+      </template> -->
       <MiniMap />
       <ToolBox />
       <Menu class="menu" v-model="menuShow">
@@ -50,6 +51,7 @@
         <li @click="deleteItem">删除</li>
       </Menu>
     </GraphVue>
+    <ConfigPanel />
   </div>
 </template>
 
@@ -58,7 +60,7 @@ import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
 import ConfigPanel from '@/components/config-panel.vue'
 import { ToolBox, Menu, MiniMap, GraphVue } from '@datafe/graph-vue'
-import { INodeModel, IEdgeModel, IEdge, Graph } from '@datafe/graph-core'
+import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 import GraphConfigStore from '@/stores/graph-config'
@@ -109,8 +111,11 @@ export default class DAG extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node.contextmenu', this.handleNodeContextMenu)
+    this.graph.on('node:contextmenu', this.handleNodeContextMenu)
     this.graph.on('keyup', this.handleKeyUp)
+    this.graph.on('node:mousedown', ({ target }: { target: INode }) => {
+      target?.setZIndex(1000)
+    })
   }
 
   handleDrop(e: DragEvent) {
@@ -175,22 +180,26 @@ export default class DAG extends Vue {
     }
   }
 
-  handleNodeContextMenu(e: MouseEvent, data: { id: string }) {
+  handleNodeContextMenu({ data }: { data: { id: string } }) {
     this.menuShow = true
     this.activeId = data.id
   }
 
   async created() {
-    await GraphStore.getData()
+    await GraphStore.getDagData()
   }
 }
 </script>
 
 <style lang="scss" scoped>
-.dag_component {
-  position: relative;
+.dag-container {
   width: 100%;
   height: 100%;
+  display: flex;
+}
+.graph-wrapper {
+  position: relative;
+  flex: 1;
 }
 .node-container {
   width: 100%;
@@ -204,7 +213,7 @@ export default class DAG extends Vue {
   box-sizing: border-box;
   font-size: 12px;
   .left {
-    width: 20%;
+    width: 9%;
     height: 100%;
     background-color: orange;
     &.leaf {
@@ -218,7 +227,7 @@ export default class DAG extends Vue {
 }
 .graph-custom-edge {
   stroke: rgb(235, 226, 224);
-  stroke-width: 1px;
+  stroke-width: 1.5;
   stroke-dasharray: 2;
   fill: none;
   &:hover {

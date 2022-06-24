@@ -4,6 +4,7 @@
     "target": "es5",
     "module": "esnext",
     "allowJs": true,
+    "jsx": "preserve",
     "importHelpers": true,
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -15,9 +16,9 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["src/*", "../../packages/*/src"],
-      // "@datafe/graph-vue": ["../../packages/graph-vue"],
-      "@datafe/graph-core": ["../../packages/graph-core/src"]
+      "@/*": ["src/*"],
+      "@datafe/graph-vue": ["../../packages/graph-vue"],
+      "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

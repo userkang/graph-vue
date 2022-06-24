@@ -1,6 +1,7 @@
 import { INode, ISlot } from '../types'
 import Graph from '../controller/graph'
 import Base from './base'
+import Slot from '../item/slot'
 
 export default class CreateEdge extends Base {
   fromSlot!: ISlot
@@ -23,32 +24,31 @@ export default class CreateEdge extends Base {
   }
 
   init() {
-    this.addEvent('slot.mousedown', this.slotMouseDown)
+    this.addEvent('port:mousedown', this.slotMouseDown)
     this.addEvent('mousemove', this.mouseMove)
-    this.addEvent('slot.mouseup', this.slotMouseUp)
+    this.addEvent('port:mouseup', this.slotMouseUp)
     this.addEvent('mouseup', this.mouseUp)
   }
 
-  slotMouseDown(e: MouseEvent, data: { id: string }) {
-    const { id } = data
+  slotMouseDown({ target }: { target: Slot }) {
     // 初始化连线的起点和移动位置
-    const slot = this.graph.findSlot(id)
-    if (!slot || slot.type === 'in') {
+    const port = target
+    if (!port || port.type === 'in') {
       return
     }
 
-    const fromNode = this.graph.findNode(slot.nodeId)
+    const fromNode = this.graph.findNode(port.nodeId)
     if (!fromNode) {
       return
     }
 
-    const { x, y } = slot
+    const { x, y } = port
     this.setNewEdgeStart(x, y)
     this.setNewEdgeMove(x, y)
-    this.fromSlot = slot
+    this.fromSlot = port
     this.fromNode = fromNode
     this.setEnableSlot()
-    this.graph.emit('beforeaddedge')
+    this.graph.emit('edge:connect', port)
   }
 
   mouseMove(e: MouseEvent) {
@@ -57,22 +57,22 @@ export default class CreateEdge extends Base {
     }
     const { x, y } = this.graph.getPointByClient(e.x, e.y)
     this.setNewEdgeMove(x, y)
-    this.graph.emit('addingedge', this.createEdge)
+    this.graph.emit('edge:connecting', this.createEdge)
   }
 
-  slotMouseUp(e: MouseEvent, data: { id: string }) {
+  slotMouseUp({ e, target }: { e: MouseEvent; target: Slot }) {
     e.stopPropagation()
-    const { id } = data
-    const slot = this.graph.findSlot(id)
 
-    if (!slot) {
+    const port = target
+
+    if (!port) {
       return
     }
 
-    if (slot.hasState('enable')) {
+    if (port.hasState('enable')) {
       // 这里要传 model 下的 id，保证用户数据类型正确
       // 当 model 下无 id 时，再取自生成 id
-      const node = this.graph.findNode(slot.nodeId)
+      const node = this.graph.findNode(port.nodeId)
 
       if (!node) {
         return
@@ -91,7 +91,7 @@ export default class CreateEdge extends Base {
 
       if (node.model.slots) {
         Object.assign(edgeInfo, {
-          toSlotId: slot.model.id
+          toSlotId: port.model.id
         })
       }
 
@@ -99,13 +99,13 @@ export default class CreateEdge extends Base {
     }
 
     this.setResetEdge()
-    this.graph.emit('addingedge', null)
+    this.graph.emit('edge:connecting', null)
   }
 
   mouseUp() {
     if (this.isMoveing) {
       this.setResetEdge()
-      this.graph.emit('addingedge', null)
+      this.graph.emit('edge:connecting', null)
     }
   }
 

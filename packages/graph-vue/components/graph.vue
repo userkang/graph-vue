@@ -92,7 +92,7 @@ export default class GraphVue extends Vue {
 
   @Prop({
     default: () => {
-      return { rankdir: 'TB' }
+      return { options: { type: 'dagre', rankdir: 'TB' } }
     }
   })
   layout!: ILayout
@@ -118,11 +118,7 @@ export default class GraphVue extends Vue {
   init() {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: (this.layout as any).rankdir || 'TB',
-      nodeInfo: {
-        width: 180,
-        height: 40
-      },
+      direction: (this.layout as ILayout).options?.rankdir || 'TB',
       action: this.action
     })
 
@@ -135,8 +131,8 @@ export default class GraphVue extends Vue {
 
   initCustomHooks() {
     const hooks = [
-      'afteraddnode',
-      'afteraddedge',
+      'node:added',
+      'edge:added',
       'nodeselectchange',
       'edgeselectchange',
       'aftertranslate',
@@ -156,8 +152,8 @@ export default class GraphVue extends Vue {
     })
 
     this.graph.on('datachange', this.refreshGraph)
-    this.graph.on('aftertranslate', this.aftertranslate)
-    this.graph.on('afterzoom', this.afterzoom)
+    this.graph.on('translate', this.aftertranslate)
+    this.graph.on('zoom', this.afterzoom)
     this.graph.on('brushing', this.brushing)
   }
 

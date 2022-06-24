@@ -11,7 +11,6 @@ export interface IDataModel {
   nodes: INodeModel[]
   // 实验连线信息
   edges: IEdgeModel[]
-  [key: string]: any
 }
 
 export interface ISlotModel {
@@ -26,9 +25,14 @@ export interface INodeModel {
   height?: number
   x?: number
   y?: number
+  parentId?: string
+  collapsed?: boolean
   slots?: ISlotModel[]
-  children?: INodeModel[]
   [key: string]: any
+}
+
+export interface ITreeDataModel extends INodeModel {
+  children?: ITreeDataModel[]
 }
 
 export interface IEdgeModel {
@@ -85,6 +89,13 @@ export interface IDataStack {
 }
 
 export interface ILayout {
+  type?: string
+  options?: IDagreLayout
+  data?: { nodes: INode[]; edges: IEdge[] }
+}
+
+export interface IDagreLayout {
+  rankdir?: 'LR' | 'TB'
   align?: 'UL' | 'UR' | 'DL' | 'DR'
   nodesep?: number
   edgesep?: number
@@ -96,9 +107,18 @@ export interface ILayout {
 export type IAction = Array<
   | 'brush-select'
   | 'click-select'
-  | 'create-edge'
+  | 'connect-edge'
   | 'drag-node'
-  | 'drag-svg'
+  | 'drag-blank'
   | 'wheel-move'
   | 'wheel-zoom'
 >
+
+export interface IGraphEvent {
+  e: MouseEvent
+  x: number
+  y: number
+  data: Record<string, string | null>
+  target: Node | Edge | Slot | undefined
+  [key: string]: any
+}

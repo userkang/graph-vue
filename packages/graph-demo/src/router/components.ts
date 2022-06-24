@@ -1,17 +1,23 @@
-export const GraphContainer = () =>
-  import(
-    /* webpackChunkName: "graphContainer"*/
-    '../views/graph-editor.vue'
-  )
-
 export const DAG = () =>
   import(
     /* webpackChunkName: "dag"*/
-    '../views/templates/DAG.vue'
+    '../views/DAG.vue'
   )
 
 export const Tree = () =>
   import(
     /* webpackChunkName: "tree"*/
-    '../views/templates/Tree.vue'
+    '../views/Tree.vue'
+  )
+
+export const MindMap = () =>
+  import(
+    /* webpackChunkName: "mindMap"*/
+    '../views/MindMap.vue'
+  )
+
+export const NodeCell = () =>
+  import(
+    /* webpackChunkName: "nodeCell"*/
+    '../views/NodeCell.vue'
   )

@@ -16,13 +16,13 @@ export default class DragSvg extends Base {
   }
 
   init() {
-    this.addEvent('svg.mousedown', this.mouseDown)
+    this.addEvent('blank:mousedown', this.mouseDown)
     this.addEvent('mousemove', this.mouseMove)
     this.addEvent('mouseup', this.mouseUp)
     this.addEvent('mouseleave', this.mouseUp)
   }
 
-  mouseDown(e: MouseEvent) {
+  mouseDown() {
     if (!this.graph.get('brushing')) {
       this.isMoving = true
     }

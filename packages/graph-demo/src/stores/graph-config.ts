@@ -1,31 +1,35 @@
-import { IDataModel, INodeModel } from '@datafe/graph-core'
+import { IDataModel, ITreeDataModel } from '@datafe/graph-core'
 
 interface GraphConfigState {
   layout: {
-    rankdir: string
+    options: {
+      rankdir: string
+    }
   }
   action: string[]
-  data: IDataModel | INodeModel
+  data: IDataModel | ITreeDataModel
 }
 
 class GraphConfig {
   public state: GraphConfigState = {
     layout: {
-      rankdir: 'TB'
+      options: {
+        rankdir: 'TB'
+      }
     },
     action: [
-      'drag-svg',
+      'drag-blank',
       'drag-node',
       'click-select',
-      'create-edge',
+      'connect-edge',
       // 'wheel-move',
       'wheel-zoom',
-      'brush-select',
+      'brush-select'
     ],
     data: {
       nodes: [],
-      edges: [],
-    },
+      edges: []
+    }
   }
 }
 

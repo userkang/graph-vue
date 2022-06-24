@@ -42,7 +42,7 @@ export default class Node extends Element {
   }
 
   drawDom() {
-    const htmlFunction = this.node.get('cfg').html
+    const htmlFunction = this.node.cfg.html
     let div: HTMLElement = document.createElement('div')
     // TODO: vue 渲染
     if (htmlFunction) {
@@ -72,18 +72,17 @@ export default class Node extends Element {
   }
 
   initHook() {
-    this.addEvent('dragingnode', this.updateTransform)
-    this.addEvent('afterdragnode', this.updateTransform)
-    this.addEvent('afterlayout', this.transform)
-    this.addEvent('nodeselectchange', this.updateSelect)
+    this.addEvent('node:moving', this.updateTransform)
+    this.addEvent('node:moved', this.updateTransform)
+    this.addEvent('layout', this.transform)
+    this.addEvent('node:change:selected', this.updateSelect)
     this.addEvent('brushing', this.updateSelect)
   }
 
-  updateTransform(moveNodes: INodeModel[]) {
-    const nodeModel = moveNodes.find(item => String(item.id) === this.node.id)
+  updateTransform(moveNodes: INode[]) {
+    const node = moveNodes.find(item => String(item.id) === this.node.id)
 
-    if (nodeModel) {
-      const node = this.graph.findNode(nodeModel.id)
+    if (node) {
       this.node = node
       this.transform()
     }

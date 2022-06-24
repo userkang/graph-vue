@@ -5,7 +5,9 @@ const generateTreeNode = () => {
   return {
     id,
     label: id,
-    nodeId
+    nodeId,
+    width: 60,
+    height: 60
   }
 }
 
@@ -16,18 +18,14 @@ export const dagMock = () => {
         id: '1',
         label: '工具栏悬浮有说明',
         nodeId: 232,
-        x: 400,
-        y: 100,
-        width: 200,
-        height: 50
+        x: 680,
+        y: 263
       },
       {
         id: '2',
         label: '拖动添加组件',
-        x: 540,
-        y: 407.5,
-        width: 210,
-        height: 30,
+        x: 795,
+        y: 533,
         slots: [
           {
             type: 'in',
@@ -46,32 +44,32 @@ export const dagMock = () => {
       {
         id: '3',
         label: '拖动插槽连线',
-        x: 641,
-        y: 284.5
+        x: 795,
+        y: 443
       },
       {
         id: '4',
         label: '右键可删除',
-        x: 297,
-        y: 522.5
+        x: 565,
+        y: 533
       },
       {
         id: '5',
         label: '交互可配置',
-        x: 381,
-        y: 234.5
+        x: 565,
+        y: 353
       },
       {
         id: '6',
         label: '交互可配置',
-        x: 531,
-        y: 640.5
+        x: 680,
+        y: 623
       },
       {
         id: '7',
         label: '交互可配置',
-        x: 280,
-        y: 413.5,
+        x: 565,
+        y: 443,
         slots: [
           {
             type: 'in',
@@ -144,4 +142,31 @@ export const treeMock = (times: number) => {
     stack.push(node.children[0], node.children[1])
   }
   return head
+}
+
+export const mindMapMock = () => {
+  return {
+    id: '1',
+    label: '工具栏悬浮有说明',
+    nodeId: 232,
+    slots: [{ type: 'out', id: 'slot1' }],
+    isCollapsed: false,
+    children: [
+      {
+        id: '2',
+        label: '拖动添加组件',
+        isCollapsed: false
+      },
+      {
+        id: '3',
+        label: '拖动插槽连线',
+        isCollapsed: false
+      },
+      {
+        id: '4',
+        label: '交互可配置',
+        isCollapsed: false
+      }
+    ]
+  }
 }

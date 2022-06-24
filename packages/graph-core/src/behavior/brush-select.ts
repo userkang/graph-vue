@@ -1,6 +1,7 @@
 import Graph from '../controller/graph'
 import Node from '../item/node'
 import Base from './base'
+import { IGraphEvent } from '../types'
 
 interface Range {
   startX: number
@@ -21,12 +22,12 @@ export default class BrushSelect extends Base {
   }
 
   init() {
-    this.addEvent('svg.mousedown', this.onMouseDown)
+    this.addEvent('blank:mousedown', this.onMouseDown)
     this.addEvent('mousemove', this.onMouseMove)
     this.addEvent('mouseup', this.onMouseUp)
   }
 
-  onMouseDown(e: MouseEvent) {
+  onMouseDown({ e }: IGraphEvent) {
     this.originX = e.x
     this.originY = e.y
     if (this.graph.get('brushing')) {
@@ -51,13 +52,12 @@ export default class BrushSelect extends Base {
     this.checkSelected(this.originX, this.originY, e.x, e.y)
   }
 
-  onMouseUp(e: MouseEvent) {
+  onMouseUp() {
     if (this.moving) {
       const before = this.beforeSelectedNodes.map(item => item.id).toString()
       const after = this.afterSelectedNodes.map(item => item.id).toString()
       if (String(before) !== String(after)) {
-        const nodeModels = this.afterSelectedNodes.map(item => item.model)
-        this.graph.emit('nodeselectchange', nodeModels)
+        this.graph.emit('node:change:selected', this.afterSelectedNodes)
       }
     }
 

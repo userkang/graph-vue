@@ -1,6 +1,6 @@
 <template>
   <div class="component-panel">
-    <div class="title">组件</div>
+    <div class="title">拖动组件到画布</div>
     <li
       v-for="item in componentList"
       :key="item.componentId"
@@ -63,21 +63,22 @@ export default class ComponentPanel extends Vue {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 240px;
-  height: 240px;
+  width: 180px;
+  height: 250px;
   user-select: none;
   box-sizing: border-box;
   background: #333;
+  z-index: 1;
 }
 .title {
   font-size: 12px;
   color: #ddd;
   text-align: left;
-  margin: 5px 10px;
+  margin: 10px 10px;
 }
 .component-item {
   display: flex;
-  height: 35px;
+  height: 40px;
   box-sizing: border-box;
   color: #ddd;
   font-size: 12px;

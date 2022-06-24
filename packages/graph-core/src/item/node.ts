@@ -20,14 +20,16 @@ export default class Node extends Base {
 
     this.set('cfg', cfg)
 
-    // TODO: 这部分把一些 graph 的配置传进来，后期希望 item 能不依赖 graph
     this.set('direction', cfg.direction || direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
+    this.set('zIndex', model.zIndex || 0)
+    this.set('parentId', model.parentId && String(model.parentId))
 
     this.set('slots', [])
     // 保存与节点相关的边
     this.set('edges', [])
+    this.set('children', [])
 
     // 如果没有传坐标，默认为0
     model.x = model.x ? model.x : 0
@@ -36,12 +38,20 @@ export default class Node extends Base {
     this.setSlotsPoint()
   }
 
-  public get x() {
-    return this.model.x as number
+  public get cfg() {
+    return this.get('cfg')
   }
 
-  public get y() {
-    return this.model.y as number
+  public get parentId(): string {
+    return this.get('parentId')
+  }
+
+  public get x(): number {
+    return this.model.x
+  }
+
+  public get y(): number {
+    return this.model.y
   }
 
   public get width(): number {
@@ -56,29 +66,133 @@ export default class Node extends Base {
     return this.get('slots')
   }
 
+  public get zIndex(): number {
+    return this.get('zIndex')
+  }
+
+  public set zIndex(value: number) {
+    this.set('zIndex', value)
+  }
+
+  public setZIndex(value: number) {
+    if (this.model.zIndex) {
+      this.model.zIndex = value
+    }
+    this.set('zIndex', value)
+    this.emit('change:zIndex', this)
+  }
+
   public getEdges(): IEdge[] {
     return this.get('edges')
   }
 
-  public getInEdges() {
+  public getInEdges(): IEdge[] {
     return this.getEdges().filter(edge => edge.toNode.id === this.id)
   }
 
-  public getOutEdges() {
+  public getOutEdges(): IEdge[] {
     return this.getEdges().filter(edge => edge.fromNode.id === this.id)
   }
 
-  public getNeighbors() {
+  public lock() {
+    this.setState('locked')
+  }
+
+  public unlock() {
+    this.clearState('locaked')
+  }
+
+  public show() {
+    this.clearState('hide')
+    this.getEdges().forEach(edge => {
+      edge.clearState('hide')
+    })
+  }
+
+  public hide() {
+    this.setState('hide')
+    this.getEdges().forEach(edge => {
+      edge.setState('hide')
+    })
+  }
+
+  public addChild(node: INode) {
+    this.get('children').push(node)
+  }
+
+  public deleteChild(id: string) {
+    const childNodes = this.getChildren()
+    const index = childNodes.findIndex(item => item.id === id)
+    if (index > -1) {
+      this.getChildren().splice(index, 1)
+    }
+  }
+
+  public getChildren(): INode[] {
+    return this.get('children')
+  }
+
+  public setParent(node: INode) {
+    this.set('parent', node)
+  }
+
+  public getParent(): INode {
+    return this.get('parent')
+  }
+
+  public getSourceNodes(): INode[] {
     const nodes: INode[] = []
     this.getInEdges().forEach(edge => {
       nodes.push(edge.fromNode)
     })
+    return nodes
+  }
 
+  public getTargetNodes() {
+    const nodes: INode[] = []
     this.getOutEdges().forEach(edge => {
       nodes.push(edge.toNode)
     })
 
     return nodes
+  }
+
+  public getAllSourceNodes() {
+    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const tempNodes: INode[] = this.getSourceNodes()
+
+    let i = 0
+
+    while (i < tempNodes.length) {
+      const node = tempNodes[i]
+      if (nodes[node.id]) {
+        break
+      }
+      nodes[node.id] = true
+      tempNodes.push(...tempNodes[i].getSourceNodes())
+      i++
+    }
+
+    return tempNodes
+  }
+
+  public getAllTargetNodes() {
+    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const tempNodes: INode[] = this.getTargetNodes()
+
+    let i = 0
+
+    while (i < tempNodes.length) {
+      const node = tempNodes[i]
+      if (nodes[node.id]) {
+        break
+      }
+      nodes[node.id] = true
+      tempNodes.push(...tempNodes[i].getTargetNodes())
+      i++
+    }
+
+    return tempNodes
   }
 
   public addEdge(edge: IEdge) {
@@ -103,8 +217,7 @@ export default class Node extends Base {
     this.model.y = y
     // slot 位置更新
     this.slots.forEach(slot => {
-      slot.set('x', slot.x + moveX)
-      slot.set('y', slot.y + moveY)
+      slot.update(slot.x + moveX, slot.y + moveY)
     })
   }
 
@@ -120,14 +233,21 @@ export default class Node extends Base {
     }
 
     Object.assign(this.model, model)
-    this.set('width', this.model.width || this.width)
-    this.set('height', this.model.height || this.height)
+
+    if (model.width || model.height) {
+      this.set('width', this.model.width || this.width)
+      this.set('height', this.model.height || this.height)
+      this.model.width = this.width
+      this.model.height = this.height
+    }
 
     this.updateSlots()
 
     this.getEdges().forEach(edge => {
       edge.update()
     })
+
+    this.emit('update', this)
   }
 
   /**

@@ -52,7 +52,7 @@ const graph = new Graph({
     height: 40
   },
   // 默认交互
-  action: ['drag-node', 'drag-svg', 'wheel-zoom', 'wheel-move', 'click-select']
+  action: ['drag-node', 'drag-blank', 'wheel-zoom', 'wheel-move', 'click-select']
 })
 ```
 
@@ -127,7 +127,7 @@ graph.data(data)
         },
         action: [
           'drag-node',
-          'drag-svg',
+          'drag-blank',
           'wheel-zoom',
           'wheel-move',
           'click-select'

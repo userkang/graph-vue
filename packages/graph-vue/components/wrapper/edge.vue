@@ -1,5 +1,5 @@
 <template>
-  <g graph-type="edge" :graph-id="edge.id">
+  <g v-if="!edge.hasState('hide')" graph-type="edge" :graph-id="edge.id">
     <slot></slot>
   </g>
 </template>

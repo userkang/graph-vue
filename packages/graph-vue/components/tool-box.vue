@@ -121,7 +121,7 @@ export default class ToolBox extends Vue {
   }
 
   brushSelect() {
-    // 通过设置 brushing 属性，避免 brush-select 和 drag-svg 行为拖动事件的冲突问题。
+    // 通过设置 brushing 属性，避免 brush-select 和 drag-blank 行为拖动事件的冲突问题。
     this.isBrushing = !this.graph.get('brushing')
     this.graph.set('brushing', this.isBrushing)
   }

@@ -29,7 +29,9 @@ const getRandomId = () => Math.random().toString().slice(2)
 
 enum demoTypes {
   DEFAULT = 'dag',
-  TREE = 'tree'
+  TREE = 'tree',
+  MINDMAP = 'mindMap',
+  NODEGROUP = 'nodeCell'
 }
 
 @Component({
@@ -52,6 +54,18 @@ export default class ComponentPanel extends Vue {
       type: demoTypes.TREE,
       desc: '树型结构',
       img: demoTree
+    },
+    {
+      id: getRandomId(),
+      type: demoTypes.MINDMAP,
+      desc: '思维导图',
+      img: demoTree
+    },
+    {
+      id: getRandomId(),
+      type: demoTypes.NODEGROUP,
+      desc: '节点组',
+      img: demoTree
     }
   ]
 
@@ -61,8 +75,8 @@ export default class ComponentPanel extends Vue {
   }
 
   initActiveTemplate() {
-    const routePath = this.$route.path
-    const templateType = routePath.split('/')[2]
+    const hash = location.hash
+    const templateType = hash.split('/')[1]
     this.activeTemplate = templateType
   }
 

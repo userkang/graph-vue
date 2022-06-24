@@ -30,6 +30,10 @@ export default class Edge extends Base {
     this.toNode.addEdge(this)
   }
 
+  public get cfg() {
+    return this.get('cfg')
+  }
+
   public get fromNode(): INode {
     return this.get('fromNode')
   }

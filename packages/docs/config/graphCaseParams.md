@@ -13,7 +13,7 @@ IGraphConfig {
     width: number
     height: number
   }
-  // 默认行为配置。目前支持的默认行为有：drag-svg,drag-node,click-select,create-edge,wheel-move,wheel-zoom,brush-select
+  // 默认行为配置。目前支持的默认行为有：drag-blank,drag-node,click-select,connect-edge,wheel-move,wheel-zoom,brush-select
   action: string[]
 }
 ```

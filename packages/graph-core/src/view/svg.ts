@@ -113,7 +113,7 @@ export default class Svg extends Element {
     this.add(brushing)
   }
 
-  addGroup(attrs) {
+  addGroup(attrs: { [key: string]: string }) {
     const group = new Group(attrs)
     this.add(group)
     return group

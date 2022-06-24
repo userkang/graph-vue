@@ -65,7 +65,7 @@ export const setGlobalId = (id: string) => {
   globalId.push(id)
 }
 
-export const clone = obj => {
+export const clone = (obj: any): any => {
   if (typeof obj !== 'object' || obj === null) {
     return obj
   }
@@ -125,6 +125,6 @@ export const preorder = (root: INodeModel): IDataModel => {
   return { nodes, edges }
 }
 
-export const isIDataModel = (props): props is IDataModel =>
+export const isIDataModel = (props: any): props is IDataModel =>
   typeof (props as IDataModel)['nodes'] !== 'undefined' &&
   typeof (props as IDataModel)['edges'] !== 'undefined'

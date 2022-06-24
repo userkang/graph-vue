@@ -314,6 +314,11 @@ export default class Graph extends EventEmitter {
     return layoutData
   }
 
+  public circleLayout(options: ILayout = {}) {
+    this.layoutController.circleLayout(options)
+    this.emit('afterlayoutcircle')
+  }
+
   public removeAction(action?: string | string[]) {
     this.eventController.removeBehavior(action)
   }

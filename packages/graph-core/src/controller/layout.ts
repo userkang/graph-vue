@@ -3,6 +3,12 @@ import { IDagreLayout, ILayout, INode, INodeModel } from '../types'
 import dagre from 'dagre'
 import Graph from './graph'
 
+const getDTheta = (nodesLength: number) => {
+  const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
+  const dTheta = sweep / Math.max(1, nodesLength - 1)
+  return dTheta
+}
+
 export default class LayoutController {
   graph: Graph
   dagre: any = null
@@ -44,7 +50,6 @@ export default class LayoutController {
     edges.forEach(item => {
       this.dagre.setEdge(item.fromNode.id, item.toNode.id)
     })
-
     dagre.layout(this.dagre)
 
     const group = this.dagre.graph()
@@ -66,6 +71,33 @@ export default class LayoutController {
     this.graph.pushStack('updateNodePosition', { nodes: stackNode })
 
     return this.dagre
+  }
+
+  circleLayout(
+    cfg: Partial<
+      ILayout & { clockwise?: boolean; startAngle?: number; addRadius?: number }
+    >
+  ) {
+    const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
+      node => !node.parentId
+    )
+
+    const radius =
+      Math.max(...nodes.map(node => node.width + node.height)) +
+      (cfg.addRadius || 0)
+
+    const stackNode: INodeModel[] = nodes.map(node => ({ ...node.model }))
+
+    const dTheta = getDTheta(nodes.length) * (cfg.clockwise === false ? -1 : 1)
+
+    for (let i = 0; i < nodes.length; i++) {
+      const node = nodes[i]
+      const theta = i * dTheta + (cfg.startAngle || 0)
+      const posX = radius * Math.cos(theta)
+      const posY = radius * Math.sin(theta)
+      node.updatePosition(posX, posY)
+    }
+    this.graph.pushStack('updateNodePosition', { nodes: stackNode })
   }
 
   destroy() {

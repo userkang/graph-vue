@@ -33,9 +33,7 @@ export default class ViewController {
   constructor(graph: Graph) {
     this.graph = graph
     this.$svg = graph.cfg.container.querySelector('svg') as SVGElement
-    ;/Safari/.test(navigator.userAgent)
-      ? setTimeout(() => this.resize())
-      : this.resize()
+    this.resize()
   }
 
   public getZoom() {

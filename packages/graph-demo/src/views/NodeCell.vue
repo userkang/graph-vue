@@ -156,7 +156,7 @@ export default class NodeCell extends Vue {
   }
 
   initGroups() {
-    this.layout()
+    this.layout(false)
 
     const groups = this.graph
       .getNodes()
@@ -166,7 +166,7 @@ export default class NodeCell extends Vue {
     })
   }
 
-  layout() {
+  layout(stack = true) {
     // 获取根节点
     const rootNodes = this.graph.getNodes().filter(item => !item.model.parentId)
     const edges: Record<string, IEdge> = {}
@@ -181,9 +181,12 @@ export default class NodeCell extends Vue {
     })
 
     // 先对根节点进行布局
-    this.graph.layout({
-      data: { nodes: rootNodes, edges: Object.values(edges) }
-    })
+    this.graph.layout(
+      {
+        data: { nodes: rootNodes, edges: Object.values(edges) }
+      },
+      stack
+    )
 
     // 处理根节点下子节点布局
     rootNodes.forEach(item => {
@@ -201,9 +204,12 @@ export default class NodeCell extends Vue {
         })
 
         // 对子节点布局。默认布局不能满足需求，需要获取实例自定义布局位置
-        const dagre = this.graph.layout({
-          data: { nodes: children, edges: Object.values(childrenEdges) }
-        })
+        const dagre = this.graph.layout(
+          {
+            data: { nodes: children, edges: Object.values(childrenEdges) }
+          },
+          stack
+        )
 
         // 通过布局实例返回的坐标点，自定义布局位置。
         dagre.nodes().forEach((v: string) => {
@@ -250,6 +256,6 @@ export default class NodeCell extends Vue {
   border: 2px solid #ddd;
 }
 .group-node {
-  background: rgba(134, 244, 106, 0.654);;
+  background: rgba(134, 244, 106, 0.654);
 }
 </style>

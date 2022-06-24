@@ -32,7 +32,7 @@ export default class LayoutController {
     })
   }
 
-  layout(cfg: ILayout) {
+  layout(cfg: ILayout, stack: boolean) {
     this.initDagre(cfg.options)
 
     const nodes = cfg.data?.nodes || this.graph.getNodes()
@@ -68,7 +68,9 @@ export default class LayoutController {
       node.updatePosition(posX, posY)
     })
 
-    this.graph.pushStack('updateNodePosition', { nodes: stackNode })
+    if (stack) {
+      this.graph.pushStack('updateNodePosition', { nodes: stackNode })
+    }
 
     return this.dagre
   }

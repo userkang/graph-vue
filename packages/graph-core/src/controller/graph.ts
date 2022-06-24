@@ -189,7 +189,7 @@ export default class Graph extends EventEmitter {
     this.emit('edge:change', edge)
   }
 
-  public deleteEdge(id: string, stack: boolean = true): IEdge | undefined {
+  public deleteEdge(id: string, stack = true): IEdge | undefined {
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
@@ -201,7 +201,7 @@ export default class Graph extends EventEmitter {
     return edge
   }
 
-  public addEdge(item: IEdgeModel, stack: boolean = true): IEdge | undefined {
+  public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
@@ -285,7 +285,7 @@ export default class Graph extends EventEmitter {
     this.nodeController.data(imodel.nodes)
     this.edgeController.data(imodel.edges)
     if (needLayout) {
-      this.layout()
+      this.layout({}, false)
     }
     this.emit('datachange')
   }
@@ -308,15 +308,15 @@ export default class Graph extends EventEmitter {
     }
   }
 
-  public layout(options: ILayout = {}) {
-    const layoutData = this.layoutController.layout(options)
+  public layout(options: ILayout = {}, stack = true) {
+    const layoutData = this.layoutController.layout(options, stack)
     this.emit('layout')
     return layoutData
   }
 
   public circleLayout(options: ILayout = {}) {
     this.layoutController.circleLayout(options)
-    this.emit('afterlayoutcircle')
+    this.emit('layout')
   }
 
   public removeAction(action?: string | string[]) {

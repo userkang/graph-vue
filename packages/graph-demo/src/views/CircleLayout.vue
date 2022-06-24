@@ -182,7 +182,8 @@ export default class Tree extends Vue {
   }
 
   circleLayout() {
-    this.graph.circleLayout()
+    const cfg = { clockwise: false, startAngle: -2, addRadius: 20 }
+    this.graph.circleLayout(cfg)
   }
 
   async created() {

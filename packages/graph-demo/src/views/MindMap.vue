@@ -76,14 +76,7 @@ import { INodeModel, IEdgeModel, IEdge, Graph, INode } from '@datafe/graph-core'
 
 import GraphStore from '@/stores/graph'
 
-const action = [
-  'drag-blank',
-  'drag-node',
-  'click-select',
-  'connect-edge',
-  'wheel-zoom',
-  'brush-select'
-]
+const action = ['click-select', 'wheel-move', 'wheel-zoom', 'brush-select']
 
 const layout = {
   type: 'dagre',
@@ -93,24 +86,24 @@ const layout = {
 const mindMapMock = () => {
   return {
     id: '1',
-    label: '工具栏悬浮有说明',
+    label: '主题',
     nodeId: 232,
     slots: [{ type: 'out', id: 'slot1' }],
     isCollapsed: false,
     children: [
       {
         id: '2',
-        label: '拖动添加组件',
+        label: '分支1',
         isCollapsed: false
       },
       {
         id: '3',
-        label: '拖动插槽连线',
+        label: '分支2',
         isCollapsed: false
       },
       {
         id: '4',
-        label: '交互可配置',
+        label: '分支3',
         isCollapsed: false
       }
     ]
@@ -189,7 +182,6 @@ export default class MindMap extends Vue {
       item.update({ isCollapsed: true })
       item.hide()
     })
-    this.graph.emit('datachange')
   }
 
   handleKeyDown(e: KeyboardEvent) {
@@ -204,21 +196,16 @@ export default class MindMap extends Vue {
     if (tagName === 'BODY') {
       if (['Delete', 'Backspace'].includes(e.key)) {
         const selectedNodes = this.graph.findNodeByState('selected')
-        const selectedEdges = this.graph.findEdgeByState('selected')
-        if (selectedEdges.length) {
-          this.graph.deleteEdge(selectedEdges[0].id)
-        }
+
         if (selectedNodes.length) {
-          const edges: IEdgeModel[] = []
-          const nodes: INodeModel[] = []
           selectedNodes.forEach(item => {
-            item.getEdges().forEach(edge => {
-              edges.push(edge.model as IEdgeModel)
+            const targetNode = item.getAllTargetNodes()
+            targetNode.forEach(target => {
+              this.graph.deleteNode(target.id)
             })
-            nodes.push(item.model)
-            this.graph.deleteNode(item.id, false)
+
+            this.graph.deleteNode(item.id)
           })
-          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }
@@ -265,11 +252,13 @@ export default class MindMap extends Vue {
   handleNodeBlur(e, node: INode) {
     e.preventDefault()
     this.isEditText = false
+    const content = e.target
+      .querySelector('span')
+      .innerText.replace(/<br\/?>/gi, '\n')
+      .trim()
+
     node.update({
-      label: e.target
-        .querySelector('span')
-        .innerText.replace(/<br\/?>/gi, '\n')
-        .trim()
+      label: content
     })
     this.$nextTick(() => {
       const height = this.nodeEditedDom?.getBoundingClientRect().height
@@ -302,7 +291,7 @@ export default class MindMap extends Vue {
     const { x: x1, y: y1 } = edge.fromSlot
     const { x: x2, y: y2 } = edge.toSlot
     const xc = (x1 - x2) / 3
-    return `M ${x1 - 10} ${y1} L ${x1 - xc} ${y1}  L ${
+    return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc
     } ${y2} L ${x2} ${y2}`
   }
@@ -320,7 +309,6 @@ export default class MindMap extends Vue {
   background: #333;
 }
 .node-container {
-  position: relative;
   display: flex;
   justify-content: flex-start;
   align-items: center;
@@ -339,13 +327,6 @@ export default class MindMap extends Vue {
     width: 20px;
     height: 20px;
   }
-}
-.add-icon {
-  display: none;
-  cursor: pointer;
-  color: white;
-  background-color: transparent;
-  font-size: 17px;
 }
 .hide-icon {
   display: none;
@@ -369,7 +350,7 @@ export default class MindMap extends Vue {
   color: white;
   border: 1px solid white;
   background-color: transparent;
-  font-size: 16px;
+  font-size: 14px;
 }
 .text-container {
   background-color: #333;

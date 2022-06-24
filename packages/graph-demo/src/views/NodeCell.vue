@@ -250,6 +250,6 @@ export default class NodeCell extends Vue {
   border: 2px solid #ddd;
 }
 .group-node {
-  background: rgba(3, 3, 3, 0.1);
+  background: rgba(134, 244, 106, 0.654);;
 }
 </style>

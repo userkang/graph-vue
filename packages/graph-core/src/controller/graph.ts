@@ -18,8 +18,7 @@ import {
   IStack,
   IDataStack,
   ILayout,
-  NodeInfo,
-  ITreeDataModel
+  NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'

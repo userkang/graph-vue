@@ -30,6 +30,15 @@ export default new Router({
       path: '/nodeCell',
       name: 'nodeCell',
       component: NodeCell
+    },
+    {
+      path: '/circleLayout',
+      name: 'circleLayout',
+      component: () =>
+      import(
+        /* webpackChunkName: "CircleLayout"*/
+        '../views/CircleLayout.vue'
+      )
     }
   ]
 })

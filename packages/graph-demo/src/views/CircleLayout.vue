@@ -126,16 +126,16 @@ export default class Tree extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromSlot
-    const { x: x2, y: y2 } = edge.toSlot
+    const { x: x1, y: y1 } = edge.fromPort
+    const { x: x2, y: y2 } = edge.toPort
     return `M ${x1} ${y1} L ${x2} ${y2}`
   }
 
   text(edge: IEdge) {
-    const { fromSlot, toSlot } = edge
+    const { fromPort, toPort } = edge
     return {
-      x: (fromSlot.x + toSlot.x) / 2,
-      y: (fromSlot.y + toSlot.y) / 2
+      x: (fromPort.x + toPort.x) / 2,
+      y: (fromPort.y + toPort.y) / 2
     }
   }
 

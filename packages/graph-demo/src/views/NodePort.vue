@@ -1,21 +1,17 @@
 <template>
   <div class="container">
-    <GraphVue :data="dataMock" :action="action" @init="initGraph">
+    <GraphVue
+      :layout="{ options: { rankdir: 'TB' } }"
+      :data="dataMock"
+      :action="action"
+      @init="initGraph"
+    >
       <template #node="{ node }">
-        <div v-if="node.model.type === 'group'" class="group-node">
-          <button v-if="node.hasState('collapsed')" @click="showChildren(node)">
-            展开
-          </button>
-          <button v-else @click="hideChildren(node)">隐藏</button>
+        <div class="group-node">
+          {{ node.model.label }}
         </div>
-        <div v-else class="normal-node">{{ node.model.label }}</div>
       </template>
-
-      <template #port></template>
       <ToolBox />
-      <button style="position: absolute; left: 10px; top: 10px" @click="layout">
-        整理
-      </button>
     </GraphVue>
   </div>
 </template>
@@ -52,46 +48,19 @@ const nodeCellMock = (): IDataModel => {
     nodes: [
       {
         id: '1',
-        label: 'children',
-        parentId: '4'
+        label: '1',
+        ports: [{ position: 'right', type: 'in' }, { position: 'top' }]
       },
       {
         id: '2',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '3',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '4',
-        label: 'parent',
-        type: 'group'
-      },
-      {
-        id: '5',
-        label: 'parent',
-        type: 'group'
-      },
-      {
-        id: '6',
-        label: 'start'
+        label: '2',
+        ports: [{ position: 'left' }]
       }
     ],
     edges: [
       {
-        fromNodeId: '4',
-        toNodeId: '5'
-      },
-      {
-        fromNodeId: '2',
-        toNodeId: '3'
-      },
-      {
-        fromNodeId: '6',
-        toNodeId: '5'
+        fromNodeId: '1',
+        toNodeId: '2'
       }
     ]
   }
@@ -169,7 +138,7 @@ export default class NodeCell extends Vue {
       .getNodes()
       .filter(item => item.model.type === 'group')
     groups.forEach(group => {
-      this.showChildren(group)
+      this.hideChildren(group)
     })
   }
 

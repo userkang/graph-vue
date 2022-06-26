@@ -12,14 +12,14 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { ISlot } from '@datafe/graph-core'
+import { IPort } from '@datafe/graph-core'
 
 @Component
 export default class Port extends Vue {
   @Prop({
     required: true
   })
-  port!: ISlot
+  port!: IPort
 
   circleR = 4
   highlightCircleR = 6

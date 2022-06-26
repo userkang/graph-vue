@@ -1,9 +1,9 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
-import Slot from '../item/slot'
+import Port from '../item/port'
 
 export type IEdge = Edge
-export type ISlot = Slot
+export type IPort = Port
 export type INode = Node
 
 export interface IDataModel {
@@ -13,9 +13,13 @@ export interface IDataModel {
   edges: IEdgeModel[]
 }
 
-export interface ISlotModel {
+export type IPosition = 'top' | 'left' | 'right' | 'bottom' | 'center'
+export type IDirection = 'TB' | 'LR' | 'BT' | 'RL'
+
+export interface IPortModel {
   id?: string
-  type?: string
+  type?: 'in' | 'out'
+  position?: IPosition
   [key: string]: any
 }
 
@@ -27,7 +31,7 @@ export interface INodeModel {
   y?: number
   parentId?: string
   collapsed?: boolean
-  slots?: ISlotModel[]
+  ports?: IPortModel[]
   [key: string]: any
 }
 
@@ -41,8 +45,8 @@ export interface IEdgeModel {
   fromNodeId?: string
   // 目标节点ID
   toNodeId?: string
-  fromSlotId?: string
-  toSlotId?: string
+  fromPortId?: string
+  toPortId?: string
   [key: string]: any
 }
 
@@ -63,7 +67,7 @@ export interface IGraphConfig {
   // svg 容器
   container: string | HTMLElement
   // 图的方向： LR 从左到右， TB 自上到下
-  direction: 'LR' | 'TB'
+  direction: IDirection
   // 节点的宽高 单位：px
   nodeInfo?: NodeInfo
   edgeInfo?: EdgeInfo
@@ -95,7 +99,7 @@ export interface ILayout {
 }
 
 export interface IDagreLayout {
-  rankdir?: 'LR' | 'TB'
+  rankdir?: IDirection
   align?: 'UL' | 'UR' | 'DL' | 'DR'
   nodesep?: number
   edgesep?: number
@@ -125,6 +129,6 @@ export interface IGraphEvent {
   x: number
   y: number
   data: Record<string, string | null>
-  target: Node | Edge | Slot | undefined
+  target: Node | Edge | Port | undefined
   [key: string]: any
 }

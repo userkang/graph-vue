@@ -1,5 +1,5 @@
 import EventEmitter from '../util/event-emitter'
-import { IEdgeModel, INodeModel, ISlotModel } from '../types'
+import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { setGlobalId } from '../util/utils'
 
 export default class Base extends EventEmitter {
@@ -11,18 +11,17 @@ export default class Base extends EventEmitter {
       linked: false,
       enable: false,
       locked: false,
-      hide: false,
-      skipLayout: false
+      hide: false
     }
   }
 
-  constructor(model: INodeModel | IEdgeModel | ISlotModel) {
+  constructor(model: INodeModel | IEdgeModel | IPortModel) {
     super()
     this.set('model', model)
     if (model.id !== undefined) {
       this.set('id', String(model.id))
       // 如果节点保存了之前自动生成的 id，需要累积，解决自动生成 id 重复的问题
-      if (/(node|edge|slot)\d+/.test(model.id)) {
+      if (/(node|edge|port)\d+/.test(model.id)) {
         setGlobalId(model.id)
       }
     }
@@ -40,7 +39,7 @@ export default class Base extends EventEmitter {
     return this.get('id')
   }
 
-  public get model(): INodeModel | IEdgeModel | ISlotModel {
+  public get model(): INodeModel | IEdgeModel | IPortModel {
     return this.get('model')
   }
 
@@ -48,16 +47,32 @@ export default class Base extends EventEmitter {
     return this.get('view')
   }
 
-  public get states() {
-    return this.get('states')
+  public get zIndex(): number {
+    return this.get('zIndex')
+  }
+
+  public set zIndex(value: number) {
+    this.set('zIndex', value)
+  }
+
+  public setZIndex(value: number) {
+    if (this.model.zIndex) {
+      this.model.zIndex = value
+    }
+    this.set('zIndex', value)
+    this.emit('change', this, 'zIndex')
   }
 
   public setState(state: string) {
+    if (this.hasState(state)) {
+      return
+    }
     this.getStates()[state] = true
+    this.emit('change', this, state)
   }
 
   public hasState(state: string): boolean {
-    return this.getStates()[state] || false
+    return this.getStates()[state]
   }
 
   public getStates() {
@@ -67,6 +82,7 @@ export default class Base extends EventEmitter {
   public clearState(state: string) {
     if (this.hasState(state)) {
       this.getStates()[state] = false
+      this.emit('change', this, state)
     }
   }
 }

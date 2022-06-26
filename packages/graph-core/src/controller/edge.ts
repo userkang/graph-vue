@@ -35,17 +35,17 @@ export default class EdgeController {
       return
     }
     // 先删除前后节点的相关边
-    const { fromNode, toNode, fromSlot, toSlot } = edge
+    const { fromNode, toNode, fromPort, toPort } = edge
     edge.fromNode.deleteEdge(id)
     edge.toNode.deleteEdge(id)
 
-    // 如果边两端的 slot 没有其他边连接，就清除该 slot 的 linked 状态
-    if (!fromNode.getEdges().find(item => item.fromSlot.id === fromSlot.id)) {
-      fromSlot.clearState('linked')
+    // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
+    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
+      fromPort.clearState('linked')
     }
 
-    if (!toNode.getEdges().find(item => item.toSlot.id === toSlot.id)) {
-      toSlot.clearState('linked')
+    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
+      toPort.clearState('linked')
     }
 
     delete this._edges[id]
@@ -62,14 +62,14 @@ export default class EdgeController {
       console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }
-    const { fromSlotId, toSlotId, fromNodeId, toNodeId } = item
-    // 如果仅有 slotId，自动补全 nodeId
+    const { fromPortId, toPortId, fromNodeId, toNodeId } = item
+    // 如果仅有 portId，自动补全 nodeId
     const fromNode =
       (fromNodeId && this.graph.findNode(fromNodeId)) ||
-      (fromSlotId && this.graph.findNodeBySlot(fromSlotId))
+      (fromPortId && this.graph.findNodeByPort(fromPortId))
     const toNode =
       (toNodeId && this.graph.findNode(toNodeId)) ||
-      (toSlotId && this.graph.findNodeBySlot(toSlotId))
+      (toPortId && this.graph.findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -80,6 +80,8 @@ export default class EdgeController {
     const edge = new Edge(item, edgeCfg, fromNode, toNode)
     this._edges[edge.id] = edge
 
+    this.watchEdgeChange(edge)
+
     // 渲染
     if (this.graph.get('isRender')) {
       const edgeView = edge.render(this.graph)
@@ -88,6 +90,13 @@ export default class EdgeController {
     }
 
     return edge
+  }
+
+  watchEdgeChange(edge: IEdge) {
+    edge.on('change', (edge: IEdge, type: string) => {
+      this.graph.emit(`edge:change:${type}`, edge)
+      this.graph.emit('edge:change', edge, type)
+    })
   }
 
   public data(group: IEdgeModel[]) {

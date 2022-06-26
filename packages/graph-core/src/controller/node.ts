@@ -1,7 +1,6 @@
 import Graph from './graph'
 import Node from '../item/node'
-import { INode, INodeModel } from '../types'
-import Slot from '../item/slot'
+import { INode, INodeModel, IPort } from '../types'
 
 const defaultCfg = {
   width: 180,
@@ -22,10 +21,10 @@ export default class NodeController {
     return this.sortByZIndex()
   }
 
-  get slotsMap() {
-    const res: { [id: string]: Slot } = {}
+  get portsMap() {
+    const res: { [id: string]: IPort } = {}
     this.nodes.forEach(node => {
-      node.slots.forEach(slot => (res[slot.id] = slot))
+      node.ports.forEach(port => (res[port.id] = port))
     })
     return res
   }
@@ -34,8 +33,8 @@ export default class NodeController {
     return this._nodes[String(id)]
   }
 
-  public findNodeBySlot(slotId: string): INode | undefined {
-    return this.nodes.find(node => node.slots.find(slot => slot.id === slotId))
+  public findNodeByPort(portId: string): INode | undefined {
+    return this.nodes.find(node => node.ports.find(port => port.id === portId))
   }
 
   public refreshNode(id: string): void {
@@ -87,7 +86,7 @@ export default class NodeController {
     const node = new Node(item, nodeCfg, direction)
     this._nodes[node.id] = node
 
-    this.watchNodeUpdate(node)
+    this.watchNodeChange(node)
 
     // 渲染
     if (this.graph.get('isRender')) {
@@ -99,9 +98,15 @@ export default class NodeController {
     return node
   }
 
-  public watchNodeUpdate(node: INode) {
-    node.on('change:zIndex', (changeItem: INode) => {
-      this.graph.emit('node:change:zIndex', changeItem)
+  public watchNodeChange(node: INode) {
+    node.on('change', (node: INode, type: string) => {
+      this.graph.emit(`node:change:${type}`, node)
+      this.graph.emit('node:change', node, type)
+    })
+
+    node.on('port:change', (port: IPort, type: string) => {
+      this.graph.emit(`port:change:${type}`, port)
+      this.graph.emit('port:change', node, type)
     })
   }
 

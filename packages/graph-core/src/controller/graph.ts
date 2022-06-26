@@ -10,7 +10,7 @@ import {
   ICfg,
   INode,
   IEdge,
-  ISlot,
+  IPort,
   IDataModel,
   INodeModel,
   IEdgeModel,
@@ -18,8 +18,7 @@ import {
   IStack,
   IDataStack,
   ILayout,
-  NodeInfo,
-  ICircleLayout
+  NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -109,8 +108,8 @@ export default class Graph extends EventEmitter {
     })
   }
 
-  public findNodeBySlot(id: string): INode | undefined {
-    return this.nodeController.findNodeBySlot(id)
+  public findNodeByPort(id: string): INode | undefined {
+    return this.nodeController.findNodeByPort(id)
   }
 
   public refreshNode(id: string): void {
@@ -163,8 +162,8 @@ export default class Graph extends EventEmitter {
     return node
   }
 
-  public findSlot(id: string | number): ISlot | undefined {
-    return this.nodeController.slotsMap[String(id)]
+  public findPort(id: string | number): IPort | undefined {
+    return this.nodeController.portsMap[String(id)]
   }
 
   public getEdges(): IEdge[] {
@@ -271,20 +270,14 @@ export default class Graph extends EventEmitter {
     this.set('edges', [])
     this.clearItem()
 
-    let imodel: IDataModel = { nodes: [], edges: [] }
-    imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
-    const needLayout = imodel.nodes.every(
+    let model: IDataModel = { nodes: [], edges: [] }
+    model = isIDataModel(data) ? (data as IDataModel) : preorder(data)
+    const needLayout = model.nodes.every(
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    imodel.nodes.forEach(node =>
-      Object.assign(node, {
-        x: node.x || 1,
-        y: node.y || 1
-      })
-    )
-    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    this.nodeController.data(imodel.nodes)
-    this.edgeController.data(imodel.edges)
+    
+    this.nodeController.data(model.nodes)
+    this.edgeController.data(model.edges)
     if (needLayout) {
       this.layout({}, false)
     }

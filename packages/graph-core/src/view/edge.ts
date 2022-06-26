@@ -79,11 +79,11 @@ export default class Node extends Element {
     let path = ''
 
     if (pathFunction) {
-      path = pathFunction(edge.fromSlot, edge.toSlot)
+      path = pathFunction(edge.fromPort, edge.toPort)
     } else {
       const direction = this.graph.get('direction')
-      let x2 = edge.toSlot.x
-      let y2 = edge.toSlot.y
+      let x2 = edge.toPort.x
+      let y2 = edge.toPort.y
       if (direction === 'LR') {
         x2 -= 4
       } else {
@@ -91,8 +91,8 @@ export default class Node extends Element {
       }
 
       path = calculateCurve({
-        x1: edge.fromSlot.x,
-        y1: edge.fromSlot.y,
+        x1: edge.fromPort.x,
+        y1: edge.fromPort.y,
         x2,
         y2
       })

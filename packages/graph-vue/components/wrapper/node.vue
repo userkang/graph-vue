@@ -11,7 +11,7 @@
         <slot></slot>
       </foreignObject>
     </g>
-    <Port v-for="port in node.slots" :key="port.id" :port="port">
+    <Port v-for="port in node.ports" :key="port.id" :port="port">
       <slot name="port" :port="port"></slot>
     </Port>
   </g>

@@ -36,15 +36,15 @@ export default class Edge extends Vue {
   activeEdgeId = ''
 
   get path() {
-    const { fromSlot, toSlot } = this.edge
+    const { fromPort, toPort } = this.edge
     const direction = this.graph.get('direction')
-    const x2 = toSlot.x
-    const y2 = toSlot.y
+    const x2 = toPort.x
+    const y2 = toPort.y
 
     return calculateCurve(
       {
-        x1: fromSlot.x,
-        y1: fromSlot.y,
+        x1: fromPort.x,
+        y1: fromPort.y,
         x2,
         y2
       },

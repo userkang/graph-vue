@@ -14,10 +14,6 @@ class Graph {
   public getTreeData() {
     GraphConfigStore.state.data = treeMock(5) as any
   }
-
-  public getMindMapData() {
-    GraphConfigStore.state.data = mindMapMock()
-  }
 }
 
 export default new Graph()

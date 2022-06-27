@@ -16,14 +16,16 @@ const getDTheta = (nodesLength: number) => {
 }
 
 export default class LayoutController {
-  graph: Graph
-  dagre: any = null
+  private graph: Graph
+  private dagre: any = null
+  private options: IDagreLayout | ICircleLayout = {}
 
   constructor(graph: Graph) {
     this.graph = graph
   }
 
   initDagre(options?: IDagreLayout) {
+    Object.assign(this.options, options)
     this.graph.set('direction', options?.rankdir || this.graph.get('direction'))
 
     this.dagre = new dagre.graphlib.Graph()
@@ -31,7 +33,7 @@ export default class LayoutController {
       width: 0,
       height: 0,
       rankdir: this.graph.get('direction'),
-      ...options
+      ...this.options
     })
     this.dagre.setDefaultEdgeLabel(() => {
       return {}
@@ -89,7 +91,11 @@ export default class LayoutController {
   }
 
   circleLayout(cfg: ILayout, stack: boolean) {
-    const options = cfg.options as ICircleLayout
+    const options = Object.assign(
+      {},
+      this.options,
+      cfg.options
+    ) as ICircleLayout
     const svgInfo = this.graph.getSvgInfo()
     const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
       node => !node.parentId

@@ -4,7 +4,7 @@
       :data="dataMock"
       :action="action"
       @init="initGraph"
-      :layout="{ options: { rankdir: 'LR' } }"
+      :layout="{ options: { rankdir: 'LR', ranksep: 20, nodesep: 20 } }"
     >
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">

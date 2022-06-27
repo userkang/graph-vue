@@ -1,14 +1,21 @@
 <template>
   <div class="container">
-    <GraphVue :data="dataMock" :action="action" @init="initGraph">
+    <GraphVue
+      :data="dataMock"
+      :action="action"
+      @init="initGraph"
+      :layout="{ options: { rankdir: 'LR' } }"
+    >
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">
-          <button v-if="node.hasState('collapsed')" @click="showChildren(node)">
+          <button v-if="node.model.collapsed" @click="showChildren(node)">
             展开
           </button>
           <button v-else @click="hideChildren(node)">隐藏</button>
         </div>
-        <div v-else class="normal-node">{{ node.model.label }}</div>
+        <div v-else class="normal-node">
+          {{ node.model.label }}
+        </div>
       </template>
 
       <template #port></template>
@@ -44,7 +51,8 @@ const action = [
   'click-select',
   'connect-edge',
   'wheel-zoom',
-  'brush-select'
+  'brush-select',
+  'wheel-move'
 ]
 
 const nodeCellMock = (): IDataModel => {
@@ -68,16 +76,19 @@ const nodeCellMock = (): IDataModel => {
       {
         id: '4',
         label: 'parent',
-        type: 'group'
+        type: 'group',
+        collapsed: true
       },
       {
         id: '5',
         label: 'parent',
-        type: 'group'
+        type: 'group',
+        collapsed: false
       },
       {
         id: '6',
-        label: 'start'
+        label: 'start',
+        collapsed: false
       }
     ],
     edges: [
@@ -126,7 +137,8 @@ export default class NodeCell extends Vue {
       width: 180,
       height: 40
     })
-    node.setState('collapsed')
+    node.model.collapsed = true
+
     this.layout()
   }
 
@@ -135,7 +147,7 @@ export default class NodeCell extends Vue {
     children.forEach(child => {
       child.show()
     })
-    node.clearState('collapsed')
+    node.model.collapsed = false
 
     this.resizeGroup(node)
     this.layout()
@@ -146,7 +158,9 @@ export default class NodeCell extends Vue {
     this.graph = graph
 
     this.initEvent()
-    this.initGroups()
+    this.$nextTick(() => {
+      this.initGroups()
+    })
   }
 
   initEvent() {
@@ -168,8 +182,14 @@ export default class NodeCell extends Vue {
     const groups = this.graph
       .getNodes()
       .filter(item => item.model.type === 'group')
+
     groups.forEach(group => {
-      this.showChildren(group)
+      if (group.model.collapsed) {
+        const children = group.getChildren()
+        children.forEach(child => {
+          child.hide()
+        })
+      }
     })
   }
 
@@ -228,10 +248,9 @@ export default class NodeCell extends Vue {
         })
       }
     })
-
     // 布局后，再更新下group节点的大小
     rootNodes.forEach(item => {
-      if (item.getChildren().length && !item.hasState('collapsed')) {
+      if (item.getChildren().length && !item.model.collapsed) {
         this.resizeGroup(item)
       }
     })

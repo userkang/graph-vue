@@ -6,8 +6,7 @@
  */
 export const calculateCurve = (
   position: { x1: number; y1: number; x2: number; y2: number },
-  direction = 'TB',
-  showArrow = true
+  direction = 'TB'
 ) => {
   const { x1, y1, x2, y2 } = position
   let line = ''

@@ -140,16 +140,11 @@ export default class GraphVue extends Vue {
     const hooks = [
       'node:added',
       'edge:added',
-      'nodeselectchange',
-      'edgeselectchange',
-      'aftertranslate',
-      'afterzoom',
-      'brushing',
-      'afterdeletenode',
-      'afterdeleteedge',
-      'afterdragnode',
-      'keyup',
-      'datachange'
+      'node:click',
+      'edge:click',
+      'node:change',
+      'edge:change',
+      'port:change'
     ]
 
     hooks.forEach(hook => {
@@ -182,10 +177,6 @@ export default class GraphVue extends Vue {
     this.transform.scale = zoom
   }
 
-  beforeDestroy() {
-    this.graph.destroy()
-  }
-
   @Watch('data')
   dataChange(val: IDataModel) {
     const data = JSON.parse(JSON.stringify(val))
@@ -201,6 +192,13 @@ export default class GraphVue extends Vue {
   @Watch('layout', { deep: true })
   handelRankdir(v: ILayout) {
     this.graph.layout(v)
+    if ((v.options as IDagreLayout).rankdir) {
+      this.dataChange(this.graph.getDataModel())
+    }
+  }
+
+  beforeDestroy() {
+    this.graph.destroy()
   }
 }
 </script>

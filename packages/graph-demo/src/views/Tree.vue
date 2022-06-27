@@ -1,10 +1,10 @@
 <template>
   <div class="dag_component">
     <GraphVue
-      ref="graph"
+      class="graph-wrapper"
       :data="dataMock"
       :action="action"
-      :layout="layout" 
+      :layout="layout"
       @init="initGraph"
     >
       <template #node="{ node }">
@@ -35,6 +35,7 @@
         <li @click="deleteItem">删除</li>
       </Menu>
     </GraphVue>
+    <ConfigPanel />
   </div>
 </template>
 
@@ -108,22 +109,33 @@ export default class Tree extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromSlot
-    const { x: x2, y: y2 } = edge.toSlot
-    const xc = (y2 - y1) / 2
-    return `
+    const { x: x1, y: y1 } = edge.fromPort
+    const { x: x2, y: y2 } = edge.toPort
+
+    if (['TB', 'BT'].includes(this.graph.get('direction'))) {
+      const xc = (y2 - y1) / 2
+      return `
         M ${x1} ${y1}
         L ${x1} ${y1 + xc}
         L ${x1} ${y2 - xc}
         C ${x2} ${y2 - xc} ${x2} ${y2 - xc} ${x2} ${y2}
-    `
+      `
+    } else {
+      const xc = (x2 - x1) / 2
+      return `
+        M ${x1} ${y1}
+        L ${x1 + xc} ${y1}
+        L ${x1 + xc} ${y2}
+        C ${x2 - xc} ${y2} ${x2 - xc} ${y2} ${x2} ${y2}
+      `
+    }
   }
 
   text(edge: IEdge) {
-    const { fromSlot, toSlot } = edge
+    const { fromPort, toPort } = edge
     return {
-      x: (fromSlot.x + toSlot.x) / 2,
-      y: (fromSlot.y + toSlot.y) / 2
+      x: (fromPort.x + toPort.x) / 2,
+      y: (fromPort.y + toPort.y) / 2
     }
   }
 
@@ -181,8 +193,13 @@ export default class Tree extends Vue {
 
 <style lang="scss" scoped>
 .dag_component {
+  display: flex;
   width: 100%;
   height: 100%;
+}
+.graph-wrapper {
+  position: relative;
+  flex: 1;
 }
 .node-container {
   width: 100%;

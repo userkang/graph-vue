@@ -4,9 +4,22 @@
 
     <div class="form-item">
       <div class="label">图方向</div>
-      <select v-model="graphConfigState.layout.rankdir">
+      <select v-model="graphConfigState.layout.options.rankdir">
         <option value="TB">TB（自上而下）</option>
         <option value="LR">LR（从左往右）</option>
+        <option value="BT">BT（从下往上）</option>
+        <option value="RL">RL（从右往左）</option>
+      </select>
+    </div>
+
+    <div class="form-item">
+      <div class="label">对齐方式</div>
+      <select v-model="graphConfigState.layout.options.align">
+        <option :value="undefined">默认（居中对齐）</option>
+        <option value="UL">UL（上左对齐）</option>
+        <option value="UR">UR（上右对齐）</option>
+        <option value="DL">DL（下左对齐）</option>
+        <option value="DR">DR（下右对齐）</option>
       </select>
     </div>
 
@@ -92,9 +105,8 @@ export default class ConfigPanel extends Vue {
       }
     })
     this.graph?.on('datachange', () => {
-      const nodes = this.graph?.getNodes().map(item => item.model)
-      const edges = this.graph?.getEdges().map(item => item.model)
-      this.editor.setValue(JSON.stringify({ nodes, edges }, null, ' '))
+      const model = this.graph?.getDataModel()
+      this.editor.setValue(JSON.stringify(model, null, ' '))
     })
   }
 

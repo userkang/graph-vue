@@ -1,21 +1,21 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { ISlotModel } from '../types'
+import { IPortModel } from '../types'
 
-export default class Slot extends Base {
-  constructor(model: ISlotModel, cfg: { [key: string]: unknown }) {
+export default class Port extends Base {
+  constructor(model: IPortModel, cfg: { [key: string]: unknown }) {
     super(model)
 
     if (!this.id) {
-      const id = uniqueId('slot')
+      const id = uniqueId('port')
       this.set('id', id)
-      this.get('model').id = id
+      this.model.id = this.id
     }
 
     this.set('nodeId', cfg.nodeId)
     this.set('x', cfg.x)
     this.set('y', cfg.y)
-    this.set('type', cfg.type)
+    this.set('type', model.type)
   }
 
   public get x(): number {

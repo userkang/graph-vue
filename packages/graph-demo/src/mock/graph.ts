@@ -26,18 +26,18 @@ export const dagMock = () => {
         label: '拖动添加组件',
         x: 795,
         y: 533,
-        slots: [
+        ports: [
           {
             type: 'in',
-            id: 'slot3'
+            id: 'port3'
           },
           {
             type: 'in',
-            id: 'slot4'
+            id: 'port4'
           },
           {
             type: 'out',
-            id: 'slot5'
+            id: 'port5'
           }
         ]
       },
@@ -70,18 +70,18 @@ export const dagMock = () => {
         label: '交互可配置',
         x: 565,
         y: 443,
-        slots: [
+        ports: [
           {
             type: 'in',
-            id: 'slot14'
+            id: 'port14'
           },
           {
             type: 'in',
-            id: 'slot15'
+            id: 'port15'
           },
           {
             type: 'out',
-            id: 'slot16'
+            id: 'port16'
           }
         ]
       }
@@ -95,7 +95,7 @@ export const dagMock = () => {
       {
         fromNodeId: '3',
         toNodeId: '2',
-        toSlotId: 'slot3',
+        toPortId: 'port3',
         id: 'edge2'
       },
       {
@@ -106,7 +106,7 @@ export const dagMock = () => {
       {
         fromNodeId: '7',
         toNodeId: '4',
-        fromSlotId: 'slot16',
+        fromPortId: 'port16',
         id: 'edge4'
       },
       {
@@ -117,13 +117,13 @@ export const dagMock = () => {
       {
         fromNodeId: '2',
         toNodeId: '6',
-        fromSlotId: 'slot5',
+        fromPortId: 'port5',
         id: 'edge6'
       },
       {
         fromNodeId: '5',
         toNodeId: '7',
-        toSlotId: 'slot14',
+        toPortId: 'port14',
         id: 'edge7'
       }
     ]
@@ -149,7 +149,7 @@ export const mindMapMock = () => {
     id: '1',
     label: '工具栏悬浮有说明',
     nodeId: 232,
-    slots: [{ type: 'out', id: 'slot1' }],
+    ports: [{ type: 'out', id: 'port1' }],
     isCollapsed: false,
     children: [
       {

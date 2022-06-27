@@ -6,7 +6,7 @@ export interface IDataModel {
   edges: IEdgeModel[]
   [key: string]: unknown
 }
-export interface ISlotModel {
+export interface IPortModel {
   id?: string
   type?: string
   [key: string]: unknown
@@ -15,15 +15,15 @@ export interface INodeModel {
   id?: string
   width?: number
   height?: number
-  slots?: ISlotModel[]
+  ports?: IPortModel[]
   [key: string]: unknown
 }
 export interface IEdgeModel {
   id?: string
   fromNodeId: string
   toNodeId: string
-  fromSlotId?: string
-  toSlotId?: string
+  fromPortId?: string
+  toPortId?: string
   [key: string]: unknown
 }
 export interface IGraphConfig {

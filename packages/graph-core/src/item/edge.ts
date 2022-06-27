@@ -15,7 +15,7 @@ export default class Edge extends Base {
     if (!this.id) {
       const id = uniqueId('edge')
       this.set('id', id)
-      this.get('model').id = id
+      this.model.id = this.id
     }
 
     this.set('cfg', cfg)
@@ -42,46 +42,48 @@ export default class Edge extends Base {
     return this.get('toNode')
   }
 
-  public get fromSlot() {
-    return this.get('fromSlot')
+  public get fromPort() {
+    return this.get('fromPort')
   }
 
-  public get toSlot() {
-    return this.get('toSlot')
+  public get toPort() {
+    return this.get('toPort')
   }
 
   public setPoint() {
-    const fromSlotId = String(this.model.fromSlotId)
-    const toSlotId = String(this.model.toSlotId)
+    const fromPortId = String(this.model.fromPortId)
+    const toPortId = String(this.model.toPortId)
     const fromNode = this.fromNode
     const toNode = this.toNode
 
-    fromNode.slots.find(item => {
+    fromNode.ports.find(item => {
       if (
-        (fromSlotId && item.id === fromSlotId && item.type === 'out') ||
+        !item.type ||
+        (fromPortId && item.id === fromPortId && item.type === 'out') ||
         (!this.fromNode.id && item.type === 'out')
       ) {
         item.setState('linked')
-        this.set('fromSlot', item)
+        this.set('fromPort', item)
         return true
       }
     })
 
-    toNode.slots.find(item => {
+    toNode.ports.find(item => {
       if (
-        (toSlotId && item.id === toSlotId && item.type === 'in') ||
+        !item.type ||
+        (toPortId && item.id === toPortId && item.type === 'in') ||
         (!this.toNode.id && item.type === 'in')
       ) {
         item.setState('linked')
-        this.set('toSlot', item)
+        this.set('toPort', item)
         return true
       }
     })
 
-    if (!this.fromSlot) {
+    if (!this.fromPort) {
       this.set(
-        'fromSlot',
-        fromNode.slots.find(item => {
+        'fromPort',
+        fromNode.ports.find(item => {
           if (item.type === 'out') {
             item.setState('linked')
             return true
@@ -90,10 +92,10 @@ export default class Edge extends Base {
       )
     }
 
-    if (!this.toSlot) {
+    if (!this.toPort) {
       this.set(
-        'toSlot',
-        toNode.slots.find(item => {
+        'toPort',
+        toNode.ports.find(item => {
           if (item.type === 'in') {
             item.setState('linked')
             return true
@@ -108,8 +110,8 @@ export default class Edge extends Base {
       // 不允许更新边的起始和目标节点
       delete model.fromNodeId
       delete model.toNodeId
-      delete model.fromSlotId
-      delete model.toSlotId
+      delete model.fromPortId
+      delete model.toPortId
       Object.assign(this.model, model)
     }
     this.setPoint()

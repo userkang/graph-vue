@@ -1,10 +1,9 @@
-import { INode, ISlot } from '../types'
+import { INode, IPort } from '../types'
 import Graph from '../controller/graph'
 import Base from './base'
-import Slot from '../item/slot'
 
 export default class CreateEdge extends Base {
-  fromSlot!: ISlot
+  fromPort!: IPort
   fromNode!: INode
   isMoveing = false
   createEdge = {
@@ -24,13 +23,13 @@ export default class CreateEdge extends Base {
   }
 
   init() {
-    this.addEvent('port:mousedown', this.slotMouseDown)
+    this.addEvent('port:mousedown', this.portMouseDown)
     this.addEvent('mousemove', this.mouseMove)
-    this.addEvent('port:mouseup', this.slotMouseUp)
+    this.addEvent('port:mouseup', this.portMouseUp)
     this.addEvent('mouseup', this.mouseUp)
   }
 
-  slotMouseDown({ target }: { target: Slot }) {
+  portMouseDown({ target }: { target: IPort }) {
     // 初始化连线的起点和移动位置
     const port = target
     if (!port || port.type === 'in') {
@@ -45,9 +44,9 @@ export default class CreateEdge extends Base {
     const { x, y } = port
     this.setNewEdgeStart(x, y)
     this.setNewEdgeMove(x, y)
-    this.fromSlot = port
+    this.fromPort = port
     this.fromNode = fromNode
-    this.setEnableSlot()
+    this.setEnablePort()
     this.graph.emit('edge:connect', port)
   }
 
@@ -60,11 +59,10 @@ export default class CreateEdge extends Base {
     this.graph.emit('edge:connecting', this.createEdge)
   }
 
-  slotMouseUp({ e, target }: { e: MouseEvent; target: Slot }) {
+  portMouseUp({ e, target }: { e: MouseEvent; target: IPort }) {
     e.stopPropagation()
 
     const port = target
-
     if (!port) {
       return
     }
@@ -80,18 +78,18 @@ export default class CreateEdge extends Base {
 
       const edgeInfo = {
         fromNodeId: this.fromNode.model.id || this.fromNode.id,
-        toNodeId: node.model.id
+        toNodeId: node.id
       }
 
-      if (this.fromNode.model.slots) {
+      if (this.fromNode.model.ports) {
         Object.assign(edgeInfo, {
-          fromSlotId: this.fromSlot.model.id || this.fromSlot.id
+          fromPortId: this.fromPort.model.id || this.fromPort.id
         })
       }
 
-      if (node.model.slots) {
+      if (node.model.ports) {
         Object.assign(edgeInfo, {
-          toSlotId: port.model.id
+          toPortId: port.id
         })
       }
 
@@ -109,28 +107,28 @@ export default class CreateEdge extends Base {
     }
   }
 
-  setEnableSlot() {
+  setEnablePort() {
     const nodes = this.graph.getNodes()
 
     nodes.forEach(node => {
-      node.slots.forEach(slot => {
+      node.ports.forEach(port => {
         if (
-          slot.type === 'in' &&
+          port.type === 'in' &&
           node.id !== this.fromNode.id &&
-          !this.isDirectLinked(slot)
+          !this.isDirectLinked(port)
         ) {
-          slot.setState('enable')
+          port.setState('enable')
         }
       })
     })
   }
 
-  isDirectLinked(slot: ISlot) {
+  isDirectLinked(port: IPort) {
     let linked = false
 
     for (const item of this.fromNode.getEdges()) {
       linked =
-        item.fromSlot.id === this.fromSlot.id && item.toSlot.id === slot.id
+        item.fromPort.id === this.fromPort.id && item.toPort.id === port.id
       if (linked) {
         break
       }
@@ -155,9 +153,9 @@ export default class CreateEdge extends Base {
     this.createEdge.toPoint = { x: 0, y: 0 }
     const nodes = this.graph.getNodes()
     nodes.forEach(item => {
-      item.slots.forEach(slot => {
-        if (slot.hasState('enable')) {
-          slot.clearState('enable')
+      item.ports.forEach(port => {
+        if (port.hasState('enable')) {
+          port.clearState('enable')
         }
       })
     })

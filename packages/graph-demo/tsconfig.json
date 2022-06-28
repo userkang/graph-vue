@@ -16,9 +16,9 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      "@/*": ["src/*"],
-      "@datafe/graph-vue": ["../../packages/graph-vue"],
-      "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
+      "@/*": ["src/*"]
+      // "@datafe/graph-vue": ["../../packages/graph-vue"],
+      // "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

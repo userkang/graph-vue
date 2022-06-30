@@ -43,6 +43,8 @@ import {
 
 import GraphStore from '@/stores/graph'
 
+import { data } from '../mock/aaa'
+
 const groupPadding = 25
 
 const action = [
@@ -54,6 +56,8 @@ const action = [
   'brush-select',
   'wheel-move'
 ]
+
+// const nodeCellMock = () => data
 
 const nodeCellMock = (): IDataModel => {
   return {
@@ -77,7 +81,7 @@ const nodeCellMock = (): IDataModel => {
         id: '4',
         label: 'parent',
         type: 'group',
-        collapsed: true
+        collapsed: false
       },
       {
         id: '5',
@@ -87,8 +91,7 @@ const nodeCellMock = (): IDataModel => {
       },
       {
         id: '6',
-        label: 'start',
-        collapsed: false
+        label: 'start'
       }
     ],
     edges: [
@@ -129,6 +132,7 @@ export default class NodeCell extends Vue {
   }
 
   hideChildren(node: INode) {
+    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
     const children = node.getChildren()
     children.forEach(child => {
       child.hide()
@@ -151,6 +155,7 @@ export default class NodeCell extends Vue {
 
     this.resizeGroup(node)
     this.layout()
+    this.graph.translate(node.width / 2 - 90, node.height / 2 - 20)
   }
 
   initGraph(graph: Graph) {
@@ -191,6 +196,8 @@ export default class NodeCell extends Vue {
         })
       }
     })
+
+    this.layout()
   }
 
   layout(stack = true) {

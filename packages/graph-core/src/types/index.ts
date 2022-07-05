@@ -71,6 +71,7 @@ export interface IGraphConfig {
   // 节点的宽高 单位：px
   nodeInfo?: NodeInfo
   edgeInfo?: EdgeInfo
+  defaultNode?: INodeModel
   // 默认的行为配置
   action: string[]
 }

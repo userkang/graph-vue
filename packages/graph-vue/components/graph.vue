@@ -67,7 +67,8 @@ import {
   IEdge,
   ILayout,
   INode,
-  IDagreLayout
+  IDagreLayout,
+  INodeModel
 } from '@datafe/graph-core'
 
 @Component({
@@ -104,6 +105,13 @@ export default class GraphVue extends Vue {
   })
   layout!: ILayout
 
+  @Prop({
+    default: () => {
+      return {}
+    }
+  })
+  defaultNode!: INodeModel
+
   nodes: INode[] = []
   edges: IEdge[] = []
 
@@ -126,7 +134,8 @@ export default class GraphVue extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: (this.layout.options as IDagreLayout)?.rankdir || 'TB',
-      action: this.action
+      action: this.action,
+      defaultNode: this.defaultNode
     })
 
     this.initCustomHooks()

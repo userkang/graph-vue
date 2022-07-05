@@ -59,56 +59,54 @@ const action = [
 
 // const nodeCellMock = () => data
 
-const nodeCellMock = (): IDataModel => {
-  return {
-    nodes: [
-      {
-        id: '1',
-        label: 'children',
-        parentId: '4'
-      },
-      {
-        id: '2',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '3',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '4',
-        label: 'parent',
-        type: 'group',
-        collapsed: false
-      },
-      {
-        id: '5',
-        label: 'parent',
-        type: 'group',
-        collapsed: false
-      },
-      {
-        id: '6',
-        label: 'start'
-      }
-    ],
-    edges: [
-      {
-        fromNodeId: '4',
-        toNodeId: '5'
-      },
-      {
-        fromNodeId: '2',
-        toNodeId: '3'
-      },
-      {
-        fromNodeId: '6',
-        toNodeId: '5'
-      }
-    ]
-  }
+const nodeCellMock = {
+  nodes: [
+    {
+      id: '1',
+      label: 'children',
+      parentId: '4'
+    },
+    {
+      id: '2',
+      label: 'children',
+      parentId: '5'
+    },
+    {
+      id: '3',
+      label: 'children',
+      parentId: '5'
+    },
+    {
+      id: '4',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
+      id: '5',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
+      id: '6',
+      label: 'start'
+    }
+  ],
+  edges: [
+    {
+      fromNodeId: '4',
+      toNodeId: '5'
+    },
+    {
+      fromNodeId: '2',
+      toNodeId: '3'
+    },
+    {
+      fromNodeId: '6',
+      toNodeId: '5'
+    }
+  ]
 }
 
 @Component({
@@ -122,7 +120,7 @@ const nodeCellMock = (): IDataModel => {
 })
 export default class NodeCell extends Vue {
   graph!: Graph
-  dataMock = nodeCellMock()
+  dataMock = nodeCellMock
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
   isEditText = false

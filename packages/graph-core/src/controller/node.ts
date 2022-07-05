@@ -80,10 +80,11 @@ export default class NodeController {
       return
     }
 
+    const defaultNode = this.graph.get('defaultNode') || {}
+    const model = Object.assign({}, defaultNode, item)
     const nodeCfg = this.graph.get('nodeInfo') || defaultCfg
     const direction = this.graph.get('direction')
-
-    const node = new Node(item, nodeCfg, direction)
+    const node = new Node(model, nodeCfg, direction)
     this._nodes[node.id] = node
 
     this.watchNodeChange(node)

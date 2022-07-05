@@ -275,7 +275,7 @@ export default class Graph extends EventEmitter {
     const needLayout = model.nodes.every(
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    
+
     this.nodeController.data(model.nodes)
     this.edgeController.data(model.edges)
     if (needLayout) {
@@ -330,8 +330,14 @@ export default class Graph extends EventEmitter {
     this.stackController.redo()
   }
 
-  public pushStack(type: string, data: IDataStack, stackType = 'undo') {
-    this.stackController.pushStack(type, data, stackType)
+  public pushStack(
+    type: string,
+    data: IDataStack,
+    stackType = 'undo',
+    stackData?: any
+  ) {
+    console.log('stackchange')
+    this.stackController.pushStack(type, data, stackType, stackData)
     this.emit('stackchange')
   }
 

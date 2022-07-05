@@ -20,7 +20,12 @@ export default class Stack {
     this.redoStack = []
   }
 
-  public pushStack(type: string, data: IDataStack, stackType = 'undo') {
+  public pushStack(
+    type: string,
+    data: IDataStack,
+    stackType = 'undo',
+    stackData?: any
+  ) {
     let stack: IStack[] = []
     if (stackType === 'undo') {
       stack = this.undoStack
@@ -28,7 +33,12 @@ export default class Stack {
       stack = this.redoStack
     }
 
-    stack.push({ type, data: clone(data) })
+    if (['collapse'].includes(type)) {
+      stack.push({ type, stackData } as any)
+      console.log('pushStack')
+    } else {
+      stack.push({ type, data: clone(data) })
+    }
 
     if (stack.length > DEEP) {
       stack.shift()
@@ -100,6 +110,9 @@ export default class Stack {
           this.graph.findNode(item.id as string)
         )
         this.graph.emit('node:moved', nodes)
+        break
+      case 'collapse':
+        console.log(stack)
         break
     }
 

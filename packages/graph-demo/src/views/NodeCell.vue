@@ -144,6 +144,22 @@ export default class NodeCell extends Vue {
     node.model.collapsed = true
 
     this.layout()
+
+    // stackData
+    const nodeMap: Record<string | number, Partial<INode>> = {}
+    this.graph.getNodes().forEach(node => {
+      nodeMap[node.id] = { id: node.id, x: node.x, y: node.y }
+    })
+    children.forEach(node => {
+      Object.assign(nodeMap[node.id], { hide: true })
+    })
+    Object.assign(nodeMap[node.id], {
+      collapsed: true,
+      width: node.width,
+      height: node.height
+    })
+    const stackData = { update: nodeMap }
+    this.graph.pushStack('collapse', {}, 'undo', stackData)
   }
 
   showChildren(node: INode) {

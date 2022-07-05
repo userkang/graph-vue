@@ -170,7 +170,7 @@ export default class NodeCell extends Vue {
     node.model.collapsed = false
 
     this.resizeGroup(node)
-    this.layout()
+    this.layout(false)
     this.graph.translate(node.width / 2 - 90, node.height / 2 - 20)
   }
 
@@ -207,13 +207,14 @@ export default class NodeCell extends Vue {
     groups.forEach(group => {
       if (group.model.collapsed) {
         const children = group.getChildren()
+        children
         children.forEach(child => {
           child.hide()
         })
       }
     })
 
-    this.layout()
+    this.layout(false)
   }
 
   layout(stack = true) {

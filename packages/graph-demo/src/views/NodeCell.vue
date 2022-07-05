@@ -143,7 +143,7 @@ export default class NodeCell extends Vue {
     })
     node.model.collapsed = true
 
-    this.layout()
+    this.layout(false)
 
     // stackData
     const nodeMap: Record<string | number, Partial<INode>> = {}

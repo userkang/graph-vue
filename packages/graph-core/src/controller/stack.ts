@@ -1,4 +1,4 @@
-import { IDataStack, IEdgeModel, INodeModel, IStack } from '../types'
+import { IDataStack, IEdgeModel, INode, INodeModel, IStack } from '../types'
 import Graph from './graph'
 import { clone } from '../util/utils'
 
@@ -35,7 +35,6 @@ export default class Stack {
 
     if (['collapse'].includes(type)) {
       stack.push({ type, stackData } as any)
-      console.log('pushStack')
     } else {
       stack.push({ type, data: clone(data) })
     }
@@ -112,7 +111,19 @@ export default class Stack {
         this.graph.emit('node:moved', nodes)
         break
       case 'collapse':
-        console.log(stack)
+        const before = (stack as any).stackData.before
+        Object.values(before.nodes).forEach((beforeData: any) => {
+          const node = this.graph.findNode(beforeData.id) as INode
+          node.update(beforeData)
+          ;['hide'].forEach(stateName => {
+            if (stateName in beforeData) {
+              !!beforeData[stateName]
+                ? node.clearState(stateName)
+                : node.setState(stateName)
+            }
+          })
+        })
+
         break
     }
 

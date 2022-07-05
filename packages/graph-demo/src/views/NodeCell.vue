@@ -132,19 +132,7 @@ export default class NodeCell extends Vue {
   }
 
   hideChildren(node: INode) {
-    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
     const children = node.getChildren()
-    children.forEach(child => {
-      child.hide()
-    })
-    node.update({
-      width: 180,
-      height: 40
-    })
-    node.model.collapsed = true
-
-    this.layout(false)
-
     // stackData
     const nodeMap: Record<string | number, Partial<INode>> = {}
     this.graph.getNodes().forEach(node => {
@@ -158,7 +146,21 @@ export default class NodeCell extends Vue {
       width: node.width,
       height: node.height
     })
-    const stackData = { update: nodeMap }
+    const stackData = { before: {nodes: nodeMap} }
+
+    // /stackData
+    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
+
+    children.forEach(child => {
+      child.hide()
+    })
+    node.update({
+      width: 180,
+      height: 40
+    })
+    node.model.collapsed = true
+
+    this.layout(false)
     this.graph.pushStack('collapse', {}, 'undo', stackData)
   }
 

@@ -336,7 +336,6 @@ export default class Graph extends EventEmitter {
     stackType = 'undo',
     stackData?: any
   ) {
-    console.log('stackchange')
     this.stackController.pushStack(type, data, stackType, stackData)
     this.emit('stackchange')
   }

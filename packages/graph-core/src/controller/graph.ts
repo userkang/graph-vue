@@ -192,7 +192,7 @@ export default class Graph extends EventEmitter {
     this.emit('edge:change', edge)
   }
 
-  public deleteEdge(id: string, stack = true): IEdge | undefined {
+  private realDeleteEdge=(id: string, stack = true): IEdge | undefined =>{
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
@@ -202,6 +202,12 @@ export default class Graph extends EventEmitter {
       this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
     }
     return edge
+  }
+  public deleteEdge(id: string, stack = true) {
+    const func = stack
+      ? this.withStack(this.realDeleteEdge)
+      : this.realDeleteEdge
+    return func(id)
   }
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {

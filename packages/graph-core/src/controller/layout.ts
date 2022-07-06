@@ -48,7 +48,7 @@ export default class LayoutController {
     }
   }
 
-  dagreLayout(cfg: ILayout, stack: boolean) {
+  realDagreLayout = (cfg: ILayout) => {
     this.initDagre(cfg.options as IDagreLayout)
 
     const nodes = cfg.data?.nodes || this.graph.getNodes()
@@ -83,14 +83,16 @@ export default class LayoutController {
       node.updatePosition(posX, posY)
     })
 
-    if (stack) {
-      this.graph.pushStack('updateNodePosition', { nodes: stackNode })
-    }
-
     return this.dagre
   }
+  dagreLayout(cfg: ILayout, stack: boolean) {
+    const func = stack
+      ? this.graph.withStack(this.realDagreLayout)
+      : this.realDagreLayout
+    return func(cfg)
+  }
 
-  circleLayout(cfg: ILayout, stack: boolean) {
+  realCircleLayout = (cfg: ILayout) => {
     const options = Object.assign(
       {},
       this.options,
@@ -105,8 +107,6 @@ export default class LayoutController {
       Math.max(...nodes.map(node => node.width + node.height)) +
       (options.addRadius || 0)
 
-    const stackNode: INodeModel[] = nodes.map(node => ({ ...node.model }))
-
     const dTheta =
       getDTheta(nodes.length) * (options.clockwise === false ? -1 : 1)
 
@@ -117,10 +117,12 @@ export default class LayoutController {
       const posY = radius * Math.sin(theta) + svgInfo.height / 2
       node.updatePosition(posX, posY)
     }
-
-    if (stack) {
-      this.graph.pushStack('updateNodePosition', { nodes: stackNode })
-    }
+  }
+  circleLayout(cfg: ILayout, stack: boolean) {
+    const func = stack
+      ? this.graph.withStack(this.realCircleLayout)
+      : this.realCircleLayout
+    return func(cfg)
   }
 
   destroy() {

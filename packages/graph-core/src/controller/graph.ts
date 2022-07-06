@@ -192,15 +192,12 @@ export default class Graph extends EventEmitter {
     this.emit('edge:change', edge)
   }
 
-  private realDeleteEdge=(id: string, stack = true): IEdge | undefined =>{
+  private realDeleteEdge = (id: string): IEdge | undefined => {
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
     }
     this.emit('edge:deleted', edge.model)
-    if (stack) {
-      this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-    }
     return edge
   }
   public deleteEdge(id: string, stack = true) {

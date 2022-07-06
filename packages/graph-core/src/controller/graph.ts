@@ -61,7 +61,7 @@ export default class Graph extends EventEmitter {
     ;(window as any).graph = this
   }
 
-  public get withStack(){
+  public get withStack() {
     return this.stackController.withStack
   }
 
@@ -134,22 +134,21 @@ export default class Graph extends EventEmitter {
     this.emit('node:change', node)
   }
 
-  public deleteNode(id: string, stack = true): INode | undefined {
+  public realDeleteNode = (id: string): INode | undefined => {
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
       return
     }
-    const stackData = {
-      nodes: [node.model],
-      edges: node.getEdges().map(edge => edge.model as IEdgeModel)
-    }
     this.nodeController.deleteNode(id)
     this.emit('node:deleted', node.model)
-    if (stack) {
-      this.pushStack('deleteNode', stackData)
-    }
     return node
+  }
+  public deleteNode(id: string, stack = true) {
+    const func = stack
+      ? this.withStack(this.realDeleteNode)
+      : this.realDeleteNode
+    return func(id)
   }
 
   public addNode(item: INodeModel, stack = true): INode | undefined {

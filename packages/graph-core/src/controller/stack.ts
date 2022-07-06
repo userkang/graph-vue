@@ -116,9 +116,9 @@ export default class Stack {
         this.graph.emit('node:moved', nodes)
         break
       case 'stackStep':
-        const stackData = (stack as any).stackData
+        const stackData = (stack as any).stackData 
         Object.keys(stackData.addNodes).forEach(id => {
-          this.graph.deleteNode(id, false)
+          this.graph.realDeleteNode(id)
         })
         Object.keys(stackData.removeNodes).forEach(id => {
           const { model, state, rect } = stackData.removeNodes[id]
@@ -166,13 +166,17 @@ export default class Stack {
         //
         const beforeTransform = stackData.beforeTransform
         this.graph.translate(-beforeTransform.x, -beforeTransform.y)
-        this.graph.pushStack(stack.type, clone(newData), 'redo', {
+        this.graph.pushStack(stack.type, {}, 'redo', {
           addNodes: stackData.removeNodes,
           removeNodes: stackData.addNodes,
           beforeNodes: stackData.afterNodes,
           afterNodes: stackData.beforeNodes,
           beforeTransform: stackData.afterTransform,
-          afterTransform: stackData.beforeTransform
+          afterTransform: stackData.beforeTransform,
+          addEdges: stackData.removeEdges,
+          removeEdges: stackData.addEdges,
+          beforeEdges: stackData.afterEdges,
+          afterEdges: stackData.beforeEdges
         })
         return
         break
@@ -253,8 +257,7 @@ export default class Stack {
         const stackData = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {
           this.graph.deleteNode(id, false)
-        })
-        console.log(stackData)
+        }) 
         Object.keys(stackData.removeNodes).forEach(id => {
           const { model, state, rect } = stackData.removeNodes[id]
           const node = this.graph.realAddNode(model)
@@ -301,13 +304,17 @@ export default class Stack {
         //
         const beforeTransform = stackData.beforeTransform
         this.graph.translate(-beforeTransform.x, -beforeTransform.y)
-        this.graph.pushStack(stack.type, clone(newData), 'redo', {
+        this.graph.pushStack(stack.type, {}, 'undo', {
           addNodes: stackData.removeNodes,
           removeNodes: stackData.addNodes,
           beforeNodes: stackData.afterNodes,
           afterNodes: stackData.beforeNodes,
           beforeTransform: stackData.afterTransform,
-          afterTransform: stackData.beforeTransform
+          afterTransform: stackData.beforeTransform,
+          addEdges: stackData.removeEdges,
+          removeEdges: stackData.addEdges,
+          beforeEdges: stackData.afterEdges,
+          afterEdges: stackData.beforeEdges
         })
         return
         break
@@ -322,7 +329,7 @@ export default class Stack {
         return
       }
       this.stacking = true
-      const beforeNodeMap: Record<number, any> = {}
+      const beforeNodeMap: Record<string, any> = {}
       graph.getNodes().forEach(node => {
         beforeNodeMap[node.id] = {
           model: clone(node.model),
@@ -344,7 +351,7 @@ export default class Stack {
       }, {} as Record<string, any>)
       const beforeTransform = clone((graph as any).viewController.transform)
       const res = await callback(...args)
-      const afterNodeMap: Record<number, any> = {}
+      const afterNodeMap: Record<string, any> = {}
       graph.getNodes().forEach(node => {
         afterNodeMap[node.id] = {
           model: clone(node.model),
@@ -381,16 +388,17 @@ export default class Stack {
       }
       Object.keys(afterNodeMap).forEach(id => {
         if (id in beforeNodeMap) {
-          stackData.afterNodes[id] = afterNodeMap[Number(id)]
+          stackData.afterNodes[id] = afterNodeMap[String(id)]
         } else {
-          stackData.addNodes[id] = afterNodeMap[Number(id)]
+          console.log(afterNodeMap, id)
+          stackData.addNodes[id] = afterNodeMap[String(id)]
         }
       })
       Object.keys(beforeNodeMap).forEach(id => {
         if (id in afterNodeMap) {
-          stackData.beforeNodes[id] = beforeNodeMap[Number(id)]
+          stackData.beforeNodes[id] = beforeNodeMap[String(id)]
         } else {
-          stackData.removeNodes[id] = beforeNodeMap[Number(id)]
+          stackData.removeNodes[id] = beforeNodeMap[String(id)]
         }
       })
       Object.keys(afterEdgeMap).forEach(id => {

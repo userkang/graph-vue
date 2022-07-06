@@ -109,7 +109,7 @@ export default class Tree extends Vue {
 
   initEvent() {
     this.graph.on('node:contextmenu', this.handleNodeContextMenu)
-    this.graph.on('keyup', this.handleKeyUp)
+    this.graph.on('keyup', this.graph.withStack(this.handleKeyUp))
   }
 
   handleDrop(e: DragEvent) {
@@ -159,7 +159,6 @@ export default class Tree extends Vue {
             nodes.push(item.model)
             this.graph.deleteNode(item.id, false)
           })
-          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }

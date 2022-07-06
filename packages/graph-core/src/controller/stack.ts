@@ -120,9 +120,10 @@ export default class Stack {
           this.graph.deleteNode(id, false)
         })
         Object.keys(stackData.removeNodes).forEach(id => {
-          const { model, state } = stackData.beforeNodes[id]
+          const { model, state, rect } = stackData.removeNodes[id]
           const node = this.graph.addNode(model, false)
           if (node) {
+            node.updatePosition(rect.x, rect.y)
             Object.keys(state).forEach(key => {
               state[key] ? node.setState(key) : node.clearState(key)
             })
@@ -230,9 +231,10 @@ export default class Stack {
           this.graph.deleteNode(id, false)
         })
         Object.keys(stackData.removeNodes).forEach(id => {
-          const { model, state } = stackData.beforeNodes[id]
+          const { model, state, rect } = stackData.removeNodes[id]
           const node = this.graph.addNode(model, false)
           if (node) {
+            node.updatePosition(rect.x, rect.y)
             Object.keys(state).forEach(key => {
               state[key] ? node.setState(key) : node.clearState(key)
             })

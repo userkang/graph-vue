@@ -104,7 +104,7 @@ export default class DAG extends Vue {
 
   initEvent() {
     this.graph.on('node:contextmenu', this.handleNodeContextMenu)
-    this.graph.on('keyup', this.handleKeyUp)
+    this.graph.on('keyup', this.graph.withStack(this.handleKeyUp))
     this.graph.on('node:mousedown', ({ target }: { target: INode }) => {
       target?.setZIndex(1000)
     })
@@ -160,7 +160,6 @@ export default class DAG extends Vue {
             nodes.push(item.model)
             this.graph.deleteNode(item.id, false)
           })
-          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }

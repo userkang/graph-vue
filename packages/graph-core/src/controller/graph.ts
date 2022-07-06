@@ -151,7 +151,7 @@ export default class Graph extends EventEmitter {
     return func(id)
   }
 
-  public realAddNode(item: INodeModel): INode | undefined {
+  public realAddNode = (item: INodeModel): INode | undefined => {
     const node = this.nodeController.addNode(item)
     if (!node) {
       return
@@ -208,7 +208,7 @@ export default class Graph extends EventEmitter {
     return func(id)
   }
 
-  public realAddEdge(item: IEdgeModel): IEdge | undefined {
+  public realAddEdge = (item: IEdgeModel): IEdge | undefined => {
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)

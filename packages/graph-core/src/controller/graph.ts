@@ -151,18 +151,19 @@ export default class Graph extends EventEmitter {
     return func(id)
   }
 
-  public addNode(item: INodeModel, stack = true): INode | undefined {
+  public realAddNode(item: INodeModel): INode | undefined {
     const node = this.nodeController.addNode(item)
     if (!node) {
       return
     }
     this.emit('node:added', item)
-    if (stack) {
-      const data = { nodes: [item] }
-      this.pushStack('addNode', data)
-    }
 
     return node
+  }
+
+  public addNode(item: INodeModel, stack = true) {
+    const func = stack ? this.withStack(this.realAddNode) : this.realAddNode
+    return func(item)
   }
 
   public findPort(id: string | number): IPort | undefined {
@@ -207,15 +208,17 @@ export default class Graph extends EventEmitter {
     return func(id)
   }
 
-  public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+  public realAddEdge(item: IEdgeModel): IEdge | undefined {
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
-      if (stack) {
-        this.pushStack('addEdge', { edges: [item] })
-      }
     }
     return edge
+  }
+
+  public addEdge(item: IEdgeModel, stack = true) {
+    const func = stack ? this.withStack(this.realAddEdge) : this.realAddEdge
+    return func(item)
   }
 
   public getDataModel(): IDataModel {

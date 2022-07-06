@@ -122,7 +122,7 @@ export default class Stack {
         })
         Object.keys(stackData.removeNodes).forEach(id => {
           const { model, state, rect } = stackData.removeNodes[id]
-          const node = this.graph.addNode(model, false)
+          const node = this.graph.realAddNode(model)
           if (node) {
             node.updatePosition(rect.x, rect.y)
             Object.keys(state).forEach(key => {
@@ -146,7 +146,7 @@ export default class Stack {
         })
         Object.keys(stackData.removeEdges).forEach(id => {
           const { model, state } = stackData.removeEdges[id]
-          const edge = this.graph.addEdge(model, false)
+          const edge = this.graph.realAddEdge(model)
           if (edge) {
             Object.keys(state).forEach(key => {
               state[key] ? edge.setState(key) : edge.clearState(key)
@@ -254,9 +254,10 @@ export default class Stack {
         Object.keys(stackData.addNodes).forEach(id => {
           this.graph.deleteNode(id, false)
         })
+        console.log(stackData)
         Object.keys(stackData.removeNodes).forEach(id => {
           const { model, state, rect } = stackData.removeNodes[id]
-          const node = this.graph.addNode(model, false)
+          const node = this.graph.realAddNode(model)
           if (node) {
             node.updatePosition(rect.x, rect.y)
             Object.keys(state).forEach(key => {
@@ -280,7 +281,7 @@ export default class Stack {
         })
         Object.keys(stackData.removeEdges).forEach(id => {
           const { model, state } = stackData.removeEdges[id]
-          const edge = this.graph.addEdge(model, false)
+          const edge = this.graph.realAddEdge(model)
           if (edge) {
             Object.keys(state).forEach(key => {
               state[key] ? edge.setState(key) : edge.clearState(key)

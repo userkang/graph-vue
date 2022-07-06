@@ -10,6 +10,7 @@ const EDGE_STATE_KEY = ['linked']
 
 export default class Stack {
   private graph: Graph
+  private stacking = false
 
   public undoStack: IStack[] = []
 
@@ -315,7 +316,11 @@ export default class Stack {
   }
   withStack = (callback: (...args: any[]) => any) => {
     const graph = this.graph
-    return async function (...args: any[]) {
+    return async (...args: any[]) => {
+      if (this.stacking) {
+        return
+      }
+      this.stacking = true
       const beforeNodeMap: Record<number, any> = {}
       graph.getNodes().forEach(node => {
         beforeNodeMap[node.id] = {
@@ -402,6 +407,7 @@ export default class Stack {
         }
       })
       graph.pushStack('stackStep', {}, 'undo', stackData)
+      this.stacking = false
       return res
     }
   }

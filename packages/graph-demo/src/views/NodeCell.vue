@@ -11,7 +11,7 @@
           <button v-if="node.model.collapsed" @click="showChildren(node)">
             展开
           </button>
-          <button v-else @click="hideChildren(node)">隐藏</button>
+          <button v-else @click="withStackFunc.hideChildren(node)">隐藏</button>
         </div>
         <div v-else class="normal-node">
           {{ node.model.label }}
@@ -131,24 +131,13 @@ export default class NodeCell extends Vue {
     return action
   }
 
+  get withStackFunc() {
+    const hideChildren = this.graph.withStack(node => this.hideChildren(node))
+    return { hideChildren }
+  }
+
   hideChildren(node: INode) {
     const children = node.getChildren()
-    // stackData
-    const nodeMap: Record<string | number, Partial<INode>> = {}
-    this.graph.getNodes().forEach(node => {
-      nodeMap[node.id] = { id: node.id, x: node.x, y: node.y }
-    })
-    children.forEach(node => {
-      Object.assign(nodeMap[node.id], { hide: true })
-    })
-    Object.assign(nodeMap[node.id], {
-      collapsed: true,
-      width: node.width,
-      height: node.height
-    })
-    const stackData = { before: {nodes: nodeMap} }
-
-    // /stackData
     this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
 
     children.forEach(child => {
@@ -161,7 +150,6 @@ export default class NodeCell extends Vue {
     node.model.collapsed = true
 
     this.layout(false)
-    this.graph.pushStack('collapse', {}, 'undo', stackData)
   }
 
   showChildren(node: INode) {

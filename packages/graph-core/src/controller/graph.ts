@@ -61,6 +61,10 @@ export default class Graph extends EventEmitter {
     ;(window as any).graph = this
   }
 
+  public get withStack(){
+    return this.stackController.withStack
+  }
+
   private initController() {
     this.viewController = new ViewController(this)
     this.layoutController = new LayoutController(this)

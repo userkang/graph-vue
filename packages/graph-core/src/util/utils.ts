@@ -65,7 +65,7 @@ export const setGlobalId = (id: string) => {
   globalId.push(id)
 }
 
-export const clone = (obj: any): any => {
+export const clone = <T extends any>(obj: T): T => {
   if (typeof obj !== 'object' || obj === null) {
     return obj
   }

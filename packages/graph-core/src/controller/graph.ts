@@ -41,6 +41,7 @@ export default class Graph extends EventEmitter {
   private stackController!: StackController
 
   constructor(config: IGraphConfig) {
+    super()
     const container =
       config.container instanceof HTMLElement
         ? config.container
@@ -48,7 +49,7 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
-    super()
+
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
     // 是否触发自带渲染

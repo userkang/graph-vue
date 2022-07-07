@@ -116,7 +116,7 @@ export default class Stack {
         this.graph.emit('node:moved', nodes)
         break
       case 'stackStep':
-        const stackData = (stack as any).stackData 
+        const stackData = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {
           this.graph.realDeleteNode(id)
         })
@@ -257,7 +257,7 @@ export default class Stack {
         const stackData = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {
           this.graph.deleteNode(id, false)
-        }) 
+        })
         Object.keys(stackData.removeNodes).forEach(id => {
           const { model, state, rect } = stackData.removeNodes[id]
           const node = this.graph.realAddNode(model)
@@ -324,7 +324,7 @@ export default class Stack {
   }
   withStack = (callback: (...args: any[]) => any) => {
     const graph = this.graph
-    return async (...args: any[]) => {
+    return (...args: any[]) => {
       if (this.stacking) {
         return
       }
@@ -350,7 +350,7 @@ export default class Stack {
         return edgeMap
       }, {} as Record<string, any>)
       const beforeTransform = clone((graph as any).viewController.transform)
-      const res = await callback(...args)
+      const res = callback(...args)
       const afterNodeMap: Record<string, any> = {}
       graph.getNodes().forEach(node => {
         afterNodeMap[node.id] = {

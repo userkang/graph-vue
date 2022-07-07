@@ -206,7 +206,9 @@ export default class Stack {
 
     this.graph.pushStack(stack.type, clone(newData))
   }
-  withStack = (callback: (...args: any[]) => any) => {
+  withStack = <T extends (...args: any[]) => any>(
+    callback: T
+  ): ((...args: Parameters<T>) => ReturnType<T>) => {
     const graph = this.graph
     return (...args: any[]) => {
       if (this.stacking) {

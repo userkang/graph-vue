@@ -11,7 +11,9 @@
           <button v-if="node.model.collapsed" @click="showChildren(node)">
             展开
           </button>
-          <button v-else @click="withStackFunc.hideChildren(node)">隐藏</button>
+          <button v-else @click="graph.withStack(hideChildren)(node)">
+            隐藏
+          </button>
         </div>
         <div v-else class="normal-node">
           {{ node.model.label }}
@@ -129,11 +131,6 @@ export default class NodeCell extends Vue {
 
   get action() {
     return action
-  }
-
-  get withStackFunc() {
-    const hideChildren = this.graph.withStack(node => this.hideChildren(node))
-    return { hideChildren }
   }
 
   hideChildren(node: INode) {

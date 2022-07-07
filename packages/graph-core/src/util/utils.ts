@@ -128,3 +128,38 @@ export const preorder = (root: INodeModel): IDataModel => {
 export const isIDataModel = (props: any): props is IDataModel =>
   typeof (props as IDataModel)['nodes'] !== 'undefined' &&
   typeof (props as IDataModel)['edges'] !== 'undefined'
+
+export const isEqual = (a: any, b: any): boolean => {
+  const typeA = typeof a
+  if (typeA !== typeof b) {
+    return false
+  }
+  switch (typeA) {
+    case 'function':
+      return a.toString() === b.toString()
+    case 'symbol':
+      return a === b
+    case 'string':
+      return a === b
+    case 'number':
+      return a === b
+    case 'bigint':
+      return a === b
+    case 'boolean':
+      return a === b
+    case 'undefined':
+      return a === b
+    case 'object':
+      const akeys = new Set(Object.keys(a))
+      const isEqualKeys = Object.keys(b).every(key => akeys.has(key))
+      if (!isEqualKeys) {
+        return false
+      }
+      for (const key in a) {
+        if (!isEqual(a[key], b[key])) {
+          return false
+        }
+      }
+      return true
+  }
+}

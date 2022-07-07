@@ -1,6 +1,6 @@
 import { IDataStack, IEdgeModel, INode, INodeModel, IStack } from '../types'
 import Graph from './graph'
-import { clone } from '../util/utils'
+import { clone, isEqual } from '../util/utils'
 
 const DEEP = 20
 const NODE_MODEL_KEY = ['x', 'y', 'width', 'height']
@@ -17,6 +17,23 @@ interface INodeStackData {
     height: number
   }
   state: Record<string, boolean>
+}
+interface IEdgeStackData {
+  model: IEdgeModel
+  state: Record<string, boolean>
+}
+
+interface StackItem {
+  addNodes: Record<string, INodeStackData>
+  removeNodes: Record<string, INodeStackData>
+  beforeNodes: Record<string, INodeStackData>
+  afterNodes: Record<string, INodeStackData>
+  beforeTransform: { x: number; y: number } | null
+  afterTransform: { x: number; y: number } | null
+  addEdges: Record<string, IEdgeStackData>
+  removeEdges: Record<string, IEdgeStackData>
+  beforeEdges: Record<string, IEdgeStackData>
+  afterEdges: Record<string, IEdgeStackData>
 }
 
 export default class Stack {
@@ -40,7 +57,7 @@ export default class Stack {
     type: string,
     data: IDataStack,
     stackType = 'undo',
-    stackData?: any
+    stackData: StackItem
   ) {
     let stack: IStack[] = []
     if (stackType === 'undo') {
@@ -70,7 +87,7 @@ export default class Stack {
 
     switch (stack.type) {
       case 'stackStep':
-        const stackData = (stack as any).stackData
+        const stackData: StackItem = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {
           this.graph.realDeleteNode(id)
         })
@@ -119,7 +136,8 @@ export default class Stack {
         })
         //
         const beforeTransform = stackData.beforeTransform
-        this.graph.translate(-beforeTransform.x, -beforeTransform.y)
+        beforeTransform &&
+          this.graph.translate(-beforeTransform.x, -beforeTransform.y)
         this.graph.pushStack(stack.type, {}, 'redo', {
           addNodes: stackData.removeNodes,
           removeNodes: stackData.addNodes,
@@ -198,7 +216,8 @@ export default class Stack {
         })
         //
         const beforeTransform = stackData.beforeTransform
-        this.graph.translate(-beforeTransform.x, -beforeTransform.y)
+        beforeTransform &&
+          this.graph.translate(-beforeTransform.x, -beforeTransform.y)
         this.graph.pushStack(stack.type, {}, 'undo', {
           addNodes: stackData.removeNodes,
           removeNodes: stackData.addNodes,
@@ -252,8 +271,8 @@ export default class Stack {
         }, {} as Record<string, boolean>)
         edgeMap[edge.id] = { model, state }
         return edgeMap
-      }, {} as Record<string, any>)
-      const beforeTransform = clone((graph as any).viewController.transform)
+      }, {} as Record<string, IEdgeStackData>)
+      const beforeTransform = clone(graph.getTranslate())
       const res = callback(...args)
 
       const afterNodeMap = graph.getNodes().reduce((map, node) => {
@@ -281,43 +300,75 @@ export default class Stack {
         }, {} as Record<string, boolean>)
         edgeMap[edge.id] = { model, state }
         return edgeMap
-      }, {} as Record<string, any>)
+      }, {} as Record<string, IEdgeStackData>)
 
       // nodemap, edgemap, transform
 
-      const stackData = {
-        addNodes: {} as Record<string, INodeStackData>,
-        removeNodes: {} as Record<string, INodeStackData>,
-        beforeNodes: {} as Record<string, INodeStackData>,
-        afterNodes: {} as Record<string, INodeStackData>,
-        beforeTransform,
-        afterTransform: clone(graph.getTranslate()),
-        addEdges: {} as Record<string, any>,
-        removeEdges: {} as Record<string, any>,
-        beforeEdges: {} as Record<string, any>,
-        afterEdges: {} as Record<string, any>
+      const stackData: StackItem = {
+        addNodes: {},
+        removeNodes: {},
+        beforeNodes: {},
+        afterNodes: {},
+        beforeTransform: null,
+        afterTransform: null,
+        addEdges: {},
+        removeEdges: {},
+        beforeEdges: {},
+        afterEdges: {}
       }
-      Object.keys(afterNodeMap).forEach(id => {
-        const map =
-          id in beforeNodeMap ? stackData.afterNodes : stackData.addNodes
-        map[id] = afterNodeMap[id]
-      })
-      Object.keys(beforeNodeMap).forEach(id => {
-        const map =
-          id in afterNodeMap ? stackData.beforeNodes : stackData.removeNodes
-        map[id] = beforeNodeMap[id]
-      })
-      Object.keys(afterEdgeMap).forEach(id => {
-        const map =
-          id in beforeEdgeMap ? stackData.afterEdges : stackData.addEdges
-        map[id] = afterEdgeMap[id]
-      })
-      Object.keys(beforeEdgeMap).forEach(id => {
-        const map =
-          id in afterEdgeMap ? stackData.beforeEdges : stackData.removeEdges
-        map[id] = beforeEdgeMap[id]
-      })
-      graph.pushStack('stackStep', {}, 'undo', stackData)
+
+      const afterTransform = clone(graph.getTranslate())
+      if (!isEqual(beforeTransform, afterTransform)) {
+        stackData.beforeTransform = beforeTransform
+        stackData.afterTransform = afterTransform
+      }
+
+      for (const id in afterNodeMap) {
+        if (id in beforeNodeMap) {
+          const same =
+            isEqual(beforeNodeMap[id].rect, afterNodeMap[id].rect) &&
+            isEqual(beforeNodeMap[id].state, afterNodeMap[id].state)
+            console.log(beforeNodeMap[id].rect.x, afterNodeMap[id].rect.x)
+          if (!same) {
+            stackData.beforeNodes[id] = beforeNodeMap[id]
+            stackData.afterNodes[id] = afterNodeMap[id]
+          }
+        } else {
+          stackData.addNodes[id] = afterNodeMap[id]
+        }
+        delete beforeNodeMap[id]
+        delete afterNodeMap[id]
+      }
+      for (const id in beforeNodeMap) {
+        stackData.removeNodes[id] = beforeNodeMap[id]
+        delete beforeNodeMap[id]
+      }
+
+      for (const id in afterEdgeMap) {
+        if (id in beforeEdgeMap) {
+          const same =
+            isEqual(beforeEdgeMap[id].model, afterEdgeMap[id].model) &&
+            isEqual(beforeEdgeMap[id].state, afterEdgeMap[id].state)
+          if (!same) {
+            stackData.beforeEdges[id] = beforeEdgeMap[id]
+            stackData.afterEdges[id] = afterEdgeMap[id]
+          }
+        } else {
+          stackData.addEdges[id] = afterEdgeMap[id]
+        }
+        delete beforeEdgeMap[id]
+        delete afterEdgeMap[id]
+      }
+      for (const id in beforeEdgeMap) {
+        stackData.removeEdges[id] = beforeEdgeMap[id]
+        delete beforeEdgeMap[id]
+      }
+   
+      const hasChange = Object.values(stackData).some(
+        value => value && Object.keys(value).length
+      )
+      console.log(hasChange)
+      hasChange && graph.pushStack('stackStep', {}, 'undo', stackData)
       this.stacking = false
       return res
     }

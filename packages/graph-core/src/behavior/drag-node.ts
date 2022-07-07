@@ -75,7 +75,7 @@ export default class DragNode extends Base {
     this.startY = y
   }
 
-  realMouseUp = (e: MouseEvent)=> {
+  mouseUp = (e: MouseEvent) => {
     const moveX = e.x - this.originX
     const moveY = e.y - this.originY
 
@@ -90,11 +90,6 @@ export default class DragNode extends Base {
       this.graph.emit('node:moved', this.moveNode)
     }
     this.isMoving = false
-  }
-
-  mouseUp(e: MouseEvent) {
-    const func = this.graph.withStack(this.realMouseUp)
-    return func(e)
   }
 
   checkActiveNodeIsSelected() {

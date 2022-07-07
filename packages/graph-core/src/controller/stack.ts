@@ -58,63 +58,6 @@ export default class Stack {
     let newData: IDataStack = { nodes: [], edges: [] }
 
     switch (stack.type) {
-      case 'addNode':
-        newData = stack.data
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.deleteNode(item.id as string, false)
-          })
-        }
-        break
-      case 'deleteNode':
-        newData = stack.data
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.addNode(item, false)
-          })
-        }
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.addEdge(item, false)
-          })
-        }
-        break
-      case 'addEdge':
-        newData = stack.data
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.deleteEdge(item.id as string, false)
-          })
-        }
-        break
-      case 'deleteEdge':
-        newData = stack.data
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.addEdge(item, false)
-          })
-        }
-        break
-      case 'updateNodePosition':
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.getNodes().forEach(node => {
-              if (String(item.id) === node.id) {
-                // 保存位置改变前的位置
-                if (newData.nodes) {
-                  newData.nodes!.push({ ...node.model })
-                }
-                const { x, y } = item
-                node.updatePosition(x as number, y as number)
-              }
-            })
-          })
-        }
-        const nodes = stack.data.nodes?.map((item: INodeModel) =>
-          this.graph.findNode(item.id as string)
-        )
-        this.graph.emit('node:moved', nodes)
-        break
       case 'stackStep':
         const stackData = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {
@@ -194,65 +137,6 @@ export default class Stack {
     let newData: IDataStack = { nodes: [], edges: [] }
 
     switch (stack.type) {
-      case 'addNode':
-        newData = stack.data
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.addNode(item, false)
-          })
-        }
-        break
-      case 'deleteNode':
-        newData = stack.data
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.deleteEdge(item.id as string, false)
-          })
-        }
-
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.deleteNode(item.id as string, false)
-          })
-        }
-        break
-      case 'addEdge':
-        newData = stack.data
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.addEdge(item, false)
-          })
-        }
-        break
-      case 'deleteEdge':
-        newData = stack.data
-        if (stack.data.edges) {
-          stack.data.edges.forEach(item => {
-            this.graph.deleteEdge(item.id as string, false)
-          })
-        }
-        break
-      case 'updateNodePosition':
-        if (stack.data.nodes) {
-          stack.data.nodes.forEach(item => {
-            this.graph.getNodes().forEach(node => {
-              if (String(item.id) === node.id) {
-                // 保存位置改变前的位置
-                if (newData.nodes) {
-                  newData.nodes.push({ ...node.model })
-                }
-                const { x, y } = item
-                node.updatePosition(x as number, y as number)
-              }
-            })
-          })
-        }
-
-        const nodes = stack.data.nodes?.map((item: INodeModel) =>
-          this.graph.findNode(item.id as string)
-        )
-        this.graph.emit('node:moved', nodes)
-        break
       case 'stackStep':
         const stackData = (stack as any).stackData
         Object.keys(stackData.addNodes).forEach(id => {

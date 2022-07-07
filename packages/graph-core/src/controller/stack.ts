@@ -354,7 +354,7 @@ export default class Stack {
     }
 
     for (const id in afterEdgeMap) {
-      if (id in this.startStackData.beforeNodes) {
+      if (id in this.startStackData.beforeEdges) {
         const same =
           isEqual(
             this.startStackData.beforeEdges[id].model,

@@ -105,7 +105,7 @@ export default class Tree extends Vue {
 
   initEvent() {
     this.graph.on('node:contextmenu', this.handleNodeContextMenu)
-    this.graph.on('keyup', this.graph.withStack(this.handleKeyUp))
+    this.graph.on('keyup', this.handleKeyUp)
   }
 
   path(edge: IEdge) {
@@ -140,6 +140,7 @@ export default class Tree extends Vue {
   }
 
   handleKeyUp(e: KeyboardEvent) {
+    this.graph.stackStart()
     e.stopPropagation()
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
@@ -162,6 +163,7 @@ export default class Tree extends Vue {
         }
       }
     }
+    this.graph.stackEnd()
   }
 
   deleteItem() {

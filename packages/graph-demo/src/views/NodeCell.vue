@@ -11,9 +11,7 @@
           <button v-if="node.model.collapsed" @click="showChildren(node)">
             展开
           </button>
-          <button v-else @click="graph.withStack(hideChildren)(node)">
-            隐藏
-          </button>
+          <button v-else @click="hideChildren(node)">隐藏</button>
         </div>
         <div v-else class="normal-node">
           {{ node.model.label }}
@@ -134,6 +132,7 @@ export default class NodeCell extends Vue {
   }
 
   hideChildren(node: INode) {
+    this.graph.stackStart()
     const children = node.getChildren()
     this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
 
@@ -147,6 +146,7 @@ export default class NodeCell extends Vue {
     node.model.collapsed = true
 
     this.layout(false)
+    this.graph.stackEnd()
   }
 
   showChildren(node: INode) {

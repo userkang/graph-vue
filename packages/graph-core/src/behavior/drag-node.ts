@@ -35,6 +35,7 @@ export default class DragNode extends Base {
   }
 
   mouseDown({ e, target }: { e: MouseEvent; target: Node }) {
+    this.graph.stackStart()
     this.activeNode = target
     if (this.activeNode) {
       this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
@@ -90,6 +91,7 @@ export default class DragNode extends Base {
       this.graph.emit('node:moved', this.moveNode)
     }
     this.isMoving = false
+    this.graph.stackEnd()
   }
 
   checkActiveNodeIsSelected() {

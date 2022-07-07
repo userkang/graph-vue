@@ -104,7 +104,7 @@ export default class DAG extends Vue {
 
   initEvent() {
     this.graph.on('node:contextmenu', this.handleNodeContextMenu)
-    this.graph.on('keyup', this.graph.withStack(this.handleKeyUp))
+    this.graph.on('keyup', this.handleKeyUp)
     this.graph.on('node:mousedown', ({ target }: { target: INode }) => {
       target?.setZIndex(1000)
     })
@@ -141,6 +141,7 @@ export default class DAG extends Vue {
   }
 
   handleKeyUp(e: KeyboardEvent) {
+    this.graph.stackStart()
     e.stopPropagation()
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
@@ -163,6 +164,7 @@ export default class DAG extends Vue {
         }
       }
     }
+    this.graph.stackEnd()
   }
 
   deleteItem() {

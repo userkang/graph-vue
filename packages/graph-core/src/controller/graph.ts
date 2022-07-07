@@ -62,10 +62,6 @@ export default class Graph extends EventEmitter {
     ;(window as any).graph = this
   }
 
-  public get withStack() {
-    return this.stackController.withStack
-  }
-
   private initController() {
     this.viewController = new ViewController(this)
     this.layoutController = new LayoutController(this)
@@ -146,10 +142,10 @@ export default class Graph extends EventEmitter {
     return node
   }
   public deleteNode(id: string, stack = true) {
-    const func = stack
-      ? this.withStack(this.realDeleteNode)
-      : this.realDeleteNode
-    return func(id)
+    stack && this.stackStart()
+    const res = this.realDeleteNode(id)
+    stack && this.stackEnd()
+    return res
   }
 
   public realAddNode = (item: INodeModel): INode | undefined => {
@@ -163,8 +159,10 @@ export default class Graph extends EventEmitter {
   }
 
   public addNode(item: INodeModel, stack = true) {
-    const func = stack ? this.withStack(this.realAddNode) : this.realAddNode
-    return func(item)
+    stack && this.stackStart()
+    const res = this.realAddNode(item)
+    stack && this.stackEnd()
+    return res
   }
 
   public findPort(id: string | number): IPort | undefined {
@@ -203,10 +201,10 @@ export default class Graph extends EventEmitter {
     return edge
   }
   public deleteEdge(id: string, stack = true) {
-    const func = stack
-      ? this.withStack(this.realDeleteEdge)
-      : this.realDeleteEdge
-    return func(id)
+    stack && this.stackStart()
+    const res = this.realDeleteEdge(id)
+    stack && this.stackEnd()
+    return res
   }
 
   public realAddEdge = (item: IEdgeModel): IEdge | undefined => {
@@ -218,8 +216,10 @@ export default class Graph extends EventEmitter {
   }
 
   public addEdge(item: IEdgeModel, stack = true) {
-    const func = stack ? this.withStack(this.realAddEdge) : this.realAddEdge
-    return func(item)
+    stack && this.stackStart()
+    const res = this.realAddEdge(item)
+    stack && this.stackEnd()
+    return res
   }
 
   public getDataModel(): IDataModel {
@@ -348,6 +348,14 @@ export default class Graph extends EventEmitter {
   ) {
     this.stackController.pushStack(type, data, stackType, stackData)
     this.emit('stackchange')
+  }
+
+  public stackStart() {
+    return this.stackController.start()
+  }
+
+  public stackEnd() {
+    return this.stackController.end()
   }
 
   public getUndoStack(): IStack[] {

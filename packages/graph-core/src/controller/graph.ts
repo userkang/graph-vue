@@ -130,7 +130,8 @@ export default class Graph extends EventEmitter {
     this.emit('node:change', node)
   }
 
-  public realDeleteNode = (id: string): INode | undefined => {
+  public deleteNode(id: string, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
@@ -138,30 +139,19 @@ export default class Graph extends EventEmitter {
     }
     this.nodeController.deleteNode(id)
     this.emit('node:deleted', node.model)
+    stack && this.stackEnd()
     return node
   }
-  public deleteNode(id: string, stack = true) {
-    stack && this.stackStart()
-    const res = this.realDeleteNode(id)
-    stack && this.stackEnd()
-    return res
-  }
 
-  public realAddNode = (item: INodeModel): INode | undefined => {
+  public addNode(item: INodeModel, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.nodeController.addNode(item)
     if (!node) {
       return
     }
     this.emit('node:added', item)
-
-    return node
-  }
-
-  public addNode(item: INodeModel, stack = true) {
-    stack && this.stackStart()
-    const res = this.realAddNode(item)
     stack && this.stackEnd()
-    return res
+    return node
   }
 
   public findPort(id: string | number): IPort | undefined {
@@ -191,34 +181,25 @@ export default class Graph extends EventEmitter {
     this.emit('edge:change', edge)
   }
 
-  private realDeleteEdge = (id: string): IEdge | undefined => {
+  public deleteEdge(id: string, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
     }
     this.emit('edge:deleted', edge.model)
+    stack && this.stackEnd()
     return edge
   }
-  public deleteEdge(id: string, stack = true) {
-    stack && this.stackStart()
-    const res = this.realDeleteEdge(id)
-    stack && this.stackEnd()
-    return res
-  }
 
-  public realAddEdge = (item: IEdgeModel): IEdge | undefined => {
+  public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
     }
-    return edge
-  }
-
-  public addEdge(item: IEdgeModel, stack = true) {
-    stack && this.stackStart()
-    const res = this.realAddEdge(item)
     stack && this.stackEnd()
-    return res
+    return edge
   }
 
   public getDataModel(): IDataModel {

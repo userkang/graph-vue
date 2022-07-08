@@ -19,9 +19,12 @@ const EDGE_MODEL_KEY = [
   'toPortId'
 ] as const
 const EDGE_STATE_KEY = ['linked', 'hide'] as const
-const DO_TYPE = ['undo', 'redo'] as const
+const DO_TYPE = {
+  undo: 'undo',
+  redo: 'redo'
+} as const
 
-type doType = GetArrayElementType<typeof DO_TYPE>
+type doType = keyof typeof DO_TYPE
 
 const getINodeStackData = (node: INode): INodeStackData => {
   const res = {
@@ -68,7 +71,7 @@ export default class Stack {
 
   private pushStack(doType: doType, stackData: IStack) {
     const stack: IStack[] =
-      doType === DO_TYPE[0] ? this.undoStack : this.redoStack
+      doType === DO_TYPE.undo ? this.undoStack : this.redoStack
 
     stack.push(stackData)
 
@@ -80,7 +83,7 @@ export default class Stack {
 
   public do(doType: doType) {
     const stack: IStack[] =
-      doType === DO_TYPE[0] ? this.undoStack : this.redoStack
+      doType === DO_TYPE.undo ? this.undoStack : this.redoStack
     const stackData = stack.pop()
     if (!stackData) {
       return
@@ -144,7 +147,7 @@ export default class Stack {
     })
     // edge
     // /transform
-    this.pushStack(doType === DO_TYPE[0] ? DO_TYPE[1] : DO_TYPE[0], {
+    this.pushStack(doType === DO_TYPE.undo ? DO_TYPE.redo : DO_TYPE.undo, {
       addNodes: stackData.removeNodes,
       removeNodes: stackData.addNodes,
       beforeNodes: stackData.afterNodes,

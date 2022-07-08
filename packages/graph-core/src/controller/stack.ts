@@ -18,7 +18,7 @@ const EDGE_MODEL_KEY = [
   'fromPortId',
   'toPortId'
 ] as const
-const EDGE_STATE_KEY = ['linked'] as const
+const EDGE_STATE_KEY = ['linked', 'hide'] as const
 const DO_TYPE = ['undo', 'redo'] as const
 
 type doType = GetArrayElementType<typeof DO_TYPE>

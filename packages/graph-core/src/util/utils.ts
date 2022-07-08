@@ -1,4 +1,9 @@
-import { IDataModel, IEdgeModel, INodeModel } from '../types'
+import {
+  GetArrayElementType,
+  IDataModel,
+  IEdgeModel,
+  INodeModel
+} from '../types'
 
 const doc: Document & {
   mozCancelFullScreen?(): Promise<void>
@@ -65,7 +70,7 @@ export const setGlobalId = (id: string) => {
   globalId.push(id)
 }
 
-export const clone = (obj: any): any => {
+export const clone = <T extends any>(obj: T): T => {
   if (typeof obj !== 'object' || obj === null) {
     return obj
   }
@@ -128,3 +133,53 @@ export const preorder = (root: INodeModel): IDataModel => {
 export const isIDataModel = (props: any): props is IDataModel =>
   typeof (props as IDataModel)['nodes'] !== 'undefined' &&
   typeof (props as IDataModel)['edges'] !== 'undefined'
+
+export const isEqual = (a: any, b: any): boolean => {
+  const quotesA: Array<Record<any, any>> = []
+  const quotesB: Array<Record<any, any>> = []
+  const isEqualDeep = (a: any, b: any): boolean => {
+    if (Object.is(a, b)) {
+      return true
+    }
+    const typeA = typeof a
+    if (typeA !== typeof b) {
+      return false
+    } else if (typeA === 'function') {
+      return a.toString() === b.toString()
+    } else if (typeA === 'object') {
+      const akeys = new Set(Object.keys(a))
+      const bkeys = Object.keys(b)
+      const isEqualKeys =
+        akeys.size === bkeys.length && bkeys.every(key => akeys.has(key))
+      if (!isEqualKeys) {
+        return false
+      }
+      const [aIndex, bIndex] = [quotesA.indexOf(a), quotesB.indexOf(b)]
+      if (aIndex > -1 && bIndex > -1) {
+        quotesA.length - aIndex === quotesB.length - bIndex
+      }
+      aIndex > -1 ? quotesA.splice(0, aIndex) : quotesA.push(a)
+      bIndex > -1 ? quotesB.splice(0, aIndex) : quotesB.push(b)
+      for (const key in a) {
+        if (!isEqualDeep(a[key], b[key])) {
+          return false
+        }
+      }
+      return true
+    } else {
+      return a.toString() === b.toString()
+    }
+  }
+  return isEqualDeep(a, b)
+}
+
+export const pick = <T extends object, K extends keyof T>(
+  obj: T,
+  keys: ReadonlyArray<K> | Array<K>
+): Pick<T, K> => {
+  const res: Partial<Pick<T, K>> = {}
+  for (const key of keys) {
+    res[key] = obj[key]
+  }
+  return res as Pick<T, K>
+}

@@ -16,7 +16,6 @@ import {
   IEdgeModel,
   IGraphConfig,
   IStack,
-  IDataStack,
   ILayout,
   NodeInfo
 } from '../types/index'
@@ -41,6 +40,7 @@ export default class Graph extends EventEmitter {
   private stackController!: StackController
 
   constructor(config: IGraphConfig) {
+    super()
     const container =
       config.container instanceof HTMLElement
         ? config.container
@@ -48,7 +48,7 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
-    super()
+
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
     // 是否触发自带渲染
@@ -131,34 +131,26 @@ export default class Graph extends EventEmitter {
   }
 
   public deleteNode(id: string, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
       return
     }
-    const stackData = {
-      nodes: [node.model],
-      edges: node.getEdges().map(edge => edge.model as IEdgeModel)
-    }
     this.nodeController.deleteNode(id)
     this.emit('node:deleted', node.model)
-    if (stack) {
-      this.pushStack('deleteNode', stackData)
-    }
+    stack && this.stackEnd()
     return node
   }
 
   public addNode(item: INodeModel, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.nodeController.addNode(item)
     if (!node) {
       return
     }
     this.emit('node:added', item)
-    if (stack) {
-      const data = { nodes: [item] }
-      this.pushStack('addNode', data)
-    }
-
+    stack && this.stackEnd()
     return node
   }
 
@@ -190,25 +182,23 @@ export default class Graph extends EventEmitter {
   }
 
   public deleteEdge(id: string, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
     }
     this.emit('edge:deleted', edge.model)
-    if (stack) {
-      this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-    }
+    stack && this.stackEnd()
     return edge
   }
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
-      if (stack) {
-        this.pushStack('addEdge', { edges: [item] })
-      }
     }
+    stack && this.stackEnd()
     return edge
   }
 
@@ -275,7 +265,7 @@ export default class Graph extends EventEmitter {
     const needLayout = model.nodes.every(
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    
+
     this.nodeController.data(model.nodes)
     this.edgeController.data(model.edges)
     if (needLayout) {
@@ -330,9 +320,12 @@ export default class Graph extends EventEmitter {
     this.stackController.redo()
   }
 
-  public pushStack(type: string, data: IDataStack, stackType = 'undo') {
-    this.stackController.pushStack(type, data, stackType)
-    this.emit('stackchange')
+  public stackStart() {
+    return this.stackController.start()
+  }
+
+  public stackEnd() {
+    return this.stackController.end()
   }
 
   public getUndoStack(): IStack[] {

@@ -200,7 +200,7 @@ export default class GraphVue extends Vue {
 
   @Watch('layout', { deep: true })
   handelRankdir(v: ILayout) {
-    this.graph.layout(v)
+    this.graph.layout(v, false)
     if ((v.options as IDagreLayout).rankdir) {
       this.dataChange(this.graph.getDataModel())
     }

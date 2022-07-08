@@ -141,6 +141,7 @@ export default class DAG extends Vue {
   }
 
   handleKeyUp(e: KeyboardEvent) {
+    this.graph.stackStart()
     e.stopPropagation()
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
@@ -160,10 +161,10 @@ export default class DAG extends Vue {
             nodes.push(item.model)
             this.graph.deleteNode(item.id, false)
           })
-          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }
+    this.graph.stackEnd()
   }
 
   deleteItem() {

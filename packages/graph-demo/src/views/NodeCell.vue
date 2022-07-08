@@ -130,8 +130,10 @@ export default class NodeCell extends Vue {
   }
 
   hideChildren(node: INode) {
-    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
+    this.graph.stackStart()
     const children = node.getChildren()
+    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
+
     children.forEach(child => {
       child.hide()
     })
@@ -142,6 +144,7 @@ export default class NodeCell extends Vue {
     node.model.collapsed = true
 
     this.layout(false)
+    this.graph.stackEnd()
   }
 
   showChildren(node: INode) {

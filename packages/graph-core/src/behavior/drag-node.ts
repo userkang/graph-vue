@@ -11,7 +11,6 @@ export default class DragNode extends Base {
   activeNode!: Node | undefined
   // 移动的节点
   moveNode: Node[] = []
-  stackNode: INodeModel[] = []
 
   // 移动前初始值
   originX = 0
@@ -36,6 +35,7 @@ export default class DragNode extends Base {
   }
 
   mouseDown({ e, target }: { e: MouseEvent; target: Node }) {
+    this.graph.stackStart()
     this.activeNode = target
     if (this.activeNode) {
       this.isMoving = !this.activeNode.hasState('locked') && e.button === 0
@@ -45,11 +45,6 @@ export default class DragNode extends Base {
     this.originY = this.startY = e.y
 
     this.checkActiveNodeIsSelected()
-
-    // 整理存入栈的节点信息
-    this.stackNode = this.moveNode.map(item => {
-      return { ...item.model }
-    })
   }
 
   mouseMove(e: MouseEvent) {
@@ -94,10 +89,9 @@ export default class DragNode extends Base {
     // 没有移动的情况下，不触发 node:moved 事件
     if (this.isMoving && hasMove) {
       this.graph.emit('node:moved', this.moveNode)
-      this.graph.pushStack('updateNodePosition', { nodes: this.stackNode })
-      this.stackNode = []
     }
     this.isMoving = false
+    this.graph.stackEnd()
   }
 
   checkActiveNodeIsSelected() {

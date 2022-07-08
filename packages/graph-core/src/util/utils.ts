@@ -135,38 +135,42 @@ export const isIDataModel = (props: any): props is IDataModel =>
   typeof (props as IDataModel)['edges'] !== 'undefined'
 
 export const isEqual = (a: any, b: any): boolean => {
-  const typeA = typeof a
-  if (typeA !== typeof b) {
-    return false
-  }
-  switch (typeA) {
-    case 'function':
+  const quotesA: Array<Record<any, any>> = []
+  const quotesB: Array<Record<any, any>> = []
+  const isEqualDeep = (a: any, b: any): boolean => {
+    if (Object.is(a, b)) {
+      return true
+    }
+    const typeA = typeof a
+    if (typeA !== typeof b) {
+      return false
+    } else if (typeA === 'function') {
       return a.toString() === b.toString()
-    case 'symbol':
-      return a === b
-    case 'string':
-      return a === b
-    case 'number':
-      return a === b
-    case 'bigint':
-      return a === b
-    case 'boolean':
-      return a === b
-    case 'undefined':
-      return a === b
-    case 'object':
+    } else if (typeA === 'object') {
       const akeys = new Set(Object.keys(a))
-      const isEqualKeys = Object.keys(b).every(key => akeys.has(key))
+      const bkeys = Object.keys(b)
+      const isEqualKeys =
+        akeys.size === bkeys.length && bkeys.every(key => akeys.has(key))
       if (!isEqualKeys) {
         return false
       }
+      const [aIndex, bIndex] = [quotesA.indexOf(a), quotesB.indexOf(b)]
+      if (aIndex > -1 && bIndex > -1) {
+        quotesA.length - aIndex === quotesB.length - bIndex
+      }
+      aIndex > -1 ? quotesA.splice(0, aIndex) : quotesA.push(a)
+      bIndex > -1 ? quotesB.splice(0, aIndex) : quotesB.push(b)
       for (const key in a) {
-        if (!isEqual(a[key], b[key])) {
+        if (!isEqualDeep(a[key], b[key])) {
           return false
         }
       }
       return true
+    } else {
+      return a.toString() === b.toString()
+    }
   }
+  return isEqualDeep(a, b)
 }
 
 export const pick = <T extends object, K extends keyof T>(

@@ -1,4 +1,9 @@
-import { IDataModel, IEdgeModel, INodeModel } from '../types'
+import {
+  GetArrayElementType,
+  IDataModel,
+  IEdgeModel,
+  INodeModel
+} from '../types'
 
 const doc: Document & {
   mozCancelFullScreen?(): Promise<void>
@@ -162,4 +167,15 @@ export const isEqual = (a: any, b: any): boolean => {
       }
       return true
   }
+}
+
+export const pick = <T extends object, K extends keyof T>(
+  obj: T,
+  keys: ReadonlyArray<K> | Array<K>
+): Pick<T, K> => {
+  const res: Partial<Pick<T, K>> = {}
+  for (const key of keys) {
+    res[key] = obj[key]
+  }
+  return res as Pick<T, K>
 }

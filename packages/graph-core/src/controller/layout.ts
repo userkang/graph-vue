@@ -52,7 +52,7 @@ export default class LayoutController {
     return res
   }
 
-  dagreLayout = (cfg: ILayout) => {
+  dagreLayout(cfg: ILayout) {
     this.initDagre(cfg.options as IDagreLayout)
 
     const nodes = cfg.data?.nodes || this.graph.getNodes()
@@ -90,7 +90,7 @@ export default class LayoutController {
     return this.dagre
   }
 
-  circleLayout = (cfg: ILayout) => {
+  circleLayout(cfg: ILayout) {
     const options = Object.assign(
       {},
       this.options,

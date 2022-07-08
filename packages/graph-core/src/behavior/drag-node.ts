@@ -76,7 +76,7 @@ export default class DragNode extends Base {
     this.startY = y
   }
 
-  mouseUp = (e: MouseEvent) => {
+  mouseUp(e: MouseEvent) {
     const moveX = e.x - this.originX
     const moveY = e.y - this.originY
 

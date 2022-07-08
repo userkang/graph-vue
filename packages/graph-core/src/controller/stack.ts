@@ -94,7 +94,9 @@ export default class Stack {
       )
     }
     // node
-    Object.keys(stackData.addNodes).forEach(id => this.graph.deleteNode(id, false))
+    Object.keys(stackData.addNodes).forEach(id =>
+      this.graph.deleteNode(id, false)
+    )
     Object.keys(stackData.removeNodes).forEach(id => {
       const { model, state, rect } = stackData.removeNodes[id]
       const node = this.graph.addNode(model, false)
@@ -164,7 +166,7 @@ export default class Stack {
   public redo() {
     return this.do('redo')
   }
-  start = () => {
+  start() {
     if (this.startStackData) {
       return
     }

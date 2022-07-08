@@ -18,7 +18,8 @@ import {
   IStack,
   IDataStack,
   ILayout,
-  NodeInfo
+  NodeInfo,
+  TypeOfClassMethod
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'
@@ -338,16 +339,6 @@ export default class Graph extends EventEmitter {
 
   public redo() {
     this.stackController.redo()
-  }
-
-  public pushStack(
-    type: string,
-    data: IDataStack,
-    stackType = 'undo',
-    stackData?: any
-  ) {
-    this.stackController.pushStack(type, data, stackType, stackData)
-    this.emit('stackchange')
   }
 
   public stackStart() {

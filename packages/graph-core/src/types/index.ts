@@ -82,9 +82,32 @@ export interface ICfg extends IGraphConfig {
   action: string[]
   [key: string]: any
 }
+
+export interface INodeStackData {
+  model: INodeModel
+  rect: {
+    x: number
+    y: number
+    width: number
+    height: number
+  }
+  state: Record<string, boolean>
+}
+export interface IEdgeStackData {
+  model: IEdgeModel
+  state: Record<string, boolean>
+}
 export interface IStack {
-  type: string
-  data: IDataStack
+  addNodes: Record<string, INodeStackData>
+  removeNodes: Record<string, INodeStackData>
+  beforeNodes: Record<string, INodeStackData>
+  afterNodes: Record<string, INodeStackData>
+  beforeTransform: { x: number; y: number } | null
+  afterTransform: { x: number; y: number } | null
+  addEdges: Record<string, IEdgeStackData>
+  removeEdges: Record<string, IEdgeStackData>
+  beforeEdges: Record<string, IEdgeStackData>
+  afterEdges: Record<string, IEdgeStackData>
 }
 
 export interface IDataStack {
@@ -132,3 +155,5 @@ export interface IGraphEvent {
   target: Node | Edge | Port | undefined
   [key: string]: any
 }
+
+export type TypeOfClassMethod<T, M extends keyof T> = T[M] extends Function ? T[M] : never;

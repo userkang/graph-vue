@@ -172,18 +172,20 @@ export default class MindMap extends Vue {
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
       if (['Delete', 'Backspace'].includes(e.key)) {
+        this.graph.stackStart()
         const selectedNodes = this.graph.findNodeByState('selected')
 
         if (selectedNodes.length) {
           selectedNodes.forEach(item => {
             const targetNode = item.getAllTargetNodes()
             targetNode.forEach(target => {
-              this.graph.deleteNode(target.id)
+              this.graph.deleteNode(target.id, false)
             })
 
-            this.graph.deleteNode(item.id)
+            this.graph.deleteNode(item.id, false)
           })
         }
+        this.graph.stackEnd()
       }
     }
   }

@@ -85,6 +85,14 @@ export default class Stack {
     if (!stackData) {
       return
     }
+    // transform
+    const { beforeTransform, afterTransform } = stackData
+    if (beforeTransform && afterTransform) {
+      this.graph.translateBy(
+        beforeTransform.x - afterTransform.x,
+        beforeTransform.y - afterTransform.y
+      )
+    }
     // node
     Object.keys(stackData.addNodes).forEach(id => this.graph.realDeleteNode(id))
     Object.keys(stackData.removeNodes).forEach(id => {
@@ -133,10 +141,6 @@ export default class Stack {
       }
     })
     // edge
-    // transform
-    const beforeTransform = stackData.beforeTransform
-    beforeTransform &&
-      this.graph.translate(-beforeTransform.x, -beforeTransform.y)
     // /transform
     this.pushStack(doType === DO_TYPE[0] ? DO_TYPE[1] : DO_TYPE[0], {
       addNodes: stackData.removeNodes,

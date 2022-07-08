@@ -156,4 +156,5 @@ export interface IGraphEvent {
   [key: string]: any
 }
 
-export type TypeOfClassMethod<T, M extends keyof T> = T[M] extends Function ? T[M] : never;
+export type GetArrayElementType<T extends readonly any[]> =
+  T extends readonly (infer U)[] ? U : never

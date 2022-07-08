@@ -16,10 +16,8 @@ import {
   IEdgeModel,
   IGraphConfig,
   IStack,
-  IDataStack,
   ILayout,
-  NodeInfo,
-  TypeOfClassMethod
+  NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder } from '../util/utils'

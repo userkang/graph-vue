@@ -14,10 +14,12 @@ const defaultCfg = (): Pick<BaseCfg, 'id' | 'model' | 'states'> => ({
   }
 })
 
-export default class Base extends EventEmitter {
+export default class Base<
+  M extends INodeModel | IEdgeModel | IPortModel
+> extends EventEmitter {
   private _cfg: BaseCfg = defaultCfg()
 
-  constructor(model: INodeModel | IEdgeModel | IPortModel) {
+  constructor(model: M) {
     super()
     this.set('model', model)
     if (model.id !== undefined) {
@@ -41,7 +43,7 @@ export default class Base extends EventEmitter {
     return this.get('id')
   }
 
-  public get model(): INodeModel | IEdgeModel | IPortModel {
+  public get model() {
     return this.get('model')
   }
 

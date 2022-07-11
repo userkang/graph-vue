@@ -2,7 +2,7 @@ import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IPortModel } from '../types'
 
-export default class Port extends Base {
+export default class Port extends Base<IPortModel> {
   constructor(model: IPortModel, cfg: { [key: string]: unknown }) {
     super(model)
 

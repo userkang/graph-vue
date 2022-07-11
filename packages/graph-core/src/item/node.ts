@@ -33,7 +33,7 @@ const PortTypeToPosition = {
   }
 } as const
 
-export default class Node extends Base {
+export default class Node extends Base<INodeModel> {
   constructor(model: INodeModel, cfg: INodeCfg, direction: string) {
     super(model)
     if (!this.id) {

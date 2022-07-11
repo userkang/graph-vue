@@ -260,8 +260,7 @@ export default class Graph extends EventEmitter {
     this.set('edges', [])
     this.clearItem()
 
-    let model: IDataModel = { nodes: [], edges: [] }
-    model = isIDataModel(data) ? (data as IDataModel) : preorder(data)
+    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
     const needLayout = model.nodes.every(
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )

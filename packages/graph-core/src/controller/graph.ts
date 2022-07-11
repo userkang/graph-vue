@@ -15,12 +15,12 @@ import {
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  IStack,
   ILayout,
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { IStack } from '../types/type'
 
 const getDefaultConfig = (): Pick<
   ICfg,

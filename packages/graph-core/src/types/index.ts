@@ -6,24 +6,6 @@ export type IEdge = Edge
 export type IPort = Port
 export type INode = Node
 
-export interface States {
-  selected: boolean
-  linked: boolean
-  enable: boolean
-  locked: boolean
-  hide: boolean
-  [key: string]: boolean
-}
-
-export interface BaseCfg {
-  id: string
-  model: INodeModel | IEdgeModel | IPortModel
-  zIndex?: number
-  states: States
-  view?: any
-  [key: string]: any
-}
-
 export interface IDataModel {
   // 实验节点信息
   nodes: INodeModel[]
@@ -74,10 +56,6 @@ export interface NodeInfo {
   html?: (node: Node) => HTMLElement | string
 }
 
-export interface INodeCfg extends NodeInfo {
-  [key: string]: any
-}
-
 export interface EdgeInfo {
   path?: (
     from: { x: number; y: number },
@@ -85,9 +63,6 @@ export interface EdgeInfo {
   ) => string
 }
 
-export interface IEdgeCfg extends EdgeInfo {
-  [key: string]: any
-}
 export interface IGraphConfig {
   // svg 容器
   container: string | HTMLElement
@@ -109,33 +84,6 @@ export interface ICfg extends IGraphConfig {
   action: string[]
   isRender?: boolean
   [key: string]: any
-}
-
-export interface INodeStackData {
-  model: INodeModel
-  rect: {
-    x: number
-    y: number
-    width: number
-    height: number
-  }
-  state: Record<string, boolean>
-}
-export interface IEdgeStackData {
-  model: IEdgeModel
-  state: Record<string, boolean>
-}
-export interface IStack {
-  addNodes: Record<string, INodeStackData>
-  removeNodes: Record<string, INodeStackData>
-  beforeNodes: Record<string, INodeStackData>
-  afterNodes: Record<string, INodeStackData>
-  beforeTransform: { x: number; y: number } | null
-  afterTransform: { x: number; y: number } | null
-  addEdges: Record<string, IEdgeStackData>
-  removeEdges: Record<string, IEdgeStackData>
-  beforeEdges: Record<string, IEdgeStackData>
-  afterEdges: Record<string, IEdgeStackData>
 }
 
 export interface IDataStack {
@@ -183,6 +131,3 @@ export interface IGraphEvent {
   target: Node | Edge | Port | undefined
   [key: string]: any
 }
-
-export type GetArrayElementType<T extends readonly any[]> =
-  T extends readonly (infer U)[] ? U : never

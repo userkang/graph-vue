@@ -1,9 +1,4 @@
-import {
-  GetArrayElementType,
-  IDataModel,
-  IEdgeModel,
-  INodeModel
-} from '../types'
+import { IDataModel, IEdgeModel, INodeModel } from '../types'
 
 const doc: Document & {
   mozCancelFullScreen?(): Promise<void>

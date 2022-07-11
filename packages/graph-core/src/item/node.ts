@@ -8,11 +8,11 @@ import {
   IPortModel,
   INode,
   IPosition,
-  IDirection,
-  INodeCfg
+  IDirection
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
+import { INodeCfg } from '../types/type'
 
 const PortTypeToPosition = {
   TB: {

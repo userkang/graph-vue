@@ -1,6 +1,9 @@
 import EventEmitter from '../util/event-emitter'
-import { BaseCfg, IEdgeModel, INodeModel, IPortModel, States } from '../types'
+import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { setGlobalId } from '../util/utils'
+import { BaseCfg } from '../types/type'
+
+type States = BaseCfg['states']
 
 const defaultCfg = (): Pick<BaseCfg, 'id' | 'model' | 'states'> => ({
   id: '',
@@ -79,7 +82,7 @@ export default class Base<
     return this.getStates()[state]
   }
 
-  public getStates() {
+  public getStates(): States {
     return this.get('states')
   }
 

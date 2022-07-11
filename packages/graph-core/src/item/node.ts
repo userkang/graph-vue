@@ -8,7 +8,8 @@ import {
   IPortModel,
   INode,
   IPosition,
-  IDirection
+  IDirection,
+  INodeCfg
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
@@ -35,7 +36,7 @@ const PortTypeToPosition = {
 export default class Node extends Base {
   constructor(
     model: INodeModel,
-    cfg: { [key: string]: unknown },
+    cfg: INodeCfg,
     direction: string
   ) {
     super(model)

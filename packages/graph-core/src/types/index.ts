@@ -35,6 +35,10 @@ export interface INodeModel {
   [key: string]: any
 }
 
+export interface INodeCfg {
+  [key: string]: unknown
+}
+
 export interface ITreeDataModel extends INodeModel {
   children?: ITreeDataModel[]
 }

@@ -6,6 +6,23 @@ export type IEdge = Edge
 export type IPort = Port
 export type INode = Node
 
+export interface States {
+  selected: boolean
+  linked: boolean
+  enable: boolean
+  locked: boolean
+  hide: boolean
+  [key: string]: boolean
+}
+
+export interface BaseCfg {
+  id: string
+  model: INodeModel | IEdgeModel | IPortModel
+  zIndex?: number
+  states: States
+  [key: string]: any
+}
+
 export interface IDataModel {
   // 实验节点信息
   nodes: INodeModel[]

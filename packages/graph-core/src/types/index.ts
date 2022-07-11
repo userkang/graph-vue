@@ -20,6 +20,7 @@ export interface BaseCfg {
   model: INodeModel | IEdgeModel | IPortModel
   zIndex?: number
   states: States
+  view?: any
   [key: string]: any
 }
 

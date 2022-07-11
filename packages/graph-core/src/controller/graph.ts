@@ -78,7 +78,7 @@ export default class Graph extends EventEmitter {
     }
   }
 
-  public get(key: string) {
+  public get<T extends keyof ICfg>(key: T):ICfg[T]  {
     return this.cfg[key]
   }
 

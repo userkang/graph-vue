@@ -35,10 +35,6 @@ export interface INodeModel {
   [key: string]: any
 }
 
-export interface INodeCfg {
-  [key: string]: unknown
-}
-
 export interface ITreeDataModel extends INodeModel {
   children?: ITreeDataModel[]
 }
@@ -60,6 +56,10 @@ export interface NodeInfo {
   html?: (node: Node) => HTMLElement | string
 }
 
+export interface INodeCfg extends NodeInfo {
+  [key: string]: any
+}
+
 export interface EdgeInfo {
   path?: (
     from: { x: number; y: number },
@@ -67,6 +67,9 @@ export interface EdgeInfo {
   ) => string
 }
 
+export interface IEdgeCfg extends EdgeInfo {
+  [key: string]: any
+}
 export interface IGraphConfig {
   // svg 容器
   container: string | HTMLElement
@@ -85,6 +88,7 @@ export interface ICfg extends IGraphConfig {
   nodes: INodeModel[]
   edges: IEdgeModel[]
   action: string[]
+  isRender?: boolean
   [key: string]: any
 }
 

@@ -34,11 +34,7 @@ const PortTypeToPosition = {
 } as const
 
 export default class Node extends Base {
-  constructor(
-    model: INodeModel,
-    cfg: INodeCfg,
-    direction: string
-  ) {
+  constructor(model: INodeModel, cfg: INodeCfg, direction: string) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')

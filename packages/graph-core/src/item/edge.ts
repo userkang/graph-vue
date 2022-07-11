@@ -1,13 +1,13 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { IEdgeModel, INode } from '../types'
+import { IEdgeCfg, IEdgeModel, INode } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 
 export default class Edge extends Base {
   constructor(
     model: IEdgeModel,
-    cfg: { [key: string]: unknown },
+    cfg: IEdgeCfg | undefined,
     fromNode: INode,
     toNode: INode
   ) {

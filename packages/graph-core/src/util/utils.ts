@@ -183,3 +183,8 @@ export const pick = <T extends object, K extends keyof T>(
   }
   return res as Pick<T, K>
 }
+
+export const isKeyof = <T extends object>(
+  val: string | symbol | number,
+  target: T
+): val is keyof T => target instanceof Object && val in target

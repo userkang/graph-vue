@@ -8,7 +8,6 @@
     >
       <template v-slot:node="{ node }">
         <div class="node-container">
-          <span></span>
           <div
             ref="textarea"
             contenteditable

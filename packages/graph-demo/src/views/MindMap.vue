@@ -12,15 +12,14 @@
             ref="textarea"
             contenteditable
             v-if="isEditText && node.hasState('selected')"
+            v-text="node.model.label"
             @focus="handleNodeFocus"
             @blur="handleNodeBlur($event, node)"
             class="node-text"
             :class="{
               'node-text-edited': isEditText && node.hasState('selected')
             }"
-          >
-            <span>{{ node.model.label }}</span>
-          </div>
+          ></div>
           <span
             v-else
             class="node-text"
@@ -227,10 +226,7 @@ export default class MindMap extends Vue {
   handleNodeBlur(e, node: INode) {
     e.preventDefault()
     this.isEditText = false
-    const content = e.target
-      .querySelector('span')
-      .innerText.replace(/<br\/?>/gi, '\n')
-      .trim()
+    const content = e.target?.innerText.replace(/<br\/?>/gi, '\n').trim()
 
     node.update({
       label: content

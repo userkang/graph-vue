@@ -82,7 +82,7 @@ export default class NodeController {
 
     const defaultNode = this.graph.get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const nodeCfg = Object.assign(this.graph.get('nodeInfo') || {}, defaultCfg)
+    const nodeCfg = Object.assign(defaultCfg, this.graph.get('nodeInfo') || {})
     const direction = this.graph.get('direction')
     const node = new Node(model, nodeCfg, direction)
     this._nodes[node.id] = node

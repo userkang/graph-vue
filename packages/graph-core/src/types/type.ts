@@ -25,6 +25,8 @@ export interface BaseCfg {
 
 export interface INodeCfg extends NodeInfo {
   cfg?: INodeCfg
+  width: number
+  height: number
   direction?: IDirection
   [key: string]: any
 }

@@ -48,8 +48,8 @@ export default class Node extends Base<
     this.set('cfg', cfg)
 
     this.set('direction', cfg.direction || direction)
-    this.set('width', model.width || cfg.width || 0)
-    this.set('height', model.height || cfg.height || 0)
+    this.set('width', model.width || cfg.width)
+    this.set('height', model.height || cfg.height)
     this.set('zIndex', model.zIndex || 0)
     this.set('parentId', model.parentId && String(model.parentId))
     this.set('x', model.x || 0)

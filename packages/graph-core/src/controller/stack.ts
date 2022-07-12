@@ -1,13 +1,7 @@
-import {
-  GetArrayElementType,
-  IEdge,
-  IEdgeStackData,
-  INode,
-  INodeStackData,
-  IStack
-} from '../types'
+import { IEdge, INode } from '../types'
 import Graph from './graph'
 import { clone, isEqual, pick } from '../util/utils'
+import { GetArrayElementType, IEdgeStackData, INodeStackData, IStack } from '../types/type'
 
 const DEEP = 20
 const NODE_MODEL_KEY = ['x', 'y', 'width', 'height'] as const

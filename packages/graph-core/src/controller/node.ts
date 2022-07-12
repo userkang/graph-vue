@@ -5,7 +5,7 @@ import { INode, INodeModel, IPort } from '../types'
 const defaultCfg = {
   width: 180,
   height: 40
-}
+} as const
 export default class NodeController {
   graph: Graph
   private _nodes: { [id: string]: INode } = {}

@@ -15,14 +15,17 @@ import {
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  IStack,
   ILayout,
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, preorder } from '../util/utils'
+import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { IStack } from '../types/type'
 
-const getDefaultConfig = () => ({
+const getDefaultConfig = (): Pick<
+  ICfg,
+  'direction' | 'nodes' | 'edges' | 'action'
+> => ({
   direction: 'TB',
   nodes: [],
   edges: [],
@@ -70,15 +73,19 @@ export default class Graph extends EventEmitter {
     this.stackController = new StackController(this)
   }
 
-  public set<T = any>(key: string | object, val?: T) {
-    if (Object.prototype.toString.call(key) === '[object Object]') {
-      this.cfg = { ...this.cfg, ...(key as object) }
-    } else {
-      this.cfg[key as string] = val
+  set<K extends keyof ICfg>(key: K, val: ICfg[K]): void
+  public set<K extends keyof ICfg, T extends K | Record<K, ICfg[K]>>(
+    key: T,
+    val?: T extends K ? ICfg[K] : undefined
+  ) {
+    if (typeof key === 'object') {
+      this.cfg = { ...this.cfg, ...key }
+    } else if (isKeyof(key, this.cfg)) {
+      this.cfg[key] = val
     }
   }
 
-  public get(key: string) {
+  public get<T extends keyof ICfg>(key: T): ICfg[T] {
     return this.cfg[key]
   }
 
@@ -103,9 +110,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => {
-      return item.hasState(state)
-    })
+    return this.getNodes().filter(item => item.hasState(state))
   }
 
   public findNodeByPort(id: string): INode | undefined {
@@ -167,9 +172,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => {
-      return item.hasState(state)
-    })
+    return this.getEdges().filter(item => item.hasState(state))
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {

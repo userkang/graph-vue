@@ -1,21 +1,28 @@
 import EventEmitter from '../util/event-emitter'
 import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { setGlobalId } from '../util/utils'
+import { BaseCfg } from '../types/type'
 
-export default class Base extends EventEmitter {
-  private _cfg: { [key: string]: unknown } = {
-    id: '',
-    model: {},
-    states: {
-      selected: false,
-      linked: false,
-      enable: false,
-      locked: false,
-      hide: false
-    }
+type States = BaseCfg['states']
+
+const defaultCfg = (): Pick<BaseCfg, 'id' | 'model' | 'states'> => ({
+  id: '',
+  model: {},
+  states: {
+    selected: false,
+    linked: false,
+    enable: false,
+    locked: false,
+    hide: false
   }
+})
 
-  constructor(model: INodeModel | IEdgeModel | IPortModel) {
+export default class Base<
+  M extends INodeModel | IEdgeModel | IPortModel
+> extends EventEmitter {
+  private _cfg: BaseCfg = defaultCfg()
+
+  constructor(model: M) {
     super()
     this.set('model', model)
     if (model.id !== undefined) {
@@ -27,11 +34,11 @@ export default class Base extends EventEmitter {
     }
   }
 
-  protected get<T = any>(key: string): T {
-    return this._cfg[key] as T
+  protected get<K extends keyof BaseCfg>(key: K): BaseCfg[K] {
+    return this._cfg[key]
   }
 
-  protected set(key: string, val: unknown) {
+  protected set<K extends keyof BaseCfg>(key: K, val: BaseCfg[K]) {
     this._cfg[key] = val
   }
 
@@ -39,7 +46,7 @@ export default class Base extends EventEmitter {
     return this.get('id')
   }
 
-  public get model(): INodeModel | IEdgeModel | IPortModel {
+  public get model() {
     return this.get('model')
   }
 
@@ -48,7 +55,7 @@ export default class Base extends EventEmitter {
   }
 
   public get zIndex(): number {
-    return this.get('zIndex')
+    return this.get('zIndex') || 0
   }
 
   public set zIndex(value: number) {
@@ -63,7 +70,7 @@ export default class Base extends EventEmitter {
     this.emit('change', this, 'zIndex')
   }
 
-  public setState(state: string) {
+  public setState<K extends keyof States>(state: K) {
     if (this.hasState(state)) {
       return
     }
@@ -71,15 +78,15 @@ export default class Base extends EventEmitter {
     this.emit('change', this, state)
   }
 
-  public hasState(state: string): boolean {
+  public hasState<K extends keyof States>(state: K): States[K] {
     return this.getStates()[state]
   }
 
-  public getStates() {
+  public getStates(): States {
     return this.get('states')
   }
 
-  public clearState(state: string) {
+  public clearState<K extends keyof States>(state: K) {
     if (this.hasState(state)) {
       this.getStates()[state] = false
       this.emit('change', this, state)

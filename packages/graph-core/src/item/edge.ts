@@ -3,11 +3,12 @@ import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
+import { IEdgeCfg } from '../types/type'
 
-export default class Edge extends Base {
+export default class Edge extends Base<IEdgeModel> {
   constructor(
     model: IEdgeModel,
-    cfg: { [key: string]: unknown },
+    cfg: IEdgeCfg | undefined,
     fromNode: INode,
     toNode: INode
   ) {

@@ -37,13 +37,10 @@ import {
   GraphVue,
   Graph,
   INode,
-  IDataModel,
   IEdge
 } from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
-
-import { data } from '../mock/aaa'
 
 const groupPadding = 25
 

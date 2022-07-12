@@ -18,9 +18,10 @@ const defaultCfg = (): Pick<BaseCfg, 'id' | 'model' | 'states'> => ({
 })
 
 export default class Base<
-  M extends INodeModel | IEdgeModel | IPortModel
+  M extends INodeModel | IEdgeModel | IPortModel,
+  T extends BaseCfg
 > extends EventEmitter {
-  private _cfg: BaseCfg = defaultCfg()
+  private _cfg: T = defaultCfg() as T
 
   constructor(model: M) {
     super()
@@ -34,11 +35,11 @@ export default class Base<
     }
   }
 
-  protected get<K extends keyof BaseCfg>(key: K): BaseCfg[K] {
+  protected get<K extends keyof T>(key: K): T[K] {
     return this._cfg[key]
   }
 
-  protected set<K extends keyof BaseCfg>(key: K, val: BaseCfg[K]) {
+  protected set<K extends keyof T>(key: K, val: T[K]) {
     this._cfg[key] = val
   }
 
@@ -55,7 +56,8 @@ export default class Base<
   }
 
   public get zIndex(): number {
-    return this.get('zIndex') || 0
+    const zIndex = this.get('zIndex')
+    return zIndex || 0
   }
 
   public set zIndex(value: number) {

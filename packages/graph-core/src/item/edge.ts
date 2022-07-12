@@ -3,9 +3,9 @@ import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
-import { IEdgeCfg } from '../types/type'
+import { BaseCfg, IEdgeCfg } from '../types/type'
 
-export default class Edge extends Base<IEdgeModel> {
+export default class Edge extends Base<IEdgeModel, Required<IEdgeCfg> & BaseCfg> {
   constructor(
     model: IEdgeModel,
     cfg: IEdgeCfg | undefined,

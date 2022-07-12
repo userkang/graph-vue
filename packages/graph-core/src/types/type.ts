@@ -1,10 +1,17 @@
-import { EdgeInfo, IEdgeModel, INodeModel, IPortModel, NodeInfo } from '.'
+import {
+  EdgeInfo,
+  IDirection,
+  IEdgeModel,
+  INodeModel,
+  IPortModel,
+  NodeInfo
+} from '.'
 
 export interface BaseCfg {
   id: string
   model: INodeModel | IEdgeModel | IPortModel
   zIndex?: number
-  states:  {
+  states: {
     selected: boolean
     linked: boolean
     enable: boolean
@@ -17,10 +24,19 @@ export interface BaseCfg {
 }
 
 export interface INodeCfg extends NodeInfo {
+  cfg?: INodeCfg
+  direction?: IDirection
   [key: string]: any
 }
 
 export interface IEdgeCfg extends EdgeInfo {
+  [key: string]: any
+}
+
+export interface IPortCfg {
+  nodeId: string
+  x: number
+  y: number
   [key: string]: any
 }
 

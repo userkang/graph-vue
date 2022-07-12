@@ -12,7 +12,7 @@ import {
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
-import { INodeCfg } from '../types/type'
+import { BaseCfg, INodeCfg } from '../types/type'
 
 const PortTypeToPosition = {
   TB: {
@@ -33,8 +33,11 @@ const PortTypeToPosition = {
   }
 } as const
 
-export default class Node extends Base<INodeModel> {
-  constructor(model: INodeModel, cfg: INodeCfg, direction: string) {
+export default class Node extends Base<
+  INodeModel,
+  Required<INodeCfg> & BaseCfg
+> {
+  constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')
@@ -45,8 +48,8 @@ export default class Node extends Base<INodeModel> {
     this.set('cfg', cfg)
 
     this.set('direction', cfg.direction || direction)
-    this.set('width', model.width || cfg.width)
-    this.set('height', model.height || cfg.height)
+    this.set('width', model.width || cfg.width || 0)
+    this.set('height', model.height || cfg.height || 0)
     this.set('zIndex', model.zIndex || 0)
     this.set('parentId', model.parentId && String(model.parentId))
     this.set('x', model.x || 0)

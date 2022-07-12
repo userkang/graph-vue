@@ -1,9 +1,10 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IPortModel } from '../types'
+import { BaseCfg, IPortCfg } from '../types/type'
 
-export default class Port extends Base<IPortModel> {
-  constructor(model: IPortModel, cfg: { [key: string]: unknown }) {
+export default class Port extends Base<IPortModel, Required<IPortCfg> & BaseCfg> {
+  constructor(model: IPortModel, cfg: IPortCfg) {
     super(model)
 
     if (!this.id) {

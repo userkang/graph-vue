@@ -12,7 +12,7 @@ import {
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
-import { INodeCfg } from '../types/type'
+import { BaseCfg, INodeCfg } from '../types/type'
 
 const PortTypeToPosition = {
   TB: {
@@ -33,8 +33,11 @@ const PortTypeToPosition = {
   }
 } as const
 
-export default class Node extends Base<INodeModel> {
-  constructor(model: INodeModel, cfg: INodeCfg, direction: string) {
+export default class Node extends Base<
+  INodeModel,
+  Required<INodeCfg> & BaseCfg
+> {
+  constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')

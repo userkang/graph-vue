@@ -142,6 +142,10 @@ export default class GraphVue extends Vue {
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
+    if (this.layout) {
+      this.graph.layout(this.layout)
+    }
+
     this.$emit('init', this.graph)
   }
 

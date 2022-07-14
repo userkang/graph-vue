@@ -17,7 +17,7 @@
     "baseUrl": ".",
     "types": ["webpack-env"],
     "paths": {
-      // "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
+      "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

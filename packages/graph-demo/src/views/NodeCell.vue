@@ -4,7 +4,7 @@
       :data="dataMock"
       :action="action"
       @init="initGraph"
-      :layout="{ options: { rankdir: 'LR', ranksep: 20, nodesep: 20 } }"
+      :layout="layoutOptions"
     >
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">
@@ -121,6 +121,7 @@ export default class NodeCell extends Vue {
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
   isEditText = false
+  layoutOptions = { options: { rankdir: 'LR', ranksep: 20, nodesep: 10 } }
 
   get action() {
     return action
@@ -128,12 +129,18 @@ export default class NodeCell extends Vue {
 
   hideChildren(node: INode) {
     this.graph.stackStart()
-    const children = node.getChildren()
     this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
+    const children = node.getChildren()
+
+    node.update({
+      width: 180,
+      height: 40
+    })
 
     children.forEach(child => {
       child.hide()
     })
+
     node.update({
       width: 180,
       height: 40
@@ -141,6 +148,7 @@ export default class NodeCell extends Vue {
     node.model.collapsed = true
 
     this.layout(false)
+
     this.graph.stackEnd()
   }
 
@@ -213,14 +221,6 @@ export default class NodeCell extends Vue {
       })
     })
 
-    // 先对根节点进行布局
-    this.graph.layout(
-      {
-        data: { nodes: rootNodes, edges: Object.values(edges) }
-      },
-      stack
-    )
-
     // 处理根节点下子节点布局
     rootNodes.forEach(item => {
       const childrenEdges: Record<string, IEdge> = {}
@@ -248,16 +248,38 @@ export default class NodeCell extends Vue {
         dagre.nodes().forEach((v: string) => {
           const childNode = this.graph.findNode(v) as INode
           const { x, y } = dagre.node(v)
-          const posX = item.x + x - childNode.width / 2 + groupPadding
-          const posY = item.y + y - childNode.height / 2 + groupPadding
+          const posX = x - childNode.width / 2
+          const posY = y - childNode.height / 2
           childNode.updatePosition(posX, posY)
         })
       }
     })
+
     // 布局后，再更新下group节点的大小
     rootNodes.forEach(item => {
       if (item.getChildren().length && !item.model.collapsed) {
         this.resizeGroup(item)
+      }
+    })
+
+    // 对根节点进行布局
+    this.graph.layout(
+      {
+        data: { nodes: rootNodes, edges: Object.values(edges) }
+      },
+      stack
+    )
+
+    rootNodes.forEach(item => {
+      const children = item.getChildren()
+
+      if (children.length) {
+        // 通过布局实例返回的坐标点，自定义布局位置。
+        children.forEach((node: INode) => {
+          const posX = item.x + node.x + groupPadding
+          const posY = item.y + node.y + groupPadding
+          node.updatePosition(posX, posY)
+        })
       }
     })
   }

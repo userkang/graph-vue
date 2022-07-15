@@ -214,7 +214,6 @@ export default class GraphVue extends Vue {
   @Watch('layout.options.rankdir')
   handelRankdirChange(v: string, prev: string) {
     this.graph.layout(this.layout, false)
-    console.log(this.graph.get('direction'))
     this.graph.getNodes().forEach(node => {
       node.updatePorts(this.graph.get('direction'))
     })

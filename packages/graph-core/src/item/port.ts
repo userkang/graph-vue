@@ -10,7 +10,6 @@ export default class Port extends Base<
   static computePosition(rect: IRect, position: IPosition, indexRatio: number) {
     let x = 0
     let y = 0
-    console.log(position)
     switch (position) {
       case 'left':
         x = rect.x

@@ -213,11 +213,10 @@ export default class GraphVue extends Vue {
 
   @Watch('layout.options.rankdir')
   handelRankdirChange(v: string, prev: string) {
-    console.log(v, prev)
-    if (isEqualWith(v, prev)) return
-    // const data = JSON.parse(JSON.stringify(this.data))
-    // this.graph.data(data)
     this.graph.layout(this.layout, false)
+    this.graph.getNodes().forEach(node => {
+      node.updatePorts()
+    })
   }
 
   beforeDestroy() {

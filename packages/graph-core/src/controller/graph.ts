@@ -57,8 +57,6 @@ export default class Graph extends EventEmitter {
     // 是否触发自带渲染
     const svg = container.querySelector('svg')
     this.set('isRender', !svg)
-    console.log('isRender', !svg)
-    console.log(this.get('isRender'))
     if (!svg) {
       this.set('svg', new Svg(this))
     }

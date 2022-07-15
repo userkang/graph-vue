@@ -1,9 +1,40 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { IPortModel } from '../types'
-import { BaseCfg, IPortCfg } from '../types/type'
+import { IPortModel, IPosition } from '../types'
+import { BaseCfg, IPortCfg, IRect } from '../types/type'
 
-export default class Port extends Base<IPortModel, Required<IPortCfg> & BaseCfg> {
+export default class Port extends Base<
+  IPortModel,
+  Required<IPortCfg> & BaseCfg
+> {
+  static computePosition(rect: IRect, position: IPosition, indexRatio: number) {
+    let x = 0
+    let y = 0
+    switch (position) {
+      case 'left':
+        x = rect.x
+        y = rect.y + rect.height * indexRatio
+        break
+      case 'right':
+        x = rect.x + rect.width
+        y = rect.y + rect.height * indexRatio
+        break
+      case 'top':
+        x = rect.x + rect.width * indexRatio
+        y = rect.y
+        break
+      case 'bottom':
+        x = rect.x + rect.width * indexRatio
+        y = rect.y + rect.height
+        break
+      case 'center':
+        x = rect.x + rect.width / 2
+        y = rect.y + rect.height / 2
+        break
+    }
+
+    return { x, y }
+  }
   constructor(model: IPortModel, cfg: IPortCfg) {
     super(model)
 

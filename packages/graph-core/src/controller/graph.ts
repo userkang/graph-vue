@@ -74,14 +74,15 @@ export default class Graph extends EventEmitter {
   }
 
   set<K extends keyof ICfg>(key: K, val: ICfg[K]): void
-  public set<K extends keyof ICfg, T extends K | Record<K, ICfg[K]>>(
+  public set<K extends keyof ICfg, T extends string | Record<K, ICfg[K]>>(
     key: T,
     val?: T extends K ? ICfg[K] : undefined
   ) {
-    if (typeof key === 'object') {
-      this.cfg = { ...this.cfg, ...key }
-    } else if (isKeyof(key, this.cfg)) {
-      this.cfg[key] = val
+    switch (typeof key) {
+      case 'object':
+        return (this.cfg = { ...this.cfg, ...key })
+      case 'string':
+        return (this.cfg[key] = val)
     }
   }
 

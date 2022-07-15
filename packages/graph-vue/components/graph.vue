@@ -60,7 +60,7 @@ import Edge from './edge.vue'
 import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
-import {isEqualWith} from 'lodash'
+import { isEqualWith } from 'lodash'
 
 import {
   Graph,
@@ -192,24 +192,32 @@ export default class GraphVue extends Vue {
   }
 
   @Watch('data')
-  dataChange(val: IDataModel) {
+  dataChange(val: IDataModel, prev) {
+    if (isEqualWith(val, prev)) return
     const data = JSON.parse(JSON.stringify(val))
     this.graph.data(data)
   }
 
   @Watch('action')
-  handelAction(v: string[]) {
+  handelAction(v: string[], prev) {
+    if (isEqualWith(v, prev)) return
     this.graph.removeAction()
     this.graph.addAction(v)
   }
 
   @Watch('layout', { deep: true })
-  handelRankdir(v: ILayout, prev) {
-    if(isEqualWith(v, prev)) return
+  handelRankdir(v: ILayout, prev: ILayout) {
+    if (isEqualWith(v, prev)) return
     this.graph.layout(v, false)
-    if ((v.options as IDagreLayout).rankdir) {
-      this.dataChange(this.graph.getDataModel())
-    }
+  }
+
+  @Watch('layout.options.rankdir')
+  handelRankdirChange(v: string, prev: string) {
+    console.log(v, prev)
+    if (isEqualWith(v, prev)) return
+    // const data = JSON.parse(JSON.stringify(this.data))
+    // this.graph.data(data)
+    this.graph.layout(this.layout, false)
   }
 
   beforeDestroy() {

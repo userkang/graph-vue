@@ -283,7 +283,10 @@ export default class Node extends Base<
   /**
    * 更新节点 port 位置信息
    */
-  public updatePorts() {
+  public updatePorts(dir?: IDirection) {
+    if (dir) {
+      this.set('direction', dir)
+    }
     const inPorts: IPort[] = []
     const outPorts: IPort[] = []
 
@@ -297,34 +300,42 @@ export default class Node extends Base<
 
     const inPortLen = inPorts.length
     const outPortLen = outPorts.length
-
-    const width = this.get('width')
-    const height = this.get('height')
-    if (this.get('direction') === 'TB') {
-      inPorts.forEach((item, index) => {
-        const x = this.x + (width / (inPortLen + 1)) * (index + 1)
-        const y = this.y
-        item.update(x, y)
-      })
-
-      outPorts.forEach((item, index) => {
-        const x = this.x + (width / (outPortLen + 1)) * (index + 1)
-        const y = this.y + height
-        item.update(x, y)
-      })
-    } else {
-      inPorts.forEach((item, index) => {
-        const x = this.x
-        const y = this.y + (height / (inPortLen + 1)) * (index + 1)
-        item.update(x, y)
-      })
-
-      outPorts.forEach((item, index) => {
-        const x = this.x + width
-        const y = this.y + (height / (outPortLen + 1)) * (index + 1)
-        item.update(x, y)
-      })
+    //
+    const direction: IDirection = this.get('direction')
+    const rect = {
+      x: this.x,
+      y: this.y,
+      width: this.get('width'),
+      height: this.get('height')
     }
+
+    inPorts.forEach((port, index) => {
+      let position: IPosition = 'center'
+      if (port.type && ['in', 'out'].includes(port.type)) {
+        position = PortTypeToPosition[direction][port.type as 'in' | 'out']
+      }
+      const portPos = Port.computePosition(
+        rect,
+        position as IPosition,
+        (index + 1) / (inPortLen + 1)
+      )
+      port.update(portPos.x, portPos.y)
+    })
+
+    outPorts.forEach((port, index) => {
+      let position: IPosition = 'center'
+      if (port.type && ['in', 'out'].includes(port.type)) {
+        position = PortTypeToPosition[direction][port.type as 'in' | 'out']
+      }
+      const portPos = Port.computePosition(
+        rect,
+        position as IPosition,
+        (index + 1) / (outPortLen + 1)
+      )
+      port.update(portPos.x, portPos.y)
+    })
+
+    //
   }
 
   public setPorts() {

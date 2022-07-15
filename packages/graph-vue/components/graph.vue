@@ -60,6 +60,7 @@ import Edge from './edge.vue'
 import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
+import {isEqualWith} from 'lodash'
 
 import {
   Graph,
@@ -203,7 +204,8 @@ export default class GraphVue extends Vue {
   }
 
   @Watch('layout', { deep: true })
-  handelRankdir(v: ILayout) {
+  handelRankdir(v: ILayout, prev) {
+    if(isEqualWith(v, prev)) return
     this.graph.layout(v, false)
     if ((v.options as IDagreLayout).rankdir) {
       this.dataChange(this.graph.getDataModel())

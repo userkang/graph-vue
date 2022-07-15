@@ -73,3 +73,10 @@ export interface IStack {
 
 export type GetArrayElementType<T extends readonly any[]> =
   T extends readonly (infer U)[] ? U : never
+
+export interface IRect {
+  x: number
+  y: number
+  width: number
+  height: number
+}

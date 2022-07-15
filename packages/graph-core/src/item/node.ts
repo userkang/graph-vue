@@ -290,6 +290,14 @@ export default class Node extends Base<
     const inPorts: IPort[] = []
     const outPorts: IPort[] = []
 
+    const direction: IDirection = this.get('direction')
+    const rect = {
+      x: this.x,
+      y: this.y,
+      width: this.get('width'),
+      height: this.get('height')
+    } 
+
     this.ports.forEach(item => {
       if (item.type && item.type === 'out') {
         outPorts.push(item)
@@ -301,13 +309,7 @@ export default class Node extends Base<
     const inPortLen = inPorts.length
     const outPortLen = outPorts.length
     //
-    const direction: IDirection = this.get('direction')
-    const rect = {
-      x: this.x,
-      y: this.y,
-      width: this.get('width'),
-      height: this.get('height')
-    }
+
 
     inPorts.forEach((port, index) => {
       let position: IPosition = 'center'

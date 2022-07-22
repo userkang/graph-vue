@@ -1,13 +1,32 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { INode, IPortModel, IPosition } from '../types'
+import { IDirection, INode, IPort, IPortModel, IPosition } from '../types'
 import { BaseCfg, IPortCfg, IRect } from '../types/type'
+
+const PortTypeToPosition = {
+  TB: {
+    in: 'top',
+    out: 'bottom'
+  },
+  LR: {
+    in: 'left',
+    out: 'right'
+  },
+  BT: {
+    in: 'bottom',
+    out: 'top'
+  },
+  RL: {
+    in: 'right',
+    out: 'left'
+  }
+} as const
 
 export default class Port extends Base<
   IPortModel,
   Required<IPortCfg> & BaseCfg
 > {
-  static computePosition(rect: IRect, position: IPosition, indexRatio: number) {
+  static computePosition(rect: IRect, position: IPosition, indexRatio: number = 0.5) {
     let x = 0
     let y = 0
     switch (position) {
@@ -35,6 +54,42 @@ export default class Port extends Base<
 
     return { x, y }
   }
+  static computePositions<T extends IPort | IPortModel>(
+    items: Array<T>,
+    rect: IRect,
+    direction: IDirection
+  ): { x: number; y: number }[] {
+    const sideSizeMap: Record<IPosition, number> = {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      center: 0
+    }
+
+    const itemSideList: Array<{ position: IPosition; index: number }> =
+      items.map((item: T) => {
+        const type = item.type as 'in' | 'out' | undefined
+        const position =
+          item.position ||
+          (type && PortTypeToPosition[direction][type]) ||
+          'center'
+        const res = { position, index: sideSizeMap[position] }
+        sideSizeMap[position]++
+        return res
+      })
+    const posList = itemSideList.map(side => {
+      const { position, index } = side
+      const { x, y } = Port.computePosition(
+        rect,
+        position,
+        (index + 1) / (sideSizeMap[position] + 1)
+      )
+      return { x, y }
+    })
+    return posList
+  }
+
   constructor(model: IPortModel, cfg: IPortCfg) {
     super(model)
 
@@ -69,6 +124,10 @@ export default class Port extends Base<
 
   public get nodeId(): string {
     return this.get('nodeId')
+  }
+
+  public get position(): IPosition | undefined {
+    return this.get('position')
   }
 
   update(x: number, y: number) {

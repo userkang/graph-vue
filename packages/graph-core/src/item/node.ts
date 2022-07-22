@@ -230,7 +230,7 @@ export default class Node extends Base<
       this.model.y = y
     }
 
-    this.emit('change', this, 'position', {moveX,moveY})
+    this.emit('change', this, 'position', { moveX, moveY })
   }
 
   /**
@@ -291,7 +291,7 @@ export default class Node extends Base<
       y: this.y,
       width: this.get('width'),
       height: this.get('height')
-    } 
+    }
 
     this.ports.forEach(item => {
       if (item.type && item.type === 'out') {
@@ -304,7 +304,6 @@ export default class Node extends Base<
     const inPortLen = inPorts.length
     const outPortLen = outPorts.length
     //
-
 
     inPorts.forEach((port, index) => {
       let position: IPosition = 'center'
@@ -336,7 +335,10 @@ export default class Node extends Base<
   }
 
   public setPorts() {
-    const model = this.model
+    const ports: IPortModel[] = this.model.ports || [
+      { type: 'in' },
+      { type: 'out' }
+    ] // 没有 ports，默认一进一出。
     const direction: IDirection = this.get('direction')
     const positionMap: Record<IPosition, IPortModel[]> = {
       left: [],
@@ -345,7 +347,7 @@ export default class Node extends Base<
       bottom: [],
       center: []
     }
-    const ports: IPortModel[] = []
+    
     const rect = {
       x: this.x,
       y: this.y,
@@ -353,24 +355,12 @@ export default class Node extends Base<
       height: this.get('height')
     }
 
-    if (!Array.isArray(model.ports)) {
-      // 没有 ports，默认一进一出。
-      ports.push({ type: 'in' }, { type: 'out' })
-    } else {
-      ports.push(...model.ports)
-    }
-
     ports.forEach((port: IPortModel) => {
-      let position = port.position
-
-      if (!position) {
-        if (port.type && ['in', 'out'].includes(port.type)) {
-          position = PortTypeToPosition[direction][port.type as 'in' | 'out']
-        } else {
-          position = 'center'
-        }
-      }
-
+      const type = port.type
+      const position =
+        port.position ||
+        (type && PortTypeToPosition[direction][type]) ||
+        'center'
       positionMap[position].push(port)
     })
 
@@ -390,11 +380,10 @@ export default class Node extends Base<
     })
   }
 
-  private setPort(item: IPortModel, x: number, y: number, type?: string) {
+  private setPort(item: IPortModel, x: number, y: number) {
     const port = new Port(item, {
       x,
       y,
-      type,
       nodeId: this.id,
       node: this
     })

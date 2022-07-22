@@ -81,3 +81,5 @@ export interface IRect {
   width: number
   height: number
 }
+
+export type move = { moveX: number; moveY: number }

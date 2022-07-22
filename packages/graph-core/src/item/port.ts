@@ -1,7 +1,7 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IDirection, INode, IPort, IPortModel, IPosition } from '../types'
-import { BaseCfg, IPortCfg, IRect } from '../types/type'
+import { BaseCfg, IPortCfg, IRect, move } from '../types/type'
 
 const PortTypeToPosition = {
   TB: {
@@ -26,7 +26,11 @@ export default class Port extends Base<
   IPortModel,
   Required<IPortCfg> & BaseCfg
 > {
-  static computePosition(rect: IRect, position: IPosition, indexRatio: number = 0.5) {
+  static computePosition(
+    rect: IRect,
+    position: IPosition,
+    indexRatio: number = 0.5
+  ) {
     let x = 0
     let y = 0
     switch (position) {
@@ -103,11 +107,7 @@ export default class Port extends Base<
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
-    cfg.node.on('change', (target: INode, type: string, data?: any) => {
-      if (type === 'position') {
-        this.onNodeMove(data as { moveX: number; moveY: number })
-      }
-    })
+    cfg.node.on('change', this.onNodeChange)
   }
 
   public get x(): number {
@@ -134,7 +134,12 @@ export default class Port extends Base<
     this.set('x', x)
     this.set('y', y)
   }
-  onNodeMove(data: { moveX: number; moveY: number }) {
+  onNodeChange = (target: INode, type: string, data?: any) => {
+    if (type === 'position') {
+      this.onNodeMove(data as move)
+    }
+  }
+  onNodeMove = (data: move) => {
     this.update(this.x + data.moveX, this.y + data.moveY)
   }
 }

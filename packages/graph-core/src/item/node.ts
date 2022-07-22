@@ -7,31 +7,11 @@ import {
   IEdge,
   IPortModel,
   INode,
-  IPosition,
   IDirection
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect } from '../types/type'
-
-const PortTypeToPosition = {
-  TB: {
-    in: 'top',
-    out: 'bottom'
-  },
-  LR: {
-    in: 'left',
-    out: 'right'
-  },
-  BT: {
-    in: 'bottom',
-    out: 'top'
-  },
-  RL: {
-    in: 'right',
-    out: 'left'
-  }
-} as const
 
 export default class Node extends Base<
   INodeModel,
@@ -55,6 +35,7 @@ export default class Node extends Base<
     this.set('x', model.x || 0)
     this.set('y', model.y || 0)
 
+    this.set('ports', [])
     this.set('ports', [])
     // 保存与节点相关的边
     this.set('edges', [])

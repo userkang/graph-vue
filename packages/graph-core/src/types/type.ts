@@ -41,7 +41,6 @@ export interface IPortCfg {
   x: number
   y: number
   node: INode
-  [key: string]: any
 }
 
 export interface INodeStackData {

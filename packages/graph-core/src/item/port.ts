@@ -1,6 +1,6 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { IPortModel, IPosition } from '../types'
+import { INode, IPortModel, IPosition } from '../types'
 import { BaseCfg, IPortCfg, IRect } from '../types/type'
 
 export default class Port extends Base<
@@ -48,6 +48,11 @@ export default class Port extends Base<
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
+    cfg.node.on('change', (target: INode, type: string, data?: any) => {
+      if (type === 'position') {
+        this.onNodeMove(data as { moveX: number; moveY: number })
+      }
+    })
   }
 
   public get x(): number {
@@ -69,5 +74,8 @@ export default class Port extends Base<
   update(x: number, y: number) {
     this.set('x', x)
     this.set('y', y)
+  }
+  onNodeMove(data: { moveX: number; moveY: number }) {
+    this.update(this.x + data.moveX, this.y + data.moveY)
   }
 }

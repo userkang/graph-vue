@@ -230,12 +230,7 @@ export default class Node extends Base<
       this.model.y = y
     }
 
-    // port 位置更新
-    this.ports.forEach(port => {
-      port.update(port.x + moveX, port.y + moveY)
-    })
-
-    this.emit('change', this, 'position')
+    this.emit('change', this, 'position', {moveX,moveY})
   }
 
   /**
@@ -400,7 +395,8 @@ export default class Node extends Base<
       x,
       y,
       type,
-      nodeId: this.id
+      nodeId: this.id,
+      node: this
     })
     this.get('ports').push(port)
 

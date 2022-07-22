@@ -2,6 +2,7 @@ import {
   EdgeInfo,
   IDirection,
   IEdgeModel,
+  INode,
   INodeModel,
   IPortModel,
   NodeInfo
@@ -39,6 +40,7 @@ export interface IPortCfg {
   nodeId: string
   x: number
   y: number
+  node: INode
   [key: string]: any
 }
 

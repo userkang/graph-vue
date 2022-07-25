@@ -264,10 +264,10 @@ export default class Node extends Base<
   }
 
   public addPorts(models: IPortModel[]) {
-    models.forEach(model => {
+    const ports = models.forEach(model => {
       const port = new Port(model, {
         x: 0,
-        y: 0,
+        y: 0
       })
       this._ports[port.id] = port
 
@@ -275,6 +275,7 @@ export default class Node extends Base<
       port.on('change', this.onPortChange)
     })
     this.updatePorts()
+    this.emit('port:added', ports)
   }
 
   public deletePorts(ids: string[]) {

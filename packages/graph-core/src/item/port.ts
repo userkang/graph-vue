@@ -144,9 +144,9 @@ export default class Port extends Base<
     }
     const onDeleted = (ids: string[]) => {
       if (ids.includes(this.id)) {
-        container.off('change', onNodeChange)
-        container.off('port:deleted', onDeleted)
         Port.containerMap.delete(this)
+        container.off('change', onNodeChange)
+        setTimeout(() => container.off('port:deleted', onDeleted))
       }
     }
     container.on('change', onNodeChange)

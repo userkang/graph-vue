@@ -103,11 +103,11 @@ export default class Port extends Base<
       this.model.id = this.id
     }
 
-    this.set('nodeId', cfg.nodeId)
+    this.set('nodeId', cfg.node.id)
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
-    cfg.node.on('change', this.onNodeChange)
+    this.lifeCycle(cfg.node)
   }
 
   public get x(): number {
@@ -134,12 +134,19 @@ export default class Port extends Base<
     this.set('x', x)
     this.set('y', y)
   }
-  onNodeChange = (target: INode, type: string, data?: any) => {
+  private onNodeChange = (target: INode, type: string, data?: any) => {
     if (type === 'position') {
-      this.onNodeMove(data as move)
+      this.update(this.x + data.moveX, this.y + data.moveY)
     }
   }
-  onNodeMove = (data: move) => {
-    this.update(this.x + data.moveX, this.y + data.moveY)
+  private lifeCycle(node: INode) {
+    const onDeleted = (id: string) => {
+      if (id === this.id) {
+        node.off('change', this.onNodeChange)
+        node.off('port:deleted', onDeleted)
+      }
+    }
+    node.on('change', this.onNodeChange)
+    node.on('port:deleted', onDeleted)
   }
 }

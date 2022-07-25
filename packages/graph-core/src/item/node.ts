@@ -17,6 +17,7 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
+  private readonly _ports: Record<string, IPort> = {}
   constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
@@ -34,9 +35,6 @@ export default class Node extends Base<
     this.set('parentId', model.parentId && String(model.parentId))
     this.set('x', model.x || 0)
     this.set('y', model.y || 0)
-
-    this.set('ports', [])
-    this.set('ports', [])
     // 保存与节点相关的边
     this.set('edges', [])
     this.set('children', [])
@@ -78,7 +76,7 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return this.get('ports')
+    return Object.values(this._ports)
   }
 
   public getEdges(): IEdge[] {
@@ -307,14 +305,19 @@ export default class Node extends Base<
     const port = new Port(item, {
       x,
       y,
-      nodeId: this.id,
       node: this
     })
-    this.get('ports').push(port)
+    this._ports[port.id] = port
 
     port.on('change', (port: IPort, type: string) => {
       this.emit('port:change', port, type)
     })
+  }
+
+  public deletePort(id: string) {
+    const port = this._ports[id]
+    delete this._ports[id]
+    this.emit('port:deleted', port)
   }
 
   /**

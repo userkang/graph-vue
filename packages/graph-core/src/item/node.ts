@@ -39,7 +39,7 @@ export default class Node extends Base<
     this.set('edges', [])
     this.set('children', [])
 
-    this.addPorts()
+    this.addPorts(this.model.ports || [{ type: 'in' }, { type: 'out' }])
   }
 
   public get cfg() {
@@ -263,6 +263,28 @@ export default class Node extends Base<
     })
   }
 
+  public addPorts(models: IPortModel[]) {
+    models.forEach(model => {
+      const port = new Port(model, {
+        x: 0,
+        y: 0,
+      })
+      this._ports[port.id] = port
+
+      port.setupNode(this)
+      port.on('change', this.onPortChange)
+    })
+    this.updatePorts()
+  }
+
+  public deletePorts(ids: string[]) {
+    ids.forEach(id => {
+      this._ports[id].off('change', this.onPortChange)
+      delete this._ports[id]
+    })
+    this.emit('port:deleted', ids)
+  }
+
   /**
    * 更新节点 port 位置信息
    */
@@ -270,64 +292,19 @@ export default class Node extends Base<
     if (dir) {
       this.set('direction', dir)
     }
-
-    const items = this.ports
-
     const posList = Port.computePositions(
-      items,
+      this.ports,
       this.bbox,
       this.get('direction')
     )
-    items.forEach((item, index) => {
+    this.ports.forEach((item, index) => {
       const pos = posList[index]
-      if (item instanceof Port) {
-        item.update(pos.x, pos.y)
-      } else {
-        this.setPort(item, pos.x, pos.y)
-      }
-    })
-  }
-
-  public addPorts(models?: IPortModel[]) {
-    const items: Array<IPort | IPortModel> = (
-      models ||
-      this.model.ports || [{ type: 'in' }, { type: 'out' }]
-    ).concat(this.ports)
-
-    const posList = Port.computePositions(
-      items,
-      this.bbox,
-      this.get('direction')
-    )
-    items.forEach((item, index) => {
-      const pos = posList[index]
-      if (item instanceof Port) {
-        item.update(pos.x, pos.y)
-      } else {
-        this.setPort(item, pos.x, pos.y)
-      }
+      item.update(pos.x, pos.y)
     })
   }
 
   private onPortChange = (port: IPort, type: string) => {
     this.emit('port:change', port, type)
-  }
-  private setPort(item: IPortModel, x: number, y: number) {
-    const port = new Port(item, {
-      x,
-      y,
-      node: this
-    })
-    this._ports[port.id] = port
-
-    port.on('change', this.onPortChange)
-  }
-
-  public deletePort(id: string) {
-    const port = this._ports[id]
-    delete this._ports[id]
-    this.emit('port:deleted', port)
-    port.off('change', this.onPortChange)
   }
 
   /**

@@ -1,7 +1,7 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IDirection, INode, IPort, IPortModel, IPosition } from '../types'
-import { BaseCfg, IPortCfg, IRect, move } from '../types/type'
+import { BaseCfg, IPortCfg, IRect } from '../types/type'
 
 const PortTypeToPosition = {
   TB: {
@@ -26,6 +26,7 @@ export default class Port extends Base<
   IPortModel,
   Required<IPortCfg> & BaseCfg
 > {
+  static readonly containerMap = new WeakMap<Port, INode>()
   static computePosition(
     rect: IRect,
     position: IPosition,
@@ -103,11 +104,9 @@ export default class Port extends Base<
       this.model.id = this.id
     }
 
-    this.set('nodeId', cfg.node.id)
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
-    this.lifeCycle(cfg.node)
   }
 
   public get x(): number {
@@ -122,8 +121,9 @@ export default class Port extends Base<
     return this.get('type')
   }
 
-  public get nodeId(): string {
-    return this.get('nodeId')
+  public get nodeId(): string | undefined {
+    const container = Port.containerMap.get(this)
+    return container?.id
   }
 
   public get position(): IPosition | undefined {
@@ -134,19 +134,21 @@ export default class Port extends Base<
     this.set('x', x)
     this.set('y', y)
   }
-  private onNodeChange = (target: INode, type: string, data?: any) => {
-    if (type === 'position') {
-      this.update(this.x + data.moveX, this.y + data.moveY)
-    }
-  }
-  private lifeCycle(node: INode) {
-    const onDeleted = (id: string) => {
-      if (id === this.id) {
-        node.off('change', this.onNodeChange)
-        node.off('port:deleted', onDeleted)
+
+  setupNode(container: INode) {
+    Port.containerMap.set(this, container)
+    const onNodeChange = (target: INode, type: string, data?: any) => {
+      if (type === 'position') {
+        this.update(this.x + data.moveX, this.y + data.moveY)
       }
     }
-    node.on('change', this.onNodeChange)
-    node.on('port:deleted', onDeleted)
+    const onDeleted = (ids: string[]) => {
+      if (ids.includes(this.id)) {
+        container.off('change', onNodeChange)
+        container.off('port:deleted', onDeleted)
+      }
+    }
+    container.on('change', onNodeChange)
+    container.on('port:deleted', onDeleted)
   }
 }

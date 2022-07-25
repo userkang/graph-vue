@@ -60,6 +60,7 @@ import Edge from './edge.vue'
 import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
+import { isEqualWith } from 'lodash'
 
 import {
   Graph,
@@ -67,7 +68,8 @@ import {
   IEdge,
   ILayout,
   INode,
-  IDagreLayout
+  IDagreLayout,
+  INodeModel
 } from '@datafe/graph-core'
 
 @Component({
@@ -104,6 +106,13 @@ export default class GraphVue extends Vue {
   })
   layout!: ILayout
 
+  @Prop({
+    default: () => {
+      return {}
+    }
+  })
+  defaultNode!: INodeModel
+
   nodes: INode[] = []
   edges: IEdge[] = []
 
@@ -126,12 +135,17 @@ export default class GraphVue extends Vue {
     this.graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: (this.layout.options as IDagreLayout)?.rankdir || 'TB',
-      action: this.action
+      action: this.action,
+      defaultNode: this.defaultNode
     })
 
     this.initCustomHooks()
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
+
+    if (this.layout) {
+      this.graph.layout(this.layout)
+    }
 
     this.$emit('init', this.graph)
   }
@@ -140,16 +154,11 @@ export default class GraphVue extends Vue {
     const hooks = [
       'node:added',
       'edge:added',
-      'nodeselectchange',
-      'edgeselectchange',
-      'aftertranslate',
-      'afterzoom',
-      'brushing',
-      'afterdeletenode',
-      'afterdeleteedge',
-      'afterdragnode',
-      'keyup',
-      'datachange'
+      'node:click',
+      'edge:click',
+      'node:change',
+      'edge:change',
+      'port:change'
     ]
 
     hooks.forEach(hook => {
@@ -182,25 +191,36 @@ export default class GraphVue extends Vue {
     this.transform.scale = zoom
   }
 
-  beforeDestroy() {
-    this.graph.destroy()
-  }
-
   @Watch('data')
-  dataChange(val: IDataModel) {
+  dataChange(val: IDataModel, prev) {
+    if (isEqualWith(val, prev)) return
     const data = JSON.parse(JSON.stringify(val))
     this.graph.data(data)
   }
 
   @Watch('action')
-  handelAction(v: string[]) {
+  handelAction(v: string[], prev) {
+    if (isEqualWith(v, prev)) return
     this.graph.removeAction()
     this.graph.addAction(v)
   }
 
   @Watch('layout', { deep: true })
-  handelRankdir(v: ILayout) {
-    this.graph.layout(v)
+  handelRankdir(v: ILayout, prev: ILayout) {
+    if (isEqualWith(v, prev)) return
+    this.graph.layout(v, false)
+  }
+
+  @Watch('layout.options.rankdir')
+  handelRankdirChange(v: string, prev: string) {
+    this.graph.layout(this.layout, false)
+    this.graph.getNodes().forEach(node => {
+      node.updatePorts(this.graph.get('direction'))
+    })
+  }
+
+  beforeDestroy() {
+    this.graph.destroy()
   }
 }
 </script>

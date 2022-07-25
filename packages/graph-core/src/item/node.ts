@@ -1,21 +1,28 @@
 import Base from './base'
-import Slot from './slot'
+import Port from './port'
 import { uniqueId } from '../util/utils'
-import { INodeModel, ISlot, IEdge, ISlotModel, INode } from '../types'
+import {
+  INodeModel,
+  IPort,
+  IEdge,
+  IPortModel,
+  INode,
+  IDirection
+} from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
+import { BaseCfg, INodeCfg, IRect } from '../types/type'
 
-export default class Node extends Base {
-  constructor(
-    model: INodeModel,
-    cfg: { [key: string]: unknown },
-    direction: string
-  ) {
+export default class Node extends Base<
+  INodeModel,
+  Required<INodeCfg> & BaseCfg
+> {
+  constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')
       this.set('id', id)
-      this.get('model').id = id
+      this.model.id = this.id
     }
 
     this.set('cfg', cfg)
@@ -25,17 +32,16 @@ export default class Node extends Base {
     this.set('height', model.height || cfg.height)
     this.set('zIndex', model.zIndex || 0)
     this.set('parentId', model.parentId && String(model.parentId))
+    this.set('x', model.x || 0)
+    this.set('y', model.y || 0)
 
-    this.set('slots', [])
+    this.set('ports', [])
+    this.set('ports', [])
     // 保存与节点相关的边
     this.set('edges', [])
     this.set('children', [])
 
-    // 如果没有传坐标，默认为0
-    model.x = model.x ? model.x : 0
-    model.y = model.y ? model.y : 0
-
-    this.setSlotsPoint()
+    this.setPorts()
   }
 
   public get cfg() {
@@ -47,11 +53,11 @@ export default class Node extends Base {
   }
 
   public get x(): number {
-    return this.model.x
+    return this.get('x')
   }
 
   public get y(): number {
-    return this.model.y
+    return this.get('y')
   }
 
   public get width(): number {
@@ -62,24 +68,17 @@ export default class Node extends Base {
     return this.get('height')
   }
 
-  public get slots(): ISlot[] {
-    return this.get('slots')
-  }
-
-  public get zIndex(): number {
-    return this.get('zIndex')
-  }
-
-  public set zIndex(value: number) {
-    this.set('zIndex', value)
-  }
-
-  public setZIndex(value: number) {
-    if (this.model.zIndex) {
-      this.model.zIndex = value
+  public get bbox(): IRect {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.get('width'),
+      height: this.get('height')
     }
-    this.set('zIndex', value)
-    this.emit('change:zIndex', this)
+  }
+
+  public get ports(): IPort[] {
+    return this.get('ports')
   }
 
   public getEdges(): IEdge[] {
@@ -213,12 +212,15 @@ export default class Node extends Base {
     const moveX = x - this.x
     const moveY = y - this.y
     // 节点位置更新
-    this.model.x = x
-    this.model.y = y
-    // slot 位置更新
-    this.slots.forEach(slot => {
-      slot.update(slot.x + moveX, slot.y + moveY)
-    })
+    this.set('x', x)
+    this.set('y', y)
+
+    if (this.model.x || this.model.y) {
+      this.model.x = x
+      this.model.y = y
+    }
+
+    this.emit('change', this, 'position', { moveX, moveY })
   }
 
   /**
@@ -227,27 +229,28 @@ export default class Node extends Base {
    */
   public update(model: INodeModel) {
     if (model.x || model.y) {
-      const x = model.x ? model.x : this.x
-      const y = model.y ? model.y : this.y
+      const x = model.x || this.x
+      const y = model.y || this.y
       this.updatePosition(x, y)
+    }
+
+    if (model.width || model.height) {
+      this.set('width', model.width || this.width)
+      this.set('height', model.height || this.height)
+      this.model.width = this.width
+      this.model.height = this.height
+      this.emit('change', this, 'size')
     }
 
     Object.assign(this.model, model)
 
-    if (model.width || model.height) {
-      this.set('width', this.model.width || this.width)
-      this.set('height', this.model.height || this.height)
-      this.model.width = this.width
-      this.model.height = this.height
-    }
-
-    this.updateSlots()
+    this.updatePorts()
 
     this.getEdges().forEach(edge => {
       edge.update()
     })
 
-    this.emit('update', this)
+    this.emit('change', this, 'model')
   }
 
   /**
@@ -263,112 +266,55 @@ export default class Node extends Base {
   }
 
   /**
-   * 更新节点 slot 位置信息
+   * 更新节点 port 位置信息
    */
-  public updateSlots() {
-    const inSlots: ISlot[] = []
-    const outSlots: ISlot[] = []
+  public updatePorts(dir?: IDirection) {
+    if (dir) {
+      this.set('direction', dir)
+    }
 
-    this.slots.forEach(item => {
-      if (item.type && item.type === 'out') {
-        outSlots.push(item)
-      } else {
-        inSlots.push(item)
-      }
+    const ports = this.ports
+
+    const posList = Port.computePositions(
+      ports,
+      this.bbox,
+      this.get('direction')
+    )
+    ports.forEach((item, index) => {
+      const pos = posList[index]
+      item.update(pos.x, pos.y)
     })
-
-    const inSlotLen = inSlots.length
-    const outSlotLen = outSlots.length
-
-    const width = this.get('width')
-    const height = this.get('height')
-    if (this.get('direction') === 'TB') {
-      inSlots.forEach((item, index) => {
-        const x = this.x + (width / (inSlotLen + 1)) * (index + 1)
-        const y = this.y
-        item.update(x, y)
-      })
-
-      outSlots.forEach((item, index) => {
-        const x = this.x + (width / (outSlotLen + 1)) * (index + 1)
-        const y = this.y + height
-        item.update(x, y)
-      })
-    } else {
-      inSlots.forEach((item, index) => {
-        const x = this.x
-        const y = this.y + (height / (inSlotLen + 1)) * (index + 1)
-        item.update(x, y)
-      })
-
-      outSlots.forEach((item, index) => {
-        const x = this.x + width
-        const y = this.y + (height / (outSlotLen + 1)) * (index + 1)
-        item.update(x, y)
-      })
-    }
   }
 
-  public setSlotsPoint() {
-    const model = this.model
-    const width = this.get('width')
-    const height = this.get('height')
+  public setPorts() {
+    const ports: IPortModel[] = this.model.ports || [
+      { type: 'in' },
+      { type: 'out' }
+    ] // 没有 ports，默认一进一出。
 
-    this.set('slots', [])
-    let inSlots: ISlotModel[] = []
-    let outSlots: ISlotModel[] = []
-    if (Array.isArray(model.slots)) {
-      model.slots.forEach(item => {
-        if (item.type && item.type === 'out') {
-          outSlots.push(item)
-        } else {
-          inSlots.push(item)
-        }
-      })
-    } else {
-      // 默认一进一出
-      inSlots = [{}]
-      outSlots = [{}]
-    }
-
-    const inSlotLen = inSlots.length
-    const outSlotLen = outSlots.length
-
-    if (this.get('direction') === 'TB') {
-      inSlots.forEach((item, index) => {
-        const x = Number(model.x) + (width / (inSlotLen + 1)) * (index + 1)
-        const y = Number(model.y)
-        this.setSlot(item, x, y, 'in')
-      })
-
-      outSlots.forEach((item, index) => {
-        const x = Number(model.x) + (width / (outSlotLen + 1)) * (index + 1)
-        const y = Number(model.y) + height
-        this.setSlot(item, x, y, 'out')
-      })
-    } else {
-      inSlots.forEach((item, index) => {
-        const x = Number(model.x)
-        const y = Number(model.y) + (height / (inSlotLen + 1)) * (index + 1)
-        this.setSlot(item, x, y, 'in')
-      })
-
-      outSlots.forEach((item, index) => {
-        const x = Number(model.x) + width
-        const y = Number(model.y) + (height / (outSlotLen + 1)) * (index + 1)
-        this.setSlot(item, x, y, 'out')
-      })
-    }
+    const posList = Port.computePositions(
+      ports,
+      this.bbox,
+      this.get('direction')
+    )
+    ports.forEach((item, index) => {
+      const pos = posList[index]
+      this.setPort(item, pos.x, pos.y)
+    })
   }
 
-  private setSlot(item: ISlotModel, x: number, y: number, type: string) {
-    const slot = new Slot(item, {
+  private setPort(item: IPortModel, x: number, y: number) {
+    const port = new Port(item, {
       x,
       y,
-      type,
-      nodeId: this.id
+      nodeId: this.id,
+      node: this
     })
-    this.get('slots').push(slot)
+    this.get('ports').push(port)
+
+    port.on('change', (port: IPort, type: string) => {
+      this.emit('port:change', port, type)
+    })
   }
 
   /**

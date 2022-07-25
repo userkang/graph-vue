@@ -1,17 +1,17 @@
-import { INode, INodeModel } from '../types'
+import { INode } from '../types'
 import Element from './element'
 import Graph from '../controller/graph'
-import Slot from './slot'
+import Port from './port'
 export default class Node extends Element {
   node!: INode
-  slots!: Slot[]
+  ports!: Port[]
 
   constructor(node: INode, graph: Graph) {
     super()
     this.node = node
     this.set('graph', graph)
     this.draw()
-    this.drawSlot()
+    this.drawPort()
     this.initHook()
   }
 
@@ -63,12 +63,12 @@ export default class Node extends Element {
     this.set('div', div)
   }
 
-  drawSlot() {
-    const slots: Slot[] = []
-    this.node.slots.forEach(item => {
-      slots.push(new Slot(item, this, this.graph))
+  drawPort() {
+    const ports: Port[] = []
+    this.node.ports.forEach(item => {
+      ports.push(new Port(item, this, this.graph))
     })
-    this.slots = slots
+    this.ports = ports
   }
 
   initHook() {
@@ -94,7 +94,7 @@ export default class Node extends Element {
       'transform',
       `translate(${this.node.x}, ${this.node.y})`
     )
-    this.slots.forEach(item => {
+    this.ports.forEach(item => {
       item.updateTransform()
     })
   }

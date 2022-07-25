@@ -27,15 +27,13 @@ const EXTENDEVENTS = ['keyup', 'keydown']
 const DATACHANGE = [
   'node:added',
   'edge:added',
-  'node:change:selected',
-  'edge:change:selected',
-  'node:change:zIndex',
   'node:deleted',
   'edge:deleted',
   'node:moved',
   'layout',
   'node:change',
-  'edge:change'
+  'edge:change',
+  'port:change'
 ]
 
 export default class EventController {
@@ -179,8 +177,8 @@ export default class EventController {
       return this.graph.findNode(id)
     } else if (type === 'edge') {
       return this.graph.findEdge(id)
-    } else if (type === 'port' || type === 'slot') {
-      return this.graph.findSlot(id)
+    } else if (type === 'port') {
+      return this.graph.findPort(id)
     }
   }
 

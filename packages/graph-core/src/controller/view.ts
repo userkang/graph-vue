@@ -189,7 +189,7 @@ export default class ViewController {
   }
 
   fixMissView() {
-    const visiableDom = this.$svg.querySelector('g[graph-type=slot]')
+    const visiableDom = this.$svg.querySelector('g[graph-type=port]')
     if (visiableDom) {
       visiableDom.innerHTML = visiableDom.innerHTML
     }

@@ -25,7 +25,6 @@ export default class ClickSelect extends Base {
     selectedNodes.forEach(item => item.clearState('selected'))
     if (target && !target.hasState('locked')) {
       target.setState('selected')
-      this.graph.emit('node:change:selected', [target])
     }
   }
 
@@ -40,7 +39,6 @@ export default class ClickSelect extends Base {
     selectedEdges.forEach(item => item.clearState('selected'))
     if (target) {
       target.setState('selected')
-      this.graph.emit('edge:change:selected', [target])
     }
   }
 
@@ -59,10 +57,6 @@ export default class ClickSelect extends Base {
         node.clearState('selected')
       }
     })
-
-    if (selectedNodes.length) {
-      this.graph.emit('node:change:selected', [])
-    }
   }
 
   resetEdgeSelect() {
@@ -77,7 +71,6 @@ export default class ClickSelect extends Base {
     })
 
     if (selectedEdges.length) {
-      this.graph.emit('edge:change:selected', [])
     }
   }
 }

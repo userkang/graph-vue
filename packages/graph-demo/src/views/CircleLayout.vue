@@ -126,20 +126,21 @@ export default class Tree extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromSlot
-    const { x: x2, y: y2 } = edge.toSlot
+    const { x: x1, y: y1 } = edge.fromPort
+    const { x: x2, y: y2 } = edge.toPort
     return `M ${x1} ${y1} L ${x2} ${y2}`
   }
 
   text(edge: IEdge) {
-    const { fromSlot, toSlot } = edge
+    const { fromPort, toPort } = edge
     return {
-      x: (fromSlot.x + toSlot.x) / 2,
-      y: (fromSlot.y + toSlot.y) / 2
+      x: (fromPort.x + toPort.x) / 2,
+      y: (fromPort.y + toPort.y) / 2
     }
   }
 
   handleKeyUp(e: KeyboardEvent) {
+    this.graph.stackStart()
     e.stopPropagation()
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
@@ -159,10 +160,10 @@ export default class Tree extends Vue {
             nodes.push(item.model)
             this.graph.deleteNode(item.id, false)
           })
-          this.graph.pushStack('deleteNode', { nodes, edges })
         }
       }
     }
+    this.graph.stackEnd()
   }
 
   deleteItem() {

@@ -4,6 +4,7 @@ interface GraphConfigState {
   layout: {
     options: {
       rankdir: string
+      align: string | undefined
     }
   }
   action: string[]
@@ -14,7 +15,8 @@ class GraphConfig {
   public state: GraphConfigState = {
     layout: {
       options: {
-        rankdir: 'TB'
+        rankdir: 'TB',
+        align: undefined
       }
     },
     action: [

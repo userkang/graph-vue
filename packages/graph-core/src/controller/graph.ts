@@ -10,21 +10,22 @@ import {
   ICfg,
   INode,
   IEdge,
-  ISlot,
+  IPort,
   IDataModel,
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  IStack,
-  IDataStack,
   ILayout,
-  NodeInfo,
-  ICircleLayout
+  NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, preorder } from '../util/utils'
+import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { IStack } from '../types/type'
 
-const getDefaultConfig = () => ({
+const getDefaultConfig = (): Pick<
+  ICfg,
+  'direction' | 'nodes' | 'edges' | 'action'
+> => ({
   direction: 'TB',
   nodes: [],
   edges: [],
@@ -42,6 +43,7 @@ export default class Graph extends EventEmitter {
   private stackController!: StackController
 
   constructor(config: IGraphConfig) {
+    super()
     const container =
       config.container instanceof HTMLElement
         ? config.container
@@ -49,7 +51,7 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
-    super()
+
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
     // 是否触发自带渲染
@@ -71,15 +73,20 @@ export default class Graph extends EventEmitter {
     this.stackController = new StackController(this)
   }
 
-  public set<T = any>(key: string | object, val?: T) {
-    if (Object.prototype.toString.call(key) === '[object Object]') {
-      this.cfg = { ...this.cfg, ...(key as object) }
-    } else {
-      this.cfg[key as string] = val
+  set<K extends keyof ICfg>(key: K, val: ICfg[K]): void
+  public set<K extends keyof ICfg, T extends string | Record<K, ICfg[K]>>(
+    key: T,
+    val?: T extends K ? ICfg[K] : undefined
+  ) {
+    switch (typeof key) {
+      case 'object':
+        return (this.cfg = { ...this.cfg, ...key })
+      case 'string':
+        return (this.cfg[key] = val)
     }
   }
 
-  public get(key: string) {
+  public get<T extends keyof ICfg>(key: T): ICfg[T] {
     return this.cfg[key]
   }
 
@@ -104,13 +111,11 @@ export default class Graph extends EventEmitter {
   }
 
   public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => {
-      return item.hasState(state)
-    })
+    return this.getNodes().filter(item => item.hasState(state))
   }
 
-  public findNodeBySlot(id: string): INode | undefined {
-    return this.nodeController.findNodeBySlot(id)
+  public findNodeByPort(id: string): INode | undefined {
+    return this.nodeController.findNodeByPort(id)
   }
 
   public refreshNode(id: string): void {
@@ -132,39 +137,31 @@ export default class Graph extends EventEmitter {
   }
 
   public deleteNode(id: string, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
       return
     }
-    const stackData = {
-      nodes: [node.model],
-      edges: node.getEdges().map(edge => edge.model as IEdgeModel)
-    }
     this.nodeController.deleteNode(id)
     this.emit('node:deleted', node.model)
-    if (stack) {
-      this.pushStack('deleteNode', stackData)
-    }
+    stack && this.stackEnd()
     return node
   }
 
   public addNode(item: INodeModel, stack = true): INode | undefined {
+    stack && this.stackStart()
     const node = this.nodeController.addNode(item)
     if (!node) {
       return
     }
     this.emit('node:added', item)
-    if (stack) {
-      const data = { nodes: [item] }
-      this.pushStack('addNode', data)
-    }
-
+    stack && this.stackEnd()
     return node
   }
 
-  public findSlot(id: string | number): ISlot | undefined {
-    return this.nodeController.slotsMap[String(id)]
+  public findPort(id: string | number): IPort | undefined {
+    return this.nodeController.portsMap[String(id)]
   }
 
   public getEdges(): IEdge[] {
@@ -176,9 +173,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => {
-      return item.hasState(state)
-    })
+    return this.getEdges().filter(item => item.hasState(state))
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {
@@ -191,25 +186,23 @@ export default class Graph extends EventEmitter {
   }
 
   public deleteEdge(id: string, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.deleteEdge(id)
     if (!edge) {
       return
     }
     this.emit('edge:deleted', edge.model)
-    if (stack) {
-      this.pushStack('deleteEdge', { edges: [edge.model as IEdgeModel] })
-    }
+    stack && this.stackEnd()
     return edge
   }
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+    stack && this.stackStart()
     const edge = this.edgeController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
-      if (stack) {
-        this.pushStack('addEdge', { edges: [item] })
-      }
     }
+    stack && this.stackEnd()
     return edge
   }
 
@@ -271,20 +264,13 @@ export default class Graph extends EventEmitter {
     this.set('edges', [])
     this.clearItem()
 
-    let imodel: IDataModel = { nodes: [], edges: [] }
-    imodel = isIDataModel(data) ? (data as IDataModel) : preorder(data)
-    const needLayout = imodel.nodes.every(
+    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
+    const needLayout = model.nodes.every(
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
-    imodel.nodes.forEach(node =>
-      Object.assign(node, {
-        x: node.x || 1,
-        y: node.y || 1
-      })
-    )
-    // TODO 判断有没有坐标(对于纯展示的场景)，没有的话需要先格式化
-    this.nodeController.data(imodel.nodes)
-    this.edgeController.data(imodel.edges)
+
+    this.nodeController.data(model.nodes)
+    this.edgeController.data(model.edges)
     if (needLayout) {
       this.layout({}, false)
     }
@@ -337,9 +323,12 @@ export default class Graph extends EventEmitter {
     this.stackController.redo()
   }
 
-  public pushStack(type: string, data: IDataStack, stackType = 'undo') {
-    this.stackController.pushStack(type, data, stackType)
-    this.emit('stackchange')
+  public stackStart() {
+    return this.stackController.start()
+  }
+
+  public stackEnd() {
+    return this.stackController.end()
   }
 
   public getUndoStack(): IStack[] {

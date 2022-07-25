@@ -47,7 +47,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      // '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+      '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
     }
   },
   externals: {

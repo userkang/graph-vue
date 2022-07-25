@@ -247,6 +247,7 @@ export default class ToolBox extends Vue {
 .graph-vue-tool-box-disable {
   cursor: not-allowed;
   color: #585858;
+  pointer-events: none;
 }
 .graph-vue-tool-box-disable:hover {
   background: none;

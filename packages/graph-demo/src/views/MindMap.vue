@@ -12,15 +12,14 @@
             ref="textarea"
             contenteditable
             v-if="isEditText && node.hasState('selected')"
+            v-text="node.model.label"
             @focus="handleNodeFocus"
             @blur="handleNodeBlur($event, node)"
             class="node-text"
             :class="{
               'node-text-edited': isEditText && node.hasState('selected')
             }"
-          >
-            <span>{{ node.model.label }}</span>
-          </div>
+          ></div>
           <span
             v-else
             class="node-text"
@@ -79,6 +78,7 @@ import {
   Graph,
   INode
 } from '@datafe/graph-vue'
+import { dataMock } from '../mock/mind-map'
 
 import GraphStore from '@/stores/graph'
 
@@ -87,33 +87,6 @@ const action = ['click-select', 'wheel-move', 'wheel-zoom', 'brush-select']
 const layout = {
   type: 'dagre',
   options: { rankdir: 'LR' }
-}
-
-const mindMapMock = () => {
-  return {
-    id: '1',
-    label: '主题',
-    nodeId: 232,
-    slots: [{ type: 'out', id: 'slot1' }],
-    isCollapsed: false,
-    children: [
-      {
-        id: '2',
-        label: '分支1',
-        isCollapsed: false
-      },
-      {
-        id: '3',
-        label: '分支2',
-        isCollapsed: false
-      },
-      {
-        id: '4',
-        label: '分支3',
-        isCollapsed: false
-      }
-    ]
-  }
 }
 
 @Component({
@@ -127,7 +100,7 @@ const mindMapMock = () => {
 })
 export default class MindMap extends Vue {
   graph!: Graph
-  dataMock = mindMapMock()
+  dataMock = dataMock
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
   isEditText = false
@@ -147,14 +120,11 @@ export default class MindMap extends Vue {
   }
 
   initEvent() {
-    this.graph.on('node:mousedown', this.handleNodeDrag)
     this.graph.on('node:dblclick', this.handleNodeDblClick)
     this.graph.on('keydown', this.handleKeyDown)
 
-    this.graph.on('node:change:selected', (nodes: INode[]) => {
-      nodes.forEach((item: INode) => {
-        item?.setZIndex(1000)
-      })
+    this.graph.on('node:change:selected', (node: INode) => {
+      node?.setZIndex(1000)
     })
   }
 
@@ -201,18 +171,20 @@ export default class MindMap extends Vue {
     const tagName = (e.target as HTMLBodyElement).tagName
     if (tagName === 'BODY') {
       if (['Delete', 'Backspace'].includes(e.key)) {
+        this.graph.stackStart()
         const selectedNodes = this.graph.findNodeByState('selected')
 
         if (selectedNodes.length) {
           selectedNodes.forEach(item => {
             const targetNode = item.getAllTargetNodes()
             targetNode.forEach(target => {
-              this.graph.deleteNode(target.id)
+              this.graph.deleteNode(target.id, false)
             })
 
-            this.graph.deleteNode(item.id)
+            this.graph.deleteNode(item.id, false)
           })
         }
+        this.graph.stackEnd()
       }
     }
   }
@@ -246,10 +218,6 @@ export default class MindMap extends Vue {
     this.handleNodeDblClick()
   }
 
-  handleNodeDrag({ target }: { target: INode }) {
-    target?.setZIndex(1000)
-  }
-
   handleNodeFocus() {
     this.nodeEditedDom =
       document.querySelector('.node-text-edited')?.parentElement || null
@@ -258,10 +226,7 @@ export default class MindMap extends Vue {
   handleNodeBlur(e, node: INode) {
     e.preventDefault()
     this.isEditText = false
-    const content = e.target
-      .querySelector('span')
-      .innerText.replace(/<br\/?>/gi, '\n')
-      .trim()
+    const content = e.target?.innerText.replace(/<br\/?>/gi, '\n').trim()
 
     node.update({
       label: content
@@ -294,16 +259,12 @@ export default class MindMap extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromSlot
-    const { x: x2, y: y2 } = edge.toSlot
+    const { x: x1, y: y1 } = edge.fromPort
+    const { x: x2, y: y2 } = edge.toPort
     const xc = (x1 - x2) / 3
     return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc
     } ${y2} L ${x2} ${y2}`
-  }
-
-  async created() {
-    await GraphStore.getMindMapData()
   }
 }
 </script>

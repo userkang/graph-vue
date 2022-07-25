@@ -1,14 +1,14 @@
-import { ISlot, INode, INodeModel } from '../types'
+import { IPort, INode, INodeModel } from '../types'
 import Element from './element'
 import Graph from '../controller/graph'
 import Node from './node'
-export default class Slot extends Element {
-  slot!: ISlot
+export default class Port extends Element {
+  port!: IPort
   node!: Node
 
-  constructor(slot: ISlot, node: Node, graph: Graph) {
+  constructor(port: IPort, node: Node, graph: Graph) {
     super()
-    this.slot = slot
+    this.port = port
     this.node = node
     this.set('graph', graph)
     this.draw()
@@ -18,11 +18,11 @@ export default class Slot extends Element {
 
   draw() {
     const circle = this.createDom('circle', {
-      class: `graph-slot`,
+      class: `graph-port`,
       'graph-type': 'port',
-      'graph-id': this.slot.id,
+      'graph-id': this.port.id,
       r: '4',
-      transform: `translate(${this.slot.x}, ${this.slot.y})`
+      transform: `translate(${this.port.x}, ${this.port.y})`
     })
 
     this.node.get('g').appendChild(circle)
@@ -34,25 +34,25 @@ export default class Slot extends Element {
   drawStyle() {
     const circle = this.get('circle')
 
-    if (this.slot.type === 'out') {
-      circle.classList.add('graph-slot-active')
+    if (this.port.type === 'out') {
+      circle.classList.add('graph-port-active')
     }
 
-    const enable = this.slot.hasState('enable')
-    const linked = this.slot.hasState('linked')
+    const enable = this.port.hasState('enable')
+    const linked = this.port.hasState('linked')
 
     if (enable) {
-      circle.classList.add('graph-slot-enable')
+      circle.classList.add('graph-port-enable')
       circle.setAttribute('r', '6')
     } else {
-      circle.classList.remove('graph-slot-enable')
+      circle.classList.remove('graph-port-enable')
       circle.setAttribute('r', '4')
     }
 
     if (linked && !enable) {
-      circle.classList.add('graph-slot-linked')
+      circle.classList.add('graph-port-linked')
     } else {
-      circle.classList.remove('graph-slot-linked')
+      circle.classList.remove('graph-port-linked')
     }
   }
 
@@ -67,7 +67,7 @@ export default class Slot extends Element {
     const circle = this.get('circle')
     circle.setAttribute(
       'transform',
-      `translate(${this.slot.x}, ${this.slot.y})`
+      `translate(${this.port.x}, ${this.port.y})`
     )
   }
 }

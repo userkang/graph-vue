@@ -14,15 +14,15 @@ INodeModel {
     id?: string;
     width?: number;
     height?: number;
-    slots?: ISlotModel[];
+    ports?: IPortModel[];
     [key: string]: unknown;
 }
 IEdgeModel {
     id?: string;
     fromNodeId: string;
     toNodeId: string;
-    fromSlotId?: string;
-    toSlotId?: string;
+    fromPortId?: string;
+    toPortId?: string;
     [key: string]: unknown;
 }
 ```
@@ -123,7 +123,7 @@ graph.data(data) // 重新初始化数据
 
 - id 为更新边的 id;
 - model 为修改信息;
-- 注意：边的起始位置和目标位置（fromNodeId, toNodeId, fromSlotId, toSlotId）信息不支持修改。
+- 注意：边的起始位置和目标位置（fromNodeId, toNodeId, fromPortId, toPortId）信息不支持修改。
 
 ---
 
@@ -143,7 +143,7 @@ graph.data(data) // 重新初始化数据
 - id 为边的 id，兼容数字和字符串类型。
 - 返回边实例。
 
-#### findSlot(id: string | number): ISlot
+#### findPort(id: string | number): IPort
 
 <em>查找节点上插槽元素（边和节点相交的位置）</em>
 

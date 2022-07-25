@@ -1,14 +1,21 @@
 <template>
   <div class="container">
-    <GraphVue :data="dataMock" :action="action" @init="initGraph">
+    <GraphVue
+      :data="dataMock"
+      :action="action"
+      @init="initGraph"
+      :layout="layoutOptions"
+    >
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">
-          <button v-if="node.hasState('collapsed')" @click="showChildren(node)">
+          <button v-if="node.model.collapsed" @click="showChildren(node)">
             展开
           </button>
           <button v-else @click="hideChildren(node)">隐藏</button>
         </div>
-        <div v-else class="normal-node">{{ node.model.label }}</div>
+        <div v-else class="normal-node">
+          {{ node.model.label }}
+        </div>
       </template>
 
       <template #port></template>
@@ -30,7 +37,6 @@ import {
   GraphVue,
   Graph,
   INode,
-  IDataModel,
   IEdge
 } from '@datafe/graph-vue'
 
@@ -44,57 +50,60 @@ const action = [
   'click-select',
   'connect-edge',
   'wheel-zoom',
-  'brush-select'
+  'brush-select',
+  'wheel-move'
 ]
 
-const nodeCellMock = (): IDataModel => {
-  return {
-    nodes: [
-      {
-        id: '1',
-        label: 'children',
-        parentId: '4'
-      },
-      {
-        id: '2',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '3',
-        label: 'children',
-        parentId: '5'
-      },
-      {
-        id: '4',
-        label: 'parent',
-        type: 'group'
-      },
-      {
-        id: '5',
-        label: 'parent',
-        type: 'group'
-      },
-      {
-        id: '6',
-        label: 'start'
-      }
-    ],
-    edges: [
-      {
-        fromNodeId: '4',
-        toNodeId: '5'
-      },
-      {
-        fromNodeId: '2',
-        toNodeId: '3'
-      },
-      {
-        fromNodeId: '6',
-        toNodeId: '5'
-      }
-    ]
-  }
+// const nodeCellMock = () => data
+
+const nodeCellMock = {
+  nodes: [
+    {
+      id: '1',
+      label: 'children',
+      parentId: '4'
+    },
+    {
+      id: '2',
+      label: 'children',
+      parentId: '5'
+    },
+    {
+      id: '3',
+      label: 'children',
+      parentId: '5'
+    },
+    {
+      id: '4',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
+      id: '5',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
+      id: '6',
+      label: 'start'
+    }
+  ],
+  edges: [
+    {
+      fromNodeId: '4',
+      toNodeId: '5'
+    },
+    {
+      fromNodeId: '2',
+      toNodeId: '3'
+    },
+    {
+      fromNodeId: '6',
+      toNodeId: '5'
+    }
+  ]
 }
 
 @Component({
@@ -108,26 +117,39 @@ const nodeCellMock = (): IDataModel => {
 })
 export default class NodeCell extends Vue {
   graph!: Graph
-  dataMock = nodeCellMock()
+  dataMock = nodeCellMock
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
   isEditText = false
+  layoutOptions = { options: { rankdir: 'LR', ranksep: 20, nodesep: 10 } }
 
   get action() {
     return action
   }
 
   hideChildren(node: INode) {
+    this.graph.stackStart()
+    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
     const children = node.getChildren()
-    children.forEach(child => {
-      child.hide()
-    })
+
     node.update({
       width: 180,
       height: 40
     })
-    node.setState('collapsed')
-    this.layout()
+
+    children.forEach(child => {
+      child.hide()
+    })
+
+    node.update({
+      width: 180,
+      height: 40
+    })
+    node.model.collapsed = true
+
+    this.layout(false)
+
+    this.graph.stackEnd()
   }
 
   showChildren(node: INode) {
@@ -135,10 +157,11 @@ export default class NodeCell extends Vue {
     children.forEach(child => {
       child.show()
     })
-    node.clearState('collapsed')
+    node.model.collapsed = false
 
     this.resizeGroup(node)
-    this.layout()
+    this.layout(false)
+    this.graph.translate(node.width / 2 - 90, node.height / 2 - 20)
   }
 
   initGraph(graph: Graph) {
@@ -146,7 +169,9 @@ export default class NodeCell extends Vue {
     this.graph = graph
 
     this.initEvent()
-    this.initGroups()
+    this.$nextTick(() => {
+      this.initGroups()
+    })
   }
 
   initEvent() {
@@ -168,9 +193,18 @@ export default class NodeCell extends Vue {
     const groups = this.graph
       .getNodes()
       .filter(item => item.model.type === 'group')
+
     groups.forEach(group => {
-      this.hideChildren(group)
+      if (group.model.collapsed) {
+        const children = group.getChildren()
+        children
+        children.forEach(child => {
+          child.hide()
+        })
+      }
     })
+
+    this.layout(false)
   }
 
   layout(stack = true) {
@@ -186,14 +220,6 @@ export default class NodeCell extends Vue {
         }
       })
     })
-
-    // 先对根节点进行布局
-    this.graph.layout(
-      {
-        data: { nodes: rootNodes, edges: Object.values(edges) }
-      },
-      stack
-    )
 
     // 处理根节点下子节点布局
     rootNodes.forEach(item => {
@@ -222,8 +248,8 @@ export default class NodeCell extends Vue {
         dagre.nodes().forEach((v: string) => {
           const childNode = this.graph.findNode(v) as INode
           const { x, y } = dagre.node(v)
-          const posX = item.x + x - childNode.width / 2 + groupPadding
-          const posY = item.y + y - childNode.height / 2 + groupPadding
+          const posX = x - childNode.width / 2
+          const posY = y - childNode.height / 2
           childNode.updatePosition(posX, posY)
         })
       }
@@ -231,8 +257,29 @@ export default class NodeCell extends Vue {
 
     // 布局后，再更新下group节点的大小
     rootNodes.forEach(item => {
-      if (item.getChildren().length && !item.hasState('collapsed')) {
+      if (item.getChildren().length && !item.model.collapsed) {
         this.resizeGroup(item)
+      }
+    })
+
+    // 对根节点进行布局
+    this.graph.layout(
+      {
+        data: { nodes: rootNodes, edges: Object.values(edges) }
+      },
+      stack
+    )
+
+    rootNodes.forEach(item => {
+      const children = item.getChildren()
+
+      if (children.length) {
+        // 通过布局实例返回的坐标点，自定义布局位置。
+        children.forEach((node: INode) => {
+          const posX = item.x + node.x + groupPadding
+          const posY = item.y + node.y + groupPadding
+          node.updatePosition(posX, posY)
+        })
       }
     })
   }

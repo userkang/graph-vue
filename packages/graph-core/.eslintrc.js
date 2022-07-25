@@ -4,14 +4,12 @@ module.exports = {
     browser: true,
     node: true
   },
-  extends: [
-    'plugin:vue/essential',
-    'eslint:recommended',
-    '@vue/typescript/recommended',
-    '@vue/prettier',
-    '@vue/prettier/@typescript-eslint'
-  ],
   plugins: ['@typescript-eslint'],
+  extends: [
+    'eslint:recommended',
+    'plugin:@typescript-eslint/eslint-recommended',
+    'plugin:@typescript-eslint/recommended'
+  ],
   parserOptions: {
     parser: '@typescript-eslint/parser',
     sourceType: 'module',

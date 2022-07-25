@@ -33,7 +33,8 @@ enum demoTypes {
   TREE = 'tree',
   MINDMAP = 'mindMap',
   NODEGROUP = 'nodeCell',
-  CIRCLE_LAYOUT = 'circleLayout'
+  CIRCLE_LAYOUT = 'circleLayout',
+  NODEPORT = 'nodePort'
 }
 
 @Component({
@@ -73,6 +74,12 @@ export default class ComponentPanel extends Vue {
       id: getRandomId(),
       type: demoTypes.CIRCLE_LAYOUT,
       desc: '圆形布局',
+      img: demoCircle
+    },
+     {
+      id: getRandomId(),
+      type: demoTypes.NODEPORT,
+      desc: '节点port',
       img: demoCircle
     }
   ]

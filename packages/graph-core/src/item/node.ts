@@ -7,31 +7,11 @@ import {
   IEdge,
   IPortModel,
   INode,
-  IPosition,
   IDirection
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
-import { BaseCfg, INodeCfg } from '../types/type'
-
-const PortTypeToPosition = {
-  TB: {
-    in: 'top',
-    out: 'bottom'
-  },
-  LR: {
-    in: 'left',
-    out: 'right'
-  },
-  BT: {
-    in: 'bottom',
-    out: 'top'
-  },
-  RL: {
-    in: 'right',
-    out: 'left'
-  }
-} as const
+import { BaseCfg, INodeCfg, IRect } from '../types/type'
 
 export default class Node extends Base<
   INodeModel,
@@ -55,6 +35,7 @@ export default class Node extends Base<
     this.set('x', model.x || 0)
     this.set('y', model.y || 0)
 
+    this.set('ports', [])
     this.set('ports', [])
     // 保存与节点相关的边
     this.set('edges', [])
@@ -85,6 +66,15 @@ export default class Node extends Base<
 
   public get height(): number {
     return this.get('height')
+  }
+
+  public get bbox(): IRect {
+    return {
+      x: this.x,
+      y: this.y,
+      width: this.get('width'),
+      height: this.get('height')
+    }
   }
 
   public get ports(): IPort[] {
@@ -230,12 +220,7 @@ export default class Node extends Base<
       this.model.y = y
     }
 
-    // port 位置更新
-    this.ports.forEach(port => {
-      port.update(port.x + moveX, port.y + moveY)
-    })
-
-    this.emit('change', this, 'position')
+    this.emit('change', this, 'position', { moveX, moveY })
   }
 
   /**
@@ -287,120 +272,43 @@ export default class Node extends Base<
     if (dir) {
       this.set('direction', dir)
     }
-    const inPorts: IPort[] = []
-    const outPorts: IPort[] = []
 
-    const direction: IDirection = this.get('direction')
-    const rect = {
-      x: this.x,
-      y: this.y,
-      width: this.get('width'),
-      height: this.get('height')
-    } 
+    const ports = this.ports
 
-    this.ports.forEach(item => {
-      if (item.type && item.type === 'out') {
-        outPorts.push(item)
-      } else {
-        inPorts.push(item)
-      }
+    const posList = Port.computePositions(
+      ports,
+      this.bbox,
+      this.get('direction')
+    )
+    ports.forEach((item, index) => {
+      const pos = posList[index]
+      item.update(pos.x, pos.y)
     })
-
-    const inPortLen = inPorts.length
-    const outPortLen = outPorts.length
-    //
-
-
-    inPorts.forEach((port, index) => {
-      let position: IPosition = 'center'
-      if (port.type && ['in', 'out'].includes(port.type)) {
-        position = PortTypeToPosition[direction][port.type as 'in' | 'out']
-      }
-      const portPos = Port.computePosition(
-        rect,
-        position as IPosition,
-        (index + 1) / (inPortLen + 1)
-      )
-      port.update(portPos.x, portPos.y)
-    })
-
-    outPorts.forEach((port, index) => {
-      let position: IPosition = 'center'
-      if (port.type && ['in', 'out'].includes(port.type)) {
-        position = PortTypeToPosition[direction][port.type as 'in' | 'out']
-      }
-      const portPos = Port.computePosition(
-        rect,
-        position as IPosition,
-        (index + 1) / (outPortLen + 1)
-      )
-      port.update(portPos.x, portPos.y)
-    })
-
-    //
   }
 
   public setPorts() {
-    const model = this.model
-    const direction: IDirection = this.get('direction')
-    const positionMap: Record<IPosition, IPortModel[]> = {
-      left: [],
-      right: [],
-      top: [],
-      bottom: [],
-      center: []
-    }
-    const ports: IPortModel[] = []
-    const rect = {
-      x: this.x,
-      y: this.y,
-      width: this.get('width'),
-      height: this.get('height')
-    }
+    const ports: IPortModel[] = this.model.ports || [
+      { type: 'in' },
+      { type: 'out' }
+    ] // 没有 ports，默认一进一出。
 
-    if (!Array.isArray(model.ports)) {
-      // 没有 ports，默认一进一出。
-      ports.push({ type: 'in' }, { type: 'out' })
-    } else {
-      ports.push(...model.ports)
-    }
-
-    ports.forEach((port: IPortModel) => {
-      let position = port.position
-
-      if (!position) {
-        if (port.type && ['in', 'out'].includes(port.type)) {
-          position = PortTypeToPosition[direction][port.type as 'in' | 'out']
-        } else {
-          position = 'center'
-        }
-      }
-
-      positionMap[position].push(port)
-    })
-
-    Object.keys(positionMap).forEach(position => {
-      const oneSide = positionMap[position as IPosition]
-      const sideCount = oneSide.length
-
-      oneSide.forEach((item, index) => {
-        const portPos = Port.computePosition(
-          rect,
-          position as IPosition,
-          (index + 1) / (sideCount + 1)
-        )
-
-        this.setPort(item, portPos.x, portPos.y)
-      })
+    const posList = Port.computePositions(
+      ports,
+      this.bbox,
+      this.get('direction')
+    )
+    ports.forEach((item, index) => {
+      const pos = posList[index]
+      this.setPort(item, pos.x, pos.y)
     })
   }
 
-  private setPort(item: IPortModel, x: number, y: number, type?: string) {
+  private setPort(item: IPortModel, x: number, y: number) {
     const port = new Port(item, {
       x,
       y,
-      type,
-      nodeId: this.id
+      nodeId: this.id,
+      node: this
     })
     this.get('ports').push(port)
 

@@ -2,6 +2,7 @@ import {
   EdgeInfo,
   IDirection,
   IEdgeModel,
+  INode,
   INodeModel,
   IPortModel,
   NodeInfo
@@ -39,7 +40,7 @@ export interface IPortCfg {
   nodeId: string
   x: number
   y: number
-  [key: string]: any
+  node: INode
 }
 
 export interface INodeStackData {
@@ -80,3 +81,5 @@ export interface IRect {
   width: number
   height: number
 }
+
+export type move = { moveX: number; moveY: number }

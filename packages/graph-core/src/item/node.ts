@@ -39,7 +39,7 @@ export default class Node extends Base<
     this.set('edges', [])
     this.set('children', [])
 
-    this.setPorts()
+    this.addPorts()
   }
 
   public get cfg() {
@@ -271,20 +271,24 @@ export default class Node extends Base<
       this.set('direction', dir)
     }
 
-    const ports = this.ports
+    const items = this.ports
 
     const posList = Port.computePositions(
-      ports,
+      items,
       this.bbox,
       this.get('direction')
     )
-    ports.forEach((item, index) => {
+    items.forEach((item, index) => {
       const pos = posList[index]
-      item.update(pos.x, pos.y)
+      if (item instanceof Port) {
+        item.update(pos.x, pos.y)
+      } else {
+        this.setPort(item, pos.x, pos.y)
+      }
     })
   }
 
-  public setPorts(models?: IPortModel[]) {
+  public addPorts(models?: IPortModel[]) {
     const items: Array<IPort | IPortModel> = (
       models ||
       this.model.ports || [{ type: 'in' }, { type: 'out' }]

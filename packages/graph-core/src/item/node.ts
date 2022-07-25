@@ -284,20 +284,24 @@ export default class Node extends Base<
     })
   }
 
-  public setPorts() {
-    const ports: IPortModel[] = this.model.ports || [
-      { type: 'in' },
-      { type: 'out' }
-    ] // 没有 ports，默认一进一出。
+  public setPorts(models?: IPortModel[]) {
+    const items: Array<IPort | IPortModel> = (
+      models ||
+      this.model.ports || [{ type: 'in' }, { type: 'out' }]
+    ).concat(this.ports)
 
     const posList = Port.computePositions(
-      ports,
+      items,
       this.bbox,
       this.get('direction')
     )
-    ports.forEach((item, index) => {
+    items.forEach((item, index) => {
       const pos = posList[index]
-      this.setPort(item, pos.x, pos.y)
+      if (item instanceof Port) {
+        item.update(pos.x, pos.y)
+      } else {
+        this.setPort(item, pos.x, pos.y)
+      }
     })
   }
 

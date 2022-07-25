@@ -301,6 +301,9 @@ export default class Node extends Base<
     })
   }
 
+  private onPortChange = (port: IPort, type: string) => {
+    this.emit('port:change', port, type)
+  }
   private setPort(item: IPortModel, x: number, y: number) {
     const port = new Port(item, {
       x,
@@ -309,15 +312,14 @@ export default class Node extends Base<
     })
     this._ports[port.id] = port
 
-    port.on('change', (port: IPort, type: string) => {
-      this.emit('port:change', port, type)
-    })
+    port.on('change', this.onPortChange)
   }
 
   public deletePort(id: string) {
     const port = this._ports[id]
     delete this._ports[id]
     this.emit('port:deleted', port)
+    port.off('change', this.onPortChange)
   }
 
   /**

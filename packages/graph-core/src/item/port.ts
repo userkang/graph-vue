@@ -146,6 +146,7 @@ export default class Port extends Base<
       if (ids.includes(this.id)) {
         container.off('change', onNodeChange)
         container.off('port:deleted', onDeleted)
+        Port.containerMap.delete(this)
       }
     }
     container.on('change', onNodeChange)

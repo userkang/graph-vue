@@ -17,6 +17,7 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
+  private readonly _ports: Record<string, IPort> = {}
   constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
@@ -34,14 +35,11 @@ export default class Node extends Base<
     this.set('parentId', model.parentId && String(model.parentId))
     this.set('x', model.x || 0)
     this.set('y', model.y || 0)
-
-    this.set('ports', [])
-    this.set('ports', [])
     // 保存与节点相关的边
     this.set('edges', [])
     this.set('children', [])
 
-    this.setPorts()
+    this.addPorts(this.model.ports || [{ type: 'in' }, { type: 'out' }])
   }
 
   public get cfg() {
@@ -78,7 +76,7 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return this.get('ports')
+    return Object.values(this._ports)
   }
 
   public getEdges(): IEdge[] {
@@ -265,6 +263,29 @@ export default class Node extends Base<
     })
   }
 
+  public addPorts(models: IPortModel[]) {
+    const ports = models.forEach(model => {
+      const port = new Port(model, {
+        x: 0,
+        y: 0
+      })
+      this._ports[port.id] = port
+
+      port.setupNode(this)
+      port.on('change', this.onPortChange)
+    })
+    this.updatePorts()
+    this.emit('port:added', ports)
+  }
+
+  public deletePorts(ids: string[]) {
+    ids.forEach(id => {
+      this._ports[id].off('change', this.onPortChange)
+      delete this._ports[id]
+    })
+    this.emit('port:deleted', ids)
+  }
+
   /**
    * 更新节点 port 位置信息
    */
@@ -272,49 +293,19 @@ export default class Node extends Base<
     if (dir) {
       this.set('direction', dir)
     }
-
-    const ports = this.ports
-
     const posList = Port.computePositions(
-      ports,
+      this.ports,
       this.bbox,
       this.get('direction')
     )
-    ports.forEach((item, index) => {
+    this.ports.forEach((item, index) => {
       const pos = posList[index]
       item.update(pos.x, pos.y)
     })
   }
 
-  public setPorts() {
-    const ports: IPortModel[] = this.model.ports || [
-      { type: 'in' },
-      { type: 'out' }
-    ] // 没有 ports，默认一进一出。
-
-    const posList = Port.computePositions(
-      ports,
-      this.bbox,
-      this.get('direction')
-    )
-    ports.forEach((item, index) => {
-      const pos = posList[index]
-      this.setPort(item, pos.x, pos.y)
-    })
-  }
-
-  private setPort(item: IPortModel, x: number, y: number) {
-    const port = new Port(item, {
-      x,
-      y,
-      nodeId: this.id,
-      node: this
-    })
-    this.get('ports').push(port)
-
-    port.on('change', (port: IPort, type: string) => {
-      this.emit('port:change', port, type)
-    })
+  private onPortChange = (port: IPort, type: string) => {
+    this.emit('port:change', port, type)
   }
 
   /**

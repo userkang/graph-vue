@@ -37,10 +37,8 @@ export interface IEdgeCfg extends EdgeInfo {
 }
 
 export interface IPortCfg {
-  nodeId: string
   x: number
   y: number
-  node: INode
 }
 
 export interface INodeStackData {

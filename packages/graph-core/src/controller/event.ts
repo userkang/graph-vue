@@ -33,7 +33,9 @@ const DATACHANGE = [
   'layout',
   'node:change',
   'edge:change',
-  'port:change'
+  'port:change',
+  'port:added',
+  'port:deleted'
 ]
 
 export default class EventController {

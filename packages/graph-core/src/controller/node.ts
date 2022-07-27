@@ -8,7 +8,7 @@ const defaultCfg = {
 } as const
 export default class NodeController {
   graph: Graph
-  private _nodes: { [id: string]: INode } = {}
+  private readonly _nodes: { [id: string]: INode } = {}
 
   constructor(graph: Graph) {
     this.graph = graph
@@ -63,7 +63,7 @@ export default class NodeController {
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
       this.graph.deleteEdge(node.getEdges()[i]?.id, false)
     }
-
+    this._nodes[node.id].off()
     delete this._nodes[node.id]
 
     if (this.graph.get('isRender')) {
@@ -99,16 +99,33 @@ export default class NodeController {
     return node
   }
 
-  public watchNodeChange(node: INode) {
-    node.on('change', (node: INode, type: string) => {
-      this.graph.emit(`node:change:${type}`, node)
-      this.graph.emit('node:change', node, type)
-    })
+  onNodeChange = (node: INode, type: string) => {
+    const eventType = 'node:change'
+    this.graph.emit(`${eventType}:${type}`, node)
+    this.graph.emit(eventType, node, type)
+  }
 
-    node.on('port:change', (port: IPort, type: string) => {
-      this.graph.emit(`port:change:${type}`, port)
-      this.graph.emit('port:change', node, type)
-    })
+  onPortChange = (port: IPort, type: string) => {
+    const eventType = 'port:change'
+    this.graph.emit(`${eventType}:${type}`, port)
+    this.graph.emit(eventType, port, type)
+  }
+
+  onPortAdded = (ports: IPort[]) => {
+    const eventType = 'port:added'
+    this.graph.emit(eventType, ports)
+  }
+
+  onPortDeleted = (ids: string[]) => {
+    const eventType = 'port:deleted'
+    this.graph.emit(eventType, ids)
+  }
+
+  public watchNodeChange(node: INode) {
+    node.on('change', this.onNodeChange)
+    node.on('port:change', this.onPortChange)
+    node.on('port:added', this.onPortAdded)
+    node.on('port:deleted', this.onPortDeleted)
   }
 
   public sortByZIndex() {
@@ -131,7 +148,7 @@ export default class NodeController {
   public data(nodes: INodeModel[]) {
     const childNodes: INode[] = []
 
-    this._nodes = {}
+    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
     nodes.forEach(item => {
       const node = this.addNode(item)
       if (item.parentId && node) {
@@ -155,6 +172,6 @@ export default class NodeController {
 
   public destroy() {
     ;(this.graph as null | Graph) = null
-    this._nodes = {}
+    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
   }
 }

@@ -36,7 +36,7 @@ export default class CreateEdge extends Base {
       return
     }
 
-    const fromNode = this.graph.findNode(port.nodeId)
+    const fromNode = this.graph.findNode(port.nodeId || '')
     if (!fromNode) {
       return
     }
@@ -70,7 +70,7 @@ export default class CreateEdge extends Base {
     if (port.hasState('enable')) {
       // 这里要传 model 下的 id，保证用户数据类型正确
       // 当 model 下无 id 时，再取自生成 id
-      const node = this.graph.findNode(port.nodeId)
+      const node = this.graph.findNode(port.nodeId || '')
 
       if (!node) {
         return

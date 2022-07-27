@@ -63,7 +63,7 @@ export default class NodeController {
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
       this.graph.deleteEdge(node.getEdges()[i]?.id, false)
     }
-    this.removeWatchNodeChange(this._nodes[node.id])
+    this._nodes[node.id].off()
     delete this._nodes[node.id]
 
     if (this.graph.get('isRender')) {
@@ -128,13 +128,6 @@ export default class NodeController {
     node.on('port:change', this.onPortChange)
     node.on('port:added', this.onPortAdded)
     node.on('port:deleted', this.onPortDeleted)
-  }
-
-  public removeWatchNodeChange(node: INode) {
-    node.off('change', this.onNodeChange)
-    node.off('port:change', this.onPortChange)
-    node.off('port:added', this.onPortAdded)
-    node.off('port:deleted', this.onPortDeleted)
   }
 
   public sortByZIndex() {

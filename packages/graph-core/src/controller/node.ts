@@ -111,16 +111,14 @@ export default class NodeController {
     this.graph.emit(eventType, port, type)
   }
 
-  onPortAdded = (port: IPort, type: string) => {
+  onPortAdded = (ports: IPort[]) => {
     const eventType = 'port:added'
-    this.graph.emit(`${eventType}:${type}`, port)
-    this.graph.emit(eventType, port, type)
+    this.graph.emit(eventType, ports)
   }
 
-  onPortDeleted = (port: IPort, type: string) => {
+  onPortDeleted = (ids: string[]) => {
     const eventType = 'port:deleted'
-    this.graph.emit(`${eventType}:${type}`, port)
-    this.graph.emit(eventType, port, type)
+    this.graph.emit(eventType, ids)
   }
 
   public watchNodeChange(node: INode) {

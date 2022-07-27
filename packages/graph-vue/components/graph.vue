@@ -158,7 +158,9 @@ export default class GraphVue extends Vue {
       'edge:click',
       'node:change',
       'edge:change',
-      'port:change'
+      'port:change',
+      'port:added',
+      'port:deleted'
     ]
 
     hooks.forEach(hook => {

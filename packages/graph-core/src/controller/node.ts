@@ -8,7 +8,7 @@ const defaultCfg = {
 } as const
 export default class NodeController {
   graph: Graph
-  private _nodes: { [id: string]: INode } = {}
+  private readonly _nodes: { [id: string]: INode } = {}
 
   constructor(graph: Graph) {
     this.graph = graph
@@ -127,14 +127,14 @@ export default class NodeController {
     node.on('change', this.onNodeChange)
     node.on('port:change', this.onPortChange)
     node.on('port:added', this.onPortAdded)
-    node.on('port:deleted',this.onPortDeleted)
+    node.on('port:deleted', this.onPortDeleted)
   }
 
   public removeWatchNodeChange(node: INode) {
     node.off('change', this.onNodeChange)
     node.off('port:change', this.onPortChange)
     node.off('port:added', this.onPortAdded)
-    node.off('port:deleted',this.onPortDeleted)
+    node.off('port:deleted', this.onPortDeleted)
   }
 
   public sortByZIndex() {
@@ -157,7 +157,7 @@ export default class NodeController {
   public data(nodes: INodeModel[]) {
     const childNodes: INode[] = []
 
-    this._nodes = {}
+    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
     nodes.forEach(item => {
       const node = this.addNode(item)
       if (item.parentId && node) {
@@ -181,6 +181,6 @@ export default class NodeController {
 
   public destroy() {
     ;(this.graph as null | Graph) = null
-    this._nodes = {}
+    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
   }
 }

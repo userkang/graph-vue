@@ -108,6 +108,9 @@ export default class DAG extends Vue {
     this.graph.on('node:mousedown', ({ target }: { target: INode }) => {
       target?.setZIndex(1000)
     })
+    this.graph.on('edge:connected', (edgeModel: IEdgeModel) => {
+      this.graph.addEdge(edgeModel)
+    })
   }
 
   handleDrop(e: DragEvent) {

@@ -93,7 +93,7 @@ export default class CreateEdge extends Base {
         })
       }
 
-      this.graph.addEdge(edgeInfo)
+      this.graph.emit('edge:connected', edgeInfo)
     }
 
     this.setResetEdge()

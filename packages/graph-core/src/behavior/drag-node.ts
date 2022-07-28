@@ -1,4 +1,3 @@
-import { INodeModel } from '../types'
 import Graph from '../controller/graph'
 import Node from '../item/node'
 import Base from './base'
@@ -67,9 +66,9 @@ export default class DragNode extends Base {
             child.updatePosition(childPosX, childposY)
           })
         }
-      })
 
-      this.graph.emit('node:moving', this.moveNode)
+        this.graph.emit('node:moving', item)
+      })
     }
 
     this.startX = x
@@ -88,7 +87,9 @@ export default class DragNode extends Base {
 
     // 没有移动的情况下，不触发 node:moved 事件
     if (this.isMoving && hasMove) {
-      this.graph.emit('node:moved', this.moveNode)
+      this.moveNode.forEach(item => {
+        this.graph.emit('node:moved', item)
+      })
     }
     this.isMoving = false
     this.graph.stackEnd()

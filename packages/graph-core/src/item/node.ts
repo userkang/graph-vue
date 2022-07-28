@@ -155,7 +155,7 @@ export default class Node extends Base<
   }
 
   public getAllSourceNodes() {
-    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const nodes: Record<string, boolean> = { [this.id]: true }
     const tempNodes: INode[] = this.getSourceNodes()
 
     let i = 0
@@ -174,7 +174,7 @@ export default class Node extends Base<
   }
 
   public getAllTargetNodes() {
-    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const nodes: Record<string, boolean> = { [this.id]: true }
     const tempNodes: INode[] = this.getTargetNodes()
 
     let i = 0

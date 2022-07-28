@@ -112,7 +112,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in behavior/base.ts:5</li>
+									<li>Defined in behavior/base.ts:9</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-parameters-title">Parameters</h4>
@@ -131,12 +131,19 @@
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="eventqueue" class="tsd-anchor"></a>
 					<h3>event<wbr>Queue</h3>
-					<div class="tsd-signature tsd-kind-icon">event<wbr>Queue<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
+					<div class="tsd-signature tsd-kind-icon">event<wbr>Queue<span class="tsd-signature-symbol">:</span> <span class="tsd-signature-type">GraphEvent</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol"> = []</span></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in behavior/base.ts:5</li>
+							<li>Defined in behavior/base.ts:9</li>
 						</ul>
 					</aside>
+					<div class="tsd-comment tsd-typography">
+						<dl class="tsd-comment-tags">
+							<dt>todo</dt>
+							<dd><p>为什么事件队列不在拥有on函数的对象里？应该是on函数添加事件队列</p>
+							</dd>
+						</dl>
+					</div>
 				</section>
 				<section class="tsd-panel tsd-member tsd-kind-property tsd-parent-kind-class">
 					<a name="graph" class="tsd-anchor"></a>
@@ -144,7 +151,7 @@
 					<div class="tsd-signature tsd-kind-icon">graph<span class="tsd-signature-symbol">:</span> <a href="graph.html" class="tsd-signature-type" data-tsd-kind="Class">Graph</a></div>
 					<aside class="tsd-sources">
 						<ul>
-							<li>Defined in behavior/base.ts:4</li>
+							<li>Defined in behavior/base.ts:5</li>
 						</ul>
 					</aside>
 				</section>
@@ -155,40 +162,33 @@
 					<a name="addevent" class="tsd-anchor"></a>
 					<h3>add<wbr>Event</h3>
 					<ul class="tsd-signatures tsd-kind-method tsd-parent-kind-class">
-						<li class="tsd-signature tsd-kind-icon">add<wbr>Event<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
+						<li class="tsd-signature tsd-kind-icon">add<wbr>Event<span class="tsd-signature-symbol">(</span>type<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">string</span>, callback<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">Callback</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
 					</ul>
 					<ul class="tsd-descriptions">
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in behavior/base.ts:11</li>
+									<li>Defined in behavior/base.ts:20</li>
 								</ul>
 							</aside>
+							<div class="tsd-comment tsd-typography">
+								<div class="lead">
+									<p>监听事件</p>
+								</div>
+							</div>
 							<h4 class="tsd-parameters-title">Parameters</h4>
 							<ul class="tsd-parameters">
 								<li>
 									<h5>type: <span class="tsd-signature-type">string</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>事件类型</p>
+									</div>
 								</li>
 								<li>
-									<h5>callback: <span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol"> =&gt; </span><span class="tsd-signature-type">void</span></h5>
-									<ul class="tsd-parameters">
-										<li class="tsd-parameter-signature">
-											<ul class="tsd-signatures tsd-kind-type-literal">
-												<li class="tsd-signature tsd-kind-icon"><span class="tsd-signature-symbol">(</span><span class="tsd-signature-symbol">...</span>args<span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span><span class="tsd-signature-symbol">)</span><span class="tsd-signature-symbol">: </span><span class="tsd-signature-type">void</span></li>
-											</ul>
-											<ul class="tsd-descriptions">
-												<li class="tsd-description">
-													<h4 class="tsd-parameters-title">Parameters</h4>
-													<ul class="tsd-parameters">
-														<li>
-															<h5><span class="tsd-flag ts-flagRest">Rest</span> <span class="tsd-signature-symbol">...</span>args: <span class="tsd-signature-type">any</span><span class="tsd-signature-symbol">[]</span></h5>
-														</li>
-													</ul>
-													<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
-												</li>
-											</ul>
-										</li>
-									</ul>
+									<h5>callback: <span class="tsd-signature-type">Callback</span></h5>
+									<div class="tsd-comment tsd-typography">
+										<p>事件回调</p>
+									</div>
 								</li>
 							</ul>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -205,7 +205,7 @@
 						<li class="tsd-description">
 							<aside class="tsd-sources">
 								<ul>
-									<li>Defined in behavior/base.ts:17</li>
+									<li>Defined in behavior/base.ts:26</li>
 								</ul>
 							</aside>
 							<h4 class="tsd-returns-title">Returns <span class="tsd-signature-type">void</span></h4>
@@ -224,6 +224,9 @@
 			</nav>
 			<nav class="tsd-navigation secondary menu-sticky">
 				<ul class="before-current">
+					<li class=" tsd-kind-reference">
+						<a href="../modules.html#edge" class="tsd-kind-icon">Edge</a>
+					</li>
 				</ul>
 				<ul class="current">
 					<li class="current tsd-kind-class">
@@ -251,6 +254,24 @@
 					<li class=" tsd-kind-class">
 						<a href="graph.html" class="tsd-kind-icon">Graph</a>
 					</li>
+					<li class=" tsd-kind-class">
+						<a href="node.html" class="tsd-kind-icon">Node</a>
+					</li>
+					<li class=" tsd-kind-class">
+						<a href="port.html" class="tsd-kind-icon">Port</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/edgeinfo.html" class="tsd-kind-icon">Edge<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/icfg.html" class="tsd-kind-icon">ICfg</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/icirclelayout.html" class="tsd-kind-icon">ICircle<wbr>Layout</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/idagrelayout.html" class="tsd-kind-icon">IDagre<wbr>Layout</a>
+					</li>
 					<li class=" tsd-kind-interface">
 						<a href="../interfaces/idatamodel.html" class="tsd-kind-icon">IData<wbr>Model</a>
 					</li>
@@ -264,13 +285,28 @@
 						<a href="../interfaces/igraphconfig.html" class="tsd-kind-icon">IGraph<wbr>Config</a>
 					</li>
 					<li class=" tsd-kind-interface">
+						<a href="../interfaces/igraphevent.html" class="tsd-kind-icon">IGraph<wbr>Event</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/ilayout.html" class="tsd-kind-icon">ILayout</a>
+					</li>
+					<li class=" tsd-kind-interface">
 						<a href="../interfaces/inodemodel.html" class="tsd-kind-icon">INode<wbr>Model</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/islotmodel.html" class="tsd-kind-icon">ISlot<wbr>Model</a>
+						<a href="../interfaces/iportmodel.html" class="tsd-kind-icon">IPort<wbr>Model</a>
 					</li>
 					<li class=" tsd-kind-interface">
-						<a href="../interfaces/istack.html" class="tsd-kind-icon">IStack</a>
+						<a href="../interfaces/itreedatamodel.html" class="tsd-kind-icon">ITree<wbr>Data<wbr>Model</a>
+					</li>
+					<li class=" tsd-kind-interface">
+						<a href="../interfaces/nodeinfo.html" class="tsd-kind-icon">Node<wbr>Info</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#iaction" class="tsd-kind-icon">IAction</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#idirection" class="tsd-kind-icon">IDirection</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
 						<a href="../modules.html#iedge" class="tsd-kind-icon">IEdge</a>
@@ -279,7 +315,10 @@
 						<a href="../modules.html#inode" class="tsd-kind-icon">INode</a>
 					</li>
 					<li class=" tsd-kind-type-alias">
-						<a href="../modules.html#islot" class="tsd-kind-icon">ISlot</a>
+						<a href="../modules.html#iport" class="tsd-kind-icon">IPort</a>
+					</li>
+					<li class=" tsd-kind-type-alias">
+						<a href="../modules.html#iposition" class="tsd-kind-icon">IPosition</a>
 					</li>
 					<li class=" tsd-kind-property">
 						<a href="../modules.html#default" class="tsd-kind-icon">default</a>
@@ -297,16 +336,20 @@
 				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
 				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
 				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
 			</ul>
 			<ul class="tsd-legend">
 				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
 			</ul>
 			<ul class="tsd-legend">
-				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
 			</ul>
 		</div>
 	</div>

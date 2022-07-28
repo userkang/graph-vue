@@ -80,7 +80,9 @@ export default class Graph extends EventEmitter {
   ) {
     switch (typeof key) {
       case 'object':
-        return (this.cfg = { ...this.cfg, ...key })
+        const newCfg = Object.assign({}, this.cfg, key)
+        this.cfg = newCfg
+        return this.cfg
       case 'string':
         return (this.cfg[key] = val)
     }

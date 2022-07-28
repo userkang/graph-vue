@@ -7,7 +7,7 @@ const withExecPromise = cmd =>
 
 const getCurrentBranch = () =>
   withExecPromise('git rev-parse --symbolic --abbrev-ref HEAD')
-const docsBranchName = 'docs'
+const docsBranchName = 'master'
 const deployUrl = `https://docs.sankuai.com/hook/mt/~zhangkangkang02/mlp-graph/${docsBranchName}/`
 const deploy = () => withExecPromise(`curl ${deployUrl}`)
 Promise.resolve()

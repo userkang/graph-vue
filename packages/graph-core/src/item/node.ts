@@ -18,7 +18,7 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  private readonly _children: Record<itemId, Base<any, any>> = {}
+  private readonly _itemMap: Record<itemId, Base<any, any>> = {}
   constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
@@ -75,7 +75,7 @@ export default class Node extends Base<
 
   public get ports(): IPort[] {
     const res: IPort[] = []
-    Object.values(this._children).forEach(item => {
+    Object.values(this._itemMap).forEach(item => {
       item instanceof Port && res.push(item)
     })
     return res
@@ -83,7 +83,7 @@ export default class Node extends Base<
 
   public getEdges(): IEdge[] {
     const res: IEdge[] = []
-    Object.values(this._children).forEach(item => {
+    Object.values(this._itemMap).forEach(item => {
       item instanceof Edge && res.push(item)
     })
     return res
@@ -120,7 +120,7 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    this._children[node.id] = node
+    this._itemMap[node.id] = node
   }
 
   public deleteChild(id: string) {
@@ -133,7 +133,7 @@ export default class Node extends Base<
 
   public getChildren(): INode[] {
     const res: Node[] = []
-    Object.values(this._children).forEach(item => {
+    Object.values(this._itemMap).forEach(item => {
       item instanceof Node && res.push(item)
     })
     return res
@@ -203,12 +203,12 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this._children[edge.id] = edge
+    this._itemMap[edge.id] = edge
   }
 
   public deleteEdge(id: string) {
-    if (this._children[id] instanceof Edge) {
-      delete this._children[id]
+    if (this._itemMap[id] instanceof Edge) {
+      delete this._itemMap[id]
     }
   }
 
@@ -276,7 +276,7 @@ export default class Node extends Base<
         x: 0,
         y: 0
       })
-      this._children[port.id] = port
+      this._itemMap[port.id] = port
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -288,9 +288,9 @@ export default class Node extends Base<
 
   public deletePorts(ids: string[]) {
     ids.forEach(id => {
-      if (this._children[id] instanceof Port) {
-        this._children[id].off('change', this.onPortChange)
-        delete this._children[id]
+      if (this._itemMap[id] instanceof Port) {
+        this._itemMap[id].off('change', this.onPortChange)
+        delete this._itemMap[id]
       }
     })
     this.emit('port:deleted', ids)

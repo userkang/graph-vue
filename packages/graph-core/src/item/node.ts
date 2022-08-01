@@ -36,8 +36,6 @@ export default class Node extends Base<
     this.set('parentId', model.parentId && String(model.parentId))
     this.set('x', model.x || 0)
     this.set('y', model.y || 0)
-    // 保存与节点相关的边
-    this.set('edges', [])
 
     this.addPorts(this.model.ports || [{ type: 'in' }, { type: 'out' }])
   }

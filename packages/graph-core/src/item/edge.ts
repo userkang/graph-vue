@@ -1,11 +1,22 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
-import { IEdgeModel, INode } from '../types'
+import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 import { BaseCfg, IEdgeCfg } from '../types/type'
 
-export default class Edge extends Base<IEdgeModel, Required<IEdgeCfg> & BaseCfg> {
+interface ItemMap {
+  fromNode: INode
+  toNode: INode
+  fromPort: IPort
+  toPort: IPort
+}
+
+export default class Edge extends Base<
+  IEdgeModel,
+  Required<IEdgeCfg> & BaseCfg
+> {
+  private readonly _itemMap: ItemMap = {} as ItemMap
   constructor(
     model: IEdgeModel,
     cfg: IEdgeCfg | undefined,
@@ -21,8 +32,8 @@ export default class Edge extends Base<IEdgeModel, Required<IEdgeCfg> & BaseCfg>
 
     this.set('cfg', cfg)
 
-    this.set('fromNode', fromNode)
-    this.set('toNode', toNode)
+    this._itemMap.fromNode = fromNode
+    this._itemMap.toNode = toNode
 
     this.setPoint()
 
@@ -36,74 +47,46 @@ export default class Edge extends Base<IEdgeModel, Required<IEdgeCfg> & BaseCfg>
   }
 
   public get fromNode(): INode {
-    return this.get('fromNode')
+    return this._itemMap.fromNode
   }
 
   public get toNode(): INode {
-    return this.get('toNode')
+    return this._itemMap.toNode
   }
 
   public get fromPort() {
-    return this.get('fromPort')
+    return this._itemMap.fromPort
   }
 
   public get toPort() {
-    return this.get('toPort')
+    return this._itemMap.toPort
+  }
+
+  private matchPort(type: 'in' | 'out') {
+    const payload =
+      type === 'out'
+        ? { portId: String(this.model.fromPortId), node: this.fromNode }
+        : { portId: String(this.model.toPortId), node: this.toNode }
+
+    const port =
+      payload.node.ports.find(
+        item =>
+          !item.type ||
+          (item.type === type &&
+            (!payload.node.id ||
+              (payload.portId && item.id === payload.portId)))
+      ) || (payload.node.ports.find(item => item.type === type) as IPort)
+    return port
   }
 
   public setPoint() {
-    const fromPortId = String(this.model.fromPortId)
-    const toPortId = String(this.model.toPortId)
-    const fromNode = this.fromNode
-    const toNode = this.toNode
+    const fromPort = this.matchPort('out')
+    fromPort.setState('linked')
+    this._itemMap.fromPort = fromPort
 
-    fromNode.ports.find(item => {
-      if (
-        !item.type ||
-        (fromPortId && item.id === fromPortId && item.type === 'out') ||
-        (!this.fromNode.id && item.type === 'out')
-      ) {
-        item.setState('linked')
-        this.set('fromPort', item)
-        return true
-      }
-    })
-
-    toNode.ports.find(item => {
-      if (
-        !item.type ||
-        (toPortId && item.id === toPortId && item.type === 'in') ||
-        (!this.toNode.id && item.type === 'in')
-      ) {
-        item.setState('linked')
-        this.set('toPort', item)
-        return true
-      }
-    })
-
-    if (!this.fromPort) {
-      this.set(
-        'fromPort',
-        fromNode.ports.find(item => {
-          if (item.type === 'out') {
-            item.setState('linked')
-            return true
-          }
-        })
-      )
-    }
-
-    if (!this.toPort) {
-      this.set(
-        'toPort',
-        toNode.ports.find(item => {
-          if (item.type === 'in') {
-            item.setState('linked')
-            return true
-          }
-        })
-      )
-    }
+    const toPort = this.matchPort('in')
+    toPort.setState('linked')
+    this._itemMap.toPort = toPort
   }
 
   public update(model?: IEdgeModel) {

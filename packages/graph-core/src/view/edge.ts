@@ -45,13 +45,8 @@ export default class Node extends Element {
     this.addEvent('edge:change:selected', this.updateSelect)
   }
 
-  updatePath(moveNodes: INode[]) {
-    const node = moveNodes.find(
-      item =>
-        String(item.id) === this.edge.fromNode.id ||
-        String(item.id) === this.edge.toNode.id
-    )
-    if (node) {
+  updatePath(moveNode: INode) {
+    if ([this.edge.fromNode.id, this.edge.toNode.id].includes(moveNode.id)) {
       this.setPath()
     }
   }

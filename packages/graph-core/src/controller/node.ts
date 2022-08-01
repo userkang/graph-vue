@@ -172,7 +172,7 @@ export default class NodeController {
   }
 
   public destroy() {
-    ;(this.graph as null | Graph) = null
     Object.keys(this._nodes).forEach(id => this.deleteNode(id))
+    ;(this.graph as null | Graph) = null
   }
 }

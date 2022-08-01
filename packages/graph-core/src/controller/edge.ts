@@ -1,6 +1,7 @@
 import { IEdgeModel, IEdge } from '../types'
 import Graph from '../controller/graph'
 import Edge from '../item/edge'
+
 export default class EdgeController {
   graph: Graph
   private _edges: { [id: string]: IEdge } = {}
@@ -10,6 +11,7 @@ export default class EdgeController {
     if (graph.cfg.edges) {
       this.data(graph.cfg.edges)
     }
+    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   get edges() {

@@ -11,13 +11,14 @@ import {
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
-import { BaseCfg, INodeCfg, IRect } from '../types/type'
+import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
+import Edge from './edge'
 
 export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  private readonly _ports: Record<string, IPort> = {}
+  private readonly _children: Record<itemId, Base<any, any>> = {}
   constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
@@ -37,7 +38,6 @@ export default class Node extends Base<
     this.set('y', model.y || 0)
     // 保存与节点相关的边
     this.set('edges', [])
-    this.set('children', [])
 
     this.addPorts(this.model.ports || [{ type: 'in' }, { type: 'out' }])
   }
@@ -76,11 +76,19 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return Object.values(this._ports)
+    const res: IPort[] = []
+    Object.values(this._children).forEach(item => {
+      item instanceof Port && res.push(item)
+    })
+    return res
   }
 
   public getEdges(): IEdge[] {
-    return this.get('edges')
+    const res: IEdge[] = []
+    Object.values(this._children).forEach(item => {
+      item instanceof Edge && res.push(item)
+    })
+    return res
   }
 
   public getInEdges(): IEdge[] {
@@ -114,7 +122,7 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    this.get('children').push(node)
+    this._children[node.id] = node
   }
 
   public deleteChild(id: string) {
@@ -126,7 +134,11 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    return this.get('children')
+    const res: Node[] = []
+    Object.values(this._children).forEach(item => {
+      item instanceof Node && res.push(item)
+    })
+    return res
   }
 
   public setParent(node: INode) {
@@ -193,15 +205,12 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this.get('edges').push(edge)
+    this._children[edge.id] = edge
   }
 
   public deleteEdge(id: string) {
-    const edges = this.getEdges()
-    const index = edges.findIndex(item => item.id === id)
-
-    if (index > -1) {
-      edges.splice(index, 1)
+    if (this._children[id] instanceof Edge) {
+      delete this._children[id]
     }
   }
 
@@ -269,7 +278,7 @@ export default class Node extends Base<
         x: 0,
         y: 0
       })
-      this._ports[port.id] = port
+      this._children[port.id] = port
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -281,8 +290,10 @@ export default class Node extends Base<
 
   public deletePorts(ids: string[]) {
     ids.forEach(id => {
-      this._ports[id].off('change', this.onPortChange)
-      delete this._ports[id]
+      if (this._children[id] instanceof Port) {
+        this._children[id].off('change', this.onPortChange)
+        delete this._children[id]
+      }
     })
     this.emit('port:deleted', ids)
   }

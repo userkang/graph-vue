@@ -155,7 +155,7 @@ export default class Node extends Base<
   }
 
   public getAllSourceNodes() {
-    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const nodes: Record<string, boolean> = { [this.id]: true }
     const tempNodes: INode[] = this.getSourceNodes()
 
     let i = 0
@@ -174,7 +174,7 @@ export default class Node extends Base<
   }
 
   public getAllTargetNodes() {
-    const nodes: { [key: string | number]: boolean } = { [this.id]: true }
+    const nodes: Record<string, boolean> = { [this.id]: true }
     const tempNodes: INode[] = this.getTargetNodes()
 
     let i = 0
@@ -264,7 +264,7 @@ export default class Node extends Base<
   }
 
   public addPorts(models: IPortModel[]) {
-    const ports = models.forEach(model => {
+    const ports = models.map(model => {
       const port = new Port(model, {
         x: 0,
         y: 0
@@ -273,6 +273,7 @@ export default class Node extends Base<
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
+      return port
     })
     this.updatePorts()
     this.emit('port:added', ports)

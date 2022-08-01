@@ -32,18 +32,5 @@ export default class NodeWrapper extends Vue {
     required: true
   })
   node!: INode
-  refresh() {
-    this.$forceUpdate()
-  }
-  created() {
-    this.node.on('port:added', this.refresh)
-    this.node.on('port:change', this.refresh)
-    this.node.on('port:deleted', this.refresh)
-  }
-  beforeDestroy() {
-    this.node.off('port:added', this.refresh)
-    this.node.off('port:change', this.refresh)
-    this.node.off('port:deleted', this.refresh)
-  }
 }
 </script>

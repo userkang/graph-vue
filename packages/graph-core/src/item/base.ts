@@ -56,7 +56,7 @@ export default class Base<
   }
 
   public get zIndex(): number {
-    const zIndex = this.get('zIndex')
+    const zIndex = Number(this.get('zIndex'))
     return zIndex || 0
   }
 
@@ -66,7 +66,7 @@ export default class Base<
 
   public setZIndex(value: number) {
     if (this.model.zIndex) {
-      this.model.zIndex = value
+      ;(this.model as any).zIndex = value
     }
     this.set('zIndex', value)
     this.emit('change', this, 'zIndex')

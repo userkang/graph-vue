@@ -71,4 +71,7 @@ export default class Menu extends Vue {
   box-shadow: 0 0 4px 0 rgba(50, 57, 131, 0.25);
   border-radius: 1px;
 }
+.graph-vue-menu-wrapper li {
+  list-style: none;
+}
 </style>

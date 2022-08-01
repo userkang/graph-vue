@@ -79,11 +79,9 @@ export default class Node extends Element {
     this.addEvent('brushing', this.updateSelect)
   }
 
-  updateTransform(moveNodes: INode[]) {
-    const node = moveNodes.find(item => String(item.id) === this.node.id)
-
-    if (node) {
-      this.node = node
+  updateTransform(moveNode: INode) {
+    if (moveNode.id === this.node.id) {
+      this.node = moveNode
       this.transform()
     }
   }

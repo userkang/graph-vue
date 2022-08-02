@@ -1,12 +1,12 @@
 <template>
   <div v-show="value">
-    <ul
+    <div
       ref="menu"
       class="graph-vue-menu-wrapper"
       :style="{ top: menu.y + 2 + 'px', left: menu.x + 2 + 'px' }"
     >
       <slot :item="menu"></slot>
-    </ul>
+    </div>
   </div>
 </template>
 
@@ -70,8 +70,5 @@ export default class Menu extends Vue {
   background: #fff;
   box-shadow: 0 0 4px 0 rgba(50, 57, 131, 0.25);
   border-radius: 1px;
-}
-.graph-vue-menu-wrapper li {
-  list-style: none;
 }
 </style>

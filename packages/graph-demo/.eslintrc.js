@@ -36,7 +36,7 @@ module.exports = {
     'accessor-pairs': 'off',
     'no-undef': 'off',
     'no-undef-init': 'warn',
-    'init-declarations': 'warn',
+    'init-declarations': 'off',
     'no-empty': 'off',
     'no-console': 'warn',
     'no-debugger': 'warn',

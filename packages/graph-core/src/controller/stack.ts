@@ -1,7 +1,12 @@
 import { IEdge, INode } from '../types'
 import Graph from './graph'
 import { clone, isEqual, pick } from '../util/utils'
-import { GetArrayElementType, IEdgeStackData, INodeStackData, IStack } from '../types/type'
+import {
+  GetArrayElementType,
+  IEdgeStackData,
+  INodeStackData,
+  IStack
+} from '../types/type'
 
 const DEEP = 20
 const NODE_MODEL_KEY = ['x', 'y', 'width', 'height'] as const
@@ -56,6 +61,7 @@ export default class Stack {
 
   constructor(graph: Graph) {
     this.graph = graph
+    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   public clearStack() {

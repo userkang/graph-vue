@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-vue",
-  "version": "0.2.3",
+  "version": "0.2.4-beta.1",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix"
@@ -17,7 +17,7 @@
     "vue": "2.6.12"
   },
   "dependencies": {
-    "@datafe/graph-core": "1.0.2"
+    "@datafe/graph-core": "1.0.3-beta.1"
   },
   "devDependencies": {
     "@types/webpack-env": "^1.16.3",

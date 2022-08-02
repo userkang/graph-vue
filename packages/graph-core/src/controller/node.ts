@@ -76,7 +76,7 @@ export default class NodeController {
   }
 
   public addNode(item: INodeModel): INode | undefined {
-    if (item.id && item.id in this._nodes) {
+    if (item.id !== undefined && this._nodes[item.id]) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }

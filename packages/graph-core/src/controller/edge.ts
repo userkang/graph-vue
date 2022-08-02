@@ -60,18 +60,18 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
-    if (item.id && this._edges[item.id]) {
+    if (item.id !== undefined && this._edges[item.id]) {
       console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }
     const { fromPortId, toPortId, fromNodeId, toNodeId } = item
     // 如果仅有 portId，自动补全 nodeId
     const fromNode =
-      (fromNodeId && this.graph.findNode(fromNodeId)) ||
-      (fromPortId && this.graph.findNodeByPort(fromPortId))
+      (fromNodeId !== undefined && this.graph.findNode(fromNodeId)) ||
+      (fromPortId !== undefined && this.graph.findNodeByPort(fromPortId))
     const toNode =
-      (toNodeId && this.graph.findNode(toNodeId)) ||
-      (toPortId && this.graph.findNodeByPort(toPortId))
+      (toNodeId !== undefined && this.graph.findNode(toNodeId)) ||
+      (toPortId !== undefined && this.graph.findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)

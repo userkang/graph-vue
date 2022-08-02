@@ -58,7 +58,7 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
-    if (item.id !== undefined && item.id in this._edges) {
+    if (item.id !== undefined && this._edges[item.id]) {
       console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }

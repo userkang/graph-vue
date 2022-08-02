@@ -19,7 +19,7 @@ import {
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { isIDataModel, preorder } from '../util/utils'
 import { IStack } from '../types/type'
 
 const getDefaultConfig = (): Pick<
@@ -146,7 +146,7 @@ export default class Graph extends EventEmitter {
       return
     }
     this.nodeController.deleteNode(id)
-    this.emit('node:deleted', node.model)
+    this.emit('node:deleted', node)
     stack && this.stackEnd()
     return node
   }
@@ -157,7 +157,7 @@ export default class Graph extends EventEmitter {
     if (!node) {
       return
     }
-    this.emit('node:added', item)
+    this.emit('node:added', node)
     stack && this.stackEnd()
     return node
   }
@@ -193,7 +193,7 @@ export default class Graph extends EventEmitter {
     if (!edge) {
       return
     }
-    this.emit('edge:deleted', edge.model)
+    this.emit('edge:deleted', edge)
     stack && this.stackEnd()
     return edge
   }
@@ -202,7 +202,7 @@ export default class Graph extends EventEmitter {
     stack && this.stackStart()
     const edge = this.edgeController.addEdge(item)
     if (edge) {
-      this.emit('edge:added', item)
+      this.emit('edge:added', edge)
     }
     stack && this.stackEnd()
     return edge

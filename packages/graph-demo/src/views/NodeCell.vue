@@ -178,13 +178,11 @@ export default class NodeCell extends Vue {
     this.graph.on('node:moving', this.handleNodeMoving)
   }
 
-  handleNodeMoving(nodes: INode[]) {
-    nodes.forEach(node => {
-      const parent = node.getParent()
-      if (parent) {
-        this.resizeGroup(parent)
-      }
-    })
+  handleNodeMoving(node: INode) {
+    const parent = node.getParent()
+    if (parent) {
+      this.resizeGroup(parent)
+    }
   }
 
   initGroups() {

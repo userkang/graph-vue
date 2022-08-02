@@ -8,8 +8,10 @@ import {
   NodeInfo
 } from '.'
 
+export type itemId = string
+
 export interface BaseCfg {
-  id: string
+  id: itemId
   model: INodeModel | IEdgeModel | IPortModel
   zIndex?: number
   states: {

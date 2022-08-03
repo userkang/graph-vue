@@ -129,7 +129,6 @@ export default class NodeCell extends Vue {
 
   hideChildren(node: INode) {
     this.graph.stackStart()
-    this.graph.translate(-node.width / 2 + 90, -node.height / 2 + 20)
     const children = node.getChildren()
 
     node.update({
@@ -161,7 +160,6 @@ export default class NodeCell extends Vue {
 
     this.resizeGroup(node)
     this.layout(false)
-    this.graph.translate(node.width / 2 - 90, node.height / 2 - 20)
   }
 
   initGraph(graph: Graph) {

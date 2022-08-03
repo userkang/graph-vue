@@ -64,10 +64,6 @@ export default class Graph extends EventEmitter {
     ;(window as any).graph = this
   }
 
-  get translateTo() {
-    return this.viewController.translateTo
-  }
-
   private initController() {
     this.viewController = new ViewController(this)
     this.layoutController = new LayoutController(this)
@@ -282,7 +278,7 @@ export default class Graph extends EventEmitter {
   public fitCenter(position?: { x: number; y: number }) {
     if (position) {
       const { width, height } = this.getSvgInfo()
-      this.translateTo(width - position.x, height - position.y)
+      this.viewController.translateTo(width - position.x, height - position.y)
     } else {
       this.viewController.translateToCenter()
     }

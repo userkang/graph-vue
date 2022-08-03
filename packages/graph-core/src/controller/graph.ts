@@ -19,7 +19,7 @@ import {
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { isIDataModel, preorder } from '../util/utils'
 import { IStack } from '../types/type'
 
 const getDefaultConfig = (): Pick<
@@ -62,6 +62,10 @@ export default class Graph extends EventEmitter {
     }
     this.initController()
     ;(window as any).graph = this
+  }
+
+  get translateTo() {
+    return this.viewController.translateTo
   }
 
   private initController() {
@@ -281,6 +285,11 @@ export default class Graph extends EventEmitter {
 
   public fitCenter() {
     this.viewController.translateToCenter()
+  }
+
+  public center = (x: number, y: number) => {
+    const { width, height } = this.getSvgInfo()
+    this.translateTo(width - x, height - y)
   }
 
   public fullScreen(el?: HTMLElement) {

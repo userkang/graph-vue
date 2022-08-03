@@ -275,6 +275,7 @@ export default class Graph extends EventEmitter {
     this.edgeController.data(model.edges)
     if (needLayout) {
       this.layout({}, false)
+      this.fitCenter()
     }
     this.emit('datachange')
   }

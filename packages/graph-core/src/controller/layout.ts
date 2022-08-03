@@ -72,22 +72,20 @@ export default class LayoutController {
     })
     dagre.layout(this.dagre)
 
-    const group = this.dagre.graph()
-    const svgInfo = this.graph.getSvgInfo()
     const stackNode: INodeModel[] = []
 
+    const { left, top } = this.graph.getNodesBBox(nodes)
     this.dagre.nodes().forEach((id: string) => {
       const node = this.graph.findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-      const posX = x - (node.width + group.width - svgInfo.width) / 2
-      const posY = y - (node.height + group.height - svgInfo.height) / 2
+      const posX = x + left - node.width / 2
+      const posY = y + top - node.height / 2
 
       stackNode.push({ ...node.model })
       node.updatePosition(posX, posY)
     })
-
     return this.dagre
   }
 
@@ -97,7 +95,6 @@ export default class LayoutController {
       this.options,
       cfg.options
     ) as ICircleLayout
-    const svgInfo = this.graph.getSvgInfo()
     const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
       node => !node.parentId
     )
@@ -108,12 +105,11 @@ export default class LayoutController {
 
     const dTheta =
       getDTheta(nodes.length) * (options.clockwise === false ? -1 : 1)
-
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
       const theta = i * dTheta + (options.startAngle || 0)
-      const posX = radius * Math.cos(theta) + svgInfo.width / 2
-      const posY = radius * Math.sin(theta) + svgInfo.height / 2
+      const posX = radius * Math.cos(theta)
+      const posY = radius * Math.sin(theta)
       node.updatePosition(posX, posY)
     }
   }

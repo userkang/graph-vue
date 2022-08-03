@@ -237,10 +237,6 @@ export default class Graph extends EventEmitter {
     return this.viewController.translateBy(x, y)
   }
 
-  public translateBy(x: number, y: number) {
-    return this.viewController.translateBy(x, y)
-  }
-
   public getZoom() {
     return this.viewController.getZoom()
   }
@@ -280,8 +276,13 @@ export default class Graph extends EventEmitter {
     this.emit('datachange')
   }
 
-  public fitCenter() {
-    this.viewController.translateToCenter()
+  public fitCenter(position?: { x: number; y: number }) {
+    if (position) {
+      const { width, height } = this.getSvgInfo()
+      this.viewController.translateTo(width - position.x, height - position.y)
+    } else {
+      this.viewController.translateToCenter()
+    }
   }
 
   public fullScreen(el?: HTMLElement) {

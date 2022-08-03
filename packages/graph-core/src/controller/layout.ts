@@ -94,7 +94,6 @@ export default class LayoutController {
       this.options,
       cfg.options
     ) as ICircleLayout
-    const svgInfo = this.graph.getSvgInfo()
     const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
       node => !node.parentId
     )
@@ -105,12 +104,11 @@ export default class LayoutController {
 
     const dTheta =
       getDTheta(nodes.length) * (options.clockwise === false ? -1 : 1)
-
     for (let i = 0; i < nodes.length; i++) {
       const node = nodes[i]
       const theta = i * dTheta + (options.startAngle || 0)
-      const posX = radius * Math.cos(theta) + svgInfo.width / 2
-      const posY = radius * Math.sin(theta) + svgInfo.height / 2
+      const posX = radius * Math.cos(theta)
+      const posY = radius * Math.sin(theta)
       node.updatePosition(posX, posY)
     }
   }

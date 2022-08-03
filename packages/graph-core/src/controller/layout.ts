@@ -71,22 +71,20 @@ export default class LayoutController {
     })
     dagre.layout(this.dagre)
 
-    const group = this.dagre.graph()
-    const svgInfo = this.graph.getSvgInfo()
     const stackNode: INodeModel[] = []
 
+    const { left, top } = this.graph.getNodesBBox(nodes)
     this.dagre.nodes().forEach((id: string) => {
       const node = this.graph.findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-      const posX = x - (node.width + group.width - svgInfo.width) / 2
-      const posY = y - (node.height + group.height - svgInfo.height) / 2
+      const posX = x + left - node.width / 2
+      const posY = y + top - node.height / 2
 
       stackNode.push({ ...node.model })
       node.updatePosition(posX, posY)
     })
-
     return this.dagre
   }
 

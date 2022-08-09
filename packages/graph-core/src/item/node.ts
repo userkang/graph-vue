@@ -13,6 +13,7 @@ import nodeView from '../view/node'
 import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
 import Edge from './edge'
+import { store } from './store'
 
 export default class Node extends Base<
   INodeModel,
@@ -276,9 +277,10 @@ export default class Node extends Base<
       const port = new Port(model, {
         x: 0,
         y: 0,
-        graphId: this.graphId,
+        graphId: this.graphId
       })
       this._itemMap[port.id] = port
+      store[this.graphId].ports[port.id] = port
 
       port.setupNode(this)
       port.on('change', this.onPortChange)

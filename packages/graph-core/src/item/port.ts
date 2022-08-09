@@ -2,6 +2,7 @@ import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IDirection, INode, IPort, IPortModel, IPosition } from '../types'
 import { BaseCfg, IPortCfg, IRect } from '../types/type'
+import { store } from './store'
 
 const PortTypeToPosition = {
   TB: {
@@ -146,6 +147,7 @@ export default class Port extends Base<
       if (ids.includes(this.id)) {
         Port.containerMap.delete(this)
         container.off('change', onNodeChange)
+        delete store[this.graphId].ports[this.id]
         setTimeout(() => container.off('port:deleted', onDeleted))
       }
     }

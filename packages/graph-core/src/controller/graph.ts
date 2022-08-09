@@ -72,7 +72,7 @@ export default class Graph extends EventEmitter {
     this.viewController = new ViewController(this.graphId)
     this.layoutController = new LayoutController(this.graphId)
     this.eventController = new EventController(this.graphId)
-    this.nodeController = new NodeController(this)
+    this.nodeController = new NodeController(this.graphId)
     this.edgeController = new EdgeController(this)
     this.stackController = new StackController(this)
   }

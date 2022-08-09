@@ -1,22 +1,19 @@
 import Graph from './graph'
 import Node from '../item/node'
 import { INode, INodeModel, IPort } from '../types'
-import { store } from '../item/store'
+import { getGraph, store } from '../item/store'
 
 const defaultCfg = {
   width: 180,
   height: 40
 } as const
 export default class NodeController {
-  graph: Graph
   private readonly _nodes: { [id: string]: INode } = {}
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    if (graph.cfg.nodes) {
-      this.data(graph.cfg.nodes)
+  constructor(readonly graphId: string) {
+    if (getGraph(this.graphId).cfg.nodes) {
+      this.data(getGraph(this.graphId).cfg.nodes)
     }
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   get nodes() {
@@ -63,13 +60,13 @@ export default class NodeController {
     }
     // 先删除与节点相关的边
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
-      this.graph.deleteEdge(node.getEdges()[i]?.id, false)
+      getGraph(this.graphId).deleteEdge(node.getEdges()[i]?.id, false)
     }
     this._nodes[node.id].off()
     delete this._nodes[node.id]
 
-    if (this.graph.get('isRender')) {
-      const nodeGroup = this.graph.get('svg').get('nodeGroup')
+    if (getGraph(this.graphId).get('isRender')) {
+      const nodeGroup = getGraph(this.graphId).get('svg').get('nodeGroup')
       nodeGroup.remove(node.view)
     }
 
@@ -82,19 +79,22 @@ export default class NodeController {
       return
     }
 
-    const defaultNode = this.graph.get('defaultNode') || {}
+    const defaultNode = getGraph(this.graphId).get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const nodeCfg = Object.assign(defaultCfg, this.graph.get('nodeInfo') || {})
-    const direction = this.graph.get('direction')
+    const nodeCfg = Object.assign(
+      defaultCfg,
+      getGraph(this.graphId).get('nodeInfo') || {}
+    )
+    const direction = getGraph(this.graphId).get('direction')
     const node = new Node(model, nodeCfg, direction)
     this._nodes[node.id] = node
 
     this.watchNodeChange(node)
 
     // 渲染
-    if (this.graph.get('isRender')) {
-      const nodeView = node.render(this.graph)
-      const nodeGroup = this.graph.get('svg').get('nodeGroup')
+    if (getGraph(this.graphId).get('isRender')) {
+      const nodeView = node.render(getGraph(this.graphId))
+      const nodeGroup = getGraph(this.graphId).get('svg').get('nodeGroup')
       nodeGroup.add(nodeView)
     }
 
@@ -103,24 +103,24 @@ export default class NodeController {
 
   onNodeChange = (node: INode, type: string) => {
     const eventType = 'node:change'
-    this.graph.emit(`${eventType}:${type}`, node)
-    this.graph.emit(eventType, node, type)
+    getGraph(this.graphId).emit(`${eventType}:${type}`, node)
+    getGraph(this.graphId).emit(eventType, node, type)
   }
 
   onPortChange = (port: IPort, type: string) => {
     const eventType = 'port:change'
-    this.graph.emit(`${eventType}:${type}`, port)
-    this.graph.emit(eventType, port, type)
+    getGraph(this.graphId).emit(`${eventType}:${type}`, port)
+    getGraph(this.graphId).emit(eventType, port, type)
   }
 
   onPortAdded = (ports: IPort[]) => {
     const eventType = 'port:added'
-    this.graph.emit(eventType, ports)
+    getGraph(this.graphId).emit(eventType, ports)
   }
 
   onPortDeleted = (ids: string[]) => {
     const eventType = 'port:deleted'
-    this.graph.emit(eventType, ids)
+    getGraph(this.graphId).emit(eventType, ids)
   }
 
   public watchNodeChange(node: INode) {
@@ -174,6 +174,5 @@ export default class NodeController {
 
   public destroy() {
     Object.keys(this._nodes).forEach(id => this.deleteNode(id))
-    ;(this.graph as null | Graph) = null
   }
 }

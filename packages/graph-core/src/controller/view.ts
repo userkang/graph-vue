@@ -33,7 +33,6 @@ export default class ViewController {
       'svg'
     ) as SVGElement
     this.resize()
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   public getZoom() {

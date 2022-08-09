@@ -7,7 +7,7 @@ import {
 } from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
-import Graph from './graph'
+import { getGraph } from '../item/store'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -16,24 +16,23 @@ const getDTheta = (nodesLength: number) => {
 }
 
 export default class LayoutController {
-  private graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    Object.defineProperty(this, 'graph', { enumerable: false })
-  }
+  constructor(readonly graphId: string) {}
 
   initDagre(options?: IDagreLayout) {
     Object.assign(this.options, options)
-    this.graph.set('direction', options?.rankdir || this.graph.get('direction'))
+    getGraph(this.graphId).set(
+      'direction',
+      options?.rankdir || getGraph(this.graphId).get('direction')
+    )
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
       width: 0,
       height: 0,
-      rankdir: this.graph.get('direction'),
+      rankdir: getGraph(this.graphId).get('direction'),
       ...this.options
     })
     this.dagre.setDefaultEdgeLabel(() => {
@@ -42,22 +41,22 @@ export default class LayoutController {
   }
 
   layout(cfg: ILayout, stack: boolean) {
-    stack && this.graph.stackStart()
+    stack && getGraph(this.graphId).stackStart()
     let res
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)
     } else {
       res = this.dagreLayout(cfg)
     }
-    stack && this.graph.stackEnd()
+    stack && getGraph(this.graphId).stackEnd()
     return res
   }
 
   dagreLayout(cfg: ILayout) {
     this.initDagre(cfg.options as IDagreLayout)
 
-    const nodes = cfg.data?.nodes || this.graph.getNodes()
-    const edges = cfg.data?.edges || this.graph.getEdges()
+    const nodes = cfg.data?.nodes || getGraph(this.graphId).getNodes()
+    const edges = cfg.data?.edges || getGraph(this.graphId).getEdges()
 
     nodes.forEach(item => {
       this.dagre.setNode(item.id, {
@@ -73,11 +72,11 @@ export default class LayoutController {
     dagre.layout(this.dagre)
 
     const group = this.dagre.graph()
-    const svgInfo = this.graph.getSvgInfo()
+    const svgInfo = getGraph(this.graphId).getSvgInfo()
     const stackNode: INodeModel[] = []
 
     this.dagre.nodes().forEach((id: string) => {
-      const node = this.graph.findNode(id) as INode
+      const node = getGraph(this.graphId).findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
@@ -97,8 +96,8 @@ export default class LayoutController {
       this.options,
       cfg.options
     ) as ICircleLayout
-    const svgInfo = this.graph.getSvgInfo()
-    const nodes = (cfg.data?.nodes || this.graph.getNodes()).filter(
+    const svgInfo = getGraph(this.graphId).getSvgInfo()
+    const nodes = (cfg.data?.nodes || getGraph(this.graphId).getNodes()).filter(
       node => !node.parentId
     )
 
@@ -120,6 +119,5 @@ export default class LayoutController {
 
   destroy() {
     this.dagre = null
-    ;(this.graph as null | Graph) = null
   }
 }

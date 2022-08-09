@@ -54,7 +54,7 @@ export default class Graph extends EventEmitter {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
 
-    store[this.graphId] = { graph: this, nodes: {}, edges: {}, ports: {} }
+    this.resetStore()
 
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
@@ -66,6 +66,10 @@ export default class Graph extends EventEmitter {
     }
     this.initController()
     ;(window as any).graph = this
+  }
+
+  private resetStore() {
+    store[this.graphId] = { graph: this, nodes: {}, edges: {}, ports: {} }
   }
 
   private initController() {
@@ -266,6 +270,7 @@ export default class Graph extends EventEmitter {
       return
     }
 
+    this.resetStore()
     this.set('nodes', [])
     this.set('edges', [])
     this.clearItem()

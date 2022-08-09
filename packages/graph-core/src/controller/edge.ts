@@ -1,14 +1,16 @@
 import { IEdgeModel, IEdge } from '../types'
 import Edge from '../item/edge'
-import { getGraph } from '../item/store'
+import { getGraph, store } from '../item/store'
 
 export default class EdgeController {
-  private _edges: { [id: string]: IEdge } = {}
-
   constructor(readonly graphId: string) {
     if (getGraph(this.graphId).cfg.edges) {
       this.data(getGraph(this.graphId).cfg.edges)
     }
+  }
+
+  get _edges() {
+    return store[this.graphId].edges
   }
 
   get edges() {
@@ -102,13 +104,10 @@ export default class EdgeController {
   }
 
   public data(group: IEdgeModel[]) {
-    this._edges = {}
     for (const item of group) {
       this.addEdge(item)
     }
   }
 
-  public destroy() {
-    this._edges = {}
-  }
+  public destroy() {}
 }

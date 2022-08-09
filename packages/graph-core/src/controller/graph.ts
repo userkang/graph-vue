@@ -19,8 +19,9 @@ import {
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, isKeyof, preorder } from '../util/utils'
+import { isIDataModel, isKeyof, preorder, uniqueId } from '../util/utils'
 import { IStack } from '../types/type'
+import { store } from '../item/store'
 
 const getDefaultConfig = (): Pick<
   ICfg,
@@ -41,6 +42,7 @@ export default class Graph extends EventEmitter {
   private nodeController!: NodeController
   private edgeController!: EdgeController
   private stackController!: StackController
+  readonly graphId = uniqueId('graph')
 
   constructor(config: IGraphConfig) {
     super()
@@ -51,6 +53,8 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
+
+    store[this.graphId] = {graph: this, nodes: {}, edges: {}, ports: {}}
 
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 

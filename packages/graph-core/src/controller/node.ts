@@ -1,6 +1,7 @@
 import Graph from './graph'
 import Node from '../item/node'
 import { INode, INodeModel, IPort } from '../types'
+import { store } from '../item/store'
 
 const defaultCfg = {
   width: 180,

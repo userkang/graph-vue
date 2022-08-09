@@ -1,15 +1,14 @@
 import { IEdgeModel, IEdge } from '../types'
 import Graph from '../controller/graph'
 import Edge from '../item/edge'
+import { getGraph } from '../item/store'
 
 export default class EdgeController {
-  graph: Graph
   private _edges: { [id: string]: IEdge } = {}
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    if (graph.cfg.edges) {
-      this.data(graph.cfg.edges)
+  constructor(readonly graphId: string) {
+    if (getGraph(this.graphId).cfg.edges) {
+      this.data(getGraph(this.graphId).cfg.edges)
     }
   }
 
@@ -51,8 +50,8 @@ export default class EdgeController {
 
     delete this._edges[id]
 
-    if (this.graph.get('isRender')) {
-      const edgeGroup = this.graph.get('svg').get('edgeGroup')
+    if (getGraph(this.graphId).get('isRender')) {
+      const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
       edgeGroup.remove(edge.view)
     }
     return edge
@@ -66,27 +65,30 @@ export default class EdgeController {
     const { fromPortId, toPortId, fromNodeId, toNodeId } = item
     // 如果仅有 portId，自动补全 nodeId
     const fromNode =
-      (fromNodeId !== undefined && this.graph.findNode(fromNodeId)) ||
-      (fromPortId !== undefined && this.graph.findNodeByPort(fromPortId))
+      (fromNodeId !== undefined &&
+        getGraph(this.graphId).findNode(fromNodeId)) ||
+      (fromPortId !== undefined &&
+        getGraph(this.graphId).findNodeByPort(fromPortId))
     const toNode =
-      (toNodeId !== undefined && this.graph.findNode(toNodeId)) ||
-      (toPortId !== undefined && this.graph.findNodeByPort(toPortId))
+      (toNodeId !== undefined && getGraph(this.graphId).findNode(toNodeId)) ||
+      (toPortId !== undefined &&
+        getGraph(this.graphId).findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
       return
     }
 
-    const edgeCfg = this.graph.get('edgeInfo')
+    const edgeCfg = getGraph(this.graphId).get('edgeInfo')
     const edge = new Edge(item, edgeCfg, fromNode, toNode)
     this._edges[edge.id] = edge
 
     this.watchEdgeChange(edge)
 
     // 渲染
-    if (this.graph.get('isRender')) {
-      const edgeView = edge.render(this.graph)
-      const edgeGroup = this.graph.get('svg').get('edgeGroup')
+    if (getGraph(this.graphId).get('isRender')) {
+      const edgeView = edge.render(getGraph(this.graphId))
+      const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
       edgeGroup.add(edgeView)
     }
 
@@ -95,8 +97,8 @@ export default class EdgeController {
 
   watchEdgeChange(edge: IEdge) {
     edge.on('change', (edge: IEdge, type: string) => {
-      this.graph.emit(`edge:change:${type}`, edge)
-      this.graph.emit('edge:change', edge, type)
+      getGraph(this.graphId).emit(`edge:change:${type}`, edge)
+      getGraph(this.graphId).emit('edge:change', edge, type)
     })
   }
 
@@ -108,7 +110,6 @@ export default class EdgeController {
   }
 
   public destroy() {
-    ;(this.graph as null | Graph) = null
     this._edges = {}
   }
 }

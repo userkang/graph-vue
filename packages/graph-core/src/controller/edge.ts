@@ -1,5 +1,4 @@
 import { IEdgeModel, IEdge } from '../types'
-import Graph from '../controller/graph'
 import Edge from '../item/edge'
 import { getGraph } from '../item/store'
 

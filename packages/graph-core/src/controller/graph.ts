@@ -54,7 +54,7 @@ export default class Graph extends EventEmitter {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
 
-    store[this.graphId] = {graph: this, nodes: {}, edges: {}, ports: {}}
+    store[this.graphId] = { graph: this, nodes: {}, edges: {}, ports: {} }
 
     this.cfg = Object.assign(getDefaultConfig(), config, { container })
 
@@ -74,7 +74,7 @@ export default class Graph extends EventEmitter {
     this.eventController = new EventController(this.graphId)
     this.nodeController = new NodeController(this.graphId)
     this.edgeController = new EdgeController(this.graphId)
-    this.stackController = new StackController(this)
+    this.stackController = new StackController(this.graphId)
   }
 
   set<K extends keyof ICfg>(key: K, val: ICfg[K]): void

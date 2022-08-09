@@ -13,4 +13,3 @@ export const store: Record<
   }
 > = {}
 export const getGraph = (graphId: string) => store[graphId].graph
-;(window as any).store = store

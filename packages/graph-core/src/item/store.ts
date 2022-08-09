@@ -12,5 +12,5 @@ export const store: Record<
     ports: Record<string, Port>
   }
 > = {}
-export const getGraph = (id: string) => store[id].graph
+export const getGraph = (graphId: string) => store[graphId].graph
 ;(window as any).store = store

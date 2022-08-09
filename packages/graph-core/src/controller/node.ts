@@ -8,12 +8,14 @@ const defaultCfg = {
   height: 40
 } as const
 export default class NodeController {
-  private readonly _nodes: { [id: string]: INode } = {}
-
   constructor(readonly graphId: string) {
     if (getGraph(this.graphId).cfg.nodes) {
       this.data(getGraph(this.graphId).cfg.nodes)
     }
+  }
+
+  get _nodes() {
+    return store[this.graphId].nodes
   }
 
   get nodes() {

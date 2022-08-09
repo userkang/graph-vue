@@ -4,6 +4,7 @@ import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 import { BaseCfg, IEdgeCfg } from '../types/type'
+import { store } from './store'
 
 interface ItemMap {
   fromNode: INode
@@ -17,6 +18,9 @@ export default class Edge extends Base<
   Required<IEdgeCfg> & BaseCfg
 > {
   private readonly _itemMap: ItemMap = {} as ItemMap
+  fromNodeId: string
+  toNodeId: string
+  fromPortId!: string
   constructor(
     model: IEdgeModel,
     cfg: IEdgeCfg,
@@ -32,8 +36,9 @@ export default class Edge extends Base<
 
     this.set('cfg', cfg)
     this.graphId = cfg.graphId
-    this._itemMap.fromNode = fromNode
-    this._itemMap.toNode = toNode
+
+    this.fromNodeId = fromNode.id
+    this.toNodeId = toNode.id
 
     this.setPoint()
 
@@ -47,11 +52,11 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return this._itemMap.fromNode
+    return store[this.graphId].nodes[this.fromNodeId]
   }
 
   public get toNode(): INode {
-    return this._itemMap.toNode
+    return store[this.graphId].nodes[this.toNodeId]
   }
 
   public get fromPort() {

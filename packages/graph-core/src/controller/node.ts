@@ -19,7 +19,9 @@ export default class NodeController {
   }
 
   get nodes() {
-    return this.sortByZIndex()
+    return Object.values(this._nodes).sort(
+      (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
+    )
   }
 
   get portsMap() {
@@ -130,23 +132,6 @@ export default class NodeController {
     node.on('port:change', this.onPortChange)
     node.on('port:added', this.onPortAdded)
     node.on('port:deleted', this.onPortDeleted)
-  }
-
-  public sortByZIndex() {
-    const nodes = Object.values(this._nodes)
-    const zIndexMap: Record<number, INode[]> = {}
-    nodes.forEach(node => {
-      const zIndex = node.zIndex
-      zIndexMap[zIndex] = zIndexMap[zIndex] || []
-      zIndexMap[zIndex].push(node)
-    })
-
-    const nodeList: INode[] = []
-    Object.values(zIndexMap).forEach((items: INode[]) => {
-      nodeList.push(...items)
-    })
-
-    return nodeList
   }
 
   public data(nodes: INodeModel[]) {

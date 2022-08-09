@@ -9,16 +9,16 @@ export default class EdgeController {
     }
   }
 
-  get _edges() {
+  get edgeMap() {
     return store[this.graphId].edges
   }
 
   get edges() {
-    return Object.values(this._edges)
+    return Object.values(this.edgeMap)
   }
 
   public findEdge(id: string | number): IEdge | undefined {
-    return this._edges[String(id)]
+    return this.edgeMap[String(id)]
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {
@@ -49,7 +49,7 @@ export default class EdgeController {
       toPort.clearState('linked')
     }
 
-    delete this._edges[id]
+    delete this.edgeMap[id]
 
     if (getGraph(this.graphId).get('isRender')) {
       const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
@@ -59,7 +59,7 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
-    if (item.id !== undefined && this._edges[item.id]) {
+    if (item.id !== undefined && this.edgeMap[item.id]) {
       console.warn(`can't add edge, exist edge where id is ${item.id}`)
       return
     }
@@ -82,7 +82,7 @@ export default class EdgeController {
 
     const edgeCfg = getGraph(this.graphId).get('edgeInfo')
     const edge = new Edge(item, edgeCfg, fromNode, toNode)
-    this._edges[edge.id] = edge
+    this.edgeMap[edge.id] = edge
 
     this.watchEdgeChange(edge)
 

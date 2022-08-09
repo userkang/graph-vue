@@ -14,12 +14,12 @@ export default class NodeController {
     }
   }
 
-  get _nodes() {
+  get nodeMap() {
     return store[this.graphId].nodes
   }
 
   get nodes() {
-    return Object.values(this._nodes).sort(
+    return Object.values(this.nodeMap).sort(
       (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
     )
   }
@@ -33,7 +33,7 @@ export default class NodeController {
   }
 
   public findNode(id: string | number): INode | undefined {
-    return this._nodes[String(id)]
+    return this.nodeMap[String(id)]
   }
 
   public findNodeByPort(portId: string): INode | undefined {
@@ -66,8 +66,8 @@ export default class NodeController {
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
       getGraph(this.graphId).deleteEdge(node.getEdges()[i]?.id, false)
     }
-    this._nodes[node.id].off()
-    delete this._nodes[node.id]
+    this.nodeMap[node.id].off()
+    delete this.nodeMap[node.id]
 
     if (getGraph(this.graphId).get('isRender')) {
       const nodeGroup = getGraph(this.graphId).get('svg').get('nodeGroup')
@@ -78,7 +78,7 @@ export default class NodeController {
   }
 
   public addNode(item: INodeModel): INode | undefined {
-    if (item.id !== undefined && this._nodes[item.id]) {
+    if (item.id !== undefined && this.nodeMap[item.id]) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
@@ -91,7 +91,7 @@ export default class NodeController {
     )
     const direction = getGraph(this.graphId).get('direction')
     const node = new Node(model, nodeCfg, direction)
-    this._nodes[node.id] = node
+    this.nodeMap[node.id] = node
 
     this.watchNodeChange(node)
 
@@ -137,7 +137,7 @@ export default class NodeController {
   public data(nodes: INodeModel[]) {
     const childNodes: INode[] = []
 
-    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
+    Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
     nodes.forEach(item => {
       const node = this.addNode(item)
       if (item.parentId && node) {
@@ -160,6 +160,6 @@ export default class NodeController {
   }
 
   public destroy() {
-    Object.keys(this._nodes).forEach(id => this.deleteNode(id))
+    Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
   }
 }

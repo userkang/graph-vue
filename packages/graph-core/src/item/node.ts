@@ -12,14 +12,15 @@ import {
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
-import Edge from './edge'
 import { store } from './store'
 
 export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  private readonly _itemMap: Record<itemId, Base<any, any>> = {}
+  readonly nodeIdSet = new Set<itemId>()
+  readonly edgeIdSet = new Set<itemId>()
+  readonly portIdSet = new Set<itemId>()
   constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
     super(model)
     if (!this.id) {
@@ -76,19 +77,13 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    const res: IPort[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Port && res.push(item)
-    })
-    return res
+    return Array.from(this.portIdSet).map(
+      portId => store[this.graphId].ports[portId]
+    )
   }
 
   public getEdges(): IEdge[] {
-    const res: IEdge[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Edge && res.push(item)
-    })
-    return res
+    return Array.from(this.edgeIdSet).map(id => store[this.graphId].edges[id])
   }
 
   public getInEdges(): IEdge[] {
@@ -122,7 +117,8 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    this._itemMap[node.id] = node
+    store[this.graphId].nodes[node.id] = node
+    this.nodeIdSet.add(node.id)
   }
 
   public deleteChild(id: string) {
@@ -134,9 +130,8 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    const res: Node[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Node && res.push(item)
+    const res = Array.from(this.nodeIdSet).map(nodeId => {
+      return store[this.graphId].nodes[nodeId]
     })
     return res
   }
@@ -205,13 +200,12 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this._itemMap[edge.id] = edge
+    store[this.graphId].edges[edge.id] = edge
+    this.edgeIdSet.add(edge.id)
   }
 
   public deleteEdge(id: string) {
-    if (this._itemMap[id] instanceof Edge) {
-      delete this._itemMap[id]
-    }
+    this.edgeIdSet.delete(id)
   }
 
   public updatePosition(x: number, y: number) {
@@ -279,7 +273,7 @@ export default class Node extends Base<
         y: 0,
         graphId: this.graphId
       })
-      this._itemMap[port.id] = port
+      this.portIdSet.add(port.id)
       store[this.graphId].ports[port.id] = port
 
       port.setupNode(this)
@@ -292,10 +286,9 @@ export default class Node extends Base<
 
   public deletePorts(ids: string[]) {
     ids.forEach(id => {
-      if (this._itemMap[id] instanceof Port) {
-        this._itemMap[id].off('change', this.onPortChange)
-        delete this._itemMap[id]
-      }
+      const port = store[this.graphId].ports[id]
+      port?.off('change', this.onPortChange)
+      this.portIdSet.delete(id)
     })
     this.emit('port:deleted', ids)
   }

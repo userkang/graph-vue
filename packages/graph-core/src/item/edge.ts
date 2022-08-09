@@ -7,8 +7,6 @@ import { BaseCfg, IEdgeCfg } from '../types/type'
 import { store } from './store'
 
 interface ItemMap {
-  fromNode: INode
-  toNode: INode
   fromPort: IPort
   toPort: IPort
 }
@@ -20,7 +18,6 @@ export default class Edge extends Base<
   private readonly _itemMap: ItemMap = {} as ItemMap
   fromNodeId: string
   toNodeId: string
-  fromPortId!: string
   constructor(
     model: IEdgeModel,
     cfg: IEdgeCfg,

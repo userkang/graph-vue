@@ -31,14 +31,17 @@ export interface INodeCfg extends NodeInfo {
   width: number
   height: number
   direction?: IDirection
+  graphId: string
   [key: string]: any
 }
 
 export interface IEdgeCfg extends EdgeInfo {
+  graphId: string
   [key: string]: any
 }
 
 export interface IPortCfg {
+  graphId: string
   x: number
   y: number
 }

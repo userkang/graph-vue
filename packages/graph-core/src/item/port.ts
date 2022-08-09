@@ -103,7 +103,7 @@ export default class Port extends Base<
       this.set('id', id)
       this.model.id = this.id
     }
-
+    this.graphId = cfg.graphId
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)

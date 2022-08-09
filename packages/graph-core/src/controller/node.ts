@@ -1,7 +1,7 @@
-import Graph from './graph'
 import Node from '../item/node'
 import { INode, INodeModel, IPort } from '../types'
 import { getGraph, store } from '../item/store'
+import { INodeCfg } from '../types/type'
 
 const defaultCfg = {
   width: 180,
@@ -85,10 +85,11 @@ export default class NodeController {
 
     const defaultNode = getGraph(this.graphId).get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const nodeCfg = Object.assign(
-      defaultCfg,
-      getGraph(this.graphId).get('nodeInfo') || {}
-    )
+    const nodeCfg: INodeCfg = {
+      ...defaultCfg,
+      ...getGraph(this.graphId).get('nodeInfo'),
+      graphId: this.graphId
+    }
     const direction = getGraph(this.graphId).get('direction')
     const node = new Node(model, nodeCfg, direction)
     this.nodeMap[node.id] = node

@@ -22,6 +22,7 @@ export default class Base<
   T extends BaseCfg
 > extends EventEmitter {
   private _cfg: T = defaultCfg() as T
+  graphId: string = ''
 
   constructor(model: M) {
     super()

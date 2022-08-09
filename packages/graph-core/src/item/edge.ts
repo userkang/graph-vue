@@ -19,7 +19,7 @@ export default class Edge extends Base<
   private readonly _itemMap: ItemMap = {} as ItemMap
   constructor(
     model: IEdgeModel,
-    cfg: IEdgeCfg | undefined,
+    cfg: IEdgeCfg,
     fromNode: INode,
     toNode: INode
   ) {
@@ -31,7 +31,7 @@ export default class Edge extends Base<
     }
 
     this.set('cfg', cfg)
-
+    this.graphId = cfg.graphId
     this._itemMap.fromNode = fromNode
     this._itemMap.toNode = toNode
 

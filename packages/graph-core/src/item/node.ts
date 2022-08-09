@@ -28,6 +28,7 @@ export default class Node extends Base<
     }
 
     this.set('cfg', cfg)
+    this.graphId = cfg.graphId
 
     this.set('direction', cfg.direction || direction)
     this.set('width', model.width || cfg.width)
@@ -274,7 +275,8 @@ export default class Node extends Base<
     const ports = models.map(model => {
       const port = new Port(model, {
         x: 0,
-        y: 0
+        y: 0,
+        graphId: this.graphId,
       })
       this._itemMap[port.id] = port
 

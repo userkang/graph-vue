@@ -1,6 +1,7 @@
 import { IEdgeModel, IEdge } from '../types'
 import Edge from '../item/edge'
 import { getGraph, store } from '../item/store'
+import { IEdgeCfg } from '../types/type'
 
 export default class EdgeController {
   constructor(readonly graphId: string) {
@@ -80,7 +81,10 @@ export default class EdgeController {
       return
     }
 
-    const edgeCfg = getGraph(this.graphId).get('edgeInfo')
+    const edgeCfg: IEdgeCfg = {
+      ...getGraph(this.graphId).get('edgeInfo'),
+      graphId: this.graphId
+    }
     const edge = new Edge(item, edgeCfg, fromNode, toNode)
     this.edgeMap[edge.id] = edge
 

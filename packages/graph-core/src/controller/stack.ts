@@ -61,7 +61,6 @@ export default class Stack {
 
   constructor(graph: Graph) {
     this.graph = graph
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   public clearStack() {

@@ -1,7 +1,7 @@
 import Graph from './graph'
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
-import { getGraph } from '../item/store'
+import { store } from '../item/store'
 
 export const MOUSEEVENTS = [
   'mousedown',
@@ -51,7 +51,7 @@ export default class EventController {
   originY = 0
 
   constructor(readonly graphId: string) {
-    const svg = getGraph(graphId).cfg.container.querySelector('svg')
+    const svg = store.getters.graph(graphId).cfg.container.querySelector('svg')
     if (svg) {
       this.$svg = svg
     } else {
@@ -79,25 +79,25 @@ export default class EventController {
       addEventListener(
         window,
         'resize',
-        getGraph(this.graphId).resize.bind(getGraph(this.graphId))
+        store.getters.graph(this.graphId).resize.bind(store.getters.graph(this.graphId))
       )
     )
   }
 
   addBehavior(action?: string[]) {
-    const actions = action || getGraph(this.graphId).cfg.action
+    const actions = action || store.getters.graph(this.graphId).cfg.action
     if (actions) {
       actions.forEach((item: string) => {
         const func = behaviors[item]
         if (func && !this.behaveInstance[item]) {
-          const behave = new func(getGraph(this.graphId))
+          const behave = new func(store.getters.graph(this.graphId))
           if (behave) {
             this.behaveInstance[item] = behave
           }
         }
       })
       // 更新当前 action 配置
-      getGraph(this.graphId).set('action', Object.keys(this.behaveInstance))
+      store.getters.graph(this.graphId).set('action', Object.keys(this.behaveInstance))
     }
   }
 
@@ -108,7 +108,7 @@ export default class EventController {
         this.behaveInstance[key].destory()
       })
       this.behaveInstance = {}
-      getGraph(this.graphId).set('action', [])
+      store.getters.graph(this.graphId).set('action', [])
       return
     }
 
@@ -119,7 +119,7 @@ export default class EventController {
         delete this.behaveInstance[item]
       }
     })
-    getGraph(this.graphId).set('action', Object.keys(this.behaveInstance))
+    store.getters.graph(this.graphId).set('action', Object.keys(this.behaveInstance))
   }
 
   handleMouseEvent(e: MouseEvent) {
@@ -151,11 +151,11 @@ export default class EventController {
   }
 
   emitMouseEvent(e: MouseEvent, eventType: string) {
-    const { x, y } = getGraph(this.graphId).getPointByClient(e.x, e.y)
+    const { x, y } = store.getters.graph(this.graphId).getPointByClient(e.x, e.y)
 
     if (e.target === this.$svg) {
       this.currentItemType = 'blank'
-      getGraph(this.graphId).emit(`blank:${eventType}`, { e, x, y })
+      store.getters.graph(this.graphId).emit(`blank:${eventType}`, { e, x, y })
     }
 
     const type = getItemType(e)
@@ -164,7 +164,7 @@ export default class EventController {
       const data = getItemData(e)
       const target = this.findItem(type, data.id as string)
       // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
-      getGraph(this.graphId).emit(`${this.currentItemType}:${eventType}`, {
+      store.getters.graph(this.graphId).emit(`${this.currentItemType}:${eventType}`, {
         e,
         x,
         y,
@@ -173,27 +173,27 @@ export default class EventController {
       })
     }
 
-    getGraph(this.graphId).emit(eventType, e)
+    store.getters.graph(this.graphId).emit(eventType, e)
   }
 
   findItem(type: string, id: string) {
     if (type === 'node') {
-      return getGraph(this.graphId).findNode(id)
+      return store.getters.graph(this.graphId).findNode(id)
     } else if (type === 'edge') {
-      return getGraph(this.graphId).findEdge(id)
+      return store.getters.graph(this.graphId).findEdge(id)
     } else if (type === 'port') {
-      return getGraph(this.graphId).findPort(id)
+      return store.getters.graph(this.graphId).findPort(id)
     }
   }
 
   handleExtendEvents(e: MouseEvent) {
-    getGraph(this.graphId).emit(e.type, e)
+    store.getters.graph(this.graphId).emit(e.type, e)
   }
 
   handleMouseMove(e: MouseEvent) {
     if (this.preItemType !== this.currentItemType) {
-      getGraph(this.graphId).emit(`${this.preItemType}.mouseleave`)
-      getGraph(this.graphId).emit(`${this.currentItemType}.mouseenter`)
+      store.getters.graph(this.graphId).emit(`${this.preItemType}.mouseleave`)
+      store.getters.graph(this.graphId).emit(`${this.currentItemType}.mouseenter`)
     }
 
     this.preItemType = this.currentItemType
@@ -204,8 +204,8 @@ export default class EventController {
    */
   defaultEmit() {
     // 有些事件默认触发datachange事件
-    getGraph(this.graphId).on(DATACHANGE, () => {
-      getGraph(this.graphId).emit('datachange')
+    store.getters.graph(this.graphId).on(DATACHANGE, () => {
+      store.getters.graph(this.graphId).emit('datachange')
     })
   }
 
@@ -216,6 +216,6 @@ export default class EventController {
     this.eventQueue = []
     this.behaveInstance = []
 
-    getGraph(this.graphId).off()
+    store.getters.graph(this.graphId).off()
   }
 }

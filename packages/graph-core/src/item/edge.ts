@@ -4,7 +4,7 @@ import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 import { BaseCfg, IEdgeCfg } from '../types/type'
-import { getGraph, store } from './store'
+import { store } from './store'
 
 interface ItemMap {
   fromPort: IPort
@@ -22,20 +22,24 @@ export default class Edge extends Base<
     super(model)
     this.graphId = cfg.graphId
 
-    if (model.id !== undefined && store[this.graphId].itemMap[model.id]) {
+    if (
+      model.id !== undefined &&
+      store.getters.edgeMap(this.graphId)[model.id]
+    ) {
       throw new Error(`can't add edge, exist edge where id is ${model.id}`)
     }
     const { fromPortId, toPortId, fromNodeId, toNodeId } = model
     // 如果仅有 portId，自动补全 nodeId
     const fromNode =
       (fromNodeId !== undefined &&
-        getGraph(this.graphId).findNode(fromNodeId)) ||
+        store.getters.graph(this.graphId).findNode(fromNodeId)) ||
       (fromPortId !== undefined &&
-        getGraph(this.graphId).findNodeByPort(fromPortId))
+        store.getters.graph(this.graphId).findNodeByPort(fromPortId))
     const toNode =
-      (toNodeId !== undefined && getGraph(this.graphId).findNode(toNodeId)) ||
+      (toNodeId !== undefined &&
+        store.getters.graph(this.graphId).findNode(toNodeId)) ||
       (toPortId !== undefined &&
-        getGraph(this.graphId).findNodeByPort(toPortId))
+        store.getters.graph(this.graphId).findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -64,11 +68,11 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return store[this.graphId].itemMap[this.fromNodeId] as INode
+    return store.getters.nodeMap(this.graphId)[this.fromNodeId]
   }
 
   public get toNode(): INode {
-    return store[this.graphId].itemMap[this.toNodeId] as INode
+    return store.getters.nodeMap(this.graphId)[this.toNodeId]
   }
 
   public get fromPort() {

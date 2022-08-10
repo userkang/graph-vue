@@ -78,19 +78,22 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
+    const portMap = store.getters.portMap(this.graphId)
     const ports: Port[] = []
     Array.from(this.portIdSet).forEach(portId => {
-      const item = store[this.graphId].itemMap[portId]
-      item instanceof Port && ports.push(item)
+      const item = portMap[portId]
+      ports.push(item)
     })
     return ports
   }
 
   public getEdges(): IEdge[] {
+    const edgeMap = store.getters.edgeMap(this.graphId)
+
     const edges: IEdge[] = []
     Array.from(this.edgeIdSet).forEach(edgeId => {
-      const item = store[this.graphId].itemMap[edgeId]
-      item instanceof Edge && edges.push(item)
+      const item = edgeMap[edgeId]
+      edges.push(item)
     })
     return edges
   }
@@ -126,7 +129,7 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    store[this.graphId].itemMap[node.id] = node
+    store.mutations.insertItem(this.graphId, node)
     this.nodeIdSet.add(node.id)
   }
 
@@ -139,10 +142,11 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
+    const nodeMap = store.getters.nodeMap(this.graphId)
     const res: INode[] = []
     Array.from(this.nodeIdSet).map(nodeId => {
-      const item = store[this.graphId].itemMap[nodeId]
-      item instanceof Node && res.push(item)
+      const item = nodeMap[nodeId]
+      res.push(item)
     })
     return res
   }
@@ -211,7 +215,7 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    store[this.graphId].itemMap[edge.id] = edge
+    store.mutations.insertItem(this.graphId, edge) 
     this.edgeIdSet.add(edge.id)
   }
 
@@ -285,7 +289,7 @@ export default class Node extends Base<
         graphId: this.graphId
       })
       this.portIdSet.add(port.id)
-      store[this.graphId].itemMap[port.id] = port
+      store.mutations.insertItem(this.graphId, port) 
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -297,7 +301,7 @@ export default class Node extends Base<
 
   public deletePorts(ids: string[]) {
     ids.forEach(id => {
-      const port = store[this.graphId].itemMap[id]
+      const port = store.getters.portMap(this.graphId)[id]
       port?.off('change', this.onPortChange)
       this.portIdSet.delete(id)
     })

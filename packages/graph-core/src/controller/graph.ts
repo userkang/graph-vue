@@ -67,10 +67,7 @@ export default class Graph extends EventEmitter {
   }
 
   private resetStore() {
-    store[this.graphId] = {
-      graph: this,
-      itemMap: {}
-    }
+    store.mutations.insertGraph(this.graphId, this)
   }
 
   private initController() {

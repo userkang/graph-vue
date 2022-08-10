@@ -1,7 +1,7 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
-import { getGraph, store } from '../item/store'
+import {  store } from '../item/store'
 import { INodeCfg, IEdgeCfg } from '../types/type'
 
 const NODE_DEFAULT_CFG = {
@@ -11,22 +11,17 @@ const NODE_DEFAULT_CFG = {
 
 export default class ItemController {
   constructor(readonly graphId: string) {
-    if (getGraph(this.graphId).cfg.nodes) {
-      this.loadNodes(getGraph(this.graphId).cfg.nodes)
+    const graph = store.getters.graph(this.graphId)
+    if (graph.cfg.nodes) {
+      this.loadNodes(graph.cfg.nodes)
     }
-    if (getGraph(this.graphId).cfg.edges) {
-      this.loadEdges(getGraph(this.graphId).cfg.edges)
+    if (graph.cfg.edges) {
+      this.loadEdges(graph.cfg.edges)
     }
   }
 
-  get nodeMap() {
-    const res: Record<string, Node> = {}
-    Object.values(store[this.graphId].itemMap).forEach(item => {
-      if (item instanceof Node) {
-        res[item.id] = item
-      }
-    })
-    return res
+  get nodeMap(): Record<string, Node> {
+    return store.getters.itemMap(this.graphId, Node)
   }
 
   get nodes() {
@@ -36,11 +31,7 @@ export default class ItemController {
   }
 
   get edgeMap() {
-    const res: Record<string, Edge> = {}
-    Object.values(store[this.graphId].itemMap).forEach(item => {
-      item instanceof Edge && (res[item.id] = item)
-    })
-    return res
+    return store.getters.itemMap(this.graphId, Edge)
   }
 
   get edges() {
@@ -87,13 +78,13 @@ export default class ItemController {
     }
     // 先删除与节点相关的边
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
-      getGraph(this.graphId).deleteEdge(node.getEdges()[i]?.id, false)
+      store.getters.graph(this.graphId).deleteEdge(node.getEdges()[i]?.id, false)
     }
     this.nodeMap[node.id].off()
-    delete this.nodeMap[node.id]
+    store.mutations.removeItem(this.graphId, node.id)
 
-    if (getGraph(this.graphId).get('isRender')) {
-      const nodeGroup = getGraph(this.graphId).get('svg').get('nodeGroup')
+    if (store.getters.graph(this.graphId).get('isRender')) {
+      const nodeGroup = store.getters.graph(this.graphId).get('svg').get('nodeGroup')
       nodeGroup.remove(node.view)
     }
 
@@ -106,25 +97,25 @@ export default class ItemController {
       return
     }
 
-    const defaultNode = getGraph(this.graphId).get('defaultNode') || {}
+    const defaultNode = store.getters.graph(this.graphId).get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const direction = getGraph(this.graphId).get('direction')
+    const direction = store.getters.graph(this.graphId).get('direction')
     const nodeCfg: INodeCfg = {
       ...NODE_DEFAULT_CFG,
-      ...getGraph(this.graphId).get('nodeInfo'),
+      ...store.getters.graph(this.graphId).get('nodeInfo'),
       direction,
       graphId: this.graphId
     }
     const node = new Node(model, nodeCfg)
-    this.nodeMap[node.id] = node
-    store[this.graphId].itemMap[node.id] = node
+    this.nodeMap[node.id] = node 
+    store.mutations.insertItem(this.graphId, node)
 
     this.watchNodeChange(node)
 
     // 渲染
-    if (getGraph(this.graphId).get('isRender')) {
-      const nodeView = node.render(getGraph(this.graphId))
-      const nodeGroup = getGraph(this.graphId).get('svg').get('nodeGroup')
+    if (store.getters.graph(this.graphId).get('isRender')) {
+      const nodeView = node.render(store.getters.graph(this.graphId))
+      const nodeGroup = store.getters.graph(this.graphId).get('svg').get('nodeGroup')
       nodeGroup.add(nodeView)
     }
 
@@ -133,14 +124,13 @@ export default class ItemController {
 
   onNodeChange = (node: INode, type: string) => {
     const eventType = 'node:change'
-    getGraph(this.graphId).emit(`${eventType}:${type}`, node)
-    getGraph(this.graphId).emit(eventType, node, type)
+    store.getters.graph(this.graphId).emit(`${eventType}:${type}`, node)
+    store.getters.graph(this.graphId).emit(eventType, node, type)
   }
 
   public findEdge(id: string | number): IEdge | undefined {
     return this.edgeMap[String(id)]
   }
-
 
   public updateEdge(id: string, model: IEdgeModel): void {
     const edge = this.findEdge(id)
@@ -169,11 +159,11 @@ export default class ItemController {
     if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
       toPort.clearState('linked')
     }
+ 
+    store.mutations.removeItem(this.graphId, id)
 
-    delete this.edgeMap[id]
-
-    if (getGraph(this.graphId).get('isRender')) {
-      const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
+    if (store.getters.graph(this.graphId).get('isRender')) {
+      const edgeGroup = store.getters.graph(this.graphId).get('svg').get('edgeGroup')
       edgeGroup.remove(edge.view)
     }
     return edge
@@ -182,19 +172,19 @@ export default class ItemController {
   public addEdge(item: IEdgeModel): Edge | undefined {
     try {
       const edgeCfg: IEdgeCfg = {
-        ...getGraph(this.graphId).get('edgeInfo'),
+        ...store.getters.graph(this.graphId).get('edgeInfo'),
         graphId: this.graphId
       }
       const edge = new Edge(item, edgeCfg)
-      this.edgeMap[edge.id] = edge
-      store[this.graphId].itemMap[edge.id] = edge
+      this.edgeMap[edge.id] = edge 
+      store.mutations.insertItem(this.graphId, edge)
 
       this.watchEdgeChange(edge)
 
       // 渲染
-      if (getGraph(this.graphId).get('isRender')) {
-        const edgeView = edge.render(getGraph(this.graphId))
-        const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
+      if (store.getters.graph(this.graphId).get('isRender')) {
+        const edgeView = edge.render(store.getters.graph(this.graphId))
+        const edgeGroup = store.getters.graph(this.graphId).get('svg').get('edgeGroup')
         edgeGroup.add(edgeView)
       }
 
@@ -206,25 +196,25 @@ export default class ItemController {
 
   watchEdgeChange(edge: IEdge) {
     edge.on('change', (edge: IEdge, type: string) => {
-      getGraph(this.graphId).emit(`edge:change:${type}`, edge)
-      getGraph(this.graphId).emit('edge:change', edge, type)
+      store.getters.graph(this.graphId).emit(`edge:change:${type}`, edge)
+      store.getters.graph(this.graphId).emit('edge:change', edge, type)
     })
   }
 
   onPortChange = (port: IPort, type: string) => {
     const eventType = 'port:change'
-    getGraph(this.graphId).emit(`${eventType}:${type}`, port)
-    getGraph(this.graphId).emit(eventType, port, type)
+    store.getters.graph(this.graphId).emit(`${eventType}:${type}`, port)
+    store.getters.graph(this.graphId).emit(eventType, port, type)
   }
 
   onPortAdded = (ports: IPort[]) => {
     const eventType = 'port:added'
-    getGraph(this.graphId).emit(eventType, ports)
+    store.getters.graph(this.graphId).emit(eventType, ports)
   }
 
   onPortDeleted = (ids: string[]) => {
     const eventType = 'port:deleted'
-    getGraph(this.graphId).emit(eventType, ids)
+    store.getters.graph(this.graphId).emit(eventType, ids)
   }
 
   public watchNodeChange(node: INode) {

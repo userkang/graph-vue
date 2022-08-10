@@ -147,7 +147,7 @@ export default class Port extends Base<
       if (ids.includes(this.id)) {
         Port.containerMap.delete(this)
         container.off('change', onNodeChange)
-        delete store[this.graphId].itemMap[this.id]
+        store.mutations.removeItem(this.graphId, this.id)
         setTimeout(() => container.off('port:deleted', onDeleted))
       }
     }

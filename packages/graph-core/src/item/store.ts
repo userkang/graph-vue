@@ -54,10 +54,7 @@ function itemMap<T extends Node | Edge | Port>(
 }
 
 const getters = {
-  graph: (graphId: string) => {
-    console.log(graphId)
-    return state[graphId].graph
-  },
+  graph: (graphId: string) => state[graphId].graph,
   itemMap,
   nodeMap: (graphId: string) => itemMap(graphId, Node),
   edgeMap: (graphId: string) => itemMap(graphId, Edge),

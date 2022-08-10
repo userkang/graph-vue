@@ -22,3 +22,4 @@ export const store: Record<
   }
 > = {}
 export const getGraph = (graphId: string) => store[graphId].graph
+console.log(store)

@@ -201,6 +201,7 @@ export default class Node extends Base<
 
   public addEdge(edge: IEdge) {
     store[this.graphId].edges[edge.id] = edge
+    store[this.graphId].itemMap[edge.id] = edge
     this.edgeIdSet.add(edge.id)
   }
 
@@ -275,6 +276,7 @@ export default class Node extends Base<
       })
       this.portIdSet.add(port.id)
       store[this.graphId].ports[port.id] = port
+      store[this.graphId].itemMap[port.id] = port
 
       port.setupNode(this)
       port.on('change', this.onPortChange)

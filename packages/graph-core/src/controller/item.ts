@@ -107,6 +107,7 @@ export default class ItemController {
     }
     const node = new Node(model, nodeCfg)
     this.nodeMap[node.id] = node
+    store[this.graphId].itemMap[node.id] = node
 
     this.watchNodeChange(node)
 
@@ -176,6 +177,7 @@ export default class ItemController {
       }
       const edge = new Edge(item, edgeCfg)
       this.edgeMap[edge.id] = edge
+      store[this.graphId].itemMap[edge.id] = edge
 
       this.watchEdgeChange(edge)
 

@@ -30,7 +30,11 @@ export default class ItemController {
   }
 
   get edgeMap() {
-    return store[this.graphId].edges
+    const res: Record<string, Edge> = {}
+    Object.values(store[this.graphId].itemMap).forEach(item => {
+      item instanceof Edge && (res[item.id] = item)
+    })
+    return res
   }
 
   get edges() {

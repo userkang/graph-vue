@@ -13,6 +13,7 @@ import nodeView from '../view/node'
 import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
 import { store } from './store'
+import Edge from './edge'
 
 export default class Node extends Base<
   INodeModel,
@@ -86,7 +87,12 @@ export default class Node extends Base<
   }
 
   public getEdges(): IEdge[] {
-    return Array.from(this.edgeIdSet).map(id => store[this.graphId].edges[id])
+    const edges: IEdge[] = []
+    Array.from(this.edgeIdSet).forEach(edgeId => {
+      const item = store[this.graphId].itemMap[edgeId]
+      item instanceof Edge && edges.push(item)
+    })
+    return edges
   }
 
   public getInEdges(): IEdge[] {
@@ -202,8 +208,7 @@ export default class Node extends Base<
     return tempNodes
   }
 
-  public addEdge(edge: IEdge) {
-    store[this.graphId].edges[edge.id] = edge
+  public addEdge(edge: IEdge) { 
     store[this.graphId].itemMap[edge.id] = edge
     this.edgeIdSet.add(edge.id)
   }

@@ -70,7 +70,6 @@ export default class Graph extends EventEmitter {
     store[this.graphId] = {
       graph: this,
       nodes: {},
-      edges: {},
       itemMap: {}
     }
   }

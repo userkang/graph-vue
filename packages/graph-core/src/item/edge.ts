@@ -22,7 +22,7 @@ export default class Edge extends Base<
     super(model)
     this.graphId = cfg.graphId
 
-    if (model.id !== undefined && store[this.graphId].edges[model.id]) {
+    if (model.id !== undefined && store[this.graphId].itemMap[model.id]) {
       throw new Error(`can't add edge, exist edge where id is ${model.id}`)
     }
     const { fromPortId, toPortId, fromNodeId, toNodeId } = model

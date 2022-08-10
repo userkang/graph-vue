@@ -32,11 +32,11 @@ const mutations = {
 } as const
 
 function itemMap(graphId: string): Record<string, Item>
-function itemMap<T extends Node | Edge | Port>(
+function itemMap<T extends Item>(
   graphId: string,
   itemClass: new (...args: any[]) => T
 ): Record<string, T>
-function itemMap<T extends Node | Edge | Port>(
+function itemMap<T extends Item>(
   graphId: string,
   itemClass?: new (...args: any[]) => T
 ) {

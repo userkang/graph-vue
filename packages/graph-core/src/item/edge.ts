@@ -64,11 +64,11 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return store[this.graphId].nodes[this.fromNodeId]
+    return store[this.graphId].itemMap[this.fromNodeId] as INode
   }
 
   public get toNode(): INode {
-    return store[this.graphId].nodes[this.toNodeId]
+    return store[this.graphId].itemMap[this.toNodeId] as INode
   }
 
   public get fromPort() {

@@ -18,7 +18,7 @@ import {
   NodeInfo
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, isKeyof, preorder, uniqueId } from '../util/utils'
+import { isIDataModel, preorder, uniqueId } from '../util/utils'
 import { IStack } from '../types/type'
 import { store } from '../item/store'
 
@@ -69,7 +69,6 @@ export default class Graph extends EventEmitter {
   private resetStore() {
     store[this.graphId] = {
       graph: this,
-      nodes: {},
       itemMap: {}
     }
   }

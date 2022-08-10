@@ -1,5 +1,4 @@
 import Graph from '../controller/graph'
-import Node from './node'
 import Base from './base'
 import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { BaseCfg } from '../types/type'
@@ -13,7 +12,6 @@ export const store: Record<
   string,
   {
     graph: Graph
-    nodes: Record<string, Node>
     itemMap: Record<string, Item>
   }
 > = {}

@@ -126,7 +126,7 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    store[this.graphId].nodes[node.id] = node
+    store[this.graphId].itemMap[node.id] = node
     this.nodeIdSet.add(node.id)
   }
 
@@ -139,8 +139,10 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    const res = Array.from(this.nodeIdSet).map(nodeId => {
-      return store[this.graphId].nodes[nodeId]
+    const res: INode[] = []
+    Array.from(this.nodeIdSet).map(nodeId => {
+      const item = store[this.graphId].itemMap[nodeId]
+      item instanceof Node && res.push(item)
     })
     return res
   }
@@ -208,7 +210,7 @@ export default class Node extends Base<
     return tempNodes
   }
 
-  public addEdge(edge: IEdge) { 
+  public addEdge(edge: IEdge) {
     store[this.graphId].itemMap[edge.id] = edge
     this.edgeIdSet.add(edge.id)
   }

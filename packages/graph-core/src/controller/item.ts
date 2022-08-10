@@ -20,7 +20,13 @@ export default class ItemController {
   }
 
   get nodeMap() {
-    return store[this.graphId].nodes
+    const res: Record<string, Node> = {}
+    Object.values(store[this.graphId].itemMap).forEach(item => {
+      if (item instanceof Node) {
+        res[item.id] = item
+      }
+    })
+    return res
   }
 
   get nodes() {

@@ -29,7 +29,7 @@ const mutations = {
   removeItem: (graphId: string, itemId: string) => {
     delete state[graphId].itemMap[itemId]
   }
-}
+} as const
 
 function itemMap(graphId: string): Record<string, Item>
 function itemMap<T extends Node | Edge | Port>(
@@ -59,8 +59,8 @@ const getters = {
   nodeMap: (graphId: string) => itemMap(graphId, Node),
   edgeMap: (graphId: string) => itemMap(graphId, Edge),
   portMap: (graphId: string) => itemMap(graphId, Port)
-}
+} as const
 
-const actions = {}
+const actions = {} as const
 
 export const store = { state, mutations, getters, actions }

@@ -3,15 +3,14 @@ import { INode, INodeModel, IPort } from '../types'
 import { getGraph, store } from '../item/store'
 import { INodeCfg } from '../types/type'
 
-const defaultCfg = {
+const NODE_DEFAULT_CFG = {
   width: 180,
   height: 40
 } as const
-export default class NodeController {
-  constructor(readonly graphId: string) {
-    if (getGraph(this.graphId).cfg.nodes) {
-      this.data(getGraph(this.graphId).cfg.nodes)
-    }
+
+export default class ItemController {
+  constructor(readonly graphId: string){
+
   }
 
   get nodeMap() {
@@ -56,6 +55,7 @@ export default class NodeController {
     node.update(model)
   }
 
+
   public deleteNode(id: string): INode | undefined {
     const node = this.findNode(id)
     if (!node) {
@@ -87,7 +87,7 @@ export default class NodeController {
     const model = Object.assign({}, defaultNode, item)
     const direction = getGraph(this.graphId).get('direction')
     const nodeCfg: INodeCfg = {
-      ...defaultCfg,
+      ...NODE_DEFAULT_CFG,
       ...getGraph(this.graphId).get('nodeInfo'),
       direction,
       graphId: this.graphId

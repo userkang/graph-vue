@@ -2,7 +2,7 @@ import EventEmitter from '../util/event-emitter'
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
-import NodeController from './node'
+import ItemController from './item'
 import EdgeController from './edge'
 import StackController from './stack'
 import Svg from '../view/svg'
@@ -39,7 +39,7 @@ export default class Graph extends EventEmitter {
   private viewController!: ViewController
   private layoutController!: LayoutController
   private eventController!: EventController
-  private nodeController!: NodeController
+  private itemController!: ItemController
   private edgeController!: EdgeController
   private stackController!: StackController
   readonly graphId = uniqueId('graph')
@@ -76,7 +76,7 @@ export default class Graph extends EventEmitter {
     this.viewController = new ViewController(this.graphId)
     this.layoutController = new LayoutController(this.graphId)
     this.eventController = new EventController(this.graphId)
-    this.nodeController = new NodeController(this.graphId)
+    this.itemController = new ItemController(this.graphId)
     this.edgeController = new EdgeController(this.graphId)
     this.stackController = new StackController(this.graphId)
   }
@@ -113,11 +113,11 @@ export default class Graph extends EventEmitter {
   }
 
   public getNodes(): INode[] {
-    return this.nodeController.nodes
+    return this.itemController.nodes
   }
 
   public findNode(id: string | number): INode | undefined {
-    return this.nodeController.findNode(id)
+    return this.itemController.findNode(id)
   }
 
   public findNodeByState(state: string): INode[] {
@@ -125,24 +125,24 @@ export default class Graph extends EventEmitter {
   }
 
   public findNodeByPort(id: string): INode | undefined {
-    return this.nodeController.findNodeByPort(id)
+    return this.itemController.findNodeByPort(id)
   }
 
   public refreshNode(id: string): void {
-    const node = this.nodeController.findNode(id)
+    const node = this.itemController.findNode(id)
     if (!node) {
       return console.warn(`can't find node where id is '${id}'`)
     }
-    this.nodeController.refreshNode(id)
+    this.itemController.refreshNode(id)
     this.emit('node:refresh', node)
   }
 
   public updateNode(id: string, model: INodeModel): void {
-    const node = this.nodeController.findNode(id)
+    const node = this.itemController.findNode(id)
     if (!node) {
       return console.warn(`can't find node where id is '${id}'`)
     }
-    this.nodeController.updateNode(id, model)
+    this.itemController.updateNode(id, model)
     this.emit('node:change', node)
   }
 
@@ -153,7 +153,7 @@ export default class Graph extends EventEmitter {
       console.warn(`can't delete node where id is '${id}'`)
       return
     }
-    this.nodeController.deleteNode(id)
+    this.itemController.deleteNode(id)
     this.emit('node:deleted', node.model)
     stack && this.stackEnd()
     return node
@@ -161,7 +161,7 @@ export default class Graph extends EventEmitter {
 
   public addNode(item: INodeModel, stack = true): INode | undefined {
     stack && this.stackStart()
-    const node = this.nodeController.addNode(item)
+    const node = this.itemController.addNode(item)
     if (!node) {
       return
     }
@@ -171,7 +171,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findPort(id: string | number): IPort | undefined {
-    return this.nodeController.portsMap[String(id)]
+    return this.itemController.portsMap[String(id)]
   }
 
   public getEdges(): IEdge[] {
@@ -280,7 +280,7 @@ export default class Graph extends EventEmitter {
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
 
-    this.nodeController.data(model.nodes)
+    this.itemController.data(model.nodes)
     this.edgeController.data(model.edges)
     if (needLayout) {
       this.layout({}, false)
@@ -360,13 +360,13 @@ export default class Graph extends EventEmitter {
   public destroy() {
     this.stackController.clearStack()
     this.eventController.destroy()
-    this.nodeController.destroy()
+    this.itemController.destroy()
     this.edgeController.destroy()
     this.viewController.destroy()
     this.layoutController.destroy()
     ;(this.stackController as StackController | null) = null
     ;(this.eventController as EventController | null) = null
-    ;(this.nodeController as NodeController | null) = null
+    ;(this.itemController as ItemController | null) = null
     ;(this.edgeController as EdgeController | null) = null
     ;(this.viewController as ViewController | null) = null
     ;(this.layoutController as LayoutController | null) = null

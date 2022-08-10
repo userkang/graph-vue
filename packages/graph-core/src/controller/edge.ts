@@ -60,44 +60,27 @@ export default class EdgeController {
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
-    if (item.id !== undefined && this.edgeMap[item.id]) {
-      console.warn(`can't add edge, exist edge where id is ${item.id}`)
-      return
+    try {
+      const edgeCfg: IEdgeCfg = {
+        ...getGraph(this.graphId).get('edgeInfo'),
+        graphId: this.graphId
+      }
+      const edge = new Edge(item, edgeCfg)
+      this.edgeMap[edge.id] = edge
+
+      this.watchEdgeChange(edge)
+
+      // 渲染
+      if (getGraph(this.graphId).get('isRender')) {
+        const edgeView = edge.render(getGraph(this.graphId))
+        const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
+        edgeGroup.add(edgeView)
+      }
+
+      return edge
+    } catch (error) {
+      console.warn(error)
     }
-    const { fromPortId, toPortId, fromNodeId, toNodeId } = item
-    // 如果仅有 portId，自动补全 nodeId
-    const fromNode =
-      (fromNodeId !== undefined &&
-        getGraph(this.graphId).findNode(fromNodeId)) ||
-      (fromPortId !== undefined &&
-        getGraph(this.graphId).findNodeByPort(fromPortId))
-    const toNode =
-      (toNodeId !== undefined && getGraph(this.graphId).findNode(toNodeId)) ||
-      (toPortId !== undefined &&
-        getGraph(this.graphId).findNodeByPort(toPortId))
-
-    if (!fromNode || !toNode) {
-      console.warn(`please check the edge from ${fromNodeId} to ${toNodeId}`)
-      return
-    }
-
-    const edgeCfg: IEdgeCfg = {
-      ...getGraph(this.graphId).get('edgeInfo'),
-      graphId: this.graphId
-    }
-    const edge = new Edge(item, edgeCfg, fromNode, toNode)
-    this.edgeMap[edge.id] = edge
-
-    this.watchEdgeChange(edge)
-
-    // 渲染
-    if (getGraph(this.graphId).get('isRender')) {
-      const edgeView = edge.render(getGraph(this.graphId))
-      const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
-      edgeGroup.add(edgeView)
-    }
-
-    return edge
   }
 
   watchEdgeChange(edge: IEdge) {

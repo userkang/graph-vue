@@ -4,7 +4,7 @@ import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 import { BaseCfg, IEdgeCfg } from '../types/type'
-import { store } from './store'
+import { getGraph, store } from './store'
 
 interface ItemMap {
   fromPort: IPort
@@ -18,13 +18,29 @@ export default class Edge extends Base<
   private readonly _itemMap: ItemMap = {} as ItemMap
   fromNodeId: string
   toNodeId: string
-  constructor(
-    model: IEdgeModel,
-    cfg: IEdgeCfg,
-    fromNode: INode,
-    toNode: INode
-  ) {
+  constructor(model: IEdgeModel, cfg: IEdgeCfg) {
     super(model)
+    this.graphId = cfg.graphId
+
+    if (model.id !== undefined && store[this.graphId].edges[model.id]) {
+      throw new Error(`can't add edge, exist edge where id is ${model.id}`)
+    }
+    const { fromPortId, toPortId, fromNodeId, toNodeId } = model
+    // 如果仅有 portId，自动补全 nodeId
+    const fromNode =
+      (fromNodeId !== undefined &&
+        getGraph(this.graphId).findNode(fromNodeId)) ||
+      (fromPortId !== undefined &&
+        getGraph(this.graphId).findNodeByPort(fromPortId))
+    const toNode =
+      (toNodeId !== undefined && getGraph(this.graphId).findNode(toNodeId)) ||
+      (toPortId !== undefined &&
+        getGraph(this.graphId).findNodeByPort(toPortId))
+
+    if (!fromNode || !toNode) {
+      throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
+    }
+
     if (!this.id) {
       const id = uniqueId('edge')
       this.set('id', id)
@@ -32,7 +48,6 @@ export default class Edge extends Base<
     }
 
     this.set('cfg', cfg)
-    this.graphId = cfg.graphId
 
     this.fromNodeId = fromNode.id
     this.toNodeId = toNode.id

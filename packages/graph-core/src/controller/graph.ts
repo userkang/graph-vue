@@ -67,7 +67,13 @@ export default class Graph extends EventEmitter {
   }
 
   private resetStore() {
-    store[this.graphId] = { graph: this, nodes: {}, edges: {}, ports: {} }
+    store[this.graphId] = {
+      graph: this,
+      nodes: {},
+      edges: {},
+      ports: {},
+      itemMap: {}
+    }
   }
 
   private initController() {

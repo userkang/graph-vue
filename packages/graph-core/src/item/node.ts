@@ -21,7 +21,7 @@ export default class Node extends Base<
   readonly nodeIdSet = new Set<itemId>()
   readonly edgeIdSet = new Set<itemId>()
   readonly portIdSet = new Set<itemId>()
-  constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
+  constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')
@@ -32,7 +32,7 @@ export default class Node extends Base<
     this.set('cfg', cfg)
     this.graphId = cfg.graphId
 
-    this.set('direction', cfg.direction || direction)
+    this.set('direction', cfg.direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
     this.set('zIndex', model.zIndex || 0)

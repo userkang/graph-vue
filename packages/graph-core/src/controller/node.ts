@@ -85,13 +85,14 @@ export default class NodeController {
 
     const defaultNode = getGraph(this.graphId).get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
+    const direction = getGraph(this.graphId).get('direction')
     const nodeCfg: INodeCfg = {
       ...defaultCfg,
       ...getGraph(this.graphId).get('nodeInfo'),
+      direction,
       graphId: this.graphId
     }
-    const direction = getGraph(this.graphId).get('direction')
-    const node = new Node(model, nodeCfg, direction)
+    const node = new Node(model, nodeCfg)
     this.nodeMap[node.id] = node
 
     this.watchNodeChange(node)

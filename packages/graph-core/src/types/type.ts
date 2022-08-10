@@ -2,7 +2,6 @@ import {
   EdgeInfo,
   IDirection,
   IEdgeModel,
-  INode,
   INodeModel,
   IPortModel,
   NodeInfo
@@ -30,14 +29,12 @@ export interface INodeCfg extends NodeInfo {
   cfg?: INodeCfg
   width: number
   height: number
-  direction?: IDirection
+  direction: IDirection
   graphId: string
-  [key: string]: any
 }
 
 export interface IEdgeCfg extends EdgeInfo {
   graphId: string
-  [key: string]: any
 }
 
 export interface IPortCfg {

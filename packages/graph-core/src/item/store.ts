@@ -67,4 +67,3 @@ const getters = {
 const actions = {}
 
 export const store = { state, mutations, getters, actions }
-console.log(store)

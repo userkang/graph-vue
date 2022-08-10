@@ -13,7 +13,6 @@ import nodeView from '../view/node'
 import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
 import { store } from './store'
-import Edge from './edge'
 
 export default class Node extends Base<
   INodeModel,
@@ -79,23 +78,12 @@ export default class Node extends Base<
 
   public get ports(): IPort[] {
     const portMap = store.getters.portMap(this.graphId)
-    const ports: Port[] = []
-    Array.from(this.portIdSet).forEach(portId => {
-      const item = portMap[portId]
-      ports.push(item)
-    })
-    return ports
+    return Array.from(this.portIdSet).map(itemId => portMap[itemId])
   }
 
   public getEdges(): IEdge[] {
     const edgeMap = store.getters.edgeMap(this.graphId)
-
-    const edges: IEdge[] = []
-    Array.from(this.edgeIdSet).forEach(edgeId => {
-      const item = edgeMap[edgeId]
-      edges.push(item)
-    })
-    return edges
+    return Array.from(this.edgeIdSet).map(itemId => edgeMap[itemId])
   }
 
   public getInEdges(): IEdge[] {
@@ -143,12 +131,7 @@ export default class Node extends Base<
 
   public getChildren(): INode[] {
     const nodeMap = store.getters.nodeMap(this.graphId)
-    const res: INode[] = []
-    Array.from(this.nodeIdSet).map(nodeId => {
-      const item = nodeMap[nodeId]
-      res.push(item)
-    })
-    return res
+    return Array.from(this.nodeIdSet).map(itemId => nodeMap[itemId])
   }
 
   public setParent(node: INode) {
@@ -215,7 +198,7 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    store.mutations.insertItem(this.graphId, edge) 
+    store.mutations.insertItem(this.graphId, edge)
     this.edgeIdSet.add(edge.id)
   }
 
@@ -289,7 +272,7 @@ export default class Node extends Base<
         graphId: this.graphId
       })
       this.portIdSet.add(port.id)
-      store.mutations.insertItem(this.graphId, port) 
+      store.mutations.insertItem(this.graphId, port)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)

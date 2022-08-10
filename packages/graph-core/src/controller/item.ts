@@ -1,7 +1,7 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
-import {  store } from '../item/store'
+import { store } from '../item/store'
 import { INodeCfg, IEdgeCfg } from '../types/type'
 
 const NODE_DEFAULT_CFG = {
@@ -71,6 +71,7 @@ export default class ItemController {
   }
 
   public deleteNode(id: string): INode | undefined {
+    const graph = store.getters.graph(this.graphId)
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
@@ -78,13 +79,13 @@ export default class ItemController {
     }
     // 先删除与节点相关的边
     for (let i = node.getEdges().length - 1; i >= 0; i--) {
-      store.getters.graph(this.graphId).deleteEdge(node.getEdges()[i]?.id, false)
+      graph.deleteEdge(node.getEdges()[i]?.id, false)
     }
     this.nodeMap[node.id].off()
     store.mutations.removeItem(this.graphId, node.id)
 
-    if (store.getters.graph(this.graphId).get('isRender')) {
-      const nodeGroup = store.getters.graph(this.graphId).get('svg').get('nodeGroup')
+    if (graph.get('isRender')) {
+      const nodeGroup = graph.get('svg').get('nodeGroup')
       nodeGroup.remove(node.view)
     }
 
@@ -96,26 +97,27 @@ export default class ItemController {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
+    const graph = store.getters.graph(this.graphId)
 
-    const defaultNode = store.getters.graph(this.graphId).get('defaultNode') || {}
+    const defaultNode = graph.get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const direction = store.getters.graph(this.graphId).get('direction')
+    const direction = graph.get('direction')
     const nodeCfg: INodeCfg = {
       ...NODE_DEFAULT_CFG,
-      ...store.getters.graph(this.graphId).get('nodeInfo'),
+      ...graph.get('nodeInfo'),
       direction,
       graphId: this.graphId
     }
     const node = new Node(model, nodeCfg)
-    this.nodeMap[node.id] = node 
+    this.nodeMap[node.id] = node
     store.mutations.insertItem(this.graphId, node)
 
     this.watchNodeChange(node)
 
     // 渲染
-    if (store.getters.graph(this.graphId).get('isRender')) {
-      const nodeView = node.render(store.getters.graph(this.graphId))
-      const nodeGroup = store.getters.graph(this.graphId).get('svg').get('nodeGroup')
+    if (graph.get('isRender')) {
+      const nodeView = node.render(graph)
+      const nodeGroup = graph.get('svg').get('nodeGroup')
       nodeGroup.add(nodeView)
     }
 
@@ -159,11 +161,14 @@ export default class ItemController {
     if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
       toPort.clearState('linked')
     }
- 
+
     store.mutations.removeItem(this.graphId, id)
 
     if (store.getters.graph(this.graphId).get('isRender')) {
-      const edgeGroup = store.getters.graph(this.graphId).get('svg').get('edgeGroup')
+      const edgeGroup = store.getters
+        .graph(this.graphId)
+        .get('svg')
+        .get('edgeGroup')
       edgeGroup.remove(edge.view)
     }
     return edge
@@ -171,20 +176,21 @@ export default class ItemController {
 
   public addEdge(item: IEdgeModel): Edge | undefined {
     try {
+      const graph = store.getters.graph(this.graphId)
       const edgeCfg: IEdgeCfg = {
-        ...store.getters.graph(this.graphId).get('edgeInfo'),
+        ...graph.get('edgeInfo'),
         graphId: this.graphId
       }
       const edge = new Edge(item, edgeCfg)
-      this.edgeMap[edge.id] = edge 
+      this.edgeMap[edge.id] = edge
       store.mutations.insertItem(this.graphId, edge)
 
       this.watchEdgeChange(edge)
 
       // 渲染
-      if (store.getters.graph(this.graphId).get('isRender')) {
-        const edgeView = edge.render(store.getters.graph(this.graphId))
-        const edgeGroup = store.getters.graph(this.graphId).get('svg').get('edgeGroup')
+      if (graph.get('isRender')) {
+        const edgeView = edge.render(graph)
+        const edgeGroup = graph.get('svg').get('edgeGroup')
         edgeGroup.add(edgeView)
       }
 

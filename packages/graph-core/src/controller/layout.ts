@@ -22,17 +22,15 @@ export default class LayoutController {
   constructor(readonly graphId: string) {}
 
   initDagre(options?: IDagreLayout) {
+    const graph = store.getters.graph(this.graphId)
     Object.assign(this.options, options)
-    store.getters.graph(this.graphId).set(
-      'direction',
-      options?.rankdir || store.getters.graph(this.graphId).get('direction')
-    )
+    graph.set('direction', options?.rankdir || graph.get('direction'))
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
       width: 0,
       height: 0,
-      rankdir: store.getters.graph(this.graphId).get('direction'),
+      rankdir: graph.get('direction'),
       ...this.options
     })
     this.dagre.setDefaultEdgeLabel(() => {
@@ -41,22 +39,24 @@ export default class LayoutController {
   }
 
   layout(cfg: ILayout, stack: boolean) {
-    stack && store.getters.graph(this.graphId).stackStart()
+    const graph = store.getters.graph(this.graphId)
+    stack && graph.stackStart()
     let res
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)
     } else {
       res = this.dagreLayout(cfg)
     }
-    stack && store.getters.graph(this.graphId).stackEnd()
+    stack && graph.stackEnd()
     return res
   }
 
   dagreLayout(cfg: ILayout) {
+    const graph = store.getters.graph(this.graphId)
     this.initDagre(cfg.options as IDagreLayout)
 
-    const nodes = cfg.data?.nodes || store.getters.graph(this.graphId).getNodes()
-    const edges = cfg.data?.edges || store.getters.graph(this.graphId).getEdges()
+    const nodes = cfg.data?.nodes || graph.getNodes()
+    const edges = cfg.data?.edges || graph.getEdges()
 
     nodes.forEach(item => {
       this.dagre.setNode(item.id, {
@@ -72,11 +72,11 @@ export default class LayoutController {
     dagre.layout(this.dagre)
 
     const group = this.dagre.graph()
-    const svgInfo = store.getters.graph(this.graphId).getSvgInfo()
+    const svgInfo = graph.getSvgInfo()
     const stackNode: INodeModel[] = []
 
     this.dagre.nodes().forEach((id: string) => {
-      const node = store.getters.graph(this.graphId).findNode(id) as INode
+      const node = graph.findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
@@ -91,13 +91,14 @@ export default class LayoutController {
   }
 
   circleLayout(cfg: ILayout) {
+    const graph = store.getters.graph(this.graphId)
     const options = Object.assign(
       {},
       this.options,
       cfg.options
     ) as ICircleLayout
-    const svgInfo = store.getters.graph(this.graphId).getSvgInfo()
-    const nodes = (cfg.data?.nodes || store.getters.graph(this.graphId).getNodes()).filter(
+    const svgInfo = graph.getSvgInfo()
+    const nodes = (cfg.data?.nodes || graph.getNodes()).filter(
       node => !node.parentId
     )
 

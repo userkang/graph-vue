@@ -77,9 +77,12 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return Array.from(this.portIdSet).map(
-      portId => store[this.graphId].ports[portId]
-    )
+    const ports: Port[] = []
+    Array.from(this.portIdSet).forEach(portId => {
+      const item = store[this.graphId].itemMap[portId]
+      item instanceof Port && ports.push(item)
+    })
+    return ports
   }
 
   public getEdges(): IEdge[] {
@@ -275,7 +278,6 @@ export default class Node extends Base<
         graphId: this.graphId
       })
       this.portIdSet.add(port.id)
-      store[this.graphId].ports[port.id] = port
       store[this.graphId].itemMap[port.id] = port
 
       port.setupNode(this)
@@ -288,7 +290,7 @@ export default class Node extends Base<
 
   public deletePorts(ids: string[]) {
     ids.forEach(id => {
-      const port = store[this.graphId].ports[id]
+      const port = store[this.graphId].itemMap[id]
       port?.off('change', this.onPortChange)
       this.portIdSet.delete(id)
     })

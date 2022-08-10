@@ -71,7 +71,6 @@ export default class Graph extends EventEmitter {
       graph: this,
       nodes: {},
       edges: {},
-      ports: {},
       itemMap: {}
     }
   }

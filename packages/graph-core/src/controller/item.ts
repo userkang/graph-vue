@@ -1,7 +1,8 @@
 import Node from '../item/node'
-import { INode, INodeModel, IPort } from '../types'
+import Edge from '../item/edge'
+import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
 import { getGraph, store } from '../item/store'
-import { INodeCfg } from '../types/type'
+import { INodeCfg, IEdgeCfg } from '../types/type'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
@@ -9,8 +10,13 @@ const NODE_DEFAULT_CFG = {
 } as const
 
 export default class ItemController {
-  constructor(readonly graphId: string){
-
+  constructor(readonly graphId: string) {
+    if (getGraph(this.graphId).cfg.nodes) {
+      this.loadNodes(getGraph(this.graphId).cfg.nodes)
+    }
+    if (getGraph(this.graphId).cfg.edges) {
+      this.loadEdges(getGraph(this.graphId).cfg.edges)
+    }
   }
 
   get nodeMap() {
@@ -21,6 +27,14 @@ export default class ItemController {
     return Object.values(this.nodeMap).sort(
       (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
     )
+  }
+
+  get edgeMap() {
+    return store[this.graphId].edges
+  }
+
+  get edges() {
+    return Object.values(this.edgeMap)
   }
 
   get portsMap() {
@@ -54,7 +68,6 @@ export default class ItemController {
     }
     node.update(model)
   }
-
 
   public deleteNode(id: string): INode | undefined {
     const node = this.findNode(id)
@@ -113,6 +126,79 @@ export default class ItemController {
     getGraph(this.graphId).emit(eventType, node, type)
   }
 
+  public findEdge(id: string | number): IEdge | undefined {
+    return this.edgeMap[String(id)]
+  }
+
+
+  public updateEdge(id: string, model: IEdgeModel): void {
+    const edge = this.findEdge(id)
+    if (!edge) {
+      return console.warn(`can't update edge where id is '${id}'`)
+    }
+    edge.update(model)
+  }
+
+  public deleteEdge(id: string): IEdge | undefined {
+    const edge = this.findEdge(id)
+    if (!edge) {
+      console.warn(`can't delete edge where id is '${id}'`)
+      return
+    }
+    // 先删除前后节点的相关边
+    const { fromNode, toNode, fromPort, toPort } = edge
+    edge.fromNode.deleteEdge(id)
+    edge.toNode.deleteEdge(id)
+
+    // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
+    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
+      fromPort.clearState('linked')
+    }
+
+    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
+      toPort.clearState('linked')
+    }
+
+    delete this.edgeMap[id]
+
+    if (getGraph(this.graphId).get('isRender')) {
+      const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
+      edgeGroup.remove(edge.view)
+    }
+    return edge
+  }
+
+  public addEdge(item: IEdgeModel): Edge | undefined {
+    try {
+      const edgeCfg: IEdgeCfg = {
+        ...getGraph(this.graphId).get('edgeInfo'),
+        graphId: this.graphId
+      }
+      const edge = new Edge(item, edgeCfg)
+      this.edgeMap[edge.id] = edge
+
+      this.watchEdgeChange(edge)
+
+      // 渲染
+      if (getGraph(this.graphId).get('isRender')) {
+        const edgeView = edge.render(getGraph(this.graphId))
+        const edgeGroup = getGraph(this.graphId).get('svg').get('edgeGroup')
+        edgeGroup.add(edgeView)
+      }
+
+      return edge
+    } catch (error) {
+      console.warn(error)
+    }
+  }
+
+  watchEdgeChange(edge: IEdge) {
+    edge.on('change', (edge: IEdge, type: string) => {
+      getGraph(this.graphId).emit(`edge:change:${type}`, edge)
+      getGraph(this.graphId).emit('edge:change', edge, type)
+    })
+  }
+
   onPortChange = (port: IPort, type: string) => {
     const eventType = 'port:change'
     getGraph(this.graphId).emit(`${eventType}:${type}`, port)
@@ -136,7 +222,7 @@ export default class ItemController {
     node.on('port:deleted', this.onPortDeleted)
   }
 
-  public data(nodes: INodeModel[]) {
+  public loadNodes(nodes: INodeModel[]) {
     const childNodes: INode[] = []
 
     Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
@@ -159,6 +245,12 @@ export default class ItemController {
         )
       }
     })
+  }
+
+  public loadEdges(group: IEdgeModel[]) {
+    for (const item of group) {
+      this.addEdge(item)
+    }
   }
 
   public destroy() {

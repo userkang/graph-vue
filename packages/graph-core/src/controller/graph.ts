@@ -3,7 +3,6 @@ import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
 import ItemController from './item'
-import EdgeController from './edge'
 import StackController from './stack'
 import Svg from '../view/svg'
 import {
@@ -40,7 +39,6 @@ export default class Graph extends EventEmitter {
   private layoutController!: LayoutController
   private eventController!: EventController
   private itemController!: ItemController
-  private edgeController!: EdgeController
   private stackController!: StackController
   readonly graphId = uniqueId('graph')
 
@@ -77,7 +75,6 @@ export default class Graph extends EventEmitter {
     this.layoutController = new LayoutController(this.graphId)
     this.eventController = new EventController(this.graphId)
     this.itemController = new ItemController(this.graphId)
-    this.edgeController = new EdgeController(this.graphId)
     this.stackController = new StackController(this.graphId)
   }
 
@@ -175,11 +172,11 @@ export default class Graph extends EventEmitter {
   }
 
   public getEdges(): IEdge[] {
-    return this.edgeController.edges
+    return this.itemController.edges
   }
 
   public findEdge(id: string | number): IEdge | undefined {
-    return this.edgeController.findEdge(id)
+    return this.itemController.findEdge(id)
   }
 
   public findEdgeByState(state: string): IEdge[] {
@@ -187,17 +184,17 @@ export default class Graph extends EventEmitter {
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {
-    const edge = this.edgeController.findEdge(id)
+    const edge = this.itemController.findEdge(id)
     if (!edge) {
       return console.warn(`can't find edge where id is '${id}'`)
     }
-    this.edgeController.updateEdge(id, model)
+    this.itemController.updateEdge(id, model)
     this.emit('edge:change', edge)
   }
 
   public deleteEdge(id: string, stack = true): IEdge | undefined {
     stack && this.stackStart()
-    const edge = this.edgeController.deleteEdge(id)
+    const edge = this.itemController.deleteEdge(id)
     if (!edge) {
       return
     }
@@ -208,7 +205,7 @@ export default class Graph extends EventEmitter {
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
     stack && this.stackStart()
-    const edge = this.edgeController.addEdge(item)
+    const edge = this.itemController.addEdge(item)
     if (edge) {
       this.emit('edge:added', item)
     }
@@ -280,8 +277,8 @@ export default class Graph extends EventEmitter {
       node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
     )
 
-    this.itemController.data(model.nodes)
-    this.edgeController.data(model.edges)
+    this.itemController.loadNodes(model.nodes)
+    this.itemController.loadEdges(model.edges)
     if (needLayout) {
       this.layout({}, false)
     }
@@ -361,13 +358,11 @@ export default class Graph extends EventEmitter {
     this.stackController.clearStack()
     this.eventController.destroy()
     this.itemController.destroy()
-    this.edgeController.destroy()
     this.viewController.destroy()
     this.layoutController.destroy()
     ;(this.stackController as StackController | null) = null
     ;(this.eventController as EventController | null) = null
     ;(this.itemController as ItemController | null) = null
-    ;(this.edgeController as EdgeController | null) = null
     ;(this.viewController as ViewController | null) = null
     ;(this.layoutController as LayoutController | null) = null
   }

@@ -87,7 +87,7 @@ export default class Stack {
     // transform
     const { beforeTransform, afterTransform } = stackData
     if (beforeTransform && afterTransform) {
-      store.getters.graph(this.graphId).translateBy(
+      store.getters.graph(this.graphId).translate(
         beforeTransform.x - afterTransform.x,
         beforeTransform.y - afterTransform.y
       )

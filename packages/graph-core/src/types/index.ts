@@ -82,6 +82,7 @@ export interface ICfg extends IGraphConfig {
   edges: IEdgeModel[]
   nodeInfo?: NodeInfo
   action: string[]
+  brushing: boolean
 }
 
 export interface IDataStack {

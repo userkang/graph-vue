@@ -69,7 +69,10 @@ export default class Graph extends EventEmitter {
 
     this.resetStore()
 
-    this.cfg = Object.assign(getDefaultConfig(), config, { container })
+    this.cfg = Object.assign(getDefaultConfig(), config, {
+      container,
+      brushing: false
+    })
 
     // 是否触发自带渲染
     const svg = container.querySelector('svg')

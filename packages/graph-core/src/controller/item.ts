@@ -97,7 +97,32 @@ export default class ItemController {
     this.nodeMap[node.id] = node
     store.mutations.insertItem(this.$graph.graphId, node)
 
-    this.watchNodeChange(node)
+    const onNodeChange = (node: INode, type: string) => {
+      const eventType = 'node:change'
+      this.$graph.emit(`${eventType}:${type}`, node)
+      this.$graph.emit(eventType, node, type)
+    }
+
+    const onPortChange = (port: IPort, type: string) => {
+      const eventType = 'port:change'
+      this.$graph.emit(`${eventType}:${type}`, port)
+      this.$graph.emit(eventType, port, type)
+    }
+
+    const onPortAdded = (ports: IPort[]) => {
+      const eventType = 'port:added'
+      this.$graph.emit(eventType, ports)
+    }
+
+    const onPortDeleted = (ids: string[]) => {
+      const eventType = 'port:deleted'
+      this.$graph.emit(eventType, ids)
+    }
+
+    node.on('change', onNodeChange)
+    node.on('port:change', onPortChange)
+    node.on('port:added', onPortAdded)
+    node.on('port:deleted', onPortDeleted)
 
     // 渲染
     if (graph.get('isRender')) {
@@ -107,12 +132,6 @@ export default class ItemController {
     }
 
     return node
-  }
-
-  onNodeChange = (node: INode, type: string) => {
-    const eventType = 'node:change'
-    this.$graph.emit(`${eventType}:${type}`, node)
-    this.$graph.emit(eventType, node, type)
   }
 
   public findEdge(id: string | number): IEdge | undefined {
@@ -156,7 +175,10 @@ export default class ItemController {
       this.edgeMap[edge.id] = edge
       store.mutations.insertItem(this.$graph.graphId, edge)
 
-      this.watchEdgeChange(edge)
+      edge.on('change', (edge: IEdge, type: string) => {
+        this.$graph.emit(`edge:change:${type}`, edge)
+        this.$graph.emit('edge:change', edge, type)
+      })
 
       // 渲染
       if (graph.get('isRender')) {
@@ -169,36 +191,6 @@ export default class ItemController {
     } catch (error) {
       console.warn(error)
     }
-  }
-
-  watchEdgeChange(edge: IEdge) {
-    edge.on('change', (edge: IEdge, type: string) => {
-      this.$graph.emit(`edge:change:${type}`, edge)
-      this.$graph.emit('edge:change', edge, type)
-    })
-  }
-
-  onPortChange = (port: IPort, type: string) => {
-    const eventType = 'port:change'
-    this.$graph.emit(`${eventType}:${type}`, port)
-    this.$graph.emit(eventType, port, type)
-  }
-
-  onPortAdded = (ports: IPort[]) => {
-    const eventType = 'port:added'
-    this.$graph.emit(eventType, ports)
-  }
-
-  onPortDeleted = (ids: string[]) => {
-    const eventType = 'port:deleted'
-    this.$graph.emit(eventType, ids)
-  }
-
-  public watchNodeChange(node: INode) {
-    node.on('change', this.onNodeChange)
-    node.on('port:change', this.onPortChange)
-    node.on('port:added', this.onPortAdded)
-    node.on('port:deleted', this.onPortDeleted)
   }
 
   public loadNodes(nodes: INodeModel[]) {

@@ -14,7 +14,7 @@ export default class Svg extends Element {
     super()
     this.set('graph', graph)
     this.set('id', uniqueId('svg'))
-    this.container = graph.get('container')
+    this.container = graph.container
     this.draw()
     insertCss(content)
     this.initDefs()

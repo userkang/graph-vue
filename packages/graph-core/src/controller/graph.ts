@@ -55,6 +55,7 @@ export default class Graph extends EventEmitter {
   components: Record<string, any> = {}
   readonly $svg?: Svg
   readonly isRender: boolean
+  readonly container: HTMLElement
 
   constructor(config: IGraphConfig) {
     super()
@@ -66,11 +67,11 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
+    this.container = container
 
     this.resetStore()
 
     this.cfg = Object.assign(getDefaultConfig(), config, {
-      container,
       brushing: false
     })
 

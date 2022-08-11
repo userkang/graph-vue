@@ -323,7 +323,7 @@ export default class Node extends Base<
 
   mount() {
     const graph = store.getters.graph(this.graphId)
-    if (graph?.get('isRender')) {
+    if (graph?.isRender) {
       const nodeView = this.render(graph)
       const nodeGroup = graph.$svg?.get('nodeGroup')
       nodeGroup.add(nodeView)
@@ -332,7 +332,7 @@ export default class Node extends Base<
 
   unMount() {
     const graph = store.getters.graph(this.graphId)
-    if (graph?.get('isRender')) {
+    if (graph?.isRender) {
       const group = graph.$svg?.get('nodeGroup')
       group.remove(this.view)
     }

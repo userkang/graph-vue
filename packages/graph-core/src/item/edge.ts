@@ -137,7 +137,7 @@ export default class Edge extends Base<
 
   unMount() {
     const graph = store.getters.graph(this.graphId)
-    if (graph.get('isRender')) {
+    if (graph.isRender) {
       const group = graph.$svg?.get('edgeGroup')
       group.remove(this.view)
     }

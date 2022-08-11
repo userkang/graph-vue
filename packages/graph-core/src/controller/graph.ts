@@ -46,14 +46,15 @@ export const useGraph = () => {
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
-  private viewController: ViewController
-  private layoutController: LayoutController
-  private eventController: EventController
-  private itemController: ItemController
-  private stackController: StackController
+  private readonly viewController: ViewController
+  private readonly layoutController: LayoutController
+  private readonly eventController: EventController
+  private readonly itemController: ItemController
+  private readonly stackController: StackController
   readonly graphId = uniqueId('graph')
   components: Record<string, any> = {}
-  $svg?: Svg
+  readonly $svg?: Svg
+  readonly isRender: boolean
 
   constructor(config: IGraphConfig) {
     super()
@@ -72,7 +73,7 @@ export default class Graph extends EventEmitter {
 
     // 是否触发自带渲染
     const svg = container.querySelector('svg')
-    this.set('isRender', !svg)
+    this.isRender = !svg
     this.$svg = svg ? void 0 : new Svg(this)
     this.viewController = new ViewController()
     this.layoutController = new LayoutController()
@@ -295,7 +296,7 @@ export default class Graph extends EventEmitter {
 
   private clearItem() {
     // 清除原有节点和边
-    if (this.get('isRender')) {
+    if (this.isRender) {
       Object.values(store.getters.itemMap(this.graphId)).forEach(item =>
         item.remove()
       )

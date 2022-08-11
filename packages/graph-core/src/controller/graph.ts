@@ -52,6 +52,7 @@ export default class Graph extends EventEmitter {
   private itemController!: ItemController
   private stackController!: StackController
   readonly graphId = uniqueId('graph')
+  components: Record<string, any> = {}
 
   constructor(config: IGraphConfig) {
     super()
@@ -77,6 +78,10 @@ export default class Graph extends EventEmitter {
     this.initController()
     ;(window as any).graph = this
     instantiatingGraph = null
+  }
+
+  component(name: string, ctor: any) {
+    this.components[name] = ctor
   }
 
   private resetStore() {

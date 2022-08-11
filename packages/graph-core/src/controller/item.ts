@@ -2,7 +2,7 @@ import Node from '../item/node'
 import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
 import { store } from '../item/store'
-import { INodeCfg, IEdgeCfg } from '../types/type'
+import { INodeCfg, IEdgeCfg, Item, itemId } from '../types/type'
 import Graph, { useGraph } from './graph'
 
 const NODE_DEFAULT_CFG = {
@@ -49,6 +49,10 @@ export default class ItemController {
     return res
   }
 
+  findItem(id: itemId): Item | undefined {
+    return store.getters.itemMap(this.$graph.graphId)[id]
+  }
+
   public findNode(id: string | number): INode | undefined {
     return this.nodeMap[String(id)]
   }
@@ -71,23 +75,6 @@ export default class ItemController {
       return console.warn(`can't update node where id is '${id}'`)
     }
     node.update(model)
-  }
-
-  public deleteNode(id: string): INode | undefined {
-    const graph = this.$graph
-    const node = this.findNode(id)
-    if (!node) {
-      console.warn(`can't delete node where id is '${id}'`)
-      return
-    }
-    node.remove()
-
-    if (graph.get('isRender')) {
-      const nodeGroup = graph.get('svg').get('nodeGroup')
-      nodeGroup.remove(node.view)
-    }
-
-    return node
   }
 
   public addNode(item: INodeModel): INode | undefined {
@@ -140,19 +127,22 @@ export default class ItemController {
     edge.update(model)
   }
 
-  public deleteEdge(id: string): IEdge | undefined {
-    const edge = this.findEdge(id)
-    if (!edge) {
-      console.warn(`can't delete edge where id is '${id}'`)
+  deleteItem(id: itemId): Item | undefined {
+    const item = this.findItem(id)
+    if (!item) {
+      console.warn(`can't delete item where id is '${id}'`)
       return
     }
-    edge.remove()
+    item.remove()
+    return item
+  }
 
-    if (this.$graph.get('isRender')) {
-      const edgeGroup = this.$graph.get('svg').get('edgeGroup')
-      edgeGroup.remove(edge.view)
-    }
-    return edge
+  public deleteNode(id: string): INode | undefined {
+    return this.deleteItem(id) as INode | undefined
+  }
+
+  public deleteEdge(id: string): IEdge | undefined {
+    return this.deleteItem(id) as IEdge | undefined
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {

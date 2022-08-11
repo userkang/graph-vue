@@ -158,5 +158,7 @@ export default class Port extends Base<
   remove() {
     this.off()
     store.mutations.removeItem(this.graphId, this.id)
+
+    this.emit('removed', this)
   }
 }

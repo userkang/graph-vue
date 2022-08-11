@@ -135,6 +135,14 @@ export default class Edge extends Base<
 
   setupContainer(container: Item) {}
 
+  unMount() {
+    const graph = store.getters.graph(this.graphId)
+    if (graph.get('isRender')) {
+      const edgeGroup = graph.get('svg').get('edgeGroup')
+      edgeGroup.remove(this.view)
+    }
+  }
+
   remove() {
     // 先删除前后节点的相关边
     const { fromNode, toNode, fromPort, toPort } = this
@@ -151,5 +159,9 @@ export default class Edge extends Base<
 
     this.off()
     store.mutations.removeItem(this.graphId, this.id)
+
+    this.unMount()
+
+    this.emit('removed', this)
   }
 }

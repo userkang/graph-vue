@@ -324,6 +324,14 @@ export default class Node extends Base<
     return view
   }
 
+  unMount() {
+    const graph = store.getters.graph(this.graphId)
+    if (graph.get('isRender')) {
+      const edgeGroup = graph.get('svg').get('nodeGroup')
+      edgeGroup.remove(this.view)
+    }
+  }
+
   remove() {
     // 先删除与节点相关的边
     this.off()
@@ -333,6 +341,9 @@ export default class Node extends Base<
     })
 
     store.mutations.removeItem(this.graphId, this.id)
-    this.emit('removed')
+
+    this.unMount()
+
+    this.emit('removed', this)
   }
 }

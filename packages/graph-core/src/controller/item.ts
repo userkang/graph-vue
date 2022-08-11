@@ -94,7 +94,6 @@ export default class ItemController {
       graphId: this.$graph.graphId
     }
     const node = new Node(model, nodeCfg)
-    this.nodeMap[node.id] = node
     store.mutations.insertItem(this.$graph.graphId, node)
 
     const onNodeChange = (node: INode, type: string) => {
@@ -114,10 +113,8 @@ export default class ItemController {
       this.$graph.emit(eventType, ports)
     }
 
-    const onPortDeleted = (ids: string[]) => {
-      const eventType = 'port:deleted'
-      this.$graph.emit(eventType, ids)
-    }
+    const onPortDeleted = (ids: string[]) =>
+      this.$graph.emit('port:deleted', ids)
 
     node.on('change', onNodeChange)
     node.on('port:change', onPortChange)
@@ -125,11 +122,7 @@ export default class ItemController {
     node.on('port:deleted', onPortDeleted)
 
     // 渲染
-    if (graph.get('isRender')) {
-      const nodeView = node.render(graph)
-      const nodeGroup = graph.get('svg').get('nodeGroup')
-      nodeGroup.add(nodeView)
-    }
+    node.mount()
 
     return node
   }
@@ -153,6 +146,7 @@ export default class ItemController {
       return
     }
     item.remove()
+
     return item
   }
 

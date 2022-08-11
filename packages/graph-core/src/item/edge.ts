@@ -138,8 +138,8 @@ export default class Edge extends Base<
   unMount() {
     const graph = store.getters.graph(this.graphId)
     if (graph.get('isRender')) {
-      const edgeGroup = graph.get('svg').get('edgeGroup')
-      edgeGroup.remove(this.view)
+      const group = graph.get('svg').get('edgeGroup')
+      group.remove(this.view)
     }
   }
 

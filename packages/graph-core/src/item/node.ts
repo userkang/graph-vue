@@ -324,11 +324,20 @@ export default class Node extends Base<
     return view
   }
 
+  mount() {
+    const graph = store.getters.graph(this.graphId)
+    if (graph?.get('isRender')) {
+      const nodeView = this.render(graph)
+      const nodeGroup = graph.get('svg').get('nodeGroup')
+      nodeGroup.add(nodeView)
+    }
+  }
+
   unMount() {
     const graph = store.getters.graph(this.graphId)
-    if (graph.get('isRender')) {
-      const edgeGroup = graph.get('svg').get('nodeGroup')
-      edgeGroup.remove(this.view)
+    if (graph?.get('isRender')) {
+      const group = graph.get('svg').get('nodeGroup')
+      group.remove(this.view)
     }
   }
 

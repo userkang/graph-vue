@@ -286,8 +286,6 @@ export default class Graph extends EventEmitter {
     }
 
     this.resetStore()
-    this.set('nodes', [])
-    this.set('edges', [])
     this.clearItem()
 
     const model: IDataModel = isIDataModel(data) ? data : preorder(data)

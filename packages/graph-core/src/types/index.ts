@@ -83,7 +83,6 @@ export interface ICfg extends IGraphConfig {
   nodeInfo?: NodeInfo
   action: string[]
   isRender?: boolean
-  [key: string]: any
 }
 
 export interface IDataStack {

@@ -177,7 +177,7 @@ export default class ItemController {
       // 渲染
       if (graph.get('isRender')) {
         const edgeView = edge.render(graph)
-        const edgeGroup = graph.get('svg').get('edgeGroup')
+        const edgeGroup = graph.$svg?.get('edgeGroup')
         edgeGroup.add(edgeView)
       }
 

@@ -46,13 +46,14 @@ export const useGraph = () => {
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
-  private viewController!: ViewController
-  private layoutController!: LayoutController
-  private eventController!: EventController
-  private itemController!: ItemController
-  private stackController!: StackController
+  private viewController: ViewController
+  private layoutController: LayoutController
+  private eventController: EventController
+  private itemController: ItemController
+  private stackController: StackController
   readonly graphId = uniqueId('graph')
   components: Record<string, any> = {}
+  $svg?: Svg
 
   constructor(config: IGraphConfig) {
     super()
@@ -72,10 +73,12 @@ export default class Graph extends EventEmitter {
     // 是否触发自带渲染
     const svg = container.querySelector('svg')
     this.set('isRender', !svg)
-    if (!svg) {
-      this.set('svg', new Svg(this))
-    }
-    this.initController()
+    this.$svg = svg ? void 0 : new Svg(this)
+    this.viewController = new ViewController()
+    this.layoutController = new LayoutController()
+    this.eventController = new EventController()
+    this.itemController = new ItemController()
+    this.stackController = new StackController()
     ;(window as any).graph = this
     instantiatingGraph = null
   }
@@ -88,27 +91,8 @@ export default class Graph extends EventEmitter {
     store.mutations.insertGraph(this.graphId, this)
   }
 
-  private initController() {
-    this.viewController = new ViewController()
-    this.layoutController = new LayoutController()
-    this.eventController = new EventController()
-    this.itemController = new ItemController()
-    this.stackController = new StackController()
-  }
-
-  set<K extends keyof ICfg>(key: K, val: ICfg[K]): void
-  public set<K extends keyof ICfg, T extends string | Record<K, ICfg[K]>>(
-    key: T,
-    val?: T extends K ? ICfg[K] : undefined
-  ) {
-    switch (typeof key) {
-      case 'object':
-        const newCfg = Object.assign({}, this.cfg, key)
-        this.cfg = newCfg
-        return this.cfg
-      case 'string':
-        return (this.cfg[key] = val)
-    }
+  public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
+    this.cfg[key] = val
   }
 
   public get<T extends keyof ICfg>(key: T): ICfg[T] {
@@ -312,10 +296,9 @@ export default class Graph extends EventEmitter {
   private clearItem() {
     // 清除原有节点和边
     if (this.get('isRender')) {
-      const nodeGroup = this.get('svg').get('nodeGroup')
-      const edgeGroup = this.get('svg').get('edgeGroup')
-      nodeGroup.remove()
-      edgeGroup.remove()
+      Object.values(store.getters.itemMap(this.graphId)).forEach(item =>
+        item.remove()
+      )
     }
   }
 

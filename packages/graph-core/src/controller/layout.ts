@@ -28,13 +28,13 @@ export default class LayoutController {
   initDagre(options?: IDagreLayout) {
     const graph = this.$graph
     Object.assign(this.options, options)
-    graph.set('direction', options?.rankdir || graph.get('direction'))
+    graph.set('direction', options?.rankdir || graph.direction)
 
     this.dagre = new dagre.graphlib.Graph()
     this.dagre.setGraph({
       width: 0,
       height: 0,
-      rankdir: graph.get('direction'),
+      rankdir: graph.direction,
       ...this.options
     })
     this.dagre.setDefaultEdgeLabel(() => {

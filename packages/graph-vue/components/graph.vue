@@ -217,7 +217,7 @@ export default class GraphVue extends Vue {
   handelRankdirChange(v: string, prev: string) {
     this.graph.layout(this.layout, false)
     this.graph.getNodes().forEach(node => {
-      node.updatePorts(this.graph.get('direction'))
+      node.updatePorts(this.graph.direction)
     })
   }
 

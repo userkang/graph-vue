@@ -15,7 +15,8 @@ import {
   IEdgeModel,
   IGraphConfig,
   ILayout,
-  NodeInfo
+  NodeInfo,
+  IDirection
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder, uniqueId } from '../util/utils'
@@ -56,6 +57,7 @@ export default class Graph extends EventEmitter {
   readonly $svg?: Svg
   readonly isRender: boolean
   readonly container: HTMLElement
+  readonly direction: IDirection
 
   constructor(config: IGraphConfig) {
     super()
@@ -71,6 +73,7 @@ export default class Graph extends EventEmitter {
 
     this.resetStore()
 
+    this.direction = config.direction || 'TB'
     this.cfg = Object.assign(getDefaultConfig(), config, {
       brushing: false
     })

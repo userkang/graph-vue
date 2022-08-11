@@ -86,7 +86,7 @@ export default class ItemController {
 
     const defaultNode = graph.get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
-    const direction = graph.get('direction')
+    const direction = graph.direction
     const nodeCfg: INodeCfg = {
       ...NODE_DEFAULT_CFG,
       ...graph.get('nodeInfo'),

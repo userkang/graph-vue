@@ -1,8 +1,11 @@
 import {
   EdgeInfo,
   IDirection,
+  IEdge,
   IEdgeModel,
+  INode,
   INodeModel,
+  IPort,
   IPortModel,
   NodeInfo
 } from '.'
@@ -83,3 +86,5 @@ export interface IRect {
 }
 
 export type move = { moveX: number; moveY: number }
+
+export type Item = INode | IEdge | IPort

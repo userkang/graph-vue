@@ -80,12 +80,7 @@ export default class ItemController {
       console.warn(`can't delete node where id is '${id}'`)
       return
     }
-    // 先删除与节点相关的边
-    for (let i = node.getEdges().length - 1; i >= 0; i--) {
-      graph.deleteEdge(node.getEdges()[i]?.id, false)
-    }
-    this.nodeMap[node.id].off()
-    store.mutations.removeItem(this.$graph.graphId, node.id)
+    node.remove()
 
     if (graph.get('isRender')) {
       const nodeGroup = graph.get('svg').get('nodeGroup')
@@ -151,21 +146,7 @@ export default class ItemController {
       console.warn(`can't delete edge where id is '${id}'`)
       return
     }
-    // 先删除前后节点的相关边
-    const { fromNode, toNode, fromPort, toPort } = edge
-    edge.fromNode.deleteEdge(id)
-    edge.toNode.deleteEdge(id)
-
-    // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
-    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
-      fromPort.clearState('linked')
-    }
-
-    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
-      toPort.clearState('linked')
-    }
-
-    store.mutations.removeItem(this.$graph.graphId, id)
+    edge.remove()
 
     if (this.$graph.get('isRender')) {
       const edgeGroup = this.$graph.get('svg').get('edgeGroup')

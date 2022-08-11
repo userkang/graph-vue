@@ -11,7 +11,7 @@ import {
 } from '../types'
 import nodeView from '../view/node'
 import Graph from '../controller/graph'
-import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
+import { BaseCfg, INodeCfg, IRect, Item, itemId } from '../types/type'
 import { store } from './store'
 
 export default class Node extends Base<
@@ -199,6 +199,7 @@ export default class Node extends Base<
 
   public addEdge(edge: IEdge) {
     store.mutations.insertItem(this.graphId, edge)
+    edge.setupContainer(this)
     this.edgeIdSet.add(edge.id)
   }
 
@@ -321,5 +322,17 @@ export default class Node extends Base<
     const view = new nodeView(this, graph)
     this.set('view', view)
     return view
+  }
+
+  remove() {
+    // 先删除与节点相关的边
+    this.off()
+    const items: Item[] = this.getEdges()
+    items.forEach(item => {
+      item.remove()
+    })
+
+    store.mutations.removeItem(this.graphId, this.id)
+    this.emit('removed')
   }
 }

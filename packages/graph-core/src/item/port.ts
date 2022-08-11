@@ -154,4 +154,9 @@ export default class Port extends Base<
     container.on('change', onNodeChange)
     container.on('port:deleted', onDeleted)
   }
+
+  remove() {
+    this.off()
+    store.mutations.removeItem(this.graphId, this.id)
+  }
 }

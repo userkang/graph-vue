@@ -3,7 +3,7 @@ import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
-import { BaseCfg, IEdgeCfg } from '../types/type'
+import { BaseCfg, IEdgeCfg, Item } from '../types/type'
 import { store } from './store'
 
 interface ItemMap {
@@ -131,5 +131,25 @@ export default class Edge extends Base<
     const view = new edgeView(this, graph)
     this.set('view', view)
     return view
+  }
+
+  setupContainer(container: Item) {}
+
+  remove() {
+    // 先删除前后节点的相关边
+    const { fromNode, toNode, fromPort, toPort } = this
+    fromNode.deleteEdge(this.id)
+    toNode.deleteEdge(this.id)
+    // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
+    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
+      fromPort.clearState('linked')
+    }
+
+    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
+      toPort.clearState('linked')
+    }
+
+    this.off()
+    store.mutations.removeItem(this.graphId, this.id)
   }
 }

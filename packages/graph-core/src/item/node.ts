@@ -116,11 +116,6 @@ export default class Node extends Base<
     })
   }
 
-  public addChild(node: INode) {
-    store.mutations.insertItem(this.graphId, node)
-    this.nodeIdSet.add(node.id)
-  }
-
   public deleteChild(id: string) {
     const childNodes = this.getChildren()
     const index = childNodes.findIndex(item => item.id === id)
@@ -134,8 +129,10 @@ export default class Node extends Base<
     return Array.from(this.nodeIdSet).map(itemId => nodeMap[itemId])
   }
 
-  public setParent(node: INode) {
-    this.set('parent', node)
+  public addChild(node: INode) {
+    store.mutations.insertItem(this.graphId, node)
+    this.nodeIdSet.add(node.id)
+    node.set('parent', this)
   }
 
   public getParent(): INode {

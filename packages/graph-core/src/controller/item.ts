@@ -187,29 +187,21 @@ export default class ItemController {
     }
   }
 
-  public loadNodes(nodes: INodeModel[]) {
-    const childNodes: INode[] = []
-
+  public loadNodes(models: INodeModel[]) {
     Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
-    nodes.forEach(item => {
-      const node = this.addNode(item)
-      if (item.parentId && node) {
-        childNodes.push(node)
-      }
-    })
-
-    childNodes.forEach(childNode => {
-      const parentNode = this.findNode(childNode.parentId)
-      if (parentNode) {
-        parentNode.addChild(childNode)
-        childNode.zIndex = 1
-        childNode.setParent(parentNode)
-      } else {
-        console.warn(
-          `node id '${childNode.id}' can't find parentNode where id is '${childNode.parentId}'`
-        )
-      }
-    })
+    models
+      .map(model => this.addNode(model))
+      .forEach(node => {
+        if (!node) {
+          return
+        }
+        const parent = this.findNode(node.model.parentId)
+        if (!parent) {
+          return
+        }
+        node.zIndex = 1
+        parent.addChild(node)
+      })
   }
 
   public loadEdges(group: IEdgeModel[]) {

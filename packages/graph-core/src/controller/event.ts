@@ -1,6 +1,6 @@
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
-import { store } from '../item/store'
+import Graph, { useGraph } from './graph'
 
 export const MOUSEEVENTS = [
   'mousedown',
@@ -39,6 +39,7 @@ const DATACHANGE = [
 ]
 
 export default class EventController {
+  private $graph: Graph
   $svg: SVGSVGElement
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
@@ -49,8 +50,9 @@ export default class EventController {
   originX = 0
   originY = 0
 
-  constructor(readonly graphId: string) {
-    const svg = store.getters.graph(graphId).cfg.container.querySelector('svg')
+  constructor() {
+    this.$graph = useGraph()
+    const svg = this.$graph.cfg.container.querySelector('svg')
     if (svg) {
       this.$svg = svg
     } else {
@@ -75,18 +77,12 @@ export default class EventController {
     })
 
     this.eventQueue.push(
-      addEventListener(
-        window,
-        'resize',
-        store.getters
-          .graph(this.graphId)
-          .resize.bind(store.getters.graph(this.graphId))
-      )
+      addEventListener(window, 'resize', this.$graph.resize.bind(this.$graph))
     )
   }
 
   addBehavior(action?: string[]) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     const actions = action || graph.cfg.action
     if (actions) {
       actions.forEach((item: string) => {
@@ -110,7 +106,7 @@ export default class EventController {
         this.behaveInstance[key].destory()
       })
       this.behaveInstance = {}
-      store.getters.graph(this.graphId).set('action', [])
+      this.$graph.set('action', [])
       return
     }
 
@@ -121,9 +117,7 @@ export default class EventController {
         delete this.behaveInstance[item]
       }
     })
-    store.getters
-      .graph(this.graphId)
-      .set('action', Object.keys(this.behaveInstance))
+    this.$graph.set('action', Object.keys(this.behaveInstance))
   }
 
   handleMouseEvent(e: MouseEvent) {
@@ -155,7 +149,7 @@ export default class EventController {
   }
 
   emitMouseEvent(e: MouseEvent, eventType: string) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     const { x, y } = graph.getPointByClient(e.x, e.y)
 
     if (e.target === this.$svg) {
@@ -182,7 +176,7 @@ export default class EventController {
   }
 
   findItem(type: string, id: string) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     if (type === 'node') {
       return graph.findNode(id)
     } else if (type === 'edge') {
@@ -193,15 +187,13 @@ export default class EventController {
   }
 
   handleExtendEvents(e: MouseEvent) {
-    store.getters.graph(this.graphId).emit(e.type, e)
+    this.$graph.emit(e.type, e)
   }
 
   handleMouseMove(e: MouseEvent) {
     if (this.preItemType !== this.currentItemType) {
-      store.getters.graph(this.graphId).emit(`${this.preItemType}.mouseleave`)
-      store.getters
-        .graph(this.graphId)
-        .emit(`${this.currentItemType}.mouseenter`)
+      this.$graph.emit(`${this.preItemType}.mouseleave`)
+      this.$graph.emit(`${this.currentItemType}.mouseenter`)
     }
 
     this.preItemType = this.currentItemType
@@ -212,8 +204,8 @@ export default class EventController {
    */
   defaultEmit() {
     // 有些事件默认触发datachange事件
-    store.getters.graph(this.graphId).on(DATACHANGE, () => {
-      store.getters.graph(this.graphId).emit('datachange')
+    this.$graph.on(DATACHANGE, () => {
+      this.$graph.emit('datachange')
     })
   }
 
@@ -224,6 +216,6 @@ export default class EventController {
     this.eventQueue = []
     this.behaveInstance = []
 
-    store.getters.graph(this.graphId).off()
+    this.$graph.off()
   }
 }

@@ -32,6 +32,17 @@ const getDefaultConfig = (): Pick<
   action: []
 })
 
+let instantiatingGraph: Graph | null = null
+
+export const useGraph = () => {
+  if (!instantiatingGraph) {
+    throw new ReferenceError(
+      `useGraph only can be used when instantiate a Graph`
+    )
+  }
+  return instantiatingGraph
+}
+
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
@@ -44,6 +55,7 @@ export default class Graph extends EventEmitter {
 
   constructor(config: IGraphConfig) {
     super()
+    instantiatingGraph = this
     const container =
       config.container instanceof HTMLElement
         ? config.container
@@ -64,6 +76,7 @@ export default class Graph extends EventEmitter {
     }
     this.initController()
     ;(window as any).graph = this
+    instantiatingGraph = null
   }
 
   private resetStore() {
@@ -71,11 +84,11 @@ export default class Graph extends EventEmitter {
   }
 
   private initController() {
-    this.viewController = new ViewController(this.graphId)
-    this.layoutController = new LayoutController(this.graphId)
-    this.eventController = new EventController(this.graphId)
-    this.itemController = new ItemController(this.graphId)
-    this.stackController = new StackController(this.graphId)
+    this.viewController = new ViewController()
+    this.layoutController = new LayoutController()
+    this.eventController = new EventController()
+    this.itemController = new ItemController()
+    this.stackController = new StackController()
   }
 
   set<K extends keyof ICfg>(key: K, val: ICfg[K]): void

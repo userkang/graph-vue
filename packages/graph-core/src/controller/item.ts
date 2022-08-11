@@ -3,6 +3,7 @@ import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
 import { store } from '../item/store'
 import { INodeCfg, IEdgeCfg } from '../types/type'
+import Graph, { useGraph } from './graph'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
@@ -10,8 +11,10 @@ const NODE_DEFAULT_CFG = {
 } as const
 
 export default class ItemController {
-  constructor(readonly graphId: string) {
-    const graph = store.getters.graph(this.graphId)
+  private $graph: Graph
+  constructor() {
+    this.$graph = useGraph()
+    const graph = this.$graph
     if (graph.cfg.nodes) {
       this.loadNodes(graph.cfg.nodes)
     }
@@ -21,7 +24,7 @@ export default class ItemController {
   }
 
   get nodeMap(): Record<string, Node> {
-    return store.getters.itemMap(this.graphId, Node)
+    return store.getters.itemMap(this.$graph.graphId, Node)
   }
 
   get nodes() {
@@ -31,7 +34,7 @@ export default class ItemController {
   }
 
   get edgeMap() {
-    return store.getters.itemMap(this.graphId, Edge)
+    return store.getters.itemMap(this.$graph.graphId, Edge)
   }
 
   get edges() {
@@ -71,7 +74,7 @@ export default class ItemController {
   }
 
   public deleteNode(id: string): INode | undefined {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     const node = this.findNode(id)
     if (!node) {
       console.warn(`can't delete node where id is '${id}'`)
@@ -82,7 +85,7 @@ export default class ItemController {
       graph.deleteEdge(node.getEdges()[i]?.id, false)
     }
     this.nodeMap[node.id].off()
-    store.mutations.removeItem(this.graphId, node.id)
+    store.mutations.removeItem(this.$graph.graphId, node.id)
 
     if (graph.get('isRender')) {
       const nodeGroup = graph.get('svg').get('nodeGroup')
@@ -97,7 +100,7 @@ export default class ItemController {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
 
     const defaultNode = graph.get('defaultNode') || {}
     const model = Object.assign({}, defaultNode, item)
@@ -106,11 +109,11 @@ export default class ItemController {
       ...NODE_DEFAULT_CFG,
       ...graph.get('nodeInfo'),
       direction,
-      graphId: this.graphId
+      graphId: this.$graph.graphId
     }
     const node = new Node(model, nodeCfg)
     this.nodeMap[node.id] = node
-    store.mutations.insertItem(this.graphId, node)
+    store.mutations.insertItem(this.$graph.graphId, node)
 
     this.watchNodeChange(node)
 
@@ -126,8 +129,8 @@ export default class ItemController {
 
   onNodeChange = (node: INode, type: string) => {
     const eventType = 'node:change'
-    store.getters.graph(this.graphId).emit(`${eventType}:${type}`, node)
-    store.getters.graph(this.graphId).emit(eventType, node, type)
+    this.$graph.emit(`${eventType}:${type}`, node)
+    this.$graph.emit(eventType, node, type)
   }
 
   public findEdge(id: string | number): IEdge | undefined {
@@ -162,13 +165,10 @@ export default class ItemController {
       toPort.clearState('linked')
     }
 
-    store.mutations.removeItem(this.graphId, id)
+    store.mutations.removeItem(this.$graph.graphId, id)
 
-    if (store.getters.graph(this.graphId).get('isRender')) {
-      const edgeGroup = store.getters
-        .graph(this.graphId)
-        .get('svg')
-        .get('edgeGroup')
+    if (this.$graph.get('isRender')) {
+      const edgeGroup = this.$graph.get('svg').get('edgeGroup')
       edgeGroup.remove(edge.view)
     }
     return edge
@@ -176,14 +176,14 @@ export default class ItemController {
 
   public addEdge(item: IEdgeModel): Edge | undefined {
     try {
-      const graph = store.getters.graph(this.graphId)
+      const graph = this.$graph
       const edgeCfg: IEdgeCfg = {
         ...graph.get('edgeInfo'),
-        graphId: this.graphId
+        graphId: this.$graph.graphId
       }
       const edge = new Edge(item, edgeCfg)
       this.edgeMap[edge.id] = edge
-      store.mutations.insertItem(this.graphId, edge)
+      store.mutations.insertItem(this.$graph.graphId, edge)
 
       this.watchEdgeChange(edge)
 
@@ -202,25 +202,25 @@ export default class ItemController {
 
   watchEdgeChange(edge: IEdge) {
     edge.on('change', (edge: IEdge, type: string) => {
-      store.getters.graph(this.graphId).emit(`edge:change:${type}`, edge)
-      store.getters.graph(this.graphId).emit('edge:change', edge, type)
+      this.$graph.emit(`edge:change:${type}`, edge)
+      this.$graph.emit('edge:change', edge, type)
     })
   }
 
   onPortChange = (port: IPort, type: string) => {
     const eventType = 'port:change'
-    store.getters.graph(this.graphId).emit(`${eventType}:${type}`, port)
-    store.getters.graph(this.graphId).emit(eventType, port, type)
+    this.$graph.emit(`${eventType}:${type}`, port)
+    this.$graph.emit(eventType, port, type)
   }
 
   onPortAdded = (ports: IPort[]) => {
     const eventType = 'port:added'
-    store.getters.graph(this.graphId).emit(eventType, ports)
+    this.$graph.emit(eventType, ports)
   }
 
   onPortDeleted = (ids: string[]) => {
     const eventType = 'port:deleted'
-    store.getters.graph(this.graphId).emit(eventType, ids)
+    this.$graph.emit(eventType, ids)
   }
 
   public watchNodeChange(node: INode) {

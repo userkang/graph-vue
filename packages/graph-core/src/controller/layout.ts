@@ -8,6 +8,7 @@ import {
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
 import { store } from '../item/store'
+import Graph, { useGraph } from './graph'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -16,13 +17,16 @@ const getDTheta = (nodesLength: number) => {
 }
 
 export default class LayoutController {
+  private $graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}
 
-  constructor(readonly graphId: string) {}
+  constructor() {
+    this.$graph = useGraph()
+  }
 
   initDagre(options?: IDagreLayout) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     Object.assign(this.options, options)
     graph.set('direction', options?.rankdir || graph.get('direction'))
 
@@ -39,7 +43,7 @@ export default class LayoutController {
   }
 
   layout(cfg: ILayout, stack: boolean) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     stack && graph.stackStart()
     let res
     if (cfg.type === 'circle') {
@@ -52,7 +56,7 @@ export default class LayoutController {
   }
 
   dagreLayout(cfg: ILayout) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     this.initDagre(cfg.options as IDagreLayout)
 
     const nodes = cfg.data?.nodes || graph.getNodes()
@@ -91,7 +95,7 @@ export default class LayoutController {
   }
 
   circleLayout(cfg: ILayout) {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     const options = Object.assign(
       {},
       this.options,

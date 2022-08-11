@@ -7,6 +7,7 @@ import {
   IStack
 } from '../types/type'
 import { store } from '../item/store'
+import Graph, { useGraph } from './graph'
 
 const DEEP = 20
 const NODE_MODEL_KEY = ['x', 'y', 'width', 'height'] as const
@@ -49,6 +50,7 @@ const getIEdgeStackData = (edge: IEdge): IEdgeStackData => {
 }
 
 export default class Stack {
+  private $graph: Graph
   private startStackData: Pick<
     IStack,
     'beforeNodes' | 'beforeTransform' | 'beforeEdges'
@@ -58,7 +60,9 @@ export default class Stack {
 
   public redoStack: IStack[] = []
 
-  constructor(readonly graphId: string) {}
+  constructor() {
+    this.$graph = useGraph()
+  }
 
   public clearStack() {
     this.undoStack = []
@@ -74,7 +78,7 @@ export default class Stack {
     if (stack.length > DEEP) {
       stack.shift()
     }
-    store.getters.graph(this.graphId).emit('stackchange')
+    this.$graph.emit('stackchange')
   }
 
   public do(doType: doType) {
@@ -87,18 +91,18 @@ export default class Stack {
     // transform
     const { beforeTransform, afterTransform } = stackData
     if (beforeTransform && afterTransform) {
-      store.getters.graph(this.graphId).translate(
+      this.$graph.translate(
         beforeTransform.x - afterTransform.x,
         beforeTransform.y - afterTransform.y
       )
     }
     // node
     Object.keys(stackData.addNodes).forEach(id =>
-      store.getters.graph(this.graphId).deleteNode(id, false)
+      this.$graph.deleteNode(id, false)
     )
     Object.keys(stackData.removeNodes).forEach(id => {
       const { model, state, rect } = stackData.removeNodes[id]
-      const node = store.getters.graph(this.graphId).addNode(model, false)
+      const node = this.$graph.addNode(model, false)
       if (node) {
         node.updatePosition(rect.x, rect.y)
         Object.keys(state).forEach(key => {
@@ -107,7 +111,7 @@ export default class Stack {
       }
     })
     Object.keys(stackData.beforeNodes).forEach(id => {
-      const node = store.getters.graph(this.graphId).findNode(id)
+      const node = this.$graph.findNode(id)
       if (node) {
         const { model, state, rect } = stackData.beforeNodes[id]
         node.updatePosition(rect.x, rect.y)
@@ -120,11 +124,11 @@ export default class Stack {
     // /node
     // edge
     Object.keys(stackData.addEdges).forEach(id => {
-      store.getters.graph(this.graphId).deleteEdge(id, false)
+      this.$graph.deleteEdge(id, false)
     })
     Object.keys(stackData.removeEdges).forEach(id => {
       const { model, state } = stackData.removeEdges[id]
-      const edge = store.getters.graph(this.graphId).addEdge(model, false)
+      const edge = this.$graph.addEdge(model, false)
       if (edge) {
         Object.keys(state).forEach(key => {
           state[key] ? edge.setState(key) : edge.clearState(key)
@@ -132,7 +136,7 @@ export default class Stack {
       }
     })
     Object.keys(stackData.beforeEdges).forEach(id => {
-      const edge = store.getters.graph(this.graphId).findEdge(id)
+      const edge = this.$graph.findEdge(id)
       if (edge) {
         const { model, state } = stackData.beforeEdges[id]
         edge.update(model)
@@ -170,21 +174,17 @@ export default class Stack {
       return
     }
 
-    const beforeNodes = store.getters.graph(this.graphId)
-      .getNodes()
-      .reduce((map, node) => {
-        map[node.id] = getINodeStackData(node)
-        return map
-      }, {} as Record<string, INodeStackData>)
+    const beforeNodes = this.$graph.getNodes().reduce((map, node) => {
+      map[node.id] = getINodeStackData(node)
+      return map
+    }, {} as Record<string, INodeStackData>)
 
-    const beforeEdges = store.getters.graph(this.graphId)
-      .getEdges()
-      .reduce((edgeMap, edge) => {
-        edgeMap[edge.id] = getIEdgeStackData(edge)
-        return edgeMap
-      }, {} as Record<string, IEdgeStackData>)
+    const beforeEdges = this.$graph.getEdges().reduce((edgeMap, edge) => {
+      edgeMap[edge.id] = getIEdgeStackData(edge)
+      return edgeMap
+    }, {} as Record<string, IEdgeStackData>)
 
-    const beforeTransform = clone(store.getters.graph(this.graphId).getTranslate())
+    const beforeTransform = clone(this.$graph.getTranslate())
     this.startStackData = { beforeNodes, beforeEdges, beforeTransform }
   }
   end() {
@@ -205,7 +205,7 @@ export default class Stack {
       afterEdges: {}
     }
     // node
-    const nodes = store.getters.graph(this.graphId).getNodes()
+    const nodes = this.$graph.getNodes()
     for (const node of nodes) {
       const nodeData = getINodeStackData(node)
       if (!(node.id in this.startStackData.beforeNodes)) {
@@ -229,7 +229,7 @@ export default class Stack {
     }
     // /node
     // edge
-    const edges = store.getters.graph(this.graphId).getEdges()
+    const edges = this.$graph.getEdges()
     for (const edge of edges) {
       const edgeData = getIEdgeStackData(edge)
       if (!(edge.id in this.startStackData.beforeEdges)) {
@@ -253,7 +253,7 @@ export default class Stack {
     }
     // edge
     // transform
-    const afterTransform = clone(store.getters.graph(this.graphId).getTranslate())
+    const afterTransform = clone(this.$graph.getTranslate())
     if (!isEqual(this.startStackData.beforeTransform, afterTransform)) {
       stackData.beforeTransform = this.startStackData.beforeTransform
       stackData.afterTransform = afterTransform

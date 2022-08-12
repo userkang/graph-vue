@@ -4,6 +4,7 @@ import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
 import { store } from '../item/store'
 import { INodeCfg, IEdgeCfg, Item, itemId } from '../types/type'
 import Graph, { useGraph } from './graph'
+import { isKeyof } from '../util/utils'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
@@ -51,6 +52,31 @@ export default class ItemController {
 
   findItem(id: itemId): Item | undefined {
     return store.getters.itemMap(this.$graph.graphId)[id]
+  }
+
+  findBy(search: Record<string, any>) {
+    let items = Object.values(store.getters.itemMap(this.$graph.graphId))
+    const keys = Object.keys(search)
+    for (let i = 1; i < keys.length; i++) {
+      const key = keys[i]
+      items = items.filter(
+        item => isKeyof(key, item) && item[key] === search[key]
+      )
+    }
+    return items.find(item => {
+      const key = keys[0]
+      return isKeyof(key, item) && item[key] === search[key]
+    })
+  }
+
+  where(search: Record<string, any>) {
+    let items = Object.values(store.getters.itemMap(this.$graph.graphId))
+    for (const key in search) {
+      items = items.filter(
+        item => isKeyof(key, item) && item[key] === search[key]
+      )
+    }
+    return items
   }
 
   public findNode(id: string | number): INode | undefined {

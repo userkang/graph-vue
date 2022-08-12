@@ -91,6 +91,18 @@ export default class Graph extends EventEmitter {
     instantiatingGraph = null
   }
 
+  get find() {
+    return this.itemController.findItem
+  }
+
+  get findBy() {
+    return this.itemController.findBy
+  }
+
+  get where() {
+    return this.itemController.where
+  }
+
   component(name: string, ctor: any) {
     this.components[name] = ctor
   }

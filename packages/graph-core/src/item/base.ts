@@ -33,7 +33,6 @@ export default class Base<
         setGlobalId(model.id)
       }
     }
-    Object.defineProperty(this, '_cfg', { enumerable: false })
   }
 
   protected get<K extends keyof T>(key: K): T[K] {

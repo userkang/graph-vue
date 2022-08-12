@@ -11,7 +11,6 @@ export default class EdgeController {
     if (graph.cfg.edges) {
       this.data(graph.cfg.edges)
     }
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   get edges() {

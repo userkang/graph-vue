@@ -34,7 +34,6 @@ export default class ViewController {
     this.graph = graph
     this.$svg = graph.cfg.container.querySelector('svg') as SVGElement
     this.resize()
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   public getZoom() {

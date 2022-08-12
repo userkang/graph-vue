@@ -22,7 +22,6 @@ export default class LayoutController {
 
   constructor(graph: Graph) {
     this.graph = graph
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   initDagre(options?: IDagreLayout) {

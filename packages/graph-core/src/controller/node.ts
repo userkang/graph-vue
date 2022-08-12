@@ -15,7 +15,6 @@ export default class NodeController {
     if (graph.cfg.nodes) {
       this.data(graph.cfg.nodes)
     }
-    Object.defineProperty(this, 'graph', { enumerable: false })
   }
 
   get nodes() {

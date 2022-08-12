@@ -7,6 +7,8 @@ import { isKeyof } from '../util/utils'
 import { IDataModel } from '../types'
 
 type Item = Node | Edge | Port
+
+type itemClass<T extends Item> = new (...args: any[]) => T
 export default class Store extends EventEmitter {
   readonly itemMap: Record<string, Item> = {}
   constructor() {
@@ -18,28 +20,15 @@ export default class Store extends EventEmitter {
     this.emit('insertItem', item)
   }
 
-  deleteItem(id: itemId) {
-    if (!(id in this.itemMap)) {
-      return
-    }
-    delete this.itemMap[id]
-    this.emit('deleteItem', id)
-  }
-
-  find(id: itemId): Item | void
-  find<T extends Item>(
-    id: itemId,
-    itemClass: new (...args: any[]) => T
-  ): T | void
-  find<T extends Item>(
-    id: itemId,
-    itemClass?: new (...args: any[]) => T
-  ): Item | void {
+  find(id: itemId): Item | undefined
+  find<T extends Item>(id: itemId, itemClass?: itemClass<T>): T | undefined
+  find<T extends Item>(id: itemId, itemClass?: itemClass<T>): T | undefined {
     const item = this.itemMap[id]
+
     if (itemClass) {
       return item instanceof itemClass ? item : void 0
     } else {
-      return item
+      return item as any
     }
   }
 
@@ -104,6 +93,16 @@ export default class Store extends EventEmitter {
     return this.find(id, Node)
   }
 
+  findNodeByPort(portId: itemId) {
+    return this.getNodes().find(node =>
+      node.ports.find(port => port.id === portId)
+    )
+  }
+
+  findNodeByState(state: string) {
+    return this.getNodes().filter(item => item.hasState(state))
+  }
+
   getDataModel(): IDataModel {
     const nodes = this.getNodes().map(node => node.model)
     const edges = this.getEdges().map(edge => edge.model)
@@ -112,6 +111,29 @@ export default class Store extends EventEmitter {
 
   getTreeDataModel() {
     return this.getNodes()[0].model
+  }
+
+  deleteItem(id: itemId): Item | undefined
+  deleteItem<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
+  deleteItem<T extends Item>(
+    id: itemId,
+    itemClass?: itemClass<T>
+  ): T | undefined {
+    const item = this.find(id, itemClass)
+    if (!item) {
+      return
+    }
+    delete this.itemMap[id]
+    this.emit('deleteItem', id)
+    return item
+  }
+
+  deleteNode(id: itemId) {
+    return this.deleteItem(id, Node)
+  }
+
+  deleteEdge(id: itemId) {
+    return this.deleteItem(id, Edge)
   }
 
   clear() {

@@ -1,10 +1,9 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
-import { store } from '../item/store'
 import { INodeCfg, IEdgeCfg, Item, itemId } from '../types/type'
 import Graph, { useGraph } from './graph'
-import { isKeyof } from '../util/utils'
+import Port from '../item/port'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
@@ -29,7 +28,7 @@ export default class ItemController {
   }
 
   get nodeMap(): Record<string, Node> {
-    return store.getters.itemMap(this.$graph.graphId, Node)
+    return this.$graph.store.getItemMap(Node)
   }
 
   get nodes() {
@@ -39,56 +38,39 @@ export default class ItemController {
   }
 
   get edgeMap() {
-    return store.getters.itemMap(this.$graph.graphId, Edge)
+    return this.$graph.store.getItemMap(Edge)
   }
 
   get edges() {
-    return Object.values(this.edgeMap)
+    return this.$graph.store.getEdges()
   }
 
   get portsMap() {
-    const res: { [id: string]: IPort } = {}
-    this.nodes.forEach(node => {
-      node.ports.forEach(port => (res[port.id] = port))
-    })
-    return res
+    return this.$graph.store.getItemMap(Port)
   }
 
-  findItem(id: itemId): Item | undefined {
-    return store.getters.itemMap(this.$graph.graphId)[id]
+  get findBy() {
+    return this.$graph.store.findBy
   }
 
-  findBy(search: Record<string, any>) {
-    let items = Object.values(store.getters.itemMap(this.$graph.graphId))
-    const keys = Object.keys(search)
-    for (let i = 1; i < keys.length; i++) {
-      const key = keys[i]
-      items = items.filter(
-        item => isKeyof(key, item) && item[key] === search[key]
-      )
-    }
-    return items.find(item => {
-      const key = keys[0]
-      return isKeyof(key, item) && item[key] === search[key]
-    })
+  get where() {
+    return this.$graph.store.where
   }
 
-  where(search: Record<string, any>) {
-    let items = Object.values(store.getters.itemMap(this.$graph.graphId))
-    for (const key in search) {
-      items = items.filter(
-        item => isKeyof(key, item) && item[key] === search[key]
-      )
-    }
-    return items
+  get findItem() {
+    return this.$graph.store.find
   }
 
-  public findNode(id: string | number): INode | undefined {
-    return this.nodeMap[String(id)]
+  get findNode() {
+    return this.$graph.store.findNode
   }
 
-  public findNodeByPort(portId: string): INode | undefined {
-    return this.nodes.find(node => node.ports.find(port => port.id === portId))
+  get findNodeByPort() {
+    return this.$graph.store.findNodeByPort
+  }
+
+  get findNodeByState() {
+    return this.$graph.store.findNodeByState
   }
 
   public refreshNode(id: string): void {
@@ -124,7 +106,7 @@ export default class ItemController {
       graphId: this.$graph.graphId
     }
     const node = new Node(model, nodeCfg)
-    store.mutations.insertItem(this.$graph.graphId, node)
+    this.$graph.store.insertItem(node)
 
     const onNodeChange = (node: INode, type: string) => {
       const eventType = 'node:change'
@@ -180,12 +162,12 @@ export default class ItemController {
     return item
   }
 
-  public deleteNode(id: string): INode | undefined {
-    return this.deleteItem(id) as INode | undefined
+  public deleteNode(id: itemId) {
+    return this.$graph.store.deleteNode(id)
   }
 
-  public deleteEdge(id: string): IEdge | undefined {
-    return this.deleteItem(id) as IEdge | undefined
+  public deleteEdge(id: itemId) {
+    return this.$graph.store.deleteEdge(id)
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {
@@ -197,7 +179,7 @@ export default class ItemController {
       }
       const edge = new Edge(item, edgeCfg)
       this.edgeMap[edge.id] = edge
-      store.mutations.insertItem(this.$graph.graphId, edge)
+      this.$graph.store.insertItem(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {
         this.$graph.emit(`edge:change:${type}`, edge)

@@ -103,6 +103,14 @@ export default class Graph extends EventEmitter {
     instantiatingGraph = null
   }
 
+  get findNodeByState() {
+    return this.itemController.findNodeByState
+  }
+
+  get findNodeByPort() {
+    return this.itemController.findNodeByPort
+  }
+
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
     this.cfg[key] = val
   }
@@ -128,15 +136,7 @@ export default class Graph extends EventEmitter {
   }
 
   public findNode(id: string | number): INode | undefined {
-    return this.itemController.findNode(id)
-  }
-
-  public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => item.hasState(state))
-  }
-
-  public findNodeByPort(id: string): INode | undefined {
-    return this.itemController.findNodeByPort(id)
+    return this.itemController.findNode(String(id))
   }
 
   public refreshNode(id: string): void {

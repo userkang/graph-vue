@@ -20,8 +20,20 @@ import {
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder, uniqueId } from '../util/utils'
-import { IStack } from '../types/type'
+import { IStack, Item } from '../types/type'
 import { store } from '../item/store'
+
+const mapIncludes = (map: Map<any, any>, value: any) => {
+  const iterator = map.values()
+  let next = iterator.next()
+  while (!next.done) {
+    if (next.value === value) {
+      return true
+    }
+    next = iterator.next()
+  }
+  return false
+}
 
 const getDefaultConfig = (): Pick<
   ICfg,
@@ -53,7 +65,7 @@ export default class Graph extends EventEmitter {
   private readonly itemController: ItemController
   private readonly stackController: StackController
   readonly graphId = uniqueId('graph')
-  components: Record<string, any> = {}
+  itemClassMap: Map<Item, string> = new Map()
   readonly $svg?: Svg
   readonly isRender: boolean
   readonly container: HTMLElement
@@ -101,10 +113,6 @@ export default class Graph extends EventEmitter {
 
   get where() {
     return this.itemController.where
-  }
-
-  component(name: string, ctor: any) {
-    this.components[name] = ctor
   }
 
   private resetStore() {
@@ -321,6 +329,14 @@ export default class Graph extends EventEmitter {
       this.layout({}, false)
     }
     this.emit('datachange')
+  }
+
+  registry(itemClass: any, itemGroupName: string) {
+    if(mapIncludes(this.itemClassMap, itemGroupName)) {
+      throw new Error('组件组名已存在')
+    } 
+    // TODO验证itemClass
+    this.itemClassMap.set(itemClass, itemGroupName) 
   }
 
   public fitCenter() {

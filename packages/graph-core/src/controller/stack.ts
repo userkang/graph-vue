@@ -6,7 +6,6 @@ import {
   INodeStackData,
   IStack
 } from '../types/type'
-import { store } from '../item/store'
 import Graph, { useGraph } from './graph'
 
 const DEEP = 20

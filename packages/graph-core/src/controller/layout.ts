@@ -7,7 +7,6 @@ import {
 } from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
-import { store } from '../item/store'
 import Graph, { useGraph } from './graph'
 
 const getDTheta = (nodesLength: number) => {

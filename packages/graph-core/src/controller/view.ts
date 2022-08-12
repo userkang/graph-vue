@@ -1,4 +1,3 @@
-import { store } from '../item/store'
 import { INode } from '../types'
 import {
   isFullScreen,

@@ -22,6 +22,7 @@ import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
 import { store } from '../item/store'
+import Store from './store'
 
 const mapIncludes = (map: Map<any, any>, value: any) => {
   const iterator = map.values()
@@ -59,6 +60,7 @@ export const useGraph = () => {
 export default class Graph extends EventEmitter {
   public cfg: ICfg
 
+  readonly store: Store
   private readonly viewController: ViewController
   private readonly layoutController: LayoutController
   private readonly eventController: EventController
@@ -94,6 +96,7 @@ export default class Graph extends EventEmitter {
     const svg = container.querySelector('svg')
     this.isRender = !svg
     this.$svg = svg ? void 0 : new Svg(this)
+    this.store = new Store()
     this.viewController = new ViewController()
     this.layoutController = new LayoutController()
     this.eventController = new EventController()
@@ -332,11 +335,11 @@ export default class Graph extends EventEmitter {
   }
 
   registry(itemClass: any, itemGroupName: string) {
-    if(mapIncludes(this.itemClassMap, itemGroupName)) {
+    if (mapIncludes(this.itemClassMap, itemGroupName)) {
       throw new Error('组件组名已存在')
-    } 
+    }
     // TODO验证itemClass
-    this.itemClassMap.set(itemClass, itemGroupName) 
+    this.itemClassMap.set(itemClass, itemGroupName)
   }
 
   public fitCenter() {

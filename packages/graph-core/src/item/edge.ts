@@ -4,7 +4,6 @@ import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
 import { BaseCfg, IEdgeCfg, Item } from '../types/type'
-import { store } from './store'
 
 interface ItemMap {
   fromPort: IPort
@@ -20,26 +19,19 @@ export default class Edge extends Base<
   toNodeId: string
   constructor(model: IEdgeModel, cfg: IEdgeCfg) {
     super(model)
-    this.graphId = cfg.graphId
+    this.$graph = cfg.graph
 
-    if (
-      model.id !== undefined &&
-      store.getters.edgeMap(this.graphId)[model.id]
-    ) {
+    if (model.id !== undefined && this.$graph.store.findEdge(model.id)) {
       throw new Error(`can't add edge, exist edge where id is ${model.id}`)
     }
     const { fromPortId, toPortId, fromNodeId, toNodeId } = model
     // 如果仅有 portId，自动补全 nodeId
     const fromNode =
-      (fromNodeId !== undefined &&
-        store.getters.graph(this.graphId).findNode(fromNodeId)) ||
-      (fromPortId !== undefined &&
-        store.getters.graph(this.graphId).findNodeByPort(fromPortId))
+      (fromNodeId !== undefined && this.$graph.store.findNode(fromNodeId)) ||
+      (fromPortId !== undefined && this.$graph.store.findNodeByPort(fromPortId))
     const toNode =
-      (toNodeId !== undefined &&
-        store.getters.graph(this.graphId).findNode(toNodeId)) ||
-      (toPortId !== undefined &&
-        store.getters.graph(this.graphId).findNodeByPort(toPortId))
+      (toNodeId !== undefined && this.$graph.store.findNode(toNodeId)) ||
+      (toPortId !== undefined && this.$graph.store.findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -68,11 +60,11 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return store.getters.nodeMap(this.graphId)[this.fromNodeId]
+    return this.$graph.store.findNode(this.fromNodeId) as INode
   }
 
   public get toNode(): INode {
-    return store.getters.nodeMap(this.graphId)[this.toNodeId]
+    return this.$graph.store.findNode(this.toNodeId) as INode
   }
 
   public get fromPort() {
@@ -136,7 +128,7 @@ export default class Edge extends Base<
   setupContainer(container: Item) {}
 
   unMount() {
-    const graph = store.getters.graph(this.graphId)
+    const graph = this.$graph
     if (graph.isRender) {
       const group = graph.$svg?.get('edgeGroup')
       group.remove(this.view)
@@ -158,7 +150,7 @@ export default class Edge extends Base<
     }
 
     this.off()
-    store.mutations.removeItem(this.graphId, this.id)
+    this.$graph.store.deleteEdge(this.id)
 
     this.unMount()
 

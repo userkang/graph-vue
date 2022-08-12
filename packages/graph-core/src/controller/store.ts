@@ -69,12 +69,28 @@ export default class Store extends EventEmitter {
     }
   }
 
+  getNodeMap() {
+    return this.getItemMap(Node)
+  }
+
+  getEdgeMap() {
+    return this.getItemMap(Edge)
+  }
+
+  getPortMap() {
+    return this.getItemMap(Port)
+  }
+
   getNodes() {
-    return Object.values(this.getItemMap(Node))
+    return Object.values(this.getNodeMap())
   }
 
   getEdges() {
-    return Object.values(this.getItemMap(Edge))
+    return Object.values(this.getEdgeMap())
+  }
+
+  getPorts() {
+    return Object.values(this.getPortMap())
   }
 
   findPort(id: itemId) {
@@ -134,6 +150,10 @@ export default class Store extends EventEmitter {
 
   deleteEdge(id: itemId) {
     return this.deleteItem(id, Edge)
+  }
+
+  deletePort(id: itemId) {
+    return this.deleteItem(id, Port)
   }
 
   clear() {

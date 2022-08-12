@@ -2,6 +2,7 @@ import EventEmitter from '../util/event-emitter'
 import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { setGlobalId } from '../util/utils'
 import { BaseCfg } from '../types/type'
+import Graph from '../controller/graph'
 
 type States = BaseCfg['states']
 
@@ -22,7 +23,7 @@ export default class Base<
   T extends BaseCfg
 > extends EventEmitter {
   private _cfg: T = defaultCfg() as T
-  graphId: string = ''
+  $graph!: Graph
 
   constructor(model: M) {
     super()

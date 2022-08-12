@@ -1,3 +1,4 @@
+import Graph from '../controller/graph'
 import {
   EdgeInfo,
   IDirection,
@@ -33,15 +34,15 @@ export interface INodeCfg extends NodeInfo {
   width: number
   height: number
   direction: IDirection
-  graphId: string
+  graph: Graph
 }
 
 export interface IEdgeCfg extends EdgeInfo {
-  graphId: string
+  graph: Graph
 }
 
 export interface IPortCfg {
-  graphId: string
+  graph: Graph
   x: number
   y: number
 }

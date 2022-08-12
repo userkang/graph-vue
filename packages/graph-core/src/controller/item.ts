@@ -24,6 +24,10 @@ export default class ItemController {
     }
   }
 
+  clearItem() {
+    return this.$graph.store.clear
+  }
+
   get nodeMap(): Record<string, Node> {
     return store.getters.itemMap(this.$graph.graphId, Node)
   }

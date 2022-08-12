@@ -110,7 +110,17 @@ export default class Store extends EventEmitter {
     return { nodes, edges }
   }
 
-  getTreeDataModel() { 
+  getTreeDataModel() {
     return this.getNodes()[0].model
+  }
+
+  clear() {
+    const itemMap = this.itemMap
+    for (const key in itemMap) {
+      if (Object.prototype.hasOwnProperty.call(itemMap, key)) {
+        delete itemMap[key]
+      }
+    }
+    this.emit('clear')
   }
 }

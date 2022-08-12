@@ -21,7 +21,6 @@ import {
 import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
-import { store } from '../item/store'
 import Store from './store'
 
 const mapIncludes = (map: Map<any, any>, value: any) => {
@@ -85,8 +84,6 @@ export default class Graph extends EventEmitter {
     }
     this.container = container
 
-    this.resetStore()
-
     this.direction = config.direction || 'TB'
     this.cfg = Object.assign(getDefaultConfig(), config, {
       brushing: false
@@ -104,22 +101,6 @@ export default class Graph extends EventEmitter {
     this.stackController = new StackController()
     ;(window as any).graph = this
     instantiatingGraph = null
-  }
-
-  get find() {
-    return this.itemController.findItem
-  }
-
-  get findBy() {
-    return this.itemController.findBy
-  }
-
-  get where() {
-    return this.itemController.where
-  }
-
-  private resetStore() {
-    store.mutations.insertGraph(this.graphId, this)
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
@@ -300,7 +281,6 @@ export default class Graph extends EventEmitter {
       return
     }
 
-    this.resetStore()
     this.clearItem()
 
     const model: IDataModel = isIDataModel(data) ? data : preorder(data)
@@ -353,9 +333,7 @@ export default class Graph extends EventEmitter {
   private clearItem() {
     // 清除原有节点和边
     if (this.isRender) {
-      Object.values(store.getters.itemMap(this.graphId)).forEach(item =>
-        item.remove()
-      )
+      this.itemController.clearItem()
     }
   }
 

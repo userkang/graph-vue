@@ -32,7 +32,7 @@ export default class ViewController {
 
   constructor() {
     this.$graph = useGraph()
-    this.$svg = this.$graph.cfg.container.querySelector('svg') as SVGElement
+    this.$svg = this.$graph.getContainer().querySelector('svg') as SVGElement
     this.resize()
   }
 

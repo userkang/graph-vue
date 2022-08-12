@@ -52,7 +52,7 @@ export default class EventController {
 
   constructor() {
     this.$graph = useGraph()
-    const svg = this.$graph.cfg.container.querySelector('svg')
+    const svg = this.$graph.getContainer().querySelector('svg')
     if (svg) {
       this.$svg = svg
     } else {

@@ -128,7 +128,7 @@ export default class Graph extends EventEmitter {
   }
 
   public getContainer() {
-    return this.cfg.container
+    return this.container
   }
 
   public getSvgInfo() {

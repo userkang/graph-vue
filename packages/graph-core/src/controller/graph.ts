@@ -8,22 +8,17 @@ import Svg from '../view/svg'
 import Node from '../item/node'
 import {
   ICfg,
-  INode,
   IEdge,
-  IPort,
-  IDataModel,
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  ILayout,
   NodeInfo,
   IDirection
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, isKeyof, preorder, uniqueId } from '../util/utils'
+import { isKeyof, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
 import Store from './store'
-import Edge from '../item/edge'
 
 const getDefaultConfig = (): Pick<
   ICfg,
@@ -217,6 +212,26 @@ export default class Graph extends EventEmitter {
     return this.eventController.removeBehavior.bind(this.eventController)
   }
 
+  get getNodesBBox() {
+    return this.viewController.getNodesBBox.bind(this.viewController)
+  }
+
+  get undo() {
+    return this.stackController.undo.bind(this.stackController)
+  }
+
+  get redo() {
+    return this.stackController.redo.bind(this.stackController)
+  }
+
+  get stackStart() {
+    return this.stackController.start.bind(this.stackController)
+  }
+
+  get stackEnd() {
+    return this.stackController.end.bind(this.stackController)
+  }
+
   private withStack<T extends (payload: any) => any>(callback: T) {
     let shouldStack = true
     const func = (payload: Parameters<T>[0], stack = true) => {
@@ -286,26 +301,6 @@ export default class Graph extends EventEmitter {
     this.eventController.addBehavior(
       Array.isArray(actions) ? actions : [actions]
     )
-  }
-
-  public getNodesBBox(nodes: INode[]) {
-    return this.viewController.getNodesBBox(nodes)
-  }
-
-  public undo() {
-    this.stackController.undo()
-  }
-
-  public redo() {
-    this.stackController.redo()
-  }
-
-  public stackStart() {
-    return this.stackController.start()
-  }
-
-  public stackEnd() {
-    return this.stackController.end()
   }
 
   public getUndoStack(): IStack[] {

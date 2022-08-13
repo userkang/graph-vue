@@ -103,29 +103,27 @@ export default class Graph extends EventEmitter {
   }
 
   initController() {
-    this.itemController.on('node:refresh', (node: Node) => {
-      this.emit('node:refresh', node)
-    })
-    this.itemController.on('node:deleted', (model: INodeModel) => {
-      this.emit('node:deleted', model)
-    })
-    this.itemController.on('node:change', (node: Node) => {
-      this.emit('node:change', node)
-    })
-    this.itemController.on('node:added', (item: Node) => {
-      this.emit('node:added', item)
-    })
-
-    this.itemController.on('edge:deleted', (model: IEdgeModel) => {
-      this.emit('edge:deleted', model)
-    })
-
-    this.itemController.on('edge:change', (item: IEdge) => {
-      this.emit('edge:change', item)
-    })
-    this.itemController.on('edge:added', (item: IEdge) => {
-      this.emit('edge:added', item)
-    })
+    this.itemController.on('node:refresh', (data: Node) =>
+      this.emit('node:refresh', data)
+    )
+    this.itemController.on('node:deleted', (data: INodeModel) =>
+      this.emit('node:deleted', data)
+    )
+    this.itemController.on('node:change', (data: Node) =>
+      this.emit('node:change', data)
+    )
+    this.itemController.on('node:added', (data: Node) =>
+      this.emit('node:added', data)
+    )
+    this.itemController.on('edge:deleted', (data: IEdgeModel) =>
+      this.emit('edge:deleted', data)
+    )
+    this.itemController.on('edge:change', (data: IEdge) =>
+      this.emit('edge:change', data)
+    )
+    this.itemController.on('edge:added', (data: IEdge) =>
+      this.emit('edge:added', data)
+    )
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {

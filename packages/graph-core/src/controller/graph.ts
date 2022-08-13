@@ -25,18 +25,6 @@ import { IStack, Item } from '../types/type'
 import Store from './store'
 import Edge from '../item/edge'
 
-const mapIncludes = (map: Map<any, any>, value: any) => {
-  const iterator = map.values()
-  let next = iterator.next()
-  while (!next.done) {
-    if (next.value === value) {
-      return true
-    }
-    next = iterator.next()
-  }
-  return false
-}
-
 const getDefaultConfig = (): Pick<
   ICfg,
   'direction' | 'nodes' | 'edges' | 'action'

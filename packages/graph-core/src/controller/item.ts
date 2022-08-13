@@ -93,6 +93,7 @@ export default class ItemController extends EventEmitter {
       return console.warn(`can't update node where id is '${id}'`)
     }
     node.update(model)
+    this.emit('node:change', node)
   }
 
   public addNode(item: INodeModel): INode | undefined {

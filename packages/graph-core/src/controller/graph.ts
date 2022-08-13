@@ -109,6 +109,9 @@ export default class Graph extends EventEmitter {
     this.itemController.on('node:deleted', (model: INodeModel) => {
       this.emit('node:deleted', model)
     })
+    this.itemController.on('node:change', (node: Node) => {
+      this.emit('node:change', node)
+    })
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
@@ -144,12 +147,7 @@ export default class Graph extends EventEmitter {
   }
 
   public updateNode(id: string, model: INodeModel): void {
-    const node = this.itemController.findNode(id)
-    if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
-    }
     this.itemController.updateNode(id, model)
-    this.emit('node:change', node)
   }
 
   public deleteNode(id: string, stack = true): INode | undefined {

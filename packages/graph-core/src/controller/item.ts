@@ -1,11 +1,19 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
-import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
+import {
+  INode,
+  INodeModel,
+  IPort,
+  IEdgeModel,
+  IEdge,
+  IDataModel
+} from '../types'
 import { INodeCfg, IEdgeCfg, Item, itemId, itemClass } from '../types/type'
 import Graph, { useGraph } from './graph'
 import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import Store from './store'
+import { isIDataModel, preorder } from '../util/utils'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
@@ -72,10 +80,6 @@ export default class ItemController extends EventEmitter {
 
   get findNodeByPort() {
     return this.$store.findNodeByPort.bind(this.$store)
-  }
-
-  clearItem() {
-    return this.$store.clear
   }
 
   public refreshNode(id: string): void {
@@ -220,18 +224,17 @@ export default class ItemController extends EventEmitter {
   }
 
   public loadNodes(models: INodeModel[]) {
-    Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
     models
       .map(model => this.addNode(model))
       .forEach(node => {
         if (!node) {
           return
         }
+        node.zIndex = 1
         const parent = this.findNode(node.model.parentId)
         if (!parent) {
           return
         }
-        node.zIndex = 1
         parent.addChild(node)
       })
   }
@@ -242,7 +245,30 @@ export default class ItemController extends EventEmitter {
     }
   }
 
+  clearItem() {
+    this.$store.getNodes().forEach(node => {
+      node.remove()
+    })
+  }
+
+  public data(data: IDataModel | INodeModel) {
+    if (Object.keys(data).length === 0) {
+      return
+    }
+
+    this.clearItem()
+
+    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
+    const needLayout = model.nodes.every(
+      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
+    )
+
+    this.loadNodes(model.nodes)
+    this.loadEdges(model.edges)
+    this.emit('datachange', { needLayout: needLayout })
+  }
+
   public destroy() {
-    Object.keys(this.nodeMap).forEach(id => this.deleteNode(id))
+    this.clearItem()
   }
 }

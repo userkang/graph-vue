@@ -140,14 +140,4 @@ export default class Store extends EventEmitter {
     this.emit('deleteItem', id)
     return item
   }
-
-  clear() {
-    const itemMap = this.itemMap
-    for (const key in itemMap) {
-      if (Object.prototype.hasOwnProperty.call(itemMap, key)) {
-        delete itemMap[key]
-      }
-    }
-    this.emit('clear')
-  }
 }

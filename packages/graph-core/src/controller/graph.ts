@@ -103,27 +103,32 @@ export default class Graph extends EventEmitter {
   }
 
   initController() {
-    this.itemController.on('node:refresh', (data: Node) =>
+    this.itemController.on('node:refresh', (data: Node) => {
       this.emit('node:refresh', data)
-    )
-    this.itemController.on('node:deleted', (data: INodeModel) =>
+    })
+    this.itemController.on('node:deleted', (data: INodeModel) => {
       this.emit('node:deleted', data)
-    )
-    this.itemController.on('node:change', (data: Node) =>
+    })
+    this.itemController.on('node:change', (data: Node) => {
       this.emit('node:change', data)
-    )
-    this.itemController.on('node:added', (data: Node) =>
+    })
+    this.itemController.on('node:added', (data: Node) => {
       this.emit('node:added', data)
-    )
-    this.itemController.on('edge:deleted', (data: IEdgeModel) =>
+    })
+    this.itemController.on('edge:deleted', (data: IEdgeModel) => {
       this.emit('edge:deleted', data)
-    )
-    this.itemController.on('edge:change', (data: IEdge) =>
+    })
+    this.itemController.on('edge:change', (data: IEdge) => {
       this.emit('edge:change', data)
-    )
-    this.itemController.on('edge:added', (data: IEdge) =>
+    })
+    this.itemController.on('edge:added', (data: IEdge) => {
       this.emit('edge:added', data)
-    )
+    })
+    this.itemController.on('datachange', (data: { needLayout: boolean }) => {
+      if (data.needLayout) {
+        this.layout({}, false)
+      }
+    })
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
@@ -260,23 +265,7 @@ export default class Graph extends EventEmitter {
   }
   // 加载数据
   public data(data: IDataModel | INodeModel) {
-    if (Object.keys(data).length === 0) {
-      return
-    }
-
-    this.clearItem()
-
-    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
-    const needLayout = model.nodes.every(
-      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
-    )
-
-    this.itemController.loadNodes(model.nodes)
-    this.itemController.loadEdges(model.edges)
-    if (needLayout) {
-      this.layout({}, false)
-    }
-    this.emit('datachange')
+    this.itemController.data(data)
   }
 
   public fitCenter() {
@@ -285,13 +274,6 @@ export default class Graph extends EventEmitter {
 
   public fullScreen(el?: HTMLElement) {
     this.viewController.fullScreen(el)
-  }
-
-  private clearItem() {
-    // 清除原有节点和边
-    if (this.isRender) {
-      this.itemController.clearItem()
-    }
   }
 
   public layout(options: ILayout = {}, stack = true) {

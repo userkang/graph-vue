@@ -5,6 +5,7 @@ import EventController from './event'
 import ItemController from './item'
 import StackController from './stack'
 import Svg from '../view/svg'
+import Node from '../item/node'
 import {
   ICfg,
   INode,
@@ -22,6 +23,7 @@ import detectDirectedCycle from '../util/acyclic'
 import { isIDataModel, preorder, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
 import Store from './store'
+import Edge from '../item/edge'
 
 const mapIncludes = (map: Map<any, any>, value: any) => {
   const iterator = map.values()
@@ -159,15 +161,10 @@ export default class Graph extends EventEmitter {
 
   public deleteNode(id: string, stack = true): INode | undefined {
     stack && this.stackStart()
-    const node = this.findNode(id)
-    if (!node) {
-      console.warn(`can't delete node where id is '${id}'`)
-      return
-    }
-    this.itemController.deleteNode(id)
-    this.emit('node:deleted', node.model)
+    const node = this.itemController.deleteNode(id)
+    node && this.emit('node:deleted', node.model)
     stack && this.stackEnd()
-    return node
+    return node instanceof Node ? node : void 0
   }
 
   public addNode(item: INodeModel, stack = true): INode | undefined {
@@ -209,12 +206,9 @@ export default class Graph extends EventEmitter {
   public deleteEdge(id: string, stack = true): IEdge | undefined {
     stack && this.stackStart()
     const edge = this.itemController.deleteEdge(id)
-    if (!edge) {
-      return
-    }
-    this.emit('edge:deleted', edge.model)
+    edge && this.emit('edge:deleted', edge.model)
     stack && this.stackEnd()
-    return edge
+    return edge instanceof Edge ? edge : void 0
   }
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {

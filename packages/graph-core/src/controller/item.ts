@@ -163,11 +163,11 @@ export default class ItemController {
   }
 
   public deleteNode(id: itemId) {
-    return this.$graph.store.deleteNode(id)
+    return this.deleteItem(id)
   }
 
   public deleteEdge(id: itemId) {
-    return this.$graph.store.deleteEdge(id)
+    return this.deleteItem(id)
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {

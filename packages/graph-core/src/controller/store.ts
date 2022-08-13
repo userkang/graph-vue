@@ -2,13 +2,10 @@ import Node from '../item/node'
 import Edge from '../item/edge'
 import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
-import { itemId } from '../types/type'
+import { itemId, Item, itemClass } from '../types/type'
 import { isKeyof } from '../util/utils'
 import { IDataModel } from '../types'
 
-type Item = Node | Edge | Port
-
-type itemClass<T extends Item> = new (...args: any[]) => T
 export default class Store extends EventEmitter {
   readonly itemMap: Record<string, Item> = {}
   constructor() {

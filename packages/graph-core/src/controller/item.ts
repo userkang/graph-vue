@@ -1,7 +1,7 @@
 import Node from '../item/node'
 import Edge from '../item/edge'
 import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
-import { INodeCfg, IEdgeCfg, Item, itemId } from '../types/type'
+import { INodeCfg, IEdgeCfg, Item, itemId, itemClass } from '../types/type'
 import Graph, { useGraph } from './graph'
 import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
@@ -157,10 +157,17 @@ export default class ItemController extends EventEmitter {
     edge.update(model)
   }
 
-  deleteItem(id: itemId): Item | undefined {
-    const item = this.findItem(id)
+  deleteItem(id: itemId): Item | undefined
+  deleteItem<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
+  deleteItem<T extends Item>(
+    id: itemId,
+    itemClass?: itemClass<T>
+  ): T | undefined {
+    const item = this.$store.find(id, itemClass)
     if (!item) {
-      console.warn(`can't delete item where id is '${id}'`)
+      console.warn(
+        `can't delete ${itemClass?.name || 'item'} where id is '${id}'`
+      )
       return
     }
     item.remove()
@@ -169,11 +176,11 @@ export default class ItemController extends EventEmitter {
   }
 
   public deleteNode(id: itemId) {
-    return this.deleteItem(id)
+    return this.deleteItem(id, Node)
   }
 
   public deleteEdge(id: itemId) {
-    return this.deleteItem(id)
+    return this.deleteItem(id, Edge)
   }
 
   public addEdge(item: IEdgeModel): Edge | undefined {

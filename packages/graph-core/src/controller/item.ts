@@ -156,6 +156,7 @@ export default class ItemController extends EventEmitter {
       return console.warn(`can't update edge where id is '${id}'`)
     }
     edge.update(model)
+    this.emit('edge:change', edge)
   }
 
   deleteItem(id: itemId): Item | undefined

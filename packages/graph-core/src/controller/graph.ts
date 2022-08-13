@@ -116,6 +116,10 @@ export default class Graph extends EventEmitter {
     this.itemController.on('edge:deleted', (model: IEdgeModel) => {
       this.emit('edge:deleted', model)
     })
+
+    this.itemController.on('edge:change', (item: IEdge) => {
+      this.emit('edge:change', item)
+    })
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
@@ -189,12 +193,7 @@ export default class Graph extends EventEmitter {
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {
-    const edge = this.itemController.findEdge(id)
-    if (!edge) {
-      return console.warn(`can't find edge where id is '${id}'`)
-    }
     this.itemController.updateEdge(id, model)
-    this.emit('edge:change', edge)
   }
 
   public deleteEdge(id: string, stack = true): IEdge | undefined {

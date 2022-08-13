@@ -8,6 +8,7 @@ import {
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
+import EventEmitter from '../util/event-emitter'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -15,12 +16,13 @@ const getDTheta = (nodesLength: number) => {
   return dTheta
 }
 
-export default class LayoutController {
+export default class LayoutController extends EventEmitter {
   private $graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}
 
   constructor() {
+    super()
     this.$graph = useGraph()
   }
 
@@ -50,6 +52,7 @@ export default class LayoutController {
     } else {
       res = this.dagreLayout(cfg)
     }
+    this.emit('layout')
     stack && graph.stackEnd()
     return res
   }

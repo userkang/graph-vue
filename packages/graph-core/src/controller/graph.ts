@@ -128,6 +128,10 @@ export default class Graph extends EventEmitter {
       if (data.needLayout) {
         this.layout({}, false)
       }
+      this.emit('datachange')
+    })
+    this.layoutController.on('layout', () => {
+      this.emit('layout')
     })
   }
 
@@ -277,9 +281,7 @@ export default class Graph extends EventEmitter {
   }
 
   public layout(options: ILayout = {}, stack = true) {
-    const layoutData = this.layoutController.layout(options, stack)
-    this.emit('layout')
-    return layoutData
+    return this.layoutController.layout(options, stack)
   }
 
   public removeAction(action?: string | string[]) {

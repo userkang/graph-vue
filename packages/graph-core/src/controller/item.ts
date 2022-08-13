@@ -65,12 +65,12 @@ export default class ItemController {
     return this.$graph.store.findNode.bind(this.$graph.store)
   }
 
-  get findNodeByPort() {
-    return this.$graph.store.findNodeByPort.bind(this.$graph.store)
-  }
-
   get findNodeByState() {
     return this.$graph.store.findNodeByState.bind(this.$graph.store)
+  }
+
+  get findNodeByPort() {
+    return this.$graph.store.findNodeByPort.bind(this.$graph.store)
   }
 
   public refreshNode(id: string): void {
@@ -103,7 +103,7 @@ export default class ItemController {
       ...NODE_DEFAULT_CFG,
       ...graph.get('nodeInfo'),
       direction,
-      graph: this.$graph,
+      graph: this.$graph
     }
     const node = new Node(model, nodeCfg)
     this.$graph.store.insertItem(node)
@@ -175,7 +175,7 @@ export default class ItemController {
       const graph = this.$graph
       const edgeCfg: IEdgeCfg = {
         ...graph.get('edgeInfo'),
-        graph: this.$graph,
+        graph: this.$graph
       }
       const edge = new Edge(item, edgeCfg)
       this.edgeMap[edge.id] = edge

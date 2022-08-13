@@ -290,32 +290,6 @@ export default class Graph extends EventEmitter {
     this.emit('datachange')
   }
 
-  append(data: IDataModel | INodeModel) {
-    if (Object.keys(data).length === 0) {
-      return
-    }
-
-    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
-    const needLayout = model.nodes.every(
-      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
-    )
-
-    this.itemController.loadNodes(model.nodes)
-    this.itemController.loadEdges(model.edges)
-    if (needLayout) {
-      this.layout({}, false)
-    }
-    this.emit('datachange')
-  }
-
-  registry(itemClass: any, itemGroupName: string) {
-    if (mapIncludes(this.itemClassMap, itemGroupName)) {
-      throw new Error('组件组名已存在')
-    }
-    // TODO验证itemClass
-    this.itemClassMap.set(itemClass, itemGroupName)
-  }
-
   public fitCenter() {
     this.viewController.translateToCenter()
   }

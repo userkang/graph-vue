@@ -136,6 +136,7 @@ export default class Edge extends Base<
   }
 
   remove() {
+    this.off()
     // 先删除前后节点的相关边
     const { fromNode, toNode, fromPort, toPort } = this
     fromNode.deleteEdge(this.id)
@@ -149,7 +150,6 @@ export default class Edge extends Base<
       toPort.clearState('linked')
     }
 
-    this.off()
     this.$graph.store.deleteEdge(this.id)
 
     this.unMount()

@@ -338,8 +338,8 @@ export default class Node extends Base<
   }
 
   remove() {
-    // 先删除与节点相关的边
     this.off()
+    // 先删除与节点相关的边
     const items: Item[] = this.getEdges()
     items.forEach(item => {
       item.remove()

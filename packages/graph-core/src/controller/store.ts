@@ -89,7 +89,7 @@ export default class Store extends EventEmitter {
   getPorts() {
     return Object.values(this.getPortMap())
   }
-
+  
   findPort(id: itemId) {
     return this.find(id, Port)
   }

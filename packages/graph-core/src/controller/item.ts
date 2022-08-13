@@ -62,6 +62,14 @@ export default class ItemController extends EventEmitter {
     return this.$store.getItemMap(Port)
   }
 
+  get getDataModel() {
+    return this.$store.getDataModel.bind(this.$store)
+  }
+
+  get getTreeDataModel() {
+    return this.$store.getTreeDataModel.bind(this.$store)
+  }
+
   get findBy() {
     return this.$store.findBy.bind(this.$store)
   }

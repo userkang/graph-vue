@@ -130,6 +130,14 @@ export default class Graph extends EventEmitter {
     return this.itemController.getEdges.bind(this.itemController)
   }
 
+  get getDataModel() {
+    return this.itemController.getDataModel.bind(this.itemController)
+  }
+
+  get getTreeDataModel() {
+    return this.itemController.getTreeDataModel.bind(this.itemController)
+  }
+
   get findEdgeByState() {
     return this.itemController.findEdgeByState.bind(this.itemController)
   }
@@ -143,7 +151,45 @@ export default class Graph extends EventEmitter {
     return this.itemController.data.bind(this.itemController)
   }
 
-  initController() {
+  get deleteNode() {
+    return this.withStack(
+      this.itemController.deleteNode.bind(this.itemController)
+    )
+  }
+
+  get addNode() {
+    return this.withStack(this.itemController.addNode.bind(this.itemController))
+  }
+
+  get deleteEdge() {
+    return this.withStack(
+      this.itemController.deleteEdge.bind(this.itemController)
+    )
+  }
+
+  get addEdge() {
+    return this.withStack(this.itemController.addEdge.bind(this.itemController))
+  }
+
+  get layout() {
+    return this.withStack(
+      this.layoutController.layout.bind(this.layoutController)
+    )
+  }
+
+  private withStack<T extends (payload: any) => any>(callback: T) {
+    let shouldStack = true
+    const func = (payload: Parameters<T>[0], stack = true) => {
+      shouldStack = stack
+      shouldStack && this.stackStart()
+      const res: ReturnType<T> = callback(payload)
+      shouldStack && this.stackEnd()
+      return res
+    }
+    return func
+  }
+
+  private initController() {
     this.itemController.on('node:refresh', (data: Node) => {
       this.emit('node:refresh', data)
     })
@@ -196,45 +242,6 @@ export default class Graph extends EventEmitter {
     return this.cfg.nodeInfo
   }
 
-  public deleteNode(id: string, stack = true): INode | undefined {
-    stack && this.stackStart()
-    const node = this.itemController.deleteNode(id)
-    stack && this.stackEnd()
-    return node
-  }
-
-  public addNode(item: INodeModel, stack = true): INode | undefined {
-    stack && this.stackStart()
-    const node = this.itemController.addNode(item)
-    stack && this.stackEnd()
-    return node
-  }
-
-  public deleteEdge(id: string, stack = true): IEdge | undefined {
-    stack && this.stackStart()
-    const edge = this.itemController.deleteEdge(id)
-    stack && this.stackEnd()
-    return edge
-  }
-
-  public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
-    stack && this.stackStart()
-    const edge = this.itemController.addEdge(item)
-    stack && this.stackEnd()
-    return edge
-  }
-
-  public getDataModel(): IDataModel {
-    const nodes = this.getNodes().map(node => node.model)
-    const edges = this.getEdges().map(edge => edge.model)
-    return { nodes, edges }
-  }
-
-  public getTreeDataModel() {
-    const nodes = this.getNodes().map(node => node.model)
-    return nodes[0]
-  }
-
   public getPointByClient(
     originX: number,
     originY: number
@@ -279,10 +286,6 @@ export default class Graph extends EventEmitter {
 
   public fullScreen(el?: HTMLElement) {
     this.viewController.fullScreen(el)
-  }
-
-  public layout(options: ILayout = {}, stack = true) {
-    return this.layoutController.layout(options, stack)
   }
 
   public removeAction(action?: string | string[]) {

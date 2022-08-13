@@ -43,9 +43,7 @@ export default class LayoutController extends EventEmitter {
     })
   }
 
-  layout(cfg: ILayout, stack: boolean) {
-    const graph = this.$graph
-    stack && graph.stackStart()
+  layout(cfg: ILayout = {}) {
     let res
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)
@@ -53,7 +51,6 @@ export default class LayoutController extends EventEmitter {
       res = this.dagreLayout(cfg)
     }
     this.emit('layout')
-    stack && graph.stackEnd()
     return res
   }
 

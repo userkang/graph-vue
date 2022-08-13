@@ -142,6 +142,7 @@ export default class ItemController extends EventEmitter {
 
     // 渲染
     node.mount()
+    this.emit('node:added', item)
 
     return node
   }

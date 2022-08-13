@@ -112,6 +112,9 @@ export default class Graph extends EventEmitter {
     this.itemController.on('node:change', (node: Node) => {
       this.emit('node:change', node)
     })
+    this.itemController.on('node:added', (item: Node) => {
+      this.emit('node:added', item)
+    })
 
     this.itemController.on('edge:deleted', (model: IEdgeModel) => {
       this.emit('edge:deleted', model)
@@ -171,10 +174,6 @@ export default class Graph extends EventEmitter {
   public addNode(item: INodeModel, stack = true): INode | undefined {
     stack && this.stackStart()
     const node = this.itemController.addNode(item)
-    if (!node) {
-      return
-    }
-    this.emit('node:added', item)
     stack && this.stackEnd()
     return node
   }

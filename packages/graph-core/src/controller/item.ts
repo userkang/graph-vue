@@ -211,7 +211,7 @@ export default class ItemController extends EventEmitter {
         const edgeGroup = graph.$svg?.get('edgeGroup')
         edgeGroup.add(edgeView)
       }
-
+      this.emit('edge:added', item)
       return edge
     } catch (error) {
       console.warn(error)

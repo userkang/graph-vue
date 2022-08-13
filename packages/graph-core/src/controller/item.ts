@@ -176,7 +176,9 @@ export default class ItemController extends EventEmitter {
   }
 
   public deleteNode(id: itemId) {
-    return this.deleteItem(id, Node)
+    const node = this.deleteItem(id, Node)
+    node && this.emit('node:deleted', node.model)
+    return node
   }
 
   public deleteEdge(id: itemId) {

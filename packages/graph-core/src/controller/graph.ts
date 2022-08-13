@@ -89,6 +89,7 @@ export default class Graph extends EventEmitter {
     this.eventController = new EventController()
     this.itemController = new ItemController()
     this.stackController = new StackController()
+    this.initController()
     ;(window as any).graph = this
     instantiatingGraph = null
   }
@@ -104,6 +105,9 @@ export default class Graph extends EventEmitter {
   initController() {
     this.itemController.on('node:refresh', (node: Node) => {
       this.emit('node:refresh', node)
+    })
+    this.itemController.on('node:deleted', (model: INodeModel) => {
+      this.emit('node:deleted', model)
     })
   }
 
@@ -151,9 +155,8 @@ export default class Graph extends EventEmitter {
   public deleteNode(id: string, stack = true): INode | undefined {
     stack && this.stackStart()
     const node = this.itemController.deleteNode(id)
-    node && this.emit('node:deleted', node.model)
     stack && this.stackEnd()
-    return node instanceof Node ? node : void 0
+    return node
   }
 
   public addNode(item: INodeModel, stack = true): INode | undefined {

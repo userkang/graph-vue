@@ -141,18 +141,6 @@ export default class Store extends EventEmitter {
     return item
   }
 
-  deleteNode(id: itemId) {
-    return this.deleteItem(id, Node)
-  }
-
-  deleteEdge(id: itemId) {
-    return this.deleteItem(id, Edge)
-  }
-
-  deletePort(id: itemId) {
-    return this.deleteItem(id, Port)
-  }
-
   clear() {
     const itemMap = this.itemMap
     for (const key in itemMap) {

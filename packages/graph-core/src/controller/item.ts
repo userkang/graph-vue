@@ -4,16 +4,21 @@ import { INode, INodeModel, IPort, IEdgeModel, IEdge } from '../types'
 import { INodeCfg, IEdgeCfg, Item, itemId } from '../types/type'
 import Graph, { useGraph } from './graph'
 import Port from '../item/port'
+import EventEmitter from '../util/event-emitter'
+import Store from './store'
 
 const NODE_DEFAULT_CFG = {
   width: 180,
   height: 40
 } as const
 
-export default class ItemController {
+export default class ItemController extends EventEmitter {
   private $graph: Graph
+  private $store: Store
   constructor() {
+    super()
     this.$graph = useGraph()
+    this.$store = useGraph().store
     const graph = this.$graph
     if (graph.cfg.nodes) {
       this.loadNodes(graph.cfg.nodes)
@@ -23,12 +28,8 @@ export default class ItemController {
     }
   }
 
-  clearItem() {
-    return this.$graph.store.clear
-  }
-
   get nodeMap(): Record<string, Node> {
-    return this.$graph.store.getItemMap(Node)
+    return this.$store.getItemMap(Node)
   }
 
   get nodes() {
@@ -38,39 +39,43 @@ export default class ItemController {
   }
 
   get edgeMap() {
-    return this.$graph.store.getItemMap(Edge)
+    return this.$store.getItemMap(Edge)
   }
 
   get edges() {
-    return this.$graph.store.getEdges()
+    return this.$store.getEdges()
   }
 
   get portsMap() {
-    return this.$graph.store.getItemMap(Port)
+    return this.$store.getItemMap(Port)
   }
 
   get findBy() {
-    return this.$graph.store.findBy.bind(this.$graph.store)
+    return this.$store.findBy.bind(this.$store)
   }
 
   get where() {
-    return this.$graph.store.where.bind(this.$graph.store)
+    return this.$store.where.bind(this.$store)
   }
 
   get findItem() {
-    return this.$graph.store.find.bind(this.$graph.store)
+    return this.$store.find.bind(this.$store)
   }
 
   get findNode() {
-    return this.$graph.store.findNode.bind(this.$graph.store)
+    return this.$store.findNode.bind(this.$store)
   }
 
   get findNodeByState() {
-    return this.$graph.store.findNodeByState.bind(this.$graph.store)
+    return this.$store.findNodeByState.bind(this.$store)
   }
 
   get findNodeByPort() {
-    return this.$graph.store.findNodeByPort.bind(this.$graph.store)
+    return this.$store.findNodeByPort.bind(this.$store)
+  }
+
+  clearItem() {
+    return this.$store.clear
   }
 
   public refreshNode(id: string): void {
@@ -79,6 +84,7 @@ export default class ItemController {
       return console.warn(`can't refresh node where id is '${id}'`)
     }
     node.refresh()
+    this.emit('node:refresh', node)
   }
 
   public updateNode(id: string, model: INodeModel): void {
@@ -106,7 +112,7 @@ export default class ItemController {
       graph: this.$graph
     }
     const node = new Node(model, nodeCfg)
-    this.$graph.store.insertItem(node)
+    this.$store.insertItem(node)
 
     const onNodeChange = (node: INode, type: string) => {
       const eventType = 'node:change'
@@ -179,7 +185,7 @@ export default class ItemController {
       }
       const edge = new Edge(item, edgeCfg)
       this.edgeMap[edge.id] = edge
-      this.$graph.store.insertItem(edge)
+      this.$store.insertItem(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {
         this.$graph.emit(`edge:change:${type}`, edge)

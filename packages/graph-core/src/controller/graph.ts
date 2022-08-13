@@ -20,7 +20,7 @@ import {
   IDirection
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, preorder, uniqueId } from '../util/utils'
+import { isIDataModel, isKeyof, preorder, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
 import Store from './store'
 import Edge from '../item/edge'
@@ -101,6 +101,12 @@ export default class Graph extends EventEmitter {
     return this.itemController.findNodeByPort
   }
 
+  initController() {
+    this.itemController.on('node:refresh', (node: Node) => {
+      this.emit('node:refresh', node)
+    })
+  }
+
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
     this.cfg[key] = val
   }
@@ -130,12 +136,7 @@ export default class Graph extends EventEmitter {
   }
 
   public refreshNode(id: string): void {
-    const node = this.itemController.findNode(id)
-    if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
-    }
-    this.itemController.refreshNode(id)
-    this.emit('node:refresh', node)
+    return this.itemController.refreshNode(id)
   }
 
   public updateNode(id: string, model: INodeModel): void {
@@ -345,15 +346,18 @@ export default class Graph extends EventEmitter {
    * 销毁
    */
   public destroy() {
-    this.stackController.clearStack()
-    this.eventController.destroy()
-    this.itemController.destroy()
-    this.viewController.destroy()
-    this.layoutController.destroy()
-    ;(this.stackController as StackController | null) = null
-    ;(this.eventController as EventController | null) = null
-    ;(this.itemController as ItemController | null) = null
-    ;(this.viewController as ViewController | null) = null
-    ;(this.layoutController as LayoutController | null) = null
+    const controllerKeys = [
+      'stackController',
+      'eventController',
+      'itemController',
+      'viewController',
+      'layoutController'
+    ]
+    controllerKeys.forEach(key => {
+      if (isKeyof(key, this)) {
+        ;(this[key] as any).destroy()
+        delete this[key]
+      }
+    })
   }
 }

@@ -265,4 +265,8 @@ export default class Stack {
     hasChange && this.pushStack('undo', stackData)
     this.startStackData = null
   }
+
+  destroy() {
+    this.clearStack()
+  }
 }

@@ -177,6 +177,46 @@ export default class Graph extends EventEmitter {
     )
   }
 
+  get getPointByClient() {
+    return this.viewController.getPointByClient.bind(this.viewController)
+  }
+
+  get getTranslate() {
+    return this.viewController.getTranslate.bind(this.viewController)
+  }
+
+  get translate() {
+    return this.viewController.translateBy.bind(this.viewController)
+  }
+
+  get getZoom() {
+    return this.viewController.getZoom.bind(this.viewController)
+  }
+
+  get zoom() {
+    return this.viewController.zoom.bind(this.viewController)
+  }
+
+  get resize() {
+    return this.viewController.resize.bind(this.viewController)
+  }
+
+  get fitView() {
+    return this.viewController.fitView.bind(this.viewController)
+  }
+
+  get fitCenter() {
+    return this.viewController.translateToCenter.bind(this.viewController)
+  }
+
+  get fullScreen() {
+    return this.viewController.fullScreen.bind(this.viewController)
+  }
+
+  get removeAction() {
+    return this.eventController.removeBehavior.bind(this.eventController)
+  }
+
   private withStack<T extends (payload: any) => any>(callback: T) {
     let shouldStack = true
     const func = (payload: Parameters<T>[0], stack = true) => {
@@ -240,56 +280,6 @@ export default class Graph extends EventEmitter {
 
   public getNodeInfo(): NodeInfo | undefined {
     return this.cfg.nodeInfo
-  }
-
-  public getPointByClient(
-    originX: number,
-    originY: number
-  ): { x: number; y: number } {
-    return this.viewController.getPointByClient(originX, originY)
-  }
-
-  public getTranslate() {
-    return {
-      x: this.viewController.transform.translateX,
-      y: this.viewController.transform.translateY
-    }
-  }
-
-  public translate(x: number, y: number) {
-    return this.viewController.translateBy(x, y)
-  }
-
-  public translateBy(x: number, y: number) {
-    return this.viewController.translateBy(x, y)
-  }
-
-  public getZoom() {
-    return this.viewController.getZoom()
-  }
-
-  public zoom(value: number, e?: WheelEvent) {
-    return this.viewController.zoom(value, e)
-  }
-
-  public resize() {
-    this.viewController.resize()
-  }
-
-  public fitView() {
-    this.viewController.fitView()
-  }
-
-  public fitCenter() {
-    this.viewController.translateToCenter()
-  }
-
-  public fullScreen(el?: HTMLElement) {
-    this.viewController.fullScreen(el)
-  }
-
-  public removeAction(action?: string | string[]) {
-    this.eventController.removeBehavior(action)
   }
 
   public addAction(actions: string | string[]) {

@@ -35,6 +35,13 @@ export default class ViewController {
     this.resize()
   }
 
+  getTranslate() {
+    return {
+      x: this.transform.translateX,
+      y: this.transform.translateY
+    }
+  }
+
   public getZoom() {
     return this.transform.scale
   }

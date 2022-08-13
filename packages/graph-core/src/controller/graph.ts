@@ -16,7 +16,6 @@ import {
   IDirection
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isKeyof, uniqueId } from '../util/utils'
 import { IStack, Item } from '../types/type'
 import Store from './store'
 
@@ -50,7 +49,6 @@ export default class Graph extends EventEmitter {
   private readonly eventController: EventController
   private readonly itemController: ItemController
   private readonly stackController: StackController
-  readonly graphId = uniqueId('graph')
   itemClassMap: Map<Item, string> = new Map()
   readonly $svg?: Svg
   readonly isRender: boolean
@@ -325,12 +323,10 @@ export default class Graph extends EventEmitter {
       'itemController',
       'viewController',
       'layoutController'
-    ]
+    ] as const
     controllerKeys.forEach(key => {
-      if (isKeyof(key, this)) {
-        ;(this[key] as any).destroy()
-        delete this[key]
-      }
+      this[key].destroy()
+      delete this[key]
     })
   }
 }

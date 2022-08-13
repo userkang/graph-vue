@@ -112,6 +112,10 @@ export default class Graph extends EventEmitter {
     this.itemController.on('node:change', (node: Node) => {
       this.emit('node:change', node)
     })
+
+    this.itemController.on('edge:deleted', (model: IEdgeModel) => {
+      this.emit('edge:deleted', model)
+    })
   }
 
   public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
@@ -196,9 +200,8 @@ export default class Graph extends EventEmitter {
   public deleteEdge(id: string, stack = true): IEdge | undefined {
     stack && this.stackStart()
     const edge = this.itemController.deleteEdge(id)
-    edge && this.emit('edge:deleted', edge.model)
     stack && this.stackEnd()
-    return edge instanceof Edge ? edge : void 0
+    return edge
   }
 
   public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {

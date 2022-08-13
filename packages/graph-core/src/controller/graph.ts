@@ -95,11 +95,52 @@ export default class Graph extends EventEmitter {
   }
 
   get findNodeByState() {
-    return this.itemController.findNodeByState
+    return this.itemController.findNodeByState.bind(this.itemController)
   }
 
   get findNodeByPort() {
-    return this.itemController.findNodeByPort
+    return this.itemController.findNodeByPort.bind(this.itemController)
+  }
+
+  get getNodes() {
+    return this.itemController.getNodes.bind(this.itemController)
+  }
+
+  get findNode() {
+    return this.itemController.findNode.bind(this.itemController)
+  }
+
+  get refreshNode() {
+    return this.itemController.refreshNode.bind(this.itemController)
+  }
+
+  get updateNode() {
+    return this.itemController.updateNode.bind(this.itemController)
+  }
+
+  get findPort() {
+    return this.itemController.findPort.bind(this.itemController)
+  }
+
+  get findEdge() {
+    return this.itemController.findEdge.bind(this.itemController)
+  }
+
+  get getEdges() {
+    return this.itemController.getEdges.bind(this.itemController)
+  }
+
+  get findEdgeByState() {
+    return this.itemController.findEdgeByState.bind(this.itemController)
+  }
+
+  get updateEdge() {
+    return this.itemController.updateEdge.bind(this.itemController)
+  }
+
+  // 加载数据
+  get data() {
+    return this.itemController.data.bind(this.itemController)
   }
 
   initController() {
@@ -155,22 +196,6 @@ export default class Graph extends EventEmitter {
     return this.cfg.nodeInfo
   }
 
-  public getNodes(): INode[] {
-    return this.itemController.nodes
-  }
-
-  public findNode(id: string | number): INode | undefined {
-    return this.itemController.findNode(String(id))
-  }
-
-  public refreshNode(id: string): void {
-    return this.itemController.refreshNode(id)
-  }
-
-  public updateNode(id: string, model: INodeModel): void {
-    this.itemController.updateNode(id, model)
-  }
-
   public deleteNode(id: string, stack = true): INode | undefined {
     stack && this.stackStart()
     const node = this.itemController.deleteNode(id)
@@ -183,26 +208,6 @@ export default class Graph extends EventEmitter {
     const node = this.itemController.addNode(item)
     stack && this.stackEnd()
     return node
-  }
-
-  public findPort(id: string | number): IPort | undefined {
-    return this.itemController.portsMap[String(id)]
-  }
-
-  public getEdges(): IEdge[] {
-    return this.itemController.edges
-  }
-
-  public findEdge(id: string | number): IEdge | undefined {
-    return this.itemController.findEdge(id)
-  }
-
-  public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => item.hasState(state))
-  }
-
-  public updateEdge(id: string, model: IEdgeModel): void {
-    this.itemController.updateEdge(id, model)
   }
 
   public deleteEdge(id: string, stack = true): IEdge | undefined {
@@ -266,10 +271,6 @@ export default class Graph extends EventEmitter {
 
   public fitView() {
     this.viewController.fitView()
-  }
-  // 加载数据
-  public data(data: IDataModel | INodeModel) {
-    this.itemController.data(data)
   }
 
   public fitCenter() {

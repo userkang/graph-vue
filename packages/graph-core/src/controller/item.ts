@@ -54,6 +54,10 @@ export default class ItemController extends EventEmitter {
     return this.$store.getEdges()
   }
 
+  get getEdges() {
+    return this.$store.getEdges.bind(this.$store)
+  }
+
   get portsMap() {
     return this.$store.getItemMap(Port)
   }
@@ -74,12 +78,22 @@ export default class ItemController extends EventEmitter {
     return this.$store.findNode.bind(this.$store)
   }
 
+  get findPort() {
+    return this.$store.findPort.bind(this.$store)
+  }
+
   get findNodeByState() {
     return this.$store.findNodeByState.bind(this.$store)
   }
 
   get findNodeByPort() {
     return this.$store.findNodeByPort.bind(this.$store)
+  }
+
+  getNodes() {
+    return Object.values(this.nodeMap).sort(
+      (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
+    )
   }
 
   public refreshNode(id: string): void {
@@ -153,6 +167,10 @@ export default class ItemController extends EventEmitter {
 
   public findEdge(id: string | number): IEdge | undefined {
     return this.edgeMap[String(id)]
+  }
+
+  public findEdgeByState(state: string): IEdge[] {
+    return this.getEdges().filter(item => item.hasState(state))
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {

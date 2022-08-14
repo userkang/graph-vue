@@ -14,7 +14,7 @@ import {
   NodeInfo,
   IDirection,
   IPort,
-  INode,
+  INode
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { IStack, Item } from '../types/type'
@@ -42,19 +42,18 @@ export const useGraph = () => {
 }
 
 export default class Graph extends EventEmitter {
-  public cfg: ICfg
-
-  readonly store: Store
   private readonly viewController: ViewController
   private readonly layoutController: LayoutController
   private readonly eventController: EventController
   private readonly itemController: ItemController
   private readonly stackController: StackController
-  itemClassMap: Map<Item, string> = new Map()
+
+  readonly store: Store
   readonly $svg?: Svg
   readonly isRender: boolean
   readonly container: HTMLElement
   readonly direction: IDirection
+  cfg: ICfg
 
   constructor(config: IGraphConfig) {
     super()
@@ -295,48 +294,48 @@ export default class Graph extends EventEmitter {
     })
   }
 
-  public set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
+  set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
     this.cfg[key] = val
   }
 
-  public get<T extends keyof ICfg>(key: T): ICfg[T] {
+  get<T extends keyof ICfg>(key: T): ICfg[T] {
     return this.cfg[key]
   }
 
-  public getContainer() {
+  getContainer() {
     return this.container
   }
 
-  public getSvgInfo() {
+  getSvgInfo() {
     return this.viewController.svgInfo
   }
 
-  public getNodeInfo(): NodeInfo | undefined {
+  getNodeInfo(): NodeInfo | undefined {
     return this.cfg.nodeInfo
   }
 
-  public addAction(actions: string | string[]) {
+  addAction(actions: string | string[]) {
     this.eventController.addBehavior(
       Array.isArray(actions) ? actions : [actions]
     )
   }
 
-  public getUndoStack(): IStack[] {
+  getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }
 
-  public getRedoStack(): IStack[] {
+  getRedoStack(): IStack[] {
     return this.stackController.redoStack
   }
 
-  public detectDirectedCycle() {
+  detectDirectedCycle() {
     return detectDirectedCycle(this.getDataModel())
   }
 
   /**
    * 销毁
    */
-  public destroy() {
+  destroy() {
     const controllerKeys = [
       'stackController',
       'eventController',

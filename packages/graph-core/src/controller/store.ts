@@ -4,7 +4,7 @@ import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
-import { IDataModel } from '../types'
+import { IDataModel, IEdge } from '../types'
 
 const EVENT_TYPES = [] as const
 
@@ -104,7 +104,17 @@ export default class Store extends EventEmitter<
 
   findNode(id: itemId) {
     return this.find(id, Node)
-  } 
+  }
+
+  findEdgeByState(state: string): IEdge[] {
+    return this.getEdges().filter(item => item.hasState(state))
+  }
+
+  findNodeByPort(portId: itemId) {
+    return this.getNodes().find(node =>
+      node.ports.find(port => port.id === portId)
+    )
+  }
 
   getDataModel(): IDataModel {
     const nodes = this.getNodes().map(node => node.model)

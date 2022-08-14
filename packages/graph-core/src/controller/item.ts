@@ -114,13 +114,59 @@ export default class ItemController extends EventEmitter<
     return this.$store.findPort.bind(this.$store)
   }
 
+  get findEdgeByState() {
+    return this.$store.findEdgeByState.bind(this.$store)
+  }
+
+  get findNodeByPort() {
+    return this.$store.findNodeByPort.bind(this.$store)
+  }
+
+  private deleteItem(id: itemId): Item | undefined
+  private deleteItem<T extends Item>(
+    id: itemId,
+    itemClass: itemClass<T>
+  ): T | undefined
+  private deleteItem<T extends Item>(
+    id: itemId,
+    itemClass?: itemClass<T>
+  ): T | undefined {
+    const item = this.$store.find(id, itemClass)
+    if (!item) {
+      console.warn(
+        `can't delete ${itemClass?.name || 'item'} where id is '${id}'`
+      )
+      return
+    }
+    item.remove()
+
+    return item
+  }
+
+  private loadNodes(models: INodeModel[]) {
+    models.map(model => this.addNode(model))
+    this.getNodes().forEach(node => {
+      node.zIndex = 1
+      const parent = this.findNode(node.model.parentId)
+      parent?.addChild(node)
+    })
+  }
+
+  private loadEdges(group: IEdgeModel[]) {
+    group.forEach(model => this.addEdge(model))
+  }
+
+  private clearItem() {
+    this.getNodes().forEach(node => node.remove())
+  }
+
   getNodes() {
     return Object.values(this.nodeMap).sort(
       (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
     )
   }
 
-  public refreshNode(id: string): void {
+  refreshNode(id: string): void {
     const node = this.findNode(id)
     if (!node) {
       return console.warn(`can't refresh node where id is '${id}'`)
@@ -129,7 +175,7 @@ export default class ItemController extends EventEmitter<
     this.emit('node:refresh', node)
   }
 
-  public updateNode(id: string, model: INodeModel): void {
+  updateNode(id: string, model: INodeModel): void {
     const node = this.findNode(id)
     if (!node) {
       return console.warn(`can't update node where id is '${id}'`)
@@ -138,7 +184,7 @@ export default class ItemController extends EventEmitter<
     this.emit('node:change', node)
   }
 
-  public addNode(item: INodeModel): INode | undefined {
+  addNode(item: INodeModel): INode | undefined {
     if (item.id !== undefined && this.nodeMap[item.id]) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
@@ -173,21 +219,11 @@ export default class ItemController extends EventEmitter<
     return node
   }
 
-  public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => item.hasState(state))
-  }
-
-  findNodeByPort(portId: itemId) {
-    return this.getNodes().find(node =>
-      node.ports.find(port => port.id === portId)
-    )
-  }
-
   findNodeByState(state: string) {
     return this.getNodes().filter(item => item.hasState(state))
   }
 
-  public updateEdge(id: string, model: IEdgeModel): void {
+  updateEdge(id: string, model: IEdgeModel): void {
     const edge = this.findEdge(id)
     if (!edge) {
       return console.warn(`can't update edge where id is '${id}'`)
@@ -196,40 +232,19 @@ export default class ItemController extends EventEmitter<
     this.emit('edge:change', edge)
   }
 
-  private deleteItem(id: itemId): Item | undefined
-  private deleteItem<T extends Item>(
-    id: itemId,
-    itemClass: itemClass<T>
-  ): T | undefined
-  private deleteItem<T extends Item>(
-    id: itemId,
-    itemClass?: itemClass<T>
-  ): T | undefined {
-    const item = this.$store.find(id, itemClass)
-    if (!item) {
-      console.warn(
-        `can't delete ${itemClass?.name || 'item'} where id is '${id}'`
-      )
-      return
-    }
-    item.remove()
-
-    return item
-  }
-
-  public deleteNode(id: itemId) {
+  deleteNode(id: itemId) {
     const item = this.deleteItem(id, Node)
     item && this.emit('node:deleted', item.model)
     return item
   }
 
-  public deleteEdge(id: itemId) {
+  deleteEdge(id: itemId) {
     const item = this.deleteItem(id, Edge)
     item && this.emit('edge:deleted', item.model)
     return item
   }
 
-  public addEdge(item: IEdgeModel): Edge | undefined {
+  addEdge(item: IEdgeModel): Edge | undefined {
     try {
       const graph = this.$graph
       const edgeCfg: IEdgeCfg = {
@@ -257,35 +272,7 @@ export default class ItemController extends EventEmitter<
     }
   }
 
-  public loadNodes(models: INodeModel[]) {
-    models
-      .map(model => this.addNode(model))
-      .forEach(node => {
-        if (!node) {
-          return
-        }
-        node.zIndex = 1
-        const parent = this.findNode(node.model.parentId)
-        if (!parent) {
-          return
-        }
-        parent.addChild(node)
-      })
-  }
-
-  public loadEdges(group: IEdgeModel[]) {
-    for (const item of group) {
-      this.addEdge(item)
-    }
-  }
-
-  clearItem() {
-    this.$store.getNodes().forEach(node => {
-      node.remove()
-    })
-  }
-
-  public data(data: IDataModel | INodeModel) {
+  data(data: IDataModel | INodeModel) {
     if (Object.keys(data).length === 0) {
       return
     }
@@ -302,7 +289,7 @@ export default class ItemController extends EventEmitter<
     this.emit('datachange', { needLayout: needLayout })
   }
 
-  public destroy() {
+  destroy() {
     this.clearItem()
   }
 }

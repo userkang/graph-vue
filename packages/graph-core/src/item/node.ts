@@ -345,7 +345,7 @@ export default class Node extends Base<
       item.remove()
     })
 
-    this.$graph.store.deleteItem(this.id) 
+    this.$graph.store.deleteItem(this.id, Node) 
 
     this.unMount()
 

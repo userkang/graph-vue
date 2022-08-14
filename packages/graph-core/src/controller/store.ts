@@ -2,11 +2,16 @@ import Node from '../item/node'
 import Edge from '../item/edge'
 import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
-import { itemId, Item, itemClass } from '../types/type'
+import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
 import { IDataModel } from '../types'
 
-export default class Store extends EventEmitter {
+const EVENT_TYPES = [] as const
+
+export default class Store extends EventEmitter<
+  valuesType<typeof EVENT_TYPES>,
+  false
+> {
   readonly itemMap: Record<string, Item> = {}
   constructor() {
     super()
@@ -14,7 +19,6 @@ export default class Store extends EventEmitter {
 
   insertItem(item: Item) {
     this.itemMap[item.id] = item
-    this.emit('insertItem', item)
   }
 
   find(id: itemId): Item | undefined
@@ -89,7 +93,7 @@ export default class Store extends EventEmitter {
   getPorts() {
     return Object.values(this.getPortMap())
   }
-  
+
   findPort(id: itemId) {
     return this.find(id, Port)
   }
@@ -98,23 +102,9 @@ export default class Store extends EventEmitter {
     return this.find(id, Edge)
   }
 
-  findEdgeByState(state: string): Edge[] {
-    return this.getEdges().filter(edge => edge.hasState(state))
-  }
-
   findNode(id: itemId) {
     return this.find(id, Node)
-  }
-
-  findNodeByPort(portId: itemId) {
-    return this.getNodes().find(node =>
-      node.ports.find(port => port.id === portId)
-    )
-  }
-
-  findNodeByState(state: string) {
-    return this.getNodes().filter(item => item.hasState(state))
-  }
+  } 
 
   getDataModel(): IDataModel {
     const nodes = this.getNodes().map(node => node.model)
@@ -137,7 +127,6 @@ export default class Store extends EventEmitter {
       return
     }
     delete this.itemMap[id]
-    this.emit('deleteItem', id)
     return item
   }
 }

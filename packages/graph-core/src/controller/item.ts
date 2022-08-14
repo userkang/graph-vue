@@ -102,8 +102,8 @@ export default class ItemController extends EventEmitter<
     return this.$store.where.bind(this.$store)
   }
 
-  get findItem() {
-    return this.$store.find.bind(this.$store)
+  get findEdge() {
+    return this.$store.findEdge.bind(this.$store)
   }
 
   get findNode() {
@@ -112,14 +112,6 @@ export default class ItemController extends EventEmitter<
 
   get findPort() {
     return this.$store.findPort.bind(this.$store)
-  }
-
-  get findNodeByState() {
-    return this.$store.findNodeByState.bind(this.$store)
-  }
-
-  get findNodeByPort() {
-    return this.$store.findNodeByPort.bind(this.$store)
   }
 
   getNodes() {
@@ -181,12 +173,18 @@ export default class ItemController extends EventEmitter<
     return node
   }
 
-  public findEdge(id: string | number): IEdge | undefined {
-    return this.edgeMap[String(id)]
-  }
-
   public findEdgeByState(state: string): IEdge[] {
     return this.getEdges().filter(item => item.hasState(state))
+  }
+
+  findNodeByPort(portId: itemId) {
+    return this.getNodes().find(node =>
+      node.ports.find(port => port.id === portId)
+    )
+  }
+
+  findNodeByState(state: string) {
+    return this.getNodes().filter(item => item.hasState(state))
   }
 
   public updateEdge(id: string, model: IEdgeModel): void {
@@ -198,9 +196,12 @@ export default class ItemController extends EventEmitter<
     this.emit('edge:change', edge)
   }
 
-  deleteItem(id: itemId): Item | undefined
-  deleteItem<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
-  deleteItem<T extends Item>(
+  private deleteItem(id: itemId): Item | undefined
+  private deleteItem<T extends Item>(
+    id: itemId,
+    itemClass: itemClass<T>
+  ): T | undefined
+  private deleteItem<T extends Item>(
     id: itemId,
     itemClass?: itemClass<T>
   ): T | undefined {

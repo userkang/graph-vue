@@ -112,7 +112,7 @@ export default class Tree extends Vue {
     const { x: x1, y: y1 } = edge.fromPort
     const { x: x2, y: y2 } = edge.toPort
 
-    if (['TB', 'BT'].includes(this.graph.direction)) {
+    if (['TB', 'BT'].includes(this.graph.get('direction'))) {
       const xc = (y2 - y1) / 2
       return `
         M ${x1} ${y1}

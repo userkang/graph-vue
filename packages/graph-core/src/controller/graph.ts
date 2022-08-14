@@ -242,12 +242,10 @@ export default class Graph extends EventEmitter {
     callback: T,
     defaultPayload?: P
   ) {
-    let shouldStack = true
     const func = (payload: P | void = defaultPayload, stack = true) => {
-      shouldStack = stack
-      shouldStack && this.stackStart()
+      stack && this.stackStart()
       const res: ReturnType<T> = callback(payload)
-      shouldStack && this.stackEnd()
+      stack && this.stackEnd()
       return res
     }
     return func

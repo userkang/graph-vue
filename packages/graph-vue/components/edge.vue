@@ -37,7 +37,7 @@ export default class Edge extends Vue {
 
   get path() {
     const { fromPort, toPort } = this.edge
-    const direction = this.graph.direction
+    const direction = this.graph.get('direction')
     const x2 = toPort.x
     const y2 = toPort.y
 

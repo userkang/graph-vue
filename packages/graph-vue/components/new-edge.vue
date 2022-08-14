@@ -31,7 +31,7 @@ export default class NewEdge extends Vue {
       this.path = ''
     } else {
       const { fromPoint, toPoint } = createEdge
-      const direction = this.graph.direction
+      const direction = this.graph.get('direction')
       let x2 = toPoint.x
       let y2 = toPoint.y
       if (direction === 'LR') {

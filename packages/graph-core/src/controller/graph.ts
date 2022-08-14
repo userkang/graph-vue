@@ -12,23 +12,12 @@ import {
   IEdgeModel,
   IGraphConfig,
   NodeInfo,
-  IDirection,
   IPort,
   INode
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { IStack, Item } from '../types/type'
+import { IStack } from '../types/type'
 import Store from './store'
-
-const getDefaultConfig = (): Pick<
-  ICfg,
-  'direction' | 'nodes' | 'edges' | 'action'
-> => ({
-  direction: 'TB',
-  nodes: [],
-  edges: [],
-  action: []
-})
 
 let instantiatingGraph: Graph | null = null
 
@@ -52,8 +41,7 @@ export default class Graph extends EventEmitter {
   readonly $svg?: Svg
   readonly isRender: boolean
   readonly container: HTMLElement
-  readonly direction: IDirection
-  cfg: ICfg
+  readonly cfg: ICfg
 
   constructor(config: IGraphConfig) {
     super()
@@ -67,10 +55,15 @@ export default class Graph extends EventEmitter {
     }
     this.container = container
 
-    this.direction = config.direction || 'TB'
-    this.cfg = Object.assign(getDefaultConfig(), config, {
-      brushing: false
-    })
+    this.cfg = {
+      direction: 'TB',
+      nodes: [],
+      edges: [],
+      action: [],
+      brushing: false,
+      ...config
+    }
+    this.set('direction', config.direction || 'TB')
 
     // 是否触发自带渲染
     const svg = container.querySelector('svg')
@@ -85,6 +78,10 @@ export default class Graph extends EventEmitter {
     this.initController()
     ;(window as any).graph = this
     instantiatingGraph = null
+  }
+
+  get direction() {
+    return this.get('direction')
   }
 
   get findNodeByState() {

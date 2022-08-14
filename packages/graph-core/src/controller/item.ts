@@ -45,8 +45,8 @@ export default class ItemController extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
   false
 > {
-  private $graph: Graph
-  private $store: Store
+  private readonly $graph: Graph
+  private readonly $store: Store
   constructor() {
     super()
     this.$graph = useGraph()

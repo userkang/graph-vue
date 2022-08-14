@@ -76,7 +76,7 @@ export default class Node extends Element {
     if (pathFunction) {
       path = pathFunction(edge.fromPort, edge.toPort)
     } else {
-      const direction = this.graph.get('direction')
+      const direction = this.graph.direction
       let x2 = edge.toPort.x
       let y2 = edge.toPort.y
       if (direction === 'LR') {

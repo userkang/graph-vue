@@ -3,11 +3,9 @@ import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
-import { BaseCfg, IEdgeCfg } from '../types/type'
+import { BaseCfg, IEdgeCfg, Item } from '../types/type'
 
 interface ItemMap {
-  fromNode: INode
-  toNode: INode
   fromPort: IPort
   toPort: IPort
 }
@@ -17,13 +15,28 @@ export default class Edge extends Base<
   Required<IEdgeCfg> & BaseCfg
 > {
   private readonly _itemMap: ItemMap = {} as ItemMap
-  constructor(
-    model: IEdgeModel,
-    cfg: IEdgeCfg | undefined,
-    fromNode: INode,
-    toNode: INode
-  ) {
+  fromNodeId: string
+  toNodeId: string
+  constructor(model: IEdgeModel, cfg: IEdgeCfg) {
     super(model)
+    this.$graph = cfg.graph
+
+    if (model.id !== undefined && this.$graph.store.findEdge(model.id)) {
+      throw new Error(`can't add edge, exist edge where id is ${model.id}`)
+    }
+    const { fromPortId, toPortId, fromNodeId, toNodeId } = model
+    // 如果仅有 portId，自动补全 nodeId
+    const fromNode =
+      (fromNodeId !== undefined && this.$graph.store.findNode(fromNodeId)) ||
+      (fromPortId !== undefined && this.$graph.store.findNodeByPort(fromPortId))
+    const toNode =
+      (toNodeId !== undefined && this.$graph.store.findNode(toNodeId)) ||
+      (toPortId !== undefined && this.$graph.store.findNodeByPort(toPortId))
+
+    if (!fromNode || !toNode) {
+      throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
+    }
+
     if (!this.id) {
       const id = uniqueId('edge')
       this.set('id', id)
@@ -32,8 +45,8 @@ export default class Edge extends Base<
 
     this.set('cfg', cfg)
 
-    this._itemMap.fromNode = fromNode
-    this._itemMap.toNode = toNode
+    this.fromNodeId = fromNode.id
+    this.toNodeId = toNode.id
 
     this.setPoint()
 
@@ -47,11 +60,11 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return this._itemMap.fromNode
+    return this.$graph.store.findNode(this.fromNodeId) as INode
   }
 
   public get toNode(): INode {
-    return this._itemMap.toNode
+    return this.$graph.store.findNode(this.toNodeId) as INode
   }
 
   public get fromPort() {
@@ -110,5 +123,36 @@ export default class Edge extends Base<
     const view = new edgeView(this, graph)
     this.set('view', view)
     return view
+  }
+
+  unMount() {
+    const graph = this.$graph
+    if (graph.isRender) {
+      const group = graph.$svg?.get('edgeGroup')
+      group.remove(this.view)
+    }
+  }
+  /**
+   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   */
+  remove() {
+    this.off()
+    const { fromNode, toNode, fromPort, toPort } = this
+    fromNode.deleteEdge(this.id)
+    toNode.deleteEdge(this.id)
+    // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
+    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
+      fromPort.clearState('linked')
+    }
+
+    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
+      toPort.clearState('linked')
+    }
+
+    this.$graph.store.deleteItem(this.id, Edge)
+
+    this.unMount()
+
+    this.emit('removed', this)
   }
 }

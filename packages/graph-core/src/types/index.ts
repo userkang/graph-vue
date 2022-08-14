@@ -77,13 +77,11 @@ export interface IGraphConfig {
 }
 
 export interface ICfg extends IGraphConfig {
-  container: HTMLElement
   nodes: INodeModel[]
   edges: IEdgeModel[]
   nodeInfo?: NodeInfo
   action: string[]
-  isRender?: boolean
-  [key: string]: any
+  brushing: boolean
 }
 
 export interface IDataStack {

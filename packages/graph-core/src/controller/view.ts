@@ -4,11 +4,10 @@ import {
   requestFullScreen,
   cancelFullScreen
 } from '../util/utils'
-import Graph from './graph'
+import Graph, { useGraph } from './graph'
 
 export default class ViewController {
-  graph: Graph
-
+  private $graph: Graph
   public $svg!: SVGElement
 
   // 画布宽高信息
@@ -30,10 +29,17 @@ export default class ViewController {
 
   public translatePadding = 10
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    this.$svg = graph.cfg.container.querySelector('svg') as SVGElement
+  constructor() {
+    this.$graph = useGraph()
+    this.$svg = this.$graph.getContainer().querySelector('svg') as SVGElement
     this.resize()
+  }
+
+  getTranslate() {
+    return {
+      x: this.transform.translateX,
+      y: this.transform.translateY
+    }
   }
 
   public getZoom() {
@@ -54,7 +60,7 @@ export default class ViewController {
       this.transform.scale = value
       this.translateBy(dx, dy)
       this.caculateOffset()
-      this.graph.emit('zoom', value, e)
+      this.$graph.emit('zoom', value, e)
     }
   }
 
@@ -99,7 +105,7 @@ export default class ViewController {
   }
 
   getNodesBBox(value?: INode[]) {
-    const nodes = value || this.graph.getNodes()
+    const nodes = value || this.$graph.getNodes()
     const filterNodes = nodes.filter(item => !item.hasState('hide'))
     let [minX, minY, maxX, maxY] = [
       Number.MAX_SAFE_INTEGER,
@@ -181,7 +187,7 @@ export default class ViewController {
   public translateBy(x: number, y: number) {
     this.translateX(x)
     this.translateY(y)
-    this.graph.emit(
+    this.$graph.emit(
       'translate',
       this.transform.translateX,
       this.transform.translateY
@@ -213,7 +219,6 @@ export default class ViewController {
   }
 
   destroy() {
-    ;(this.graph as null | Graph) = null
     ;(this.$svg as SVGElement | null) = null
   }
 }

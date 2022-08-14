@@ -1,6 +1,6 @@
-import Graph from './graph'
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
+import Graph, { useGraph } from './graph'
 
 export const MOUSEEVENTS = [
   'mousedown',
@@ -39,8 +39,7 @@ const DATACHANGE = [
 ]
 
 export default class EventController {
-  private graph: Graph
-
+  private $graph: Graph
   $svg: SVGSVGElement
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
@@ -51,9 +50,9 @@ export default class EventController {
   originX = 0
   originY = 0
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    const svg = graph.cfg.container.querySelector('svg')
+  constructor() {
+    this.$graph = useGraph()
+    const svg = this.$graph.getContainer().querySelector('svg')
     if (svg) {
       this.$svg = svg
     } else {
@@ -78,24 +77,25 @@ export default class EventController {
     })
 
     this.eventQueue.push(
-      addEventListener(window, 'resize', this.graph.resize.bind(this.graph))
+      addEventListener(window, 'resize', this.$graph.resize.bind(this.$graph))
     )
   }
 
   addBehavior(action?: string[]) {
-    const actions = action || this.graph.cfg.action
+    const graph = this.$graph
+    const actions = action || graph.cfg.action
     if (actions) {
       actions.forEach((item: string) => {
         const func = behaviors[item]
         if (func && !this.behaveInstance[item]) {
-          const behave = new func(this.graph)
+          const behave = new func(graph)
           if (behave) {
             this.behaveInstance[item] = behave
           }
         }
       })
       // 更新当前 action 配置
-      this.graph.set('action', Object.keys(this.behaveInstance))
+      graph.set('action', Object.keys(this.behaveInstance))
     }
   }
 
@@ -106,7 +106,7 @@ export default class EventController {
         this.behaveInstance[key].destory()
       })
       this.behaveInstance = {}
-      this.graph.set('action', [])
+      this.$graph.set('action', [])
       return
     }
 
@@ -117,7 +117,7 @@ export default class EventController {
         delete this.behaveInstance[item]
       }
     })
-    this.graph.set('action', Object.keys(this.behaveInstance))
+    this.$graph.set('action', Object.keys(this.behaveInstance))
   }
 
   handleMouseEvent(e: MouseEvent) {
@@ -149,11 +149,12 @@ export default class EventController {
   }
 
   emitMouseEvent(e: MouseEvent, eventType: string) {
-    const { x, y } = this.graph.getPointByClient(e.x, e.y)
+    const graph = this.$graph
+    const { x, y } = graph.getPointByClient(e.x, e.y)
 
     if (e.target === this.$svg) {
       this.currentItemType = 'blank'
-      this.graph.emit(`blank:${eventType}`, { e, x, y })
+      graph.emit(`blank:${eventType}`, { e, x, y })
     }
 
     const type = getItemType(e)
@@ -162,7 +163,7 @@ export default class EventController {
       const data = getItemData(e)
       const target = this.findItem(type, data.id as string)
       // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
-      this.graph.emit(`${this.currentItemType}:${eventType}`, {
+      graph.emit(`${this.currentItemType}:${eventType}`, {
         e,
         x,
         y,
@@ -171,27 +172,28 @@ export default class EventController {
       })
     }
 
-    this.graph.emit(eventType, e)
+    graph.emit(eventType, e)
   }
 
   findItem(type: string, id: string) {
+    const graph = this.$graph
     if (type === 'node') {
-      return this.graph.findNode(id)
+      return graph.findNode(id)
     } else if (type === 'edge') {
-      return this.graph.findEdge(id)
+      return graph.findEdge(id)
     } else if (type === 'port') {
-      return this.graph.findPort(id)
+      return graph.findPort(id)
     }
   }
 
   handleExtendEvents(e: MouseEvent) {
-    this.graph.emit(e.type, e)
+    this.$graph.emit(e.type, e)
   }
 
   handleMouseMove(e: MouseEvent) {
     if (this.preItemType !== this.currentItemType) {
-      this.graph.emit(`${this.preItemType}.mouseleave`)
-      this.graph.emit(`${this.currentItemType}.mouseenter`)
+      this.$graph.emit(`${this.preItemType}.mouseleave`)
+      this.$graph.emit(`${this.currentItemType}.mouseenter`)
     }
 
     this.preItemType = this.currentItemType
@@ -202,8 +204,8 @@ export default class EventController {
    */
   defaultEmit() {
     // 有些事件默认触发datachange事件
-    this.graph.on(DATACHANGE, () => {
-      this.graph.emit('datachange')
+    this.$graph.on(DATACHANGE, () => {
+      this.$graph.emit('datachange')
     })
   }
 
@@ -214,7 +216,6 @@ export default class EventController {
     this.eventQueue = []
     this.behaveInstance = []
 
-    this.graph.off()
-    ;(this.graph as null | Graph) = null
+    this.$graph.off()
   }
 }

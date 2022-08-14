@@ -1,9 +1,12 @@
+import Graph from '../controller/graph'
 import {
   EdgeInfo,
   IDirection,
+  IEdge,
   IEdgeModel,
   INode,
   INodeModel,
+  IPort,
   IPortModel,
   NodeInfo
 } from '.'
@@ -30,15 +33,16 @@ export interface INodeCfg extends NodeInfo {
   cfg?: INodeCfg
   width: number
   height: number
-  direction?: IDirection
-  [key: string]: any
+  direction: IDirection
+  graph: Graph
 }
 
 export interface IEdgeCfg extends EdgeInfo {
-  [key: string]: any
+  graph: Graph
 }
 
 export interface IPortCfg {
+  graph: Graph
   x: number
   y: number
 }
@@ -83,3 +87,9 @@ export interface IRect {
 }
 
 export type move = { moveX: number; moveY: number }
+
+export type Item = INode | IEdge | IPort
+
+export type itemClass<T extends Item> = new (...args: any[]) => T
+
+export type valuesType<T> = T extends readonly (infer U)[] ? U : never

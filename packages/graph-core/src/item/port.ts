@@ -103,10 +103,16 @@ export default class Port extends Base<
       this.set('id', id)
       this.model.id = this.id
     }
-
+    this.$graph = cfg.graph
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
+  }
+
+  private onNodeChange = (target: INode, type: string, data?: any) => {
+    if (type === 'position') {
+      this.update(this.x + data.moveX, this.y + data.moveY)
+    }
   }
 
   public get x(): number {
@@ -137,19 +143,22 @@ export default class Port extends Base<
 
   setupNode(container: INode) {
     Port.containerMap.set(this, container)
-    const onNodeChange = (target: INode, type: string, data?: any) => {
-      if (type === 'position') {
-        this.update(this.x + data.moveX, this.y + data.moveY)
-      }
+    container.on('change', this.onNodeChange)
+  }
+  /**
+   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   */
+  remove() {
+    this.off()
+
+    const container = Port.containerMap.get(this)
+    if (container) {
+      container.off('change', this.onNodeChange)
     }
-    const onDeleted = (ids: string[]) => {
-      if (ids.includes(this.id)) {
-        Port.containerMap.delete(this)
-        container.off('change', onNodeChange)
-        setTimeout(() => container.off('port:deleted', onDeleted))
-      }
-    }
-    container.on('change', onNodeChange)
-    container.on('port:deleted', onDeleted)
+    Port.containerMap.delete(this)
+
+    this.$graph.store.deleteItem(this.id, Port)
+
+    this.emit('removed', this)
   }
 }

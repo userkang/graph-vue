@@ -274,9 +274,7 @@ export default class Graph extends EventEmitter {
       this.emit('edge:added', data)
     })
     this.itemController.on('datachange', (data: { needLayout: boolean }) => {
-      if (data.needLayout) {
-        this.layout({}, false)
-      }
+      data.needLayout && this.layout({}, false)
       this.emit('datachange')
     })
     this.layoutController.on('layout', () => {

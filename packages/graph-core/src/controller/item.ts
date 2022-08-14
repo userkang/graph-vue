@@ -8,7 +8,14 @@ import {
   IEdge,
   IDataModel
 } from '../types'
-import { INodeCfg, IEdgeCfg, Item, itemId, itemClass } from '../types/type'
+import {
+  INodeCfg,
+  IEdgeCfg,
+  Item,
+  itemId,
+  itemClass,
+  valuesType
+} from '../types/type'
 import Graph, { useGraph } from './graph'
 import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
@@ -20,7 +27,24 @@ const NODE_DEFAULT_CFG = {
   height: 40
 } as const
 
-export default class ItemController extends EventEmitter {
+const EVENT_TYPES = [
+  'node:refresh',
+  'node:change',
+  'node:deleted',
+  'node:added',
+  'edge:deleted',
+  'edge:change',
+  'edge:added',
+  'port:change',
+  'port:added',
+  'port:deleted',
+  'datachange'
+] as const
+
+export default class ItemController extends EventEmitter<
+  valuesType<typeof EVENT_TYPES>,
+  false
+> {
   private $graph: Graph
   private $store: Store
   constructor() {

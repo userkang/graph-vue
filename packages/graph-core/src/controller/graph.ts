@@ -5,7 +5,6 @@ import EventController from './event'
 import ItemController from './item'
 import StackController from './stack'
 import Svg from '../view/svg'
-import Node from '../item/node'
 import {
   ICfg,
   IEdge,
@@ -15,7 +14,7 @@ import {
   NodeInfo,
   IDirection,
   IPort,
-  INode
+  INode,
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { IStack, Item } from '../types/type'
@@ -254,17 +253,17 @@ export default class Graph extends EventEmitter {
   }
 
   private initController() {
-    this.itemController.on('node:refresh', (data: Node) => {
+    this.itemController.on('node:refresh', (data: INode) => {
       this.emit('node:refresh', data)
     })
-    this.itemController.on('node:change', (data: Node, type?: string) => {
+    this.itemController.on('node:change', (data: INode, type?: string) => {
       this.emit('node:change', data, type)
       this.emit(`node:change:${type}`, data)
     })
     this.itemController.on('node:deleted', (data: INodeModel) => {
       this.emit('node:deleted', data)
     })
-    this.itemController.on('node:added', (data: Node) => {
+    this.itemController.on('node:added', (data: INode) => {
       this.emit('node:added', data)
     })
     this.itemController.on('edge:deleted', (data: IEdgeModel) => {

@@ -91,3 +91,5 @@ export type move = { moveX: number; moveY: number }
 export type Item = INode | IEdge | IPort
 
 export type itemClass<T extends Item> = new (...args: any[]) => T
+
+export type valuesType<T> = T extends readonly (infer U)[] ? U : never

@@ -9,6 +9,7 @@ import {
 import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
 import EventEmitter from '../util/event-emitter'
+import { valuesType } from '../types/type'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -16,7 +17,12 @@ const getDTheta = (nodesLength: number) => {
   return dTheta
 }
 
-export default class LayoutController extends EventEmitter {
+const EVENT_TYPES = ['layout'] as const
+
+export default class LayoutController extends EventEmitter<
+  valuesType<typeof EVENT_TYPES>,
+  false
+> {
   private $graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}

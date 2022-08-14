@@ -77,6 +77,7 @@ export interface IGraphConfig {
 }
 
 export interface ICfg extends IGraphConfig {
+  container: HTMLElement
   direction: IDirection
   action: string[]
 

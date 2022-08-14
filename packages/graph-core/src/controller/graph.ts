@@ -39,8 +39,7 @@ export default class Graph extends EventEmitter {
 
   readonly store: Store
   readonly $svg?: Svg
-  readonly isRender: boolean
-  readonly container: HTMLElement
+  readonly isRender: boolean 
   readonly cfg: ICfg
 
   constructor(config: IGraphConfig) {
@@ -53,7 +52,6 @@ export default class Graph extends EventEmitter {
     if (!(container instanceof HTMLElement)) {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
-    this.container = container
 
     this.cfg = {
       direction: 'TB',
@@ -61,7 +59,8 @@ export default class Graph extends EventEmitter {
       edges: [],
       action: [],
       brushing: false,
-      ...config
+      ...config,
+      container
     }
     this.set('direction', config.direction || 'TB')
 
@@ -78,6 +77,10 @@ export default class Graph extends EventEmitter {
     this.initController()
     ;(window as any).graph = this
     instantiatingGraph = null
+  }
+
+  get container() {
+    return this.get('container')
   }
 
   get direction() {

@@ -166,7 +166,8 @@ export default class Graph extends EventEmitter {
 
   get layout() {
     return this.withStack(
-      this.layoutController.layout.bind(this.layoutController)
+      this.layoutController.layout.bind(this.layoutController),
+      {}
     )
   }
 
@@ -230,9 +231,19 @@ export default class Graph extends EventEmitter {
     return this.stackController.end.bind(this.stackController)
   }
 
-  private withStack<T extends (payload: any) => any>(callback: T) {
+  private withStack<T extends (payload: any) => any, P = Parameters<T>[0]>(
+    callback: T
+  ): (payload: P, stack?: boolean) => ReturnType<T>
+  private withStack<T extends (payload?: any) => any, P = Parameters<T>[0]>(
+    callback: T,
+    defaultPayload?: P
+  ): (payload?: P, stack?: boolean) => ReturnType<T>
+  private withStack<T extends (payload: any) => any, P = Parameters<T>[0]>(
+    callback: T,
+    defaultPayload?: P
+  ) {
     let shouldStack = true
-    const func = (payload: Parameters<T>[0], stack = true) => {
+    const func = (payload: P | void = defaultPayload, stack = true) => {
       shouldStack = stack
       shouldStack && this.stackStart()
       const res: ReturnType<T> = callback(payload)

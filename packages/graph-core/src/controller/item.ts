@@ -141,30 +141,14 @@ export default class ItemController extends EventEmitter {
     const node = new Node(model, nodeCfg)
     this.$store.insertItem(node)
 
-    const onNodeChange = (node: INode, type: string) => {
-      const eventType = 'node:change'
-      this.$graph.emit(`${eventType}:${type}`, node)
-      this.$graph.emit(eventType, node, type)
-    }
-
-    const onPortChange = (port: IPort, type: string) => {
-      const eventType = 'port:change'
-      this.$graph.emit(`${eventType}:${type}`, port)
-      this.$graph.emit(eventType, port, type)
-    }
-
-    const onPortAdded = (ports: IPort[]) => {
-      const eventType = 'port:added'
-      this.$graph.emit(eventType, ports)
-    }
-
-    const onPortDeleted = (ids: string[]) =>
-      this.$graph.emit('port:deleted', ids)
-
-    node.on('change', onNodeChange)
-    node.on('port:change', onPortChange)
-    node.on('port:added', onPortAdded)
-    node.on('port:deleted', onPortDeleted)
+    node.on('change', (node: INode, type: string) =>
+      this.emit('node:change', node, type)
+    )
+    node.on('port:change', (port: IPort, type: string) => {
+      this.emit('port:change', port, type)
+    })
+    node.on('port:added', (ports: IPort[]) => this.emit('port:added', ports))
+    node.on('port:deleted', (ids: string[]) => this.emit('port:deleted', ids))
 
     // 渲染
     node.mount()
@@ -232,8 +216,7 @@ export default class ItemController extends EventEmitter {
       this.$store.insertItem(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {
-        this.$graph.emit(`edge:change:${type}`, edge)
-        this.$graph.emit('edge:change', edge, type)
+        this.emit('edge:change', edge, type)
       })
 
       // 渲染

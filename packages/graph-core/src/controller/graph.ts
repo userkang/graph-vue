@@ -13,7 +13,9 @@ import {
   IEdgeModel,
   IGraphConfig,
   NodeInfo,
-  IDirection
+  IDirection,
+  IPort,
+  INode
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
 import { IStack, Item } from '../types/type'
@@ -255,11 +257,12 @@ export default class Graph extends EventEmitter {
     this.itemController.on('node:refresh', (data: Node) => {
       this.emit('node:refresh', data)
     })
+    this.itemController.on('node:change', (data: Node, type?: string) => {
+      this.emit('node:change', data, type)
+      this.emit(`node:change:${type}`, data)
+    })
     this.itemController.on('node:deleted', (data: INodeModel) => {
       this.emit('node:deleted', data)
-    })
-    this.itemController.on('node:change', (data: Node) => {
-      this.emit('node:change', data)
     })
     this.itemController.on('node:added', (data: Node) => {
       this.emit('node:added', data)
@@ -267,12 +270,23 @@ export default class Graph extends EventEmitter {
     this.itemController.on('edge:deleted', (data: IEdgeModel) => {
       this.emit('edge:deleted', data)
     })
-    this.itemController.on('edge:change', (data: IEdge) => {
-      this.emit('edge:change', data)
+    this.itemController.on('edge:change', (edge: IEdge, type?: string) => {
+      this.emit('edge:change', edge, type)
+      this.emit(`edge:change:${type}`, edge)
     })
     this.itemController.on('edge:added', (data: IEdge) => {
       this.emit('edge:added', data)
     })
+    this.itemController.on('port:change', (port: IPort, type: string) => {
+      this.emit('port:change', port, type)
+      this.emit(`${'port:change'}:${type}`, port)
+    })
+    this.itemController.on('port:added', (ports: IPort[]) =>
+      this.emit('port:added', ports)
+    )
+    this.itemController.on('port:deleted', (ids: string[]) =>
+      this.emit('port:deleted', ids)
+    )
     this.itemController.on('datachange', (data: { needLayout: boolean }) => {
       data.needLayout && this.layout({}, false)
       this.emit('datachange')

@@ -194,8 +194,7 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this.$graph.store.insertItem(edge) 
-    edge.setupContainer(this)
+    this.$graph.store.insertItem(edge)
     this.edgeIdSet.add(edge.id)
   }
 
@@ -266,10 +265,10 @@ export default class Node extends Base<
       const port = new Port(model, {
         x: 0,
         y: 0,
-    graph: this.$graph 
+        graph: this.$graph
       })
       this.portIdSet.add(port.id)
-      this.$graph.store.insertItem(port) 
+      this.$graph.store.insertItem(port)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -280,11 +279,16 @@ export default class Node extends Base<
   }
 
   public deletePorts(ids: string[]) {
-    ids.forEach(id => {
-      const port = this.$graph.store.findPort(id)
+    for (let i = 0; i < ids.length; i++) {
+      const portId = ids[i]
+      if (!this.portIdSet.has(portId)) {
+        continue
+      }
+      const port = this.$graph.store.findPort(portId)
       port?.off('change', this.onPortChange)
-      this.portIdSet.delete(id)
-    })
+      port?.remove()
+      this.portIdSet.delete(portId)
+    }
     this.emit('port:deleted', ids)
   }
 
@@ -336,16 +340,15 @@ export default class Node extends Base<
       group.remove(this.view)
     }
   }
-
+  /**
+   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   */
   remove() {
     this.off()
-    // 先删除与节点相关的边
     const items: Item[] = this.getEdges()
-    items.forEach(item => {
-      item.remove()
-    })
+    items.forEach(item => item.remove())
 
-    this.$graph.store.deleteItem(this.id, Node) 
+    this.$graph.store.deleteItem(this.id, Node)
 
     this.unMount()
 

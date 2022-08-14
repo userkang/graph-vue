@@ -125,8 +125,6 @@ export default class Edge extends Base<
     return view
   }
 
-  setupContainer(container: Item) {}
-
   unMount() {
     const graph = this.$graph
     if (graph.isRender) {
@@ -134,10 +132,11 @@ export default class Edge extends Base<
       group.remove(this.view)
     }
   }
-
+  /**
+   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   */
   remove() {
     this.off()
-    // 先删除前后节点的相关边
     const { fromNode, toNode, fromPort, toPort } = this
     fromNode.deleteEdge(this.id)
     toNode.deleteEdge(this.id)
@@ -150,7 +149,7 @@ export default class Edge extends Base<
       toPort.clearState('linked')
     }
 
-    this.$graph.store.deleteItem(this.id)
+    this.$graph.store.deleteItem(this.id, Edge)
 
     this.unMount()
 

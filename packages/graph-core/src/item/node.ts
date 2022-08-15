@@ -17,9 +17,7 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  readonly nodeIdSet = new Set<itemId>()
   readonly edgeIdSet = new Set<itemId>()
-  readonly portIdSet = new Set<itemId>()
   constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
     if (!this.id) {
@@ -76,8 +74,7 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    const portMap = this.$graph.store.getPortMap()
-    return Array.from(this.portIdSet).map(itemId => portMap[itemId])
+    return this.$graph.store.node_ports.find(this) || []
   }
 
   public getEdges(): IEdge[] {
@@ -124,13 +121,12 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    const nodeMap = this.$graph.store.getNodeMap()
-    return Array.from(this.nodeIdSet).map(itemId => nodeMap[itemId])
+    return this.$graph.store.node_nodes.find(this) || []
   }
 
   public addChild(node: INode) {
     this.$graph.store.insertItem(node)
-    this.nodeIdSet.add(node.id)
+    this.$graph.store.node_nodes.insert(node, this)
     node.set('parent', this)
   }
 
@@ -267,8 +263,8 @@ export default class Node extends Base<
         y: 0,
         graph: this.$graph
       })
-      this.portIdSet.add(port.id)
       this.$graph.store.insertItem(port)
+      this.$graph.store.node_ports.insert(port, this)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -281,13 +277,13 @@ export default class Node extends Base<
   public deletePorts(ids: string[]) {
     for (let i = 0; i < ids.length; i++) {
       const portId = ids[i]
-      if (!this.portIdSet.has(portId)) {
+      const port = this.$graph.store.findPort(portId)
+      if (!port || this.$graph.store.node_ports.find(port) !== this) {
         continue
       }
-      const port = this.$graph.store.findPort(portId)
-      port?.off('change', this.onPortChange)
-      port?.remove()
-      this.portIdSet.delete(portId)
+      port.off('change', this.onPortChange)
+      port.remove()
+      this.$graph.store.node_ports.remove(port)
     }
     this.emit('port:deleted', ids)
   }

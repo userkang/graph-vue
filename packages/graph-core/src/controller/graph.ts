@@ -13,10 +13,12 @@ import {
   IGraphConfig,
   NodeInfo,
   IPort,
-  INode
+  INode,
+  IDataModel,
+  ILayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { IStack } from '../types/type'
+import { IRect, IStack } from '../types/type'
 import Store from './store'
 
 let instantiatingGraph: Graph | null = null
@@ -39,7 +41,7 @@ export default class Graph extends EventEmitter {
 
   readonly store: Store
   readonly $svg?: Svg
-  readonly isRender: boolean 
+  readonly isRender: boolean
   readonly cfg: ICfg
 
   constructor(config: IGraphConfig) {
@@ -85,150 +87,6 @@ export default class Graph extends EventEmitter {
 
   get direction() {
     return this.get('direction')
-  }
-
-  get findNodeByState() {
-    return this.itemController.findNodeByState.bind(this.itemController)
-  }
-
-  get findNodeByPort() {
-    return this.itemController.findNodeByPort.bind(this.itemController)
-  }
-
-  get getNodes() {
-    return this.itemController.getNodes.bind(this.itemController)
-  }
-
-  get findNode() {
-    return this.itemController.findNode.bind(this.itemController)
-  }
-
-  get refreshNode() {
-    return this.itemController.refreshNode.bind(this.itemController)
-  }
-
-  get updateNode() {
-    return this.itemController.updateNode.bind(this.itemController)
-  }
-
-  get findPort() {
-    return this.itemController.findPort.bind(this.itemController)
-  }
-
-  get findEdge() {
-    return this.itemController.findEdge.bind(this.itemController)
-  }
-
-  get getEdges() {
-    return this.itemController.getEdges.bind(this.itemController)
-  }
-
-  get getDataModel() {
-    return this.itemController.getDataModel.bind(this.itemController)
-  }
-
-  get getTreeDataModel() {
-    return this.itemController.getTreeDataModel.bind(this.itemController)
-  }
-
-  get findEdgeByState() {
-    return this.itemController.findEdgeByState.bind(this.itemController)
-  }
-
-  get updateEdge() {
-    return this.itemController.updateEdge.bind(this.itemController)
-  }
-
-  // 加载数据
-  get data() {
-    return this.itemController.data.bind(this.itemController)
-  }
-
-  get deleteNode() {
-    return this.withStack(
-      this.itemController.deleteNode.bind(this.itemController)
-    )
-  }
-
-  get addNode() {
-    return this.withStack(this.itemController.addNode.bind(this.itemController))
-  }
-
-  get deleteEdge() {
-    return this.withStack(
-      this.itemController.deleteEdge.bind(this.itemController)
-    )
-  }
-
-  get addEdge() {
-    return this.withStack(this.itemController.addEdge.bind(this.itemController))
-  }
-
-  get layout() {
-    return this.withStack(
-      this.layoutController.layout.bind(this.layoutController),
-      {}
-    )
-  }
-
-  get getPointByClient() {
-    return this.viewController.getPointByClient.bind(this.viewController)
-  }
-
-  get getTranslate() {
-    return this.viewController.getTranslate.bind(this.viewController)
-  }
-
-  get translate() {
-    return this.viewController.translateBy.bind(this.viewController)
-  }
-
-  get getZoom() {
-    return this.viewController.getZoom.bind(this.viewController)
-  }
-
-  get zoom() {
-    return this.viewController.zoom.bind(this.viewController)
-  }
-
-  get resize() {
-    return this.viewController.resize.bind(this.viewController)
-  }
-
-  get fitView() {
-    return this.viewController.fitView.bind(this.viewController)
-  }
-
-  get fitCenter() {
-    return this.viewController.translateToCenter.bind(this.viewController)
-  }
-
-  get fullScreen() {
-    return this.viewController.fullScreen.bind(this.viewController)
-  }
-
-  get removeAction() {
-    return this.eventController.removeBehavior.bind(this.eventController)
-  }
-
-  get getNodesBBox() {
-    return this.viewController.getNodesBBox.bind(this.viewController)
-  }
-
-  get undo() {
-    return this.stackController.undo.bind(this.stackController)
-  }
-
-  get redo() {
-    return this.stackController.redo.bind(this.stackController)
-  }
-
-  get stackStart() {
-    return this.stackController.start.bind(this.stackController)
-  }
-
-  get stackEnd() {
-    return this.stackController.end.bind(this.stackController)
   }
 
   private withStack<T extends (payload: any) => any, P = Parameters<T>[0]>(
@@ -302,16 +160,138 @@ export default class Graph extends EventEmitter {
     return this.cfg[key]
   }
 
-  getContainer() {
+  getContainer(): HTMLElement {
     return this.container
   }
 
-  getSvgInfo() {
+  getSvgInfo(): IRect {
     return this.viewController.svgInfo
   }
 
   getNodeInfo(): NodeInfo | undefined {
     return this.cfg.nodeInfo
+  }
+  getNodes(): INode[] {
+    return this.itemController.getNodes()
+  }
+
+  findNode(id: string | number): INode | undefined {
+    return this.itemController.findNode(String(id))
+  }
+
+  findNodeByState(state: string): INode[] {
+    return this.itemController.findNodeByState(state)
+  }
+
+  findNodeByPort(id: string): INode | undefined {
+    return this.itemController.findNodeByPort(id)
+  }
+
+  refreshNode(id: string): void {
+    return this.itemController.refreshNode(id)
+  }
+
+  updateNode(id: string, model: INodeModel): void {
+    return this.itemController.updateNode(id, model)
+  }
+
+  deleteNode(id: string, stack = true): INode | undefined {
+    const func = this.itemController.deleteNode.bind(this.itemController)
+    return this.withStack(func)(id, stack)
+  }
+
+  addNode(item: INodeModel, stack = true): INode | undefined {
+    const func = this.itemController.addNode.bind(this.itemController)
+    return this.withStack(func)(item, stack)
+  }
+
+  findPort(id: string | number): IPort | undefined {
+    return this.itemController.findPort(String(id))
+  }
+
+  getEdges(): IEdge[] {
+    return this.itemController.getEdges()
+  }
+
+  findEdge(id: string | number): IEdge | undefined {
+    return this.itemController.findEdge(String(id))
+  }
+
+  findEdgeByState(state: string): IEdge[] {
+    return this.itemController.findEdgeByState(state)
+  }
+
+  updateEdge(id: string, model: IEdgeModel): void {
+    return this.itemController.updateEdge(id, model)
+  }
+
+  deleteEdge(id: string, stack = true): IEdge | undefined {
+    const func = this.itemController.deleteEdge.bind(this.itemController)
+    return this.withStack(func)(id, stack)
+  }
+
+  addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+    const func = this.itemController.addEdge.bind(this.itemController)
+    return this.withStack(func)(item, stack)
+  }
+
+  getDataModel(): IDataModel {
+    return this.itemController.getDataModel()
+  }
+
+  getTreeDataModel() {
+    return this.itemController.getTreeDataModel()
+  }
+
+  getPointByClient(originX: number, originY: number): { x: number; y: number } {
+    return this.viewController.getPointByClient(originX, originY)
+  }
+
+  getTranslate() {
+    return this.viewController.getTranslate()
+  }
+
+  translate(x: number, y: number) {
+    return this.viewController.translateBy(x, y)
+  }
+
+  getZoom() {
+    return this.viewController.getZoom()
+  }
+
+  zoom(value: number, e?: WheelEvent) {
+    return this.viewController.zoom(value, e)
+  }
+
+  resize() {
+    return this.viewController.resize()
+  }
+
+  fitView() {
+    return this.viewController.fitView()
+  }
+  /**
+   * 加载数据
+   */
+  data(data: IDataModel | INodeModel) {
+    return this.itemController.data(data)
+  }
+
+  fitCenter() {
+    return this.viewController.translateToCenter()
+  }
+
+  fullScreen(el?: HTMLElement) {
+    return this.viewController.fullScreen(el)
+  }
+
+  layout(options: ILayout = {}, stack = true) {
+    const func = this.layoutController.layout.bind(this.layoutController)
+    return this.withStack(func, {})(options, stack)
+  }
+
+  removeAction(action?: string | string[]) {
+    return this.eventController.removeBehavior(action)
   }
 
   addAction(actions: string | string[]) {
@@ -320,6 +300,25 @@ export default class Graph extends EventEmitter {
     )
   }
 
+  getNodesBBox(nodes: INode[]) {
+    return this.viewController.getNodesBBox(nodes)
+  }
+
+  undo() {
+    return this.stackController.undo()
+  }
+
+  redo() {
+    return this.stackController.redo()
+  }
+
+  stackStart() {
+    return this.stackController.start()
+  }
+
+  stackEnd() {
+    return this.stackController.end()
+  }
   getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }

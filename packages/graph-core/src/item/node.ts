@@ -17,7 +17,6 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  readonly nodeIdSet = new Set<itemId>()
   readonly edgeIdSet = new Set<itemId>()
   constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
@@ -122,13 +121,12 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    const nodeMap = this.$graph.store.getNodeMap()
-    return Array.from(this.nodeIdSet).map(itemId => nodeMap[itemId])
+    return this.$graph.store.node_nodes.find(this) || []
   }
 
   public addChild(node: INode) {
     this.$graph.store.insertItem(node)
-    this.nodeIdSet.add(node.id)
+    this.$graph.store.node_nodes.insert(node, this)
     node.set('parent', this)
   }
 

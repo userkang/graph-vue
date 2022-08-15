@@ -15,6 +15,7 @@ export default class Store extends EventEmitter<
 > {
   readonly itemMap: Record<string, Item> = {}
   readonly node_ports = new ManyToOne<Port, Node>()
+  readonly node_nodes = new ManyToOne<Node, Node>()
   readonly fromPort_edges = new ManyToOne<Edge, Port>()
   readonly toPort_edges = new ManyToOne<Edge, Port>()
   constructor() {

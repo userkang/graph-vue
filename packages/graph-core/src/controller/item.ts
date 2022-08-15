@@ -17,7 +17,6 @@ import {
   valuesType
 } from '../types/type'
 import Graph, { useGraph } from './graph'
-import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import Store from './store'
 import { isIDataModel, preorder } from '../util/utils'
@@ -60,16 +59,6 @@ export default class ItemController extends EventEmitter<
     }
   }
 
-  get nodes() {
-    return this.$store
-      .getNodes()
-      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
-  }
-
-  get edges() {
-    return this.$store.getEdges()
-  }
-
   get getEdges() {
     return this.$store.getEdges.bind(this.$store)
   }
@@ -80,14 +69,6 @@ export default class ItemController extends EventEmitter<
 
   get getTreeDataModel() {
     return this.$store.getTreeDataModel.bind(this.$store)
-  }
-
-  get findBy() {
-    return this.$store.findBy.bind(this.$store)
-  }
-
-  get where() {
-    return this.$store.where.bind(this.$store)
   }
 
   get findEdge() {

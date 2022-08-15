@@ -39,7 +39,7 @@ export default class DragSvg extends Base {
       const dx = this.moveX / zoom
       const dy = this.moveY / zoom
 
-      this.graph.translateBy(dx, dy)
+      this.graph.translate(dx, dy)
     }
 
     this.startX = x

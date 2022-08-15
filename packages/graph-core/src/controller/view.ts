@@ -124,18 +124,18 @@ export default class ViewController {
       (this.svgInfo.height * (this.transform.scale - 1)) / 2
   }
 
+  translateTo = (x: number, y: number) => {
+    const { left, top, width, height } = this.nodesBox
+    const dx = -(this.transform.translateX + left + width / 2) + x
+    const dy = -(this.transform.translateY + top + height / 2) + y
+    this.translateBy(dx, dy)
+  }
+
   // 将g移动到画布中心区域
   translateToCenter() {
     this.updateSvgInfo()
-    const dx =
-      -this.transform.translateX -
-      this.nodesBox.left +
-      (this.svgInfo.width - this.nodesBox.width) / 2
-    const dy =
-      -this.transform.translateY -
-      this.nodesBox.top +
-      (this.svgInfo.height - this.nodesBox.height) / 2
-    this.translateBy(dx, dy)
+    const { width, height } = this.svgInfo
+    this.translateTo(width / 2, height / 2)
   }
 
   private translateX(x: number) {
@@ -186,13 +186,6 @@ export default class ViewController {
       this.transform.translateX,
       this.transform.translateY
     )
-  }
-
-  fixMissView() {
-    const visiableDom = this.$svg.querySelector('g[graph-type=port]')
-    if (visiableDom) {
-      visiableDom.innerHTML = visiableDom.innerHTML
-    }
   }
 
   getPointByClient(originX: number, originY: number) {

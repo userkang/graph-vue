@@ -4,7 +4,7 @@ import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
-import { IDataModel, IEdge, IPort } from '../types'
+import { IDataModel, IEdge } from '../types'
 import { ManyToOne } from '../types/many-to-one'
 
 const EVENT_TYPES = [] as const
@@ -14,10 +14,9 @@ export default class Store extends EventEmitter<
   false
 > {
   readonly itemMap: Record<string, Item> = {}
-  readonly outPorts_node = new ManyToOne<Port, Node>()
-  readonly inPorts_node = new ManyToOne<Port, Node>()
-  readonly edge_fromPorts = new ManyToOne<Edge, Port>()
-  readonly edge_toPorts = new ManyToOne<Edge, Port>()
+  readonly node_ports = new ManyToOne<Port, Node>()
+  readonly fromPort_edges = new ManyToOne<Edge, Port>()
+  readonly toPort_edges = new ManyToOne<Edge, Port>()
   constructor() {
     super()
   }

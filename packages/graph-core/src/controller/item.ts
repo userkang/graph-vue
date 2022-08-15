@@ -91,12 +91,12 @@ export default class ItemController extends EventEmitter<
     return this.$store.findNodeByPort.bind(this.$store)
   }
 
-  private deleteItem(id: itemId): Item | undefined
-  private deleteItem<T extends Item>(
+  private remove(id: itemId): Item | undefined
+  private remove<T extends Item>(
     id: itemId,
     itemClass: itemClass<T>
   ): T | undefined
-  private deleteItem<T extends Item>(
+  private remove<T extends Item>(
     id: itemId,
     itemClass?: itemClass<T>
   ): T | undefined {
@@ -125,7 +125,7 @@ export default class ItemController extends EventEmitter<
     group.forEach(model => this.addEdge(model))
   }
 
-  private clearItem() {
+  private clear() {
     this.getNodes().forEach(node => node.remove())
   }
 
@@ -170,7 +170,7 @@ export default class ItemController extends EventEmitter<
       graph: this.$graph
     }
     const node = new Node(model, nodeCfg)
-    this.$store.insertItem(node)
+    this.$store.add(node)
 
     node.on('change', (node: INode, type: string) =>
       this.emit('node:change', node, type)
@@ -202,13 +202,13 @@ export default class ItemController extends EventEmitter<
   }
 
   deleteNode(id: itemId) {
-    const item = this.deleteItem(id, Node)
+    const item = this.remove(id, Node)
     item && this.emit('node:deleted', item.model)
     return item
   }
 
   deleteEdge(id: itemId) {
-    const item = this.deleteItem(id, Edge)
+    const item = this.remove(id, Edge)
     item && this.emit('edge:deleted', item.model)
     return item
   }
@@ -221,7 +221,7 @@ export default class ItemController extends EventEmitter<
         graph: this.$graph
       }
       const edge = new Edge(item, edgeCfg)
-      this.$store.insertItem(edge)
+      this.$store.add(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {
         this.emit('edge:change', edge, type)
@@ -245,7 +245,7 @@ export default class ItemController extends EventEmitter<
       return
     }
 
-    this.clearItem()
+    this.clear()
 
     const model: IDataModel = isIDataModel(data) ? data : preorder(data)
     const needLayout = model.nodes.every(
@@ -258,6 +258,6 @@ export default class ItemController extends EventEmitter<
   }
 
   destroy() {
-    this.clearItem()
+    this.clear()
   }
 }

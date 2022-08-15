@@ -17,7 +17,7 @@ export class ManyToOne<M, O> {
     }
   }
 
-  insert(many: M, one: O): void {
+  add(many: M, one: O): void {
     this.primaryMap.set(many, one)
     this.onInsert(many, one)
   }

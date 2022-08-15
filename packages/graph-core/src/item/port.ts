@@ -157,7 +157,7 @@ export default class Port extends Base<
     }
     Port.containerMap.delete(this)
 
-    this.$graph.store.deleteItem(this.id, Port)
+    this.$graph.store.remove(this.id, Port)
 
     this.emit('removed', this)
   }

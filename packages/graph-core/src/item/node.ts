@@ -125,8 +125,8 @@ export default class Node extends Base<
   }
 
   public addChild(node: INode) {
-    this.$graph.store.insertItem(node)
-    this.$graph.store.node_nodes.insert(node, this)
+    this.$graph.store.add(node)
+    this.$graph.store.node_nodes.add(node, this)
     node.set('parent', this)
   }
 
@@ -190,7 +190,7 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this.$graph.store.insertItem(edge)
+    this.$graph.store.add(edge)
     this.edgeIdSet.add(edge.id)
   }
 
@@ -263,8 +263,8 @@ export default class Node extends Base<
         y: 0,
         graph: this.$graph
       })
-      this.$graph.store.insertItem(port)
-      this.$graph.store.node_ports.insert(port, this)
+      this.$graph.store.add(port)
+      this.$graph.store.node_ports.add(port, this)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -344,7 +344,7 @@ export default class Node extends Base<
     const items: Item[] = this.getEdges()
     items.forEach(item => item.remove())
 
-    this.$graph.store.deleteItem(this.id, Node)
+    this.$graph.store.remove(this.id, Node)
 
     this.unMount()
 

@@ -60,18 +60,10 @@ export default class ItemController extends EventEmitter<
     }
   }
 
-  get nodeMap(): Record<string, Node> {
-    return this.$store.getItemMap(Node)
-  }
-
   get nodes() {
-    return Object.values(this.nodeMap).sort(
-      (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
-    )
-  }
-
-  get edgeMap() {
-    return this.$store.getItemMap(Edge)
+    return this.$store
+      .getNodes()
+      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
   }
 
   get edges() {
@@ -80,10 +72,6 @@ export default class ItemController extends EventEmitter<
 
   get getEdges() {
     return this.$store.getEdges.bind(this.$store)
-  }
-
-  get portsMap() {
-    return this.$store.getItemMap(Port)
   }
 
   get getDataModel() {
@@ -161,9 +149,9 @@ export default class ItemController extends EventEmitter<
   }
 
   getNodes() {
-    return Object.values(this.nodeMap).sort(
-      (a, b) => (a.zIndex || 0) - (b.zIndex || 0)
-    )
+    return this.$store
+      .getNodes()
+      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
   }
 
   refreshNode(id: string): void {
@@ -185,7 +173,7 @@ export default class ItemController extends EventEmitter<
   }
 
   addNode(item: INodeModel): INode | undefined {
-    if (item.id !== undefined && this.nodeMap[item.id]) {
+    if (item.id !== undefined && this.$store.findNode(item.id)) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
     }
@@ -252,7 +240,6 @@ export default class ItemController extends EventEmitter<
         graph: this.$graph
       }
       const edge = new Edge(item, edgeCfg)
-      this.edgeMap[edge.id] = edge
       this.$store.insertItem(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {

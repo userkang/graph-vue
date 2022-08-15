@@ -22,6 +22,24 @@ export default class Store extends EventEmitter<
     super()
   }
 
+  private getItemMap(): Record<string, Item>
+  private getItemMap<T extends Item>(
+    itemClass: new (...args: any[]) => T
+  ): Record<string, T>
+  private getItemMap<T extends Item>(itemClass?: new (...args: any[]) => T) {
+    if (itemClass) {
+      const res: Record<string, InstanceType<typeof itemClass>> = {}
+      Object.values(this.itemMap).forEach(item => {
+        if (item instanceof itemClass) {
+          res[item.id] = item
+        }
+      })
+      return res
+    } else {
+      return this.itemMap
+    }
+  }
+
   insertItem(item: Item) {
     this.itemMap[item.id] = item
   }
@@ -55,24 +73,6 @@ export default class Store extends EventEmitter<
     return this.where(search).find(item => {
       return isKeyof(findKey, item) && item[findKey] === findVal
     })
-  }
-
-  getItemMap(): Record<string, Item>
-  getItemMap<T extends Item>(
-    itemClass: new (...args: any[]) => T
-  ): Record<string, T>
-  getItemMap<T extends Item>(itemClass?: new (...args: any[]) => T) {
-    if (itemClass) {
-      const res: Record<string, InstanceType<typeof itemClass>> = {}
-      Object.values(this.itemMap).forEach(item => {
-        if (item instanceof itemClass) {
-          res[item.id] = item
-        }
-      })
-      return res
-    } else {
-      return this.itemMap
-    }
   }
 
   getNodeMap() {

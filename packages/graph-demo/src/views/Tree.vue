@@ -24,6 +24,11 @@
 
       <template #edge="{ edge }">
         <path :d="path(edge)" class="graph-custom-edge"></path>
+        <g :transform="`translate(${text(edge).x}, ${text(edge).y})`">
+          <foreignObject overflow="visible" width="0" height="0">
+            <span class="edge-label">text</span>
+          </foreignObject>
+        </g>
       </template>
 
       <template #port> </template>
@@ -246,5 +251,14 @@ export default class Tree extends Vue {
     color: #333;
     background: #dbdef3;
   }
+}
+.edge-label {
+  transform: translate(-50%, -50%);
+  display: inline-block;
+  background: #dedede;
+  padding: 2px 5px;
+  border-radius: 4px;
+  color: rgba(0, 0, 0, 0.5);
+  font-size: 10px;
 }
 </style>

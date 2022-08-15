@@ -149,7 +149,7 @@ export default class Edge extends Base<
       toPort.clearState('linked')
     }
 
-    this.$graph.store.deleteItem(this.id, Edge)
+    this.$graph.store.remove(this.id, Edge)
 
     this.unMount()
 

@@ -17,7 +17,6 @@ import {
   valuesType
 } from '../types/type'
 import Graph, { useGraph } from './graph'
-import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import Store from './store'
 import { isIDataModel, preorder } from '../util/utils'
@@ -60,16 +59,6 @@ export default class ItemController extends EventEmitter<
     }
   }
 
-  get nodes() {
-    return this.$store
-      .getNodes()
-      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
-  }
-
-  get edges() {
-    return this.$store.getEdges()
-  }
-
   get getEdges() {
     return this.$store.getEdges.bind(this.$store)
   }
@@ -80,14 +69,6 @@ export default class ItemController extends EventEmitter<
 
   get getTreeDataModel() {
     return this.$store.getTreeDataModel.bind(this.$store)
-  }
-
-  get findBy() {
-    return this.$store.findBy.bind(this.$store)
-  }
-
-  get where() {
-    return this.$store.where.bind(this.$store)
   }
 
   get findEdge() {
@@ -110,12 +91,12 @@ export default class ItemController extends EventEmitter<
     return this.$store.findNodeByPort.bind(this.$store)
   }
 
-  private deleteItem(id: itemId): Item | undefined
-  private deleteItem<T extends Item>(
+  private remove(id: itemId): Item | undefined
+  private remove<T extends Item>(
     id: itemId,
     itemClass: itemClass<T>
   ): T | undefined
-  private deleteItem<T extends Item>(
+  private remove<T extends Item>(
     id: itemId,
     itemClass?: itemClass<T>
   ): T | undefined {
@@ -133,10 +114,13 @@ export default class ItemController extends EventEmitter<
 
   private loadNodes(models: INodeModel[]) {
     models.map(model => this.addNode(model))
+    this.getNodes().forEach(node => (node.zIndex = 1))
     this.getNodes().forEach(node => {
-      node.zIndex = 1
       const parent = this.findNode(node.model.parentId)
-      parent?.addChild(node)
+      if (parent) {
+        parent.addChild(node)
+        node.zIndex = parent.zIndex + 1
+      }
     })
   }
 
@@ -144,7 +128,7 @@ export default class ItemController extends EventEmitter<
     group.forEach(model => this.addEdge(model))
   }
 
-  private clearItem() {
+  private clear() {
     this.getNodes().forEach(node => node.remove())
   }
 
@@ -189,7 +173,7 @@ export default class ItemController extends EventEmitter<
       graph: this.$graph
     }
     const node = new Node(model, nodeCfg)
-    this.$store.insertItem(node)
+    this.$store.add(node)
 
     node.on('change', (node: INode, type: string) =>
       this.emit('node:change', node, type)
@@ -221,13 +205,13 @@ export default class ItemController extends EventEmitter<
   }
 
   deleteNode(id: itemId) {
-    const item = this.deleteItem(id, Node)
+    const item = this.remove(id, Node)
     item && this.emit('node:deleted', item.model)
     return item
   }
 
   deleteEdge(id: itemId) {
-    const item = this.deleteItem(id, Edge)
+    const item = this.remove(id, Edge)
     item && this.emit('edge:deleted', item.model)
     return item
   }
@@ -240,7 +224,7 @@ export default class ItemController extends EventEmitter<
         graph: this.$graph
       }
       const edge = new Edge(item, edgeCfg)
-      this.$store.insertItem(edge)
+      this.$store.add(edge)
 
       edge.on('change', (edge: IEdge, type: string) => {
         this.emit('edge:change', edge, type)
@@ -264,7 +248,7 @@ export default class ItemController extends EventEmitter<
       return
     }
 
-    this.clearItem()
+    this.clear()
 
     const model: IDataModel = isIDataModel(data) ? data : preorder(data)
     const needLayout = model.nodes.every(
@@ -277,6 +261,6 @@ export default class ItemController extends EventEmitter<
   }
 
   destroy() {
-    this.clearItem()
+    this.clear()
   }
 }

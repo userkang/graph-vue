@@ -40,7 +40,7 @@ export default class Store extends EventEmitter<
     }
   }
 
-  insertItem(item: Item) {
+  add(item: Item) {
     this.itemMap[item.id] = item
   }
 
@@ -131,9 +131,9 @@ export default class Store extends EventEmitter<
     return this.getNodes()[0].model
   }
 
-  deleteItem(id: itemId): Item | undefined
-  deleteItem<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
-  deleteItem<T extends Item>(
+  remove(id: itemId): Item | undefined
+  remove<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
+  remove<T extends Item>(
     id: itemId,
     itemClass?: itemClass<T>
   ): T | undefined {

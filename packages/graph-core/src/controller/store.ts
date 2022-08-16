@@ -5,7 +5,7 @@ import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
 import { IDataModel, IEdge } from '../types'
-import { ManyToOne } from '../types/many-to-one'
+import { ManyToOne } from '../util/many-to-one'
 
 const EVENT_TYPES = [] as const
 

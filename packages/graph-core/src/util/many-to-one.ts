@@ -1,5 +1,5 @@
-import EventEmitter from '../util/event-emitter'
-import { ManyToOneEvent, valuesType } from './type'
+import EventEmitter from './event-emitter'
+import { ManyToOneEvent, valuesType } from '../types/type'
 
 const EVENT_TYPES = ['change'] as const
 

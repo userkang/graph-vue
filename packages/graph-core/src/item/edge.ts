@@ -3,7 +3,7 @@ import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
 import edgeView from '../view/edge'
 import Graph from '../controller/graph'
-import { BaseCfg, IEdgeCfg, Item } from '../types/type'
+import { BaseCfg, IEdgeCfg, ManyToOneEvent } from '../types/type'
 
 interface ItemMap {
   fromPort: IPort
@@ -53,6 +53,15 @@ export default class Edge extends Base<
     // 将边与其对应节点关联
     this.fromNode.addEdge(this)
     this.toNode.addEdge(this)
+    this.$graph.store.fromPort_edges.on(
+      'change',
+      (e: ManyToOneEvent<Edge, IPort>) => {
+        if (e.many !== this) {
+          return
+        }
+        this.emit('change', this)
+      }
+    )
   }
 
   public get cfg() {
@@ -68,10 +77,12 @@ export default class Edge extends Base<
   }
 
   public get fromPort() {
+    // return this.$graph.store.fromPort_edges.find(this) as IPort
     return this._itemMap.fromPort
   }
 
   public get toPort() {
+    // return this.$graph.store.toPort_edges.find(this) as IPort
     return this._itemMap.toPort
   }
 
@@ -96,10 +107,12 @@ export default class Edge extends Base<
     const fromPort = this.matchPort('out')
     fromPort.setState('linked')
     this._itemMap.fromPort = fromPort
+    this.$graph.store.fromPort_edges.add(this, fromPort)
 
     const toPort = this.matchPort('in')
     toPort.setState('linked')
     this._itemMap.toPort = toPort
+    this.$graph.store.toPort_edges.add(this, toPort)
   }
 
   public update(model?: IEdgeModel) {

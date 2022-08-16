@@ -1,12 +1,23 @@
-export class ManyToOne<M, O> {
+import EventEmitter from '../util/event-emitter'
+import { ManyToOneEvent, valuesType } from './type'
+
+const EVENT_TYPES = ['change'] as const
+
+export class ManyToOne<M, O> extends EventEmitter<
+  valuesType<typeof EVENT_TYPES>,
+  false
+> {
   primaryMap: Map<M, O> = new Map()
   indexedMap: Map<O, Set<M>> = new Map()
-  constructor() {}
+  constructor() {
+    super()
+  }
 
-  private onInsert(many: M, one: O): void {
+  private onAdded(many: M, one: O): void {
     const setMany: Set<M> = this.indexedMap.get(one) || new Set<M>()
     setMany.add(many)
     this.indexedMap.set(one, setMany)
+    this.emit('change', <ManyToOneEvent<M, O>>{ type: 'add', many, one })
   }
 
   private onRemove(many: M, one: O): void {
@@ -14,12 +25,13 @@ export class ManyToOne<M, O> {
     if (setMany) {
       setMany.delete(many)
       setMany.size === 0 && this.indexedMap.delete(one)
+      this.emit('change', <ManyToOneEvent<M, O>>{ type: 'remove', many, one })
     }
   }
 
   add(many: M, one: O): void {
     this.primaryMap.set(many, one)
-    this.onInsert(many, one)
+    this.onAdded(many, one)
   }
 
   find(item: O): M[] | void

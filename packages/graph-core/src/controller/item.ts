@@ -184,9 +184,7 @@ export default class ItemController extends EventEmitter<
     node.on('port:added', (ports: IPort[]) => this.emit('port:added', ports))
     node.on('port:deleted', (ids: string[]) => this.emit('port:deleted', ids))
 
-    // 渲染
-    node.mount()
-    this.emit('node:added', item)
+    this.emit('node:added', node)
 
     return node
   }
@@ -206,13 +204,13 @@ export default class ItemController extends EventEmitter<
 
   deleteNode(id: itemId) {
     const item = this.remove(id, Node)
-    item && this.emit('node:deleted', item.model)
+    item && this.emit('node:deleted', item)
     return item
   }
 
   deleteEdge(id: itemId) {
     const item = this.remove(id, Edge)
-    item && this.emit('edge:deleted', item.model)
+    item && this.emit('edge:deleted', item)
     return item
   }
 
@@ -229,14 +227,7 @@ export default class ItemController extends EventEmitter<
       edge.on('change', (edge: IEdge, type: string) => {
         this.emit('edge:change', edge, type)
       })
-
-      // 渲染
-      if (graph.isRender) {
-        const edgeView = edge.render(graph)
-        const edgeGroup = graph.$svg?.get('edgeGroup')
-        edgeGroup.add(edgeView)
-      }
-      this.emit('edge:added', item)
+      this.emit('edge:added', edge)
       return edge
     } catch (error) {
       console.warn(error)

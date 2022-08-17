@@ -18,7 +18,7 @@ import {
   ILayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { IRect, IStack } from '../types/type'
+import { IRect, IStack, Item } from '../types/type'
 import Store from './store'
 
 let instantiatingGraph: Graph | null = null
@@ -117,13 +117,13 @@ export default class Graph extends EventEmitter {
       this.emit('node:change', data, type)
       this.emit(`node:change:${type}`, data)
     })
-    this.itemController.on('node:deleted', (data: INodeModel) => {
+    this.itemController.on('node:deleted', (data: INode) => {
       this.emit('node:deleted', data)
     })
     this.itemController.on('node:added', (data: INode) => {
       this.emit('node:added', data)
     })
-    this.itemController.on('edge:deleted', (data: IEdgeModel) => {
+    this.itemController.on('edge:deleted', (data: IEdge) => {
       this.emit('edge:deleted', data)
     })
     this.itemController.on('edge:change', (edge: IEdge, type?: string) => {
@@ -149,6 +149,12 @@ export default class Graph extends EventEmitter {
     })
     this.layoutController.on('layout', () => {
       this.emit('layout')
+    })
+    this.store.on('add', (item: Item, prev?: Item) => {
+      this.viewController.onAdd(item, prev)
+    })
+    this.store.on('remove', (item: Item) => {
+      this.viewController.onRemove(item)
     })
   }
 

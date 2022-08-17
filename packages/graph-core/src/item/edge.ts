@@ -132,24 +132,10 @@ export default class Edge extends Base<
     view.update()
   }
 
-  public render(graph: Graph) {
-    const view = new edgeView(this, graph)
-    this.set('view', view)
-    return view
-  }
-
-  unMount() {
-    const graph = this.$graph
-    if (graph.isRender) {
-      const group = graph.$svg?.get('edgeGroup')
-      group.remove(this.view)
-    }
-  }
   /**
-   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   *  删除关联Item => 移出store => 抛出事件 => 删除视图 => 卸载事件
    */
   remove() {
-    this.off()
     const { fromNode, toNode, fromPort, toPort } = this
     fromNode.deleteEdge(this.id)
     toNode.deleteEdge(this.id)
@@ -164,8 +150,7 @@ export default class Edge extends Base<
 
     this.$graph.store.remove(this.id, Edge)
 
-    this.unMount()
-
     this.emit('removed', this)
+    this.off()
   }
 }

@@ -6,8 +6,10 @@ import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
 import { IDataModel, IEdge } from '../types'
 import { ManyToOne } from '../util/many-to-one'
+import edgeView from '../view/edge'
+import nodeView from '../view/node'
 
-const EVENT_TYPES = [] as const
+const EVENT_TYPES = ['add', 'remove'] as const
 
 export default class Store extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
@@ -18,6 +20,7 @@ export default class Store extends EventEmitter<
   readonly node_nodes = new ManyToOne<Node, Node>()
   readonly fromPort_edges = new ManyToOne<Edge, Port>()
   readonly toPort_edges = new ManyToOne<Edge, Port>()
+  readonly viewMap = new WeakMap<Item, nodeView | edgeView>()
   constructor() {
     super()
   }
@@ -41,7 +44,12 @@ export default class Store extends EventEmitter<
   }
 
   add(item: Item) {
+    if (this.itemMap[item.id] === item) {
+      return
+    }
+    const prev = this.itemMap[item.id]
     this.itemMap[item.id] = item
+    this.emit('add', item, prev)
   }
 
   find(id: itemId): Item | undefined
@@ -133,15 +141,13 @@ export default class Store extends EventEmitter<
 
   remove(id: itemId): Item | undefined
   remove<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
-  remove<T extends Item>(
-    id: itemId,
-    itemClass?: itemClass<T>
-  ): T | undefined {
+  remove<T extends Item>(id: itemId, itemClass?: itemClass<T>): T | undefined {
     const item = this.find(id, itemClass)
     if (!item) {
       return
     }
     delete this.itemMap[id]
+    this.emit('remove', item)
     return item
   }
 }

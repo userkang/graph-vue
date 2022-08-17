@@ -149,7 +149,6 @@ export default class Port extends Base<
    *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
    */
   remove() {
-    this.off()
 
     const container = Port.containerMap.get(this)
     if (container) {
@@ -160,5 +159,7 @@ export default class Port extends Base<
     this.$graph.store.remove(this.id, Port)
 
     this.emit('removed', this)
+
+    this.off()
   }
 }

@@ -311,43 +311,15 @@ export default class Node extends Base<
   }
 
   /**
-   * 节点自渲染
-   * @param graph
-   */
-  public render(graph: Graph) {
-    const view = new nodeView(this, graph)
-    this.set('view', view)
-    return view
-  }
-
-  mount() {
-    const graph = this.$graph
-    if (graph?.isRender) {
-      const nodeView = this.render(graph)
-      const nodeGroup = graph.$svg?.get('nodeGroup')
-      nodeGroup.add(nodeView)
-    }
-  }
-
-  unMount() {
-    const graph = this.$graph
-    if (graph?.isRender) {
-      const group = graph.$svg?.get('nodeGroup')
-      group.remove(this.view)
-    }
-  }
-  /**
-   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   *  删除关联Item => 移出store => 抛出事件 => 删除视图 => 卸载事件
    */
   remove() {
-    this.off()
     const items: Item[] = this.getEdges()
     items.forEach(item => item.remove())
 
-    this.$graph.store.remove(this.id, Node)
-
-    this.unMount()
+    this.$graph.store.remove(this.id, Node) 
 
     this.emit('removed', this)
+    this.off()
   }
 }

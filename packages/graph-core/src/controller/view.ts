@@ -1,13 +1,20 @@
-import { INode } from '../types'
+import { IEdge, INode } from '../types'
 import {
   isFullScreen,
   requestFullScreen,
   cancelFullScreen
 } from '../util/utils'
 import Graph, { useGraph } from './graph'
+import edgeView from '../view/edge'
+import nodeView from '../view/node'
+import Node from '../item/node'
+import Edge from '../item/edge'
+import { Item } from '../types/type'
+import Store from './store'
 
 export default class ViewController {
   private $graph: Graph
+  private readonly $store: Store
   public $svg!: SVGElement
 
   // 画布宽高信息
@@ -31,8 +38,82 @@ export default class ViewController {
 
   constructor() {
     this.$graph = useGraph()
+    this.$store = useGraph().store
     this.$svg = this.$graph.getContainer().querySelector('svg') as SVGElement
     this.resize()
+  }
+
+  mountNode(item: INode) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = 'nodeGroup'
+    const nodeGroup = graph.$svg?.get(groupName)
+    if (nodeGroup) {
+      const view = new nodeView(item, graph)
+      nodeGroup.add(view)
+      this.$store.viewMap.set(item, view)
+    }
+  }
+
+  unMountNode(item: INode) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = 'nodeGroup'
+    const group = graph.$svg?.get(groupName)
+    if (group) {
+      const view = this.$store.viewMap.get(item)
+      group.remove(view)
+    }
+  }
+
+  mountEgde(item: IEdge) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = 'edgeGroup'
+    const nodeGroup = graph.$svg?.get(groupName)
+    if (nodeGroup) {
+      const view = new edgeView(item, graph)
+      nodeGroup.add(view)
+      this.$store.viewMap.set(item, view)
+    }
+  }
+
+  unMountEdge(item: IEdge) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = 'edgeGroup'
+    const group = graph.$svg?.get(groupName)
+    if (group) {
+      const view = this.$store.viewMap.get(item)
+      group.remove(view)
+    }
+  }
+
+  onAdd(item: Item, prev?: Item) {
+    if (prev && prev !== item) {
+      this.onRemove(prev)
+    }
+    if (item instanceof Node) {
+      this.mountNode(item)
+    } else if (item instanceof Edge) {
+      this.mountEgde(item)
+    }
+  }
+
+  onRemove(item: Item) {
+    if (item instanceof Node) {
+      this.unMountNode(item)
+    } else if (item instanceof Edge) {
+      this.unMountEdge(item)
+    }
   }
 
   getTranslate() {

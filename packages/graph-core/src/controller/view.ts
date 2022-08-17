@@ -12,6 +12,22 @@ import Edge from '../item/edge'
 import { Item } from '../types/type'
 import Store from './store'
 
+const getGroupName = (item: Item) => {
+  if (item instanceof Node) {
+    return 'nodeGroup'
+  } else if (item instanceof Edge) {
+    return 'edgeGroup'
+  }
+}
+
+const createView = (item: Item, graph: Graph) => {
+  if (item instanceof Node) {
+    return new nodeView(item, graph)
+  } else if (item instanceof Edge) {
+    return new edgeView(item, graph)
+  }
+}
+
 export default class ViewController {
   private $graph: Graph
   private readonly $store: Store
@@ -43,58 +59,62 @@ export default class ViewController {
     this.resize()
   }
 
-  mountNode(item: INode) {
+  private mountItem(item: Node | Edge) {
     const graph = this.$graph
     if (!graph?.isRender) {
       return
     }
-    const groupName = 'nodeGroup'
-    const nodeGroup = graph.$svg?.get(groupName)
-    if (nodeGroup) {
-      const view = new nodeView(item, graph)
-      nodeGroup.add(view)
-      this.$store.viewMap.set(item, view)
+    const groupName = getGroupName(item)
+    if (!groupName) {
+      return
     }
+    const group = graph.$svg?.get(groupName)
+    if (!group) {
+      return
+    }
+    const view = createView(item, graph)
+    if (!view) {
+      return
+    }
+    group.add(view)
+    this.$store.viewMap.set(item, view)
+  }
+
+  private unMountItem(item: Node | Edge) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = getGroupName(item)
+    if (!groupName) {
+      return
+    }
+    const group = graph.$svg?.get(groupName)
+    if (!group) {
+      return
+    }
+    const view = this.$store.viewMap.get(item)
+    if (!view) {
+      return
+    }
+    group.remove(view)
+    this.$store.viewMap.delete(item)
+  }
+
+  mountNode(item: INode) {
+    this.mountItem(item)
   }
 
   unMountNode(item: INode) {
-    const graph = this.$graph
-    if (!graph?.isRender) {
-      return
-    }
-    const groupName = 'nodeGroup'
-    const group = graph.$svg?.get(groupName)
-    if (group) {
-      const view = this.$store.viewMap.get(item)
-      group.remove(view)
-    }
+    this.unMountItem(item)
   }
 
   mountEgde(item: IEdge) {
-    const graph = this.$graph
-    if (!graph?.isRender) {
-      return
-    }
-    const groupName = 'edgeGroup'
-    const nodeGroup = graph.$svg?.get(groupName)
-    if (nodeGroup) {
-      const view = new edgeView(item, graph)
-      nodeGroup.add(view)
-      this.$store.viewMap.set(item, view)
-    }
+    this.mountItem(item)
   }
 
   unMountEdge(item: IEdge) {
-    const graph = this.$graph
-    if (!graph?.isRender) {
-      return
-    }
-    const groupName = 'edgeGroup'
-    const group = graph.$svg?.get(groupName)
-    if (group) {
-      const view = this.$store.viewMap.get(item)
-      group.remove(view)
-    }
+    this.unMountItem(item)
   }
 
   onAdd(item: Item, prev?: Item) {

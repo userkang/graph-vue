@@ -20,7 +20,7 @@ export default class Store extends EventEmitter<
   readonly node_nodes = new ManyToOne<Node, Node>()
   readonly fromPort_edges = new ManyToOne<Edge, Port>()
   readonly toPort_edges = new ManyToOne<Edge, Port>()
-  readonly viewMap = new WeakMap<Item, nodeView | edgeView>()
+  readonly viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
   }

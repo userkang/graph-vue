@@ -156,7 +156,7 @@ export default class ItemController extends EventEmitter<
     this.emit('node:change', node)
   }
 
-  addNode(item: INodeModel): INode | undefined {
+  addNode = (item: INodeModel): INode | undefined => {
     if (item.id !== undefined && this.$store.findNode(item.id)) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
@@ -202,19 +202,19 @@ export default class ItemController extends EventEmitter<
     this.emit('edge:change', edge)
   }
 
-  deleteNode(id: itemId) {
+  deleteNode = (id: itemId) => {
     const item = this.remove(id, Node)
     item && this.emit('node:deleted', item)
     return item
   }
 
-  deleteEdge(id: itemId) {
+  deleteEdge = (id: itemId) => {
     const item = this.remove(id, Edge)
     item && this.emit('edge:deleted', item)
     return item
   }
 
-  addEdge(item: IEdgeModel): Edge | undefined {
+  addEdge = (item: IEdgeModel): Edge | undefined => {
     try {
       const graph = this.$graph
       const edgeCfg: IEdgeCfg = {

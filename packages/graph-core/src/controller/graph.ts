@@ -202,13 +202,11 @@ export default class Graph extends EventEmitter {
   }
 
   deleteNode(id: string, stack = true): INode | undefined {
-    const func = this.itemController.deleteNode.bind(this.itemController)
-    return this.withStack(func)(id, stack)
+    return this.withStack(this.itemController.deleteNode)(id, stack)
   }
 
   addNode(item: INodeModel, stack = true): INode | undefined {
-    const func = this.itemController.addNode.bind(this.itemController)
-    return this.withStack(func)(item, stack)
+    return this.withStack(this.itemController.addNode)(item, stack)
   }
 
   findPort(id: string | number): IPort | undefined {
@@ -232,13 +230,11 @@ export default class Graph extends EventEmitter {
   }
 
   deleteEdge(id: string, stack = true): IEdge | undefined {
-    const func = this.itemController.deleteEdge.bind(this.itemController)
-    return this.withStack(func)(id, stack)
+    return this.withStack(this.itemController.deleteEdge)(id, stack)
   }
 
   addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
-    const func = this.itemController.addEdge.bind(this.itemController)
-    return this.withStack(func)(item, stack)
+    return this.withStack(this.itemController.addEdge)(item, stack)
   }
 
   getDataModel(): IDataModel {
@@ -292,8 +288,7 @@ export default class Graph extends EventEmitter {
   }
 
   layout(options: ILayout = {}, stack = true) {
-    const func = this.layoutController.layout.bind(this.layoutController)
-    return this.withStack(func, {})(options, stack)
+    return this.withStack(this.layoutController.layout, {})(options, stack)
   }
 
   removeAction(action?: string | string[]) {

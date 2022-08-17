@@ -99,7 +99,7 @@ export default class Store extends EventEmitter<
     return Object.values(this.getNodeMap())
   }
 
-  getEdges() {
+  getEdges = () => {
     return Object.values(this.getEdgeMap())
   }
 
@@ -107,35 +107,35 @@ export default class Store extends EventEmitter<
     return Object.values(this.getPortMap())
   }
 
-  findPort(id: itemId) {
+  findPort = (id: itemId) => {
     return this.find(id, Port)
   }
 
-  findEdge(id: itemId) {
+  findEdge = (id: itemId) => {
     return this.find(id, Edge)
   }
 
-  findNode(id: itemId) {
+  findNode = (id: itemId) => {
     return this.find(id, Node)
   }
 
-  findEdgeByState(state: string): IEdge[] {
+  findEdgeByState = (state: string): IEdge[] => {
     return this.getEdges().filter(item => item.hasState(state))
   }
 
-  findNodeByPort(portId: itemId) {
+  findNodeByPort = (portId: itemId) => {
     return this.getNodes().find(node =>
       node.ports.find(port => port.id === portId)
     )
   }
 
-  getDataModel(): IDataModel {
+  getDataModel = (): IDataModel => {
     const nodes = this.getNodes().map(node => node.model)
     const edges = this.getEdges().map(edge => edge.model)
     return { nodes, edges }
   }
 
-  getTreeDataModel() {
+  getTreeDataModel = () => {
     return this.getNodes()[0].model
   }
 

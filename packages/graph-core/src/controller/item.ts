@@ -60,35 +60,35 @@ export default class ItemController extends EventEmitter<
   }
 
   get getEdges() {
-    return this.$store.getEdges.bind(this.$store)
+    return this.$store.getEdges
   }
 
   get getDataModel() {
-    return this.$store.getDataModel.bind(this.$store)
+    return this.$store.getDataModel
   }
 
   get getTreeDataModel() {
-    return this.$store.getTreeDataModel.bind(this.$store)
+    return this.$store.getTreeDataModel
   }
 
   get findEdge() {
-    return this.$store.findEdge.bind(this.$store)
+    return this.$store.findEdge
   }
 
   get findNode() {
-    return this.$store.findNode.bind(this.$store)
+    return this.$store.findNode
   }
 
   get findPort() {
-    return this.$store.findPort.bind(this.$store)
+    return this.$store.findPort
   }
 
   get findEdgeByState() {
-    return this.$store.findEdgeByState.bind(this.$store)
+    return this.$store.findEdgeByState
   }
 
   get findNodeByPort() {
-    return this.$store.findNodeByPort.bind(this.$store)
+    return this.$store.findNodeByPort
   }
 
   private remove(id: itemId): Item | undefined

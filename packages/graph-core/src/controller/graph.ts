@@ -76,7 +76,7 @@ export default class Graph extends EventEmitter {
     this.eventController = new EventController()
     this.itemController = new ItemController()
     this.stackController = new StackController()
-    this.initController()
+    this.initEvent()
     ;(window as any).graph = this
     instantiatingGraph = null
   }
@@ -109,7 +109,7 @@ export default class Graph extends EventEmitter {
     return func
   }
 
-  private initController() {
+  private initEvent() {
     this.itemController.on('node:refresh', (data: INode) => {
       this.emit('node:refresh', data)
     })
@@ -144,7 +144,10 @@ export default class Graph extends EventEmitter {
       this.emit('port:deleted', ids)
     )
     this.itemController.on('datachange', (data: { needLayout: boolean }) => {
-      data.needLayout && this.layout({}, false)
+      if (data.needLayout) {
+        this.layout({}, false)
+        this.fitCenter()
+      }
       this.emit('datachange')
     })
     this.layoutController.on('layout', () => {

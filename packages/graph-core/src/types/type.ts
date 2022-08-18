@@ -10,6 +10,7 @@ import {
   IPortModel,
   NodeInfo
 } from '.'
+import Store from '../controller/store'
 
 export type itemId = string
 
@@ -34,15 +35,15 @@ export interface INodeCfg extends NodeInfo {
   width: number
   height: number
   direction: IDirection
-  graph: Graph
+  store: Store
 }
 
 export interface IEdgeCfg extends EdgeInfo {
-  graph: Graph
+  store: Store
 }
 
 export interface IPortCfg {
-  graph: Graph
+  store: Store
   x: number
   y: number
 }
@@ -93,3 +94,9 @@ export type Item = INode | IEdge | IPort
 export type itemClass<T extends Item> = new (...args: any[]) => T
 
 export type valuesType<T> = T extends readonly (infer U)[] ? U : never
+
+export interface ManyToOneEvent<M, O> {
+  type: 'add' | 'remove'
+  many: M
+  one: O
+}

@@ -1,9 +1,8 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
-import edgeView from '../view/edge'
-import Graph from '../controller/graph'
-import { BaseCfg, IEdgeCfg, Item } from '../types/type'
+import { BaseCfg, IEdgeCfg, ManyToOneEvent } from '../types/type'
+import Store from '../controller/store'
 
 interface ItemMap {
   fromPort: IPort
@@ -15,23 +14,24 @@ export default class Edge extends Base<
   Required<IEdgeCfg> & BaseCfg
 > {
   private readonly _itemMap: ItemMap = {} as ItemMap
+  $store: Store
   fromNodeId: string
   toNodeId: string
   constructor(model: IEdgeModel, cfg: IEdgeCfg) {
     super(model)
-    this.$graph = cfg.graph
+    this.$store = cfg.store
 
-    if (model.id !== undefined && this.$graph.store.findEdge(model.id)) {
+    if (model.id !== undefined && this.$store.findEdge(model.id)) {
       throw new Error(`can't add edge, exist edge where id is ${model.id}`)
     }
     const { fromPortId, toPortId, fromNodeId, toNodeId } = model
     // 如果仅有 portId，自动补全 nodeId
     const fromNode =
-      (fromNodeId !== undefined && this.$graph.store.findNode(fromNodeId)) ||
-      (fromPortId !== undefined && this.$graph.store.findNodeByPort(fromPortId))
+      (fromNodeId !== undefined && this.$store.findNode(fromNodeId)) ||
+      (fromPortId !== undefined && this.$store.findNodeByPort(fromPortId))
     const toNode =
-      (toNodeId !== undefined && this.$graph.store.findNode(toNodeId)) ||
-      (toPortId !== undefined && this.$graph.store.findNodeByPort(toPortId))
+      (toNodeId !== undefined && this.$store.findNode(toNodeId)) ||
+      (toPortId !== undefined && this.$store.findNodeByPort(toPortId))
 
     if (!fromNode || !toNode) {
       throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
@@ -53,6 +53,15 @@ export default class Edge extends Base<
     // 将边与其对应节点关联
     this.fromNode.addEdge(this)
     this.toNode.addEdge(this)
+    this.$store.fromPort_edges.on(
+      'change',
+      (e: ManyToOneEvent<Edge, IPort>) => {
+        if (e.many !== this) {
+          return
+        }
+        this.emit('change', this)
+      }
+    )
   }
 
   public get cfg() {
@@ -60,18 +69,20 @@ export default class Edge extends Base<
   }
 
   public get fromNode(): INode {
-    return this.$graph.store.findNode(this.fromNodeId) as INode
+    return this.$store.findNode(this.fromNodeId) as INode
   }
 
   public get toNode(): INode {
-    return this.$graph.store.findNode(this.toNodeId) as INode
+    return this.$store.findNode(this.toNodeId) as INode
   }
 
   public get fromPort() {
+    // return   this.$store.fromPort_edges.find(this) as IPort
     return this._itemMap.fromPort
   }
 
   public get toPort() {
+    // return   this.$store.toPort_edges.find(this) as IPort
     return this._itemMap.toPort
   }
 
@@ -96,10 +107,12 @@ export default class Edge extends Base<
     const fromPort = this.matchPort('out')
     fromPort.setState('linked')
     this._itemMap.fromPort = fromPort
+    this.$store.fromPort_edges.add(this, fromPort)
 
     const toPort = this.matchPort('in')
     toPort.setState('linked')
     this._itemMap.toPort = toPort
+    this.$store.toPort_edges.add(this, toPort)
   }
 
   public update(model?: IEdgeModel) {
@@ -119,24 +132,10 @@ export default class Edge extends Base<
     view.update()
   }
 
-  public render(graph: Graph) {
-    const view = new edgeView(this, graph)
-    this.set('view', view)
-    return view
-  }
-
-  unMount() {
-    const graph = this.$graph
-    if (graph.isRender) {
-      const group = graph.$svg?.get('edgeGroup')
-      group.remove(this.view)
-    }
-  }
   /**
-   *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
+   *  删除关联Item => 移出store => 抛出事件 => 删除视图 => 卸载事件
    */
   remove() {
-    this.off()
     const { fromNode, toNode, fromPort, toPort } = this
     fromNode.deleteEdge(this.id)
     toNode.deleteEdge(this.id)
@@ -149,10 +148,9 @@ export default class Edge extends Base<
       toPort.clearState('linked')
     }
 
-    this.$graph.store.remove(this.id, Edge)
-
-    this.unMount()
+    this.$store.remove(this.id, Edge)
 
     this.emit('removed', this)
+    this.off()
   }
 }

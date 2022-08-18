@@ -23,7 +23,6 @@ export default class Base<
   T extends BaseCfg
 > extends EventEmitter {
   private _cfg: T = defaultCfg() as T
-  $graph!: Graph
 
   constructor(model: M) {
     super()

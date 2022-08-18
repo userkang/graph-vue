@@ -60,35 +60,35 @@ export default class ItemController extends EventEmitter<
   }
 
   get getEdges() {
-    return this.$store.getEdges.bind(this.$store)
+    return this.$store.getEdges
   }
 
   get getDataModel() {
-    return this.$store.getDataModel.bind(this.$store)
+    return this.$store.getDataModel
   }
 
   get getTreeDataModel() {
-    return this.$store.getTreeDataModel.bind(this.$store)
+    return this.$store.getTreeDataModel
   }
 
   get findEdge() {
-    return this.$store.findEdge.bind(this.$store)
+    return this.$store.findEdge
   }
 
   get findNode() {
-    return this.$store.findNode.bind(this.$store)
+    return this.$store.findNode
   }
 
   get findPort() {
-    return this.$store.findPort.bind(this.$store)
+    return this.$store.findPort
   }
 
   get findEdgeByState() {
-    return this.$store.findEdgeByState.bind(this.$store)
+    return this.$store.findEdgeByState
   }
 
   get findNodeByPort() {
-    return this.$store.findNodeByPort.bind(this.$store)
+    return this.$store.findNodeByPort
   }
 
   private remove(id: itemId): Item | undefined
@@ -156,7 +156,7 @@ export default class ItemController extends EventEmitter<
     this.emit('node:change', node)
   }
 
-  addNode(item: INodeModel): INode | undefined {
+  addNode = (item: INodeModel): INode | undefined => {
     if (item.id !== undefined && this.$store.findNode(item.id)) {
       console.warn(`can't add node, exist node where id is '${item.id}'`)
       return
@@ -170,7 +170,7 @@ export default class ItemController extends EventEmitter<
       ...NODE_DEFAULT_CFG,
       ...graph.get('nodeInfo'),
       direction,
-      graph: this.$graph
+      store: this.$store
     }
     const node = new Node(model, nodeCfg)
     this.$store.add(node)
@@ -184,9 +184,7 @@ export default class ItemController extends EventEmitter<
     node.on('port:added', (ports: IPort[]) => this.emit('port:added', ports))
     node.on('port:deleted', (ids: string[]) => this.emit('port:deleted', ids))
 
-    // 渲染
-    node.mount()
-    this.emit('node:added', item)
+    this.emit('node:added', node)
 
     return node
   }
@@ -204,24 +202,24 @@ export default class ItemController extends EventEmitter<
     this.emit('edge:change', edge)
   }
 
-  deleteNode(id: itemId) {
+  deleteNode = (id: itemId) => {
     const item = this.remove(id, Node)
-    item && this.emit('node:deleted', item.model)
+    item && this.emit('node:deleted', item)
     return item
   }
 
-  deleteEdge(id: itemId) {
+  deleteEdge = (id: itemId) => {
     const item = this.remove(id, Edge)
-    item && this.emit('edge:deleted', item.model)
+    item && this.emit('edge:deleted', item)
     return item
   }
 
-  addEdge(item: IEdgeModel): Edge | undefined {
+  addEdge = (item: IEdgeModel): Edge | undefined => {
     try {
       const graph = this.$graph
       const edgeCfg: IEdgeCfg = {
         ...graph.get('edgeInfo'),
-        graph: this.$graph
+        store: this.$store
       }
       const edge = new Edge(item, edgeCfg)
       this.$store.add(edge)
@@ -229,14 +227,7 @@ export default class ItemController extends EventEmitter<
       edge.on('change', (edge: IEdge, type: string) => {
         this.emit('edge:change', edge, type)
       })
-
-      // 渲染
-      if (graph.isRender) {
-        const edgeView = edge.render(graph)
-        const edgeGroup = graph.$svg?.get('edgeGroup')
-        edgeGroup.add(edgeView)
-      }
-      this.emit('edge:added', item)
+      this.emit('edge:added', edge)
       return edge
     } catch (error) {
       console.warn(error)

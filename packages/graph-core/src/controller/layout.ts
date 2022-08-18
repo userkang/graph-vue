@@ -49,7 +49,7 @@ export default class LayoutController extends EventEmitter<
     })
   }
 
-  layout(cfg: ILayout = {}) {
+  layout = (cfg: ILayout = {}) => {
     let res
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)

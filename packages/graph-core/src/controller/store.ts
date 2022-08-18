@@ -5,9 +5,11 @@ import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
 import { IDataModel, IEdge } from '../types'
-import { ManyToOne } from '../types/many-to-one'
+import { ManyToOne } from '../util/many-to-one'
+import edgeView from '../view/edge'
+import nodeView from '../view/node'
 
-const EVENT_TYPES = [] as const
+const EVENT_TYPES = ['add', 'remove'] as const
 
 export default class Store extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
@@ -18,6 +20,7 @@ export default class Store extends EventEmitter<
   readonly node_nodes = new ManyToOne<Node, Node>()
   readonly fromPort_edges = new ManyToOne<Edge, Port>()
   readonly toPort_edges = new ManyToOne<Edge, Port>()
+  readonly viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
   }
@@ -41,7 +44,12 @@ export default class Store extends EventEmitter<
   }
 
   add(item: Item) {
+    if (this.itemMap[item.id] === item) {
+      return
+    }
+    const prev = this.itemMap[item.id]
     this.itemMap[item.id] = item
+    this.emit('add', item, prev)
   }
 
   find(id: itemId): Item | undefined
@@ -91,7 +99,7 @@ export default class Store extends EventEmitter<
     return Object.values(this.getNodeMap())
   }
 
-  getEdges() {
+  getEdges = () => {
     return Object.values(this.getEdgeMap())
   }
 
@@ -99,49 +107,47 @@ export default class Store extends EventEmitter<
     return Object.values(this.getPortMap())
   }
 
-  findPort(id: itemId) {
+  findPort = (id: itemId) => {
     return this.find(id, Port)
   }
 
-  findEdge(id: itemId) {
+  findEdge = (id: itemId) => {
     return this.find(id, Edge)
   }
 
-  findNode(id: itemId) {
+  findNode = (id: itemId) => {
     return this.find(id, Node)
   }
 
-  findEdgeByState(state: string): IEdge[] {
+  findEdgeByState = (state: string): IEdge[] => {
     return this.getEdges().filter(item => item.hasState(state))
   }
 
-  findNodeByPort(portId: itemId) {
+  findNodeByPort = (portId: itemId) => {
     return this.getNodes().find(node =>
       node.ports.find(port => port.id === portId)
     )
   }
 
-  getDataModel(): IDataModel {
+  getDataModel = (): IDataModel => {
     const nodes = this.getNodes().map(node => node.model)
     const edges = this.getEdges().map(edge => edge.model)
     return { nodes, edges }
   }
 
-  getTreeDataModel() {
+  getTreeDataModel = () => {
     return this.getNodes()[0].model
   }
 
   remove(id: itemId): Item | undefined
   remove<T extends Item>(id: itemId, itemClass: itemClass<T>): T | undefined
-  remove<T extends Item>(
-    id: itemId,
-    itemClass?: itemClass<T>
-  ): T | undefined {
+  remove<T extends Item>(id: itemId, itemClass?: itemClass<T>): T | undefined {
     const item = this.find(id, itemClass)
     if (!item) {
       return
     }
     delete this.itemMap[id]
+    this.emit('remove', item)
     return item
   }
 }

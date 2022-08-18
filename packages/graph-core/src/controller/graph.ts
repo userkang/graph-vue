@@ -144,7 +144,10 @@ export default class Graph extends EventEmitter {
       this.emit('port:deleted', ids)
     )
     this.itemController.on('datachange', (data: { needLayout: boolean }) => {
-      data.needLayout && this.layout({}, false)
+      if (data.needLayout) {
+        this.layout({}, false)
+        this.fitCenter()
+      }
       this.emit('datachange')
     })
     this.layoutController.on('layout', () => {

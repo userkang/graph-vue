@@ -2,6 +2,7 @@ import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IDirection, INode, IPort, IPortModel, IPosition } from '../types'
 import { BaseCfg, IPortCfg, IRect } from '../types/type'
+import Store from '../controller/store'
 
 const PortTypeToPosition = {
   TB: {
@@ -94,7 +95,7 @@ export default class Port extends Base<
     })
     return posList
   }
-
+  $store: Store
   constructor(model: IPortModel, cfg: IPortCfg) {
     super(model)
 
@@ -103,7 +104,7 @@ export default class Port extends Base<
       this.set('id', id)
       this.model.id = this.id
     }
-    this.$graph = cfg.graph
+    this.$store = cfg.store
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
@@ -149,14 +150,13 @@ export default class Port extends Base<
    *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
    */
   remove() {
-
     const container = Port.containerMap.get(this)
     if (container) {
       container.off('change', this.onNodeChange)
     }
     Port.containerMap.delete(this)
 
-    this.$graph.store.remove(this.id, Port)
+    this.$store.remove(this.id, Port)
 
     this.emit('removed', this)
 

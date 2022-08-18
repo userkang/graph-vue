@@ -9,15 +9,15 @@ import {
   INode,
   IDirection
 } from '../types'
-import nodeView from '../view/node'
-import Graph from '../controller/graph'
 import { BaseCfg, INodeCfg, IRect, Item, itemId } from '../types/type'
+import Store from '../controller/store'
 
 export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
   readonly edgeIdSet = new Set<itemId>()
+  $store: Store
   constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
     if (!this.id) {
@@ -27,7 +27,7 @@ export default class Node extends Base<
     }
 
     this.set('cfg', cfg)
-    this.$graph = cfg.graph
+    this.$store = cfg.store
 
     this.set('direction', cfg.direction)
     this.set('width', model.width || cfg.width)
@@ -74,11 +74,11 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return this.$graph.store.node_ports.find(this) || []
+    return this.$store.node_ports.find(this) || []
   }
 
   public getEdges(): IEdge[] {
-    const edgeMap = this.$graph.store.getEdgeMap()
+    const edgeMap = this.$store.getEdgeMap()
     return Array.from(this.edgeIdSet).map(itemId => edgeMap[itemId])
   }
 
@@ -121,12 +121,12 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    return this.$graph.store.node_nodes.find(this) || []
+    return this.$store.node_nodes.find(this) || []
   }
 
   public addChild(node: INode) {
-    this.$graph.store.add(node)
-    this.$graph.store.node_nodes.add(node, this)
+    this.$store.add(node)
+    this.$store.node_nodes.add(node, this)
     node.set('parent', this)
   }
 
@@ -190,7 +190,7 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this.$graph.store.add(edge)
+    this.$store.add(edge)
     this.edgeIdSet.add(edge.id)
   }
 
@@ -261,10 +261,10 @@ export default class Node extends Base<
       const port = new Port(model, {
         x: 0,
         y: 0,
-        graph: this.$graph
+        store: this.$store
       })
-      this.$graph.store.add(port)
-      this.$graph.store.node_ports.add(port, this)
+      this.$store.add(port)
+      this.$store.node_ports.add(port, this)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -277,13 +277,13 @@ export default class Node extends Base<
   public deletePorts(ids: string[]) {
     for (let i = 0; i < ids.length; i++) {
       const portId = ids[i]
-      const port = this.$graph.store.findPort(portId)
-      if (!port || this.$graph.store.node_ports.find(port) !== this) {
+      const port = this.$store.findPort(portId)
+      if (!port || this.$store.node_ports.find(port) !== this) {
         continue
       }
       port.off('change', this.onPortChange)
       port.remove()
-      this.$graph.store.node_ports.remove(port)
+      this.$store.node_ports.remove(port)
     }
     this.emit('port:deleted', ids)
   }
@@ -317,7 +317,7 @@ export default class Node extends Base<
     const items: Item[] = this.getEdges()
     items.forEach(item => item.remove())
 
-    this.$graph.store.remove(this.id, Node) 
+    this.$store.remove(this.id, Node)
 
     this.emit('removed', this)
     this.off()

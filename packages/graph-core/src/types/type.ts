@@ -10,6 +10,7 @@ import {
   IPortModel,
   NodeInfo
 } from '.'
+import Store from '../controller/store'
 
 export type itemId = string
 
@@ -34,15 +35,15 @@ export interface INodeCfg extends NodeInfo {
   width: number
   height: number
   direction: IDirection
-  graph: Graph
+  store: Store
 }
 
 export interface IEdgeCfg extends EdgeInfo {
-  graph: Graph
+  store: Store
 }
 
 export interface IPortCfg {
-  graph: Graph
+  store: Store
   x: number
   y: number
 }

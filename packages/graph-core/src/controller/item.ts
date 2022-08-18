@@ -170,7 +170,7 @@ export default class ItemController extends EventEmitter<
       ...NODE_DEFAULT_CFG,
       ...graph.get('nodeInfo'),
       direction,
-      graph: this.$graph
+      store: this.$store
     }
     const node = new Node(model, nodeCfg)
     this.$store.add(node)
@@ -219,7 +219,7 @@ export default class ItemController extends EventEmitter<
       const graph = this.$graph
       const edgeCfg: IEdgeCfg = {
         ...graph.get('edgeInfo'),
-        graph: this.$graph
+        store: this.$store
       }
       const edge = new Edge(item, edgeCfg)
       this.$store.add(edge)

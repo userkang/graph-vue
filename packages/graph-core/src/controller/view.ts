@@ -1,14 +1,36 @@
-import { INode } from '../types'
+import { IEdge, INode } from '../types'
 import {
   isFullScreen,
   requestFullScreen,
   cancelFullScreen
 } from '../util/utils'
-import Graph from './graph'
+import Graph, { useGraph } from './graph'
+import edgeView from '../view/edge'
+import nodeView from '../view/node'
+import Node from '../item/node'
+import Edge from '../item/edge'
+import { Item } from '../types/type'
+import Store from './store'
+
+const getGroupName = (item: Item) => {
+  if (item instanceof Node) {
+    return 'nodeGroup'
+  } else if (item instanceof Edge) {
+    return 'edgeGroup'
+  }
+}
+
+const createView = (item: Item, graph: Graph) => {
+  if (item instanceof Node) {
+    return new nodeView(item, graph)
+  } else if (item instanceof Edge) {
+    return new edgeView(item, graph)
+  }
+}
 
 export default class ViewController {
-  graph: Graph
-
+  private $graph: Graph
+  private readonly $store: Store
   public $svg!: SVGElement
 
   // 画布宽高信息
@@ -30,10 +52,95 @@ export default class ViewController {
 
   public translatePadding = 10
 
-  constructor(graph: Graph) {
-    this.graph = graph
-    this.$svg = graph.cfg.container.querySelector('svg') as SVGElement
+  constructor() {
+    this.$graph = useGraph()
+    this.$store = useGraph().store
+    this.$svg = this.$graph.getContainer().querySelector('svg') as SVGElement
     this.resize()
+  }
+
+  private mountItem(item: Node | Edge) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = getGroupName(item)
+    if (!groupName) {
+      return
+    }
+    const group = graph.$svg?.get(groupName)
+    if (!group) {
+      return
+    }
+    const view = createView(item, graph)
+    if (!view) {
+      return
+    }
+    group.add(view)
+    this.$store.viewMap.set(item, view)
+  }
+
+  private unMountItem(item: Node | Edge) {
+    const graph = this.$graph
+    if (!graph?.isRender) {
+      return
+    }
+    const groupName = getGroupName(item)
+    if (!groupName) {
+      return
+    }
+    const group = graph.$svg?.get(groupName)
+    if (!group) {
+      return
+    }
+    const view = this.$store.viewMap.get(item)
+    if (!view) {
+      return
+    }
+    group.remove(view)
+    this.$store.viewMap.delete(item)
+  }
+
+  mountNode(item: INode) {
+    this.mountItem(item)
+  }
+
+  unMountNode(item: INode) {
+    this.unMountItem(item)
+  }
+
+  mountEgde(item: IEdge) {
+    this.mountItem(item)
+  }
+
+  unMountEdge(item: IEdge) {
+    this.unMountItem(item)
+  }
+
+  onAdd(item: Item, prev?: Item) {
+    if (prev && prev !== item) {
+      this.onRemove(prev)
+    }
+    if (item instanceof Node) {
+      this.mountNode(item)
+    } else if (item instanceof Edge) {
+      this.mountEgde(item)
+    }
+  }
+
+  onRemove(item: Item) {
+    if (item instanceof Node) {
+      this.unMountNode(item)
+    } else if (item instanceof Edge) {
+      this.unMountEdge(item)
+    }
+  }
+
+  getTranslate() {
+    return {
+      x: this.transform.translateX,
+      y: this.transform.translateY
+    }
   }
 
   public getZoom() {
@@ -54,7 +161,7 @@ export default class ViewController {
       this.transform.scale = value
       this.translateBy(dx, dy)
       this.caculateOffset()
-      this.graph.emit('zoom', value, e)
+      this.$graph.emit('zoom', value, e)
     }
   }
 
@@ -99,7 +206,7 @@ export default class ViewController {
   }
 
   getNodesBBox(value?: INode[]) {
-    const nodes = value || this.graph.getNodes()
+    const nodes = value || this.$graph.getNodes()
     const filterNodes = nodes.filter(item => !item.hasState('hide'))
     let [minX, minY, maxX, maxY] = [
       Number.MAX_SAFE_INTEGER,
@@ -181,7 +288,7 @@ export default class ViewController {
   public translateBy(x: number, y: number) {
     this.translateX(x)
     this.translateY(y)
-    this.graph.emit(
+    this.$graph.emit(
       'translate',
       this.transform.translateX,
       this.transform.translateY
@@ -213,7 +320,6 @@ export default class ViewController {
   }
 
   destroy() {
-    ;(this.graph as null | Graph) = null
     ;(this.$svg as SVGElement | null) = null
   }
 }

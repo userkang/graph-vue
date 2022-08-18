@@ -23,13 +23,19 @@ export default class Port extends Vue {
 
   circleR = 4
   highlightCircleR = 6
-
-  get enable() {
-    return this.port.hasState('enable')
+  enable = false
+  linked = false
+  
+  refreshPort() {
+    this.enable = this.port.hasState('enable')
+    this.linked = !this.enable && this.port.hasState('linked')
   }
-
-  get linked() {
-    return !this.enable && this.port.hasState('linked')
+  created() {
+    this.refreshPort()
+    this.port.on('change', this.refreshPort)
+  }
+  beforeDestroy() {
+    this.port.off('change', this.refreshPort)
   }
 }
 </script>

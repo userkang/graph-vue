@@ -59,7 +59,7 @@ export default class ViewController {
     this.resize()
   }
 
-  private mountItem(item: Node | Edge) {
+  private mountItem(item: Item) {
     const graph = this.$graph
     if (!graph?.isRender) {
       return
@@ -80,7 +80,7 @@ export default class ViewController {
     this.$store.viewMap.set(item, view)
   }
 
-  private unMountItem(item: Node | Edge) {
+  private unMountItem(item: Item) {
     const graph = this.$graph
     if (!graph?.isRender) {
       return
@@ -101,38 +101,22 @@ export default class ViewController {
     this.$store.viewMap.delete(item)
   }
 
-  mountNode(item: INode) {
-    this.mountItem(item)
-  }
-
-  unMountNode(item: INode) {
-    this.unMountItem(item)
-  }
-
-  mountEgde(item: IEdge) {
-    this.mountItem(item)
-  }
-
-  unMountEdge(item: IEdge) {
-    this.unMountItem(item)
-  }
-
   onAdd(item: Item, prev?: Item) {
     if (prev && prev !== item) {
       this.onRemove(prev)
     }
     if (item instanceof Node) {
-      this.mountNode(item)
+      this.mountItem(item)
     } else if (item instanceof Edge) {
-      this.mountEgde(item)
+      this.mountItem(item)
     }
   }
 
   onRemove(item: Item) {
     if (item instanceof Node) {
-      this.unMountNode(item)
+      this.unMountItem(item)
     } else if (item instanceof Edge) {
-      this.unMountEdge(item)
+      this.unMountItem(item)
     }
   }
 

@@ -105,19 +105,11 @@ export default class ViewController {
     if (prev && prev !== item) {
       this.onRemove(prev)
     }
-    if (item instanceof Node) {
-      this.mountItem(item)
-    } else if (item instanceof Edge) {
-      this.mountItem(item)
-    }
+    this.mountItem(item)
   }
 
   onRemove(item: Item) {
-    if (item instanceof Node) {
-      this.unMountItem(item)
-    } else if (item instanceof Edge) {
-      this.unMountItem(item)
-    }
+    this.unMountItem(item)
   }
 
   getTranslate() {

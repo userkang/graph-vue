@@ -48,7 +48,7 @@ export default class NewEdge extends Element {
             x2: createEdge.toPoint.x,
             y2: createEdge.toPoint.y
           },
-          this.graph.get('direction')
+          this.graph.direction
         )
       }
 

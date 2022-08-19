@@ -2,6 +2,7 @@ import EventEmitter from '../util/event-emitter'
 import { IEdgeModel, INodeModel, IPortModel } from '../types'
 import { setGlobalId } from '../util/utils'
 import { BaseCfg } from '../types/type'
+import Graph from '../controller/graph'
 
 type States = BaseCfg['states']
 

@@ -1,7 +1,14 @@
-export default class EventEmitter {
-  private _events: { [key: string]: Array<() => void> } = {}
+type K<EventType, Extensible> = Extensible extends true ? string : EventType
+export default class EventEmitter<
+  EventType extends string = '',
+  Extensible extends boolean = true
+> {
+  private _events: Record<string, Array<() => void>> = {}
 
-  public on(evt: string | string[], callback: (...args: any[]) => void) {
+  public on(
+    evt: K<EventType, Extensible> | K<EventType, Extensible>[],
+    callback: (...args: any[]) => void
+  ) {
     const bind = (e: string) => {
       if (!this._events[e]) {
         this._events[e] = []
@@ -18,7 +25,7 @@ export default class EventEmitter {
     }
   }
 
-  public emit(evt: string, ...args: unknown[]) {
+  public emit(evt: K<EventType, Extensible>, ...args: unknown[]) {
     if (!this._events[evt]) {
       return
     }
@@ -28,7 +35,10 @@ export default class EventEmitter {
     })
   }
 
-  public off(evt?: string, callback?: (...args: any[]) => void) {
+  public off(
+    evt?: K<EventType, Extensible>,
+    callback?: (...args: any[]) => void
+  ) {
     if (!evt) {
       // evt 为空全部清除
       this._events = {}

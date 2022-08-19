@@ -9,17 +9,16 @@ import {
   INode,
   IDirection
 } from '../types'
-import nodeView from '../view/node'
-import Graph from '../controller/graph'
-import { BaseCfg, INodeCfg, IRect, itemId } from '../types/type'
-import Edge from './edge'
+import { BaseCfg, INodeCfg, IRect, Item, itemId } from '../types/type'
+import Store from '../controller/store'
 
 export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  private readonly _itemMap: Record<itemId, Base<any, any>> = {}
-  constructor(model: INodeModel, cfg: INodeCfg, direction: IDirection) {
+  readonly edgeIdSet = new Set<itemId>()
+  $store: Store
+  constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
     if (!this.id) {
       const id = uniqueId('node')
@@ -28,8 +27,9 @@ export default class Node extends Base<
     }
 
     this.set('cfg', cfg)
+    this.$store = cfg.store
 
-    this.set('direction', cfg.direction || direction)
+    this.set('direction', cfg.direction)
     this.set('width', model.width || cfg.width)
     this.set('height', model.height || cfg.height)
     this.set('zIndex', model.zIndex || 0)
@@ -74,19 +74,12 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    const res: IPort[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Port && res.push(item)
-    })
-    return res
+    return this.$store.node_ports.find(this) || []
   }
 
   public getEdges(): IEdge[] {
-    const res: IEdge[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Edge && res.push(item)
-    })
-    return res
+    const edgeMap = this.$store.getEdgeMap()
+    return Array.from(this.edgeIdSet).map(itemId => edgeMap[itemId])
   }
 
   public getInEdges(): IEdge[] {
@@ -119,10 +112,6 @@ export default class Node extends Base<
     })
   }
 
-  public addChild(node: INode) {
-    this._itemMap[node.id] = node
-  }
-
   public deleteChild(id: string) {
     const childNodes = this.getChildren()
     const index = childNodes.findIndex(item => item.id === id)
@@ -132,15 +121,13 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    const res: Node[] = []
-    Object.values(this._itemMap).forEach(item => {
-      item instanceof Node && res.push(item)
-    })
-    return res
+    return this.$store.node_nodes.find(this) || []
   }
 
-  public setParent(node: INode) {
-    this.set('parent', node)
+  public addChild(node: INode) {
+    this.$store.add(node)
+    this.$store.node_nodes.add(node, this)
+    node.set('parent', this)
   }
 
   public getParent(): INode {
@@ -203,13 +190,12 @@ export default class Node extends Base<
   }
 
   public addEdge(edge: IEdge) {
-    this._itemMap[edge.id] = edge
+    this.$store.add(edge)
+    this.edgeIdSet.add(edge.id)
   }
 
   public deleteEdge(id: string) {
-    if (this._itemMap[id] instanceof Edge) {
-      delete this._itemMap[id]
-    }
+    this.edgeIdSet.delete(id)
   }
 
   public updatePosition(x: number, y: number) {
@@ -274,9 +260,11 @@ export default class Node extends Base<
     const ports = models.map(model => {
       const port = new Port(model, {
         x: 0,
-        y: 0
+        y: 0,
+        store: this.$store
       })
-      this._itemMap[port.id] = port
+      this.$store.add(port)
+      this.$store.node_ports.add(port, this)
 
       port.setupNode(this)
       port.on('change', this.onPortChange)
@@ -287,12 +275,16 @@ export default class Node extends Base<
   }
 
   public deletePorts(ids: string[]) {
-    ids.forEach(id => {
-      if (this._itemMap[id] instanceof Port) {
-        this._itemMap[id].off('change', this.onPortChange)
-        delete this._itemMap[id]
+    for (let i = 0; i < ids.length; i++) {
+      const portId = ids[i]
+      const port = this.$store.findPort(portId)
+      if (!port || this.$store.node_ports.find(port) !== this) {
+        continue
       }
-    })
+      port.off('change', this.onPortChange)
+      port.remove()
+      this.$store.node_ports.remove(port)
+    }
     this.emit('port:deleted', ids)
   }
 
@@ -319,12 +311,15 @@ export default class Node extends Base<
   }
 
   /**
-   * 节点自渲染
-   * @param graph
+   *  删除关联Item => 移出store => 抛出事件 => 删除视图 => 卸载事件
    */
-  public render(graph: Graph) {
-    const view = new nodeView(this, graph)
-    this.set('view', view)
-    return view
+  remove() {
+    const items: Item[] = this.getEdges()
+    items.forEach(item => item.remove())
+
+    this.$store.remove(this.id, Node)
+
+    this.emit('removed', this)
+    this.off()
   }
 }

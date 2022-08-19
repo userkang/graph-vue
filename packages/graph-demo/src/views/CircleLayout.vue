@@ -105,6 +105,7 @@ export default class Tree extends Vue {
     this.initEvent()
 
     this.circleLayout()
+    graph.fitCenter()
   }
 
   initEvent() {

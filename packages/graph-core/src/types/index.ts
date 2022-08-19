@@ -67,23 +67,23 @@ export interface IGraphConfig {
   // svg 容器
   container: string | HTMLElement
   // 图的方向： LR 从左到右， TB 自上到下
-  direction: IDirection
+  direction?: IDirection
   // 节点的宽高 单位：px
   nodeInfo?: NodeInfo
   edgeInfo?: EdgeInfo
   defaultNode?: INodeModel
   // 默认的行为配置
-  action: string[]
+  action?: string[]
 }
 
 export interface ICfg extends IGraphConfig {
   container: HTMLElement
+  direction: IDirection
+  action: string[]
+
   nodes: INodeModel[]
   edges: IEdgeModel[]
-  nodeInfo?: NodeInfo
-  action: string[]
-  isRender?: boolean
-  [key: string]: any
+  brushing?: boolean
 }
 
 export interface IDataStack {

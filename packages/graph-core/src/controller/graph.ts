@@ -2,48 +2,51 @@ import EventEmitter from '../util/event-emitter'
 import LayoutController from './layout'
 import ViewController from './view'
 import EventController from './event'
-import NodeController from './node'
-import EdgeController from './edge'
+import ItemController from './item'
 import StackController from './stack'
 import Svg from '../view/svg'
 import {
   ICfg,
-  INode,
   IEdge,
-  IPort,
-  IDataModel,
   INodeModel,
   IEdgeModel,
   IGraphConfig,
-  ILayout,
-  NodeInfo
+  NodeInfo,
+  IPort,
+  INode,
+  IDataModel,
+  ILayout
 } from '../types/index'
 import detectDirectedCycle from '../util/acyclic'
-import { isIDataModel, preorder } from '../util/utils'
-import { IStack } from '../types/type'
+import { IRect, IStack, Item } from '../types/type'
+import Store from './store'
 
-const getDefaultConfig = (): Pick<
-  ICfg,
-  'direction' | 'nodes' | 'edges' | 'action'
-> => ({
-  direction: 'TB',
-  nodes: [],
-  edges: [],
-  action: []
-})
+let instantiatingGraph: Graph | null = null
+
+export const useGraph = () => {
+  if (!instantiatingGraph) {
+    throw new ReferenceError(
+      `useGraph only can be used when instantiate a Graph`
+    )
+  }
+  return instantiatingGraph
+}
 
 export default class Graph extends EventEmitter {
-  public cfg: ICfg
+  private readonly viewController: ViewController
+  private readonly layoutController: LayoutController
+  private readonly eventController: EventController
+  private readonly itemController: ItemController
+  private readonly stackController: StackController
 
-  private viewController!: ViewController
-  private layoutController!: LayoutController
-  private eventController!: EventController
-  private nodeController!: NodeController
-  private edgeController!: EdgeController
-  private stackController!: StackController
+  readonly store: Store
+  readonly $svg?: Svg
+  readonly isRender: boolean
+  readonly cfg: ICfg
 
   constructor(config: IGraphConfig) {
     super()
+    instantiatingGraph = this
     const container =
       config.container instanceof HTMLElement
         ? config.container
@@ -52,315 +55,300 @@ export default class Graph extends EventEmitter {
       throw new ReferenceError(`无效的container ${config.container}`)
     }
 
-    this.cfg = Object.assign(getDefaultConfig(), config, { container })
+    this.cfg = {
+      direction: 'TB',
+      nodes: [],
+      edges: [],
+      action: [],
+      brushing: false,
+      ...config,
+      container
+    }
+    this.set('direction', config.direction || 'TB')
 
     // 是否触发自带渲染
     const svg = container.querySelector('svg')
-    this.set('isRender', !svg)
-    if (!svg) {
-      this.set('svg', new Svg(this))
-    }
-    this.initController()
+    this.isRender = !svg
+    this.$svg = svg ? void 0 : new Svg(this)
+    this.store = new Store()
+    this.viewController = new ViewController()
+    this.layoutController = new LayoutController()
+    this.eventController = new EventController()
+    this.itemController = new ItemController()
+    this.stackController = new StackController()
+    this.initEvent()
     ;(window as any).graph = this
+    instantiatingGraph = null
   }
 
-  private initController() {
-    this.viewController = new ViewController(this)
-    this.layoutController = new LayoutController(this)
-    this.eventController = new EventController(this)
-    this.nodeController = new NodeController(this)
-    this.edgeController = new EdgeController(this)
-    this.stackController = new StackController(this)
+  get container() {
+    return this.get('container')
   }
 
-  set<K extends keyof ICfg>(key: K, val: ICfg[K]): void
-  public set<K extends keyof ICfg, T extends string | Record<K, ICfg[K]>>(
-    key: T,
-    val?: T extends K ? ICfg[K] : undefined
+  get direction() {
+    return this.get('direction')
+  }
+
+  private withStack<T extends (payload: any) => any, P = Parameters<T>[0]>(
+    callback: T
+  ): (payload: P, stack?: boolean) => ReturnType<T>
+  private withStack<T extends (payload?: any) => any, P = Parameters<T>[0]>(
+    callback: T,
+    defaultPayload?: P
+  ): (payload?: P, stack?: boolean) => ReturnType<T>
+  private withStack<T extends (payload: any) => any, P = Parameters<T>[0]>(
+    callback: T,
+    defaultPayload?: P
   ) {
-    switch (typeof key) {
-      case 'object':
-        const newCfg = Object.assign({}, this.cfg, key)
-        this.cfg = newCfg
-        return this.cfg
-      case 'string':
-        return (this.cfg[key] = val)
+    const func = (payload: P | void = defaultPayload, stack = true) => {
+      stack && this.stackStart()
+      const res: ReturnType<T> = callback(payload)
+      stack && this.stackEnd()
+      return res
     }
+    return func
   }
 
-  public get<T extends keyof ICfg>(key: T): ICfg[T] {
+  private initEvent() {
+    this.itemController.on('node:refresh', (data: INode) => {
+      this.emit('node:refresh', data)
+    })
+    this.itemController.on('node:change', (data: INode, type?: string) => {
+      this.emit('node:change', data, type)
+      this.emit(`node:change:${type}`, data)
+    })
+    this.itemController.on('node:deleted', (data: INode) => {
+      this.emit('node:deleted', data)
+    })
+    this.itemController.on('node:added', (data: INode) => {
+      this.emit('node:added', data)
+    })
+    this.itemController.on('edge:deleted', (data: IEdge) => {
+      this.emit('edge:deleted', data)
+    })
+    this.itemController.on('edge:change', (edge: IEdge, type?: string) => {
+      this.emit('edge:change', edge, type)
+      this.emit(`edge:change:${type}`, edge)
+    })
+    this.itemController.on('edge:added', (data: IEdge) => {
+      this.emit('edge:added', data)
+    })
+    this.itemController.on('port:change', (port: IPort, type: string) => {
+      this.emit('port:change', port, type)
+      this.emit(`${'port:change'}:${type}`, port)
+    })
+    this.itemController.on('port:added', (ports: IPort[]) =>
+      this.emit('port:added', ports)
+    )
+    this.itemController.on('port:deleted', (ids: string[]) =>
+      this.emit('port:deleted', ids)
+    )
+    this.itemController.on('datachange', (data: { needLayout: boolean }) => {
+      if (data.needLayout) {
+        this.layout({}, false)
+        this.fitCenter()
+      }
+      this.emit('datachange')
+    })
+    this.layoutController.on('layout', () => {
+      this.emit('layout')
+    })
+    this.store.on('add', (item: Item, prev?: Item) => {
+      this.viewController.onAdd(item, prev)
+    })
+    this.store.on('remove', (item: Item) => {
+      this.viewController.onRemove(item)
+    })
+  }
+
+  set<K extends keyof ICfg>(key: K, val: ICfg[K]) {
+    this.cfg[key] = val
+  }
+
+  get<T extends keyof ICfg>(key: T): ICfg[T] {
     return this.cfg[key]
   }
 
-  public getContainer() {
-    return this.cfg.container
+  getContainer(): HTMLElement {
+    return this.container
   }
 
-  public getSvgInfo() {
+  getSvgInfo(): IRect {
     return this.viewController.svgInfo
   }
 
-  public getNodeInfo(): NodeInfo | undefined {
+  getNodeInfo(): NodeInfo | undefined {
     return this.cfg.nodeInfo
   }
-
-  public getNodes(): INode[] {
-    return this.nodeController.nodes
+  getNodes(): INode[] {
+    return this.itemController.getNodes()
   }
 
-  public findNode(id: string | number): INode | undefined {
-    return this.nodeController.findNode(id)
+  findNode(id: string | number): INode | undefined {
+    return this.itemController.findNode(String(id))
   }
 
-  public findNodeByState(state: string): INode[] {
-    return this.getNodes().filter(item => item.hasState(state))
+  findNodeByState(state: string): INode[] {
+    return this.itemController.findNodeByState(state)
   }
 
-  public findNodeByPort(id: string): INode | undefined {
-    return this.nodeController.findNodeByPort(id)
+  findNodeByPort(id: string): INode | undefined {
+    return this.itemController.findNodeByPort(id)
   }
 
-  public refreshNode(id: string): void {
-    const node = this.nodeController.findNode(id)
-    if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
-    }
-    this.nodeController.refreshNode(id)
-    this.emit('node:refresh', node)
+  refreshNode(id: string): void {
+    return this.itemController.refreshNode(id)
   }
 
-  public updateNode(id: string, model: INodeModel): void {
-    const node = this.nodeController.findNode(id)
-    if (!node) {
-      return console.warn(`can't find node where id is '${id}'`)
-    }
-    this.nodeController.updateNode(id, model)
-    this.emit('node:change', node)
+  updateNode(id: string, model: INodeModel): void {
+    return this.itemController.updateNode(id, model)
   }
 
-  public deleteNode(id: string, stack = true): INode | undefined {
-    stack && this.stackStart()
-    const node = this.findNode(id)
-    if (!node) {
-      console.warn(`can't delete node where id is '${id}'`)
-      return
-    }
-    this.nodeController.deleteNode(id)
-    this.emit('node:deleted', node.model)
-    stack && this.stackEnd()
-    return node
+  deleteNode(id: string, stack = true): INode | undefined {
+    return this.withStack(this.itemController.deleteNode)(id, stack)
   }
 
-  public addNode(item: INodeModel, stack = true): INode | undefined {
-    stack && this.stackStart()
-    const node = this.nodeController.addNode(item)
-    if (!node) {
-      return
-    }
-    this.emit('node:added', item)
-    stack && this.stackEnd()
-    return node
+  addNode(item: INodeModel, stack = true): INode | undefined {
+    return this.withStack(this.itemController.addNode)(item, stack)
   }
 
-  public findPort(id: string | number): IPort | undefined {
-    return this.nodeController.portsMap[String(id)]
+  findPort(id: string | number): IPort | undefined {
+    return this.itemController.findPort(String(id))
   }
 
-  public getEdges(): IEdge[] {
-    return this.edgeController.edges
+  getEdges(): IEdge[] {
+    return this.itemController.getEdges()
   }
 
-  public findEdge(id: string | number): IEdge | undefined {
-    return this.edgeController.findEdge(id)
+  findEdge(id: string | number): IEdge | undefined {
+    return this.itemController.findEdge(String(id))
   }
 
-  public findEdgeByState(state: string): IEdge[] {
-    return this.getEdges().filter(item => item.hasState(state))
+  findEdgeByState(state: string): IEdge[] {
+    return this.itemController.findEdgeByState(state)
   }
 
-  public updateEdge(id: string, model: IEdgeModel): void {
-    const edge = this.edgeController.findEdge(id)
-    if (!edge) {
-      return console.warn(`can't find edge where id is '${id}'`)
-    }
-    this.edgeController.updateEdge(id, model)
-    this.emit('edge:change', edge)
+  updateEdge(id: string, model: IEdgeModel): void {
+    return this.itemController.updateEdge(id, model)
   }
 
-  public deleteEdge(id: string, stack = true): IEdge | undefined {
-    stack && this.stackStart()
-    const edge = this.edgeController.deleteEdge(id)
-    if (!edge) {
-      return
-    }
-    this.emit('edge:deleted', edge.model)
-    stack && this.stackEnd()
-    return edge
+  deleteEdge(id: string, stack = true): IEdge | undefined {
+    return this.withStack(this.itemController.deleteEdge)(id, stack)
   }
 
-  public addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
-    stack && this.stackStart()
-    const edge = this.edgeController.addEdge(item)
-    if (edge) {
-      this.emit('edge:added', item)
-    }
-    stack && this.stackEnd()
-    return edge
+  addEdge(item: IEdgeModel, stack = true): IEdge | undefined {
+    return this.withStack(this.itemController.addEdge)(item, stack)
   }
 
-  public getDataModel(): IDataModel {
-    const nodes = this.getNodes().map(node => node.model)
-    const edges = this.getEdges().map(edge => edge.model)
-    return { nodes, edges }
+  getDataModel(): IDataModel {
+    return this.itemController.getDataModel()
   }
 
-  public getTreeDataModel() {
-    const nodes = this.getNodes().map(node => node.model)
-    return nodes[0]
+  getTreeDataModel() {
+    return this.itemController.getTreeDataModel()
   }
 
-  public getPointByClient(
-    originX: number,
-    originY: number
-  ): { x: number; y: number } {
+  getPointByClient(originX: number, originY: number): { x: number; y: number } {
     return this.viewController.getPointByClient(originX, originY)
   }
 
-  public getTranslate() {
-    return {
-      x: this.viewController.transform.translateX,
-      y: this.viewController.transform.translateY
-    }
+  getTranslate() {
+    return this.viewController.getTranslate()
   }
 
-  public translate(x: number, y: number) {
+  translate(x: number, y: number) {
     return this.viewController.translateBy(x, y)
   }
 
-  public getZoom() {
+  getZoom() {
     return this.viewController.getZoom()
   }
 
-  public zoom(value: number, e?: WheelEvent) {
+  zoom(value: number, e?: WheelEvent) {
     return this.viewController.zoom(value, e)
   }
 
-  public resize() {
-    this.viewController.resize()
+  resize() {
+    return this.viewController.resize()
   }
 
-  public fitView() {
-    this.viewController.fitView()
+  fitView() {
+    return this.viewController.fitView()
   }
-  // 加载数据
-  public data(data: IDataModel | INodeModel) {
-    if (Object.keys(data).length === 0) {
-      return
-    }
-
-    this.set('nodes', [])
-    this.set('edges', [])
-    this.clearItem()
-
-    const model: IDataModel = isIDataModel(data) ? data : preorder(data)
-    const needLayout = model.nodes.every(
-      node => !Number.isFinite(node.x) && !Number.isFinite(node.y)
-    )
-
-    this.nodeController.data(model.nodes)
-    this.edgeController.data(model.edges)
-    if (needLayout) {
-      this.layout({}, false)
-    }
-    this.emit('datachange')
+  /**
+   * 加载数据
+   */
+  data(data: IDataModel | INodeModel) {
+    return this.itemController.data(data)
   }
 
-  public fitCenter(position?: { x: number; y: number }) {
-    if (position) {
-      const { width, height } = this.getSvgInfo()
-      this.viewController.translateTo(width - position.x, height - position.y)
-    } else {
-      this.viewController.translateToCenter()
-    }
+  fitCenter() {
+    return this.viewController.translateToCenter()
   }
 
-  public fullScreen(el?: HTMLElement) {
-    this.viewController.fullScreen(el)
+  fullScreen(el?: HTMLElement) {
+    return this.viewController.fullScreen(el)
   }
 
-  private clearItem() {
-    // 清除原有节点和边
-    if (this.get('isRender')) {
-      const nodeGroup = this.get('svg').get('nodeGroup')
-      const edgeGroup = this.get('svg').get('edgeGroup')
-      nodeGroup.remove()
-      edgeGroup.remove()
-    }
+  layout(options: ILayout = {}, stack = true) {
+    return this.withStack(this.layoutController.layout, {})(options, stack)
   }
 
-  public layout(options: ILayout = {}, stack = true) {
-    const layoutData = this.layoutController.layout(options, stack)
-    this.emit('layout')
-    return layoutData
+  removeAction(action?: string | string[]) {
+    return this.eventController.removeBehavior(action)
   }
 
-  public removeAction(action?: string | string[]) {
-    this.eventController.removeBehavior(action)
-  }
-
-  public addAction(actions: string | string[]) {
+  addAction(actions: string | string[]) {
     this.eventController.addBehavior(
       Array.isArray(actions) ? actions : [actions]
     )
   }
 
-  public getNodesBBox(nodes: INode[]) {
+  getNodesBBox(nodes: INode[]) {
     return this.viewController.getNodesBBox(nodes)
   }
 
-  public undo() {
-    this.stackController.undo()
+  undo() {
+    return this.stackController.undo()
   }
 
-  public redo() {
-    this.stackController.redo()
+  redo() {
+    return this.stackController.redo()
   }
 
-  public stackStart() {
+  stackStart() {
     return this.stackController.start()
   }
 
-  public stackEnd() {
+  stackEnd() {
     return this.stackController.end()
   }
-
-  public getUndoStack(): IStack[] {
+  getUndoStack(): IStack[] {
     return this.stackController.undoStack
   }
 
-  public getRedoStack(): IStack[] {
+  getRedoStack(): IStack[] {
     return this.stackController.redoStack
   }
 
-  public detectDirectedCycle() {
+  detectDirectedCycle() {
     return detectDirectedCycle(this.getDataModel())
   }
 
   /**
    * 销毁
    */
-  public destroy() {
-    this.stackController.clearStack()
-    this.eventController.destroy()
-    this.nodeController.destroy()
-    this.edgeController.destroy()
-    this.viewController.destroy()
-    this.layoutController.destroy()
-    ;(this.stackController as StackController | null) = null
-    ;(this.eventController as EventController | null) = null
-    ;(this.nodeController as NodeController | null) = null
-    ;(this.edgeController as EdgeController | null) = null
-    ;(this.viewController as ViewController | null) = null
-    ;(this.layoutController as LayoutController | null) = null
+  destroy() {
+    const controllerKeys = [
+      'stackController',
+      'eventController',
+      'itemController',
+      'viewController',
+      'layoutController'
+    ] as const
+    controllerKeys.forEach(key => {
+      this[key].destroy()
+      delete this[key]
+    })
   }
 }

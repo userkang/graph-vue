@@ -184,13 +184,17 @@ export default class ViewController {
   getNodesBBox(value?: INode[]) {
     const nodes = value || this.$graph.getNodes()
     const filterNodes = nodes.filter(item => !item.hasState('hide'))
+    if (!filterNodes.length) {
+      return { left: 0, top: 0, width: 0, height: 0 }
+    }
+    const startNode = filterNodes[0]
     let [minX, minY, maxX, maxY] = [
-      Number.MAX_SAFE_INTEGER,
-      Number.MAX_SAFE_INTEGER,
-      Number.MIN_SAFE_INTEGER,
-      Number.MIN_SAFE_INTEGER
+      startNode.x,
+      startNode.y,
+      startNode.x,
+      startNode.y
     ]
-    for (let i = filterNodes.length - 1; i >= 0; i--) {
+    for (let i = filterNodes.length - 1; i > 0; i--) {
       const node = filterNodes[i]
       minX = Math.min(minX, node.x)
       minY = Math.min(minY, node.y)

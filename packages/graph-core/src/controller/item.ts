@@ -46,6 +46,7 @@ export default class ItemController extends EventEmitter<
 > {
   private readonly $graph: Graph
   private readonly $store: Store
+  dataing = false
   constructor() {
     super()
     this.$graph = useGraph()
@@ -129,7 +130,10 @@ export default class ItemController extends EventEmitter<
   }
 
   private clear() {
-    this.getNodes().forEach(node => node.remove())
+    this.$store.getNodes().forEach(item => item.off())
+    this.$store.getEdges().forEach(item => item.off())
+    this.$store.getPorts().forEach(item => item.off())
+    this.$store.reset()
   }
 
   getNodes() {
@@ -184,7 +188,7 @@ export default class ItemController extends EventEmitter<
     node.on('port:added', (ports: IPort[]) => this.emit('port:added', ports))
     node.on('port:deleted', (ids: string[]) => this.emit('port:deleted', ids))
 
-    this.emit('node:added', node)
+    !this.dataing && this.emit('node:added', node)
 
     return node
   }
@@ -227,7 +231,7 @@ export default class ItemController extends EventEmitter<
       edge.on('change', (edge: IEdge, type: string) => {
         this.emit('edge:change', edge, type)
       })
-      this.emit('edge:added', edge)
+      !this.dataing && this.emit('edge:added', edge)
       return edge
     } catch (error) {
       console.warn(error)
@@ -235,6 +239,7 @@ export default class ItemController extends EventEmitter<
   }
 
   data(data: IDataModel | INodeModel) {
+    this.dataing = true
     if (Object.keys(data).length === 0) {
       return
     }
@@ -248,7 +253,10 @@ export default class ItemController extends EventEmitter<
 
     this.loadNodes(model.nodes)
     this.loadEdges(model.edges)
+
     this.emit('datachange', { needLayout: needLayout })
+
+    this.dataing = false
   }
 
   destroy() {

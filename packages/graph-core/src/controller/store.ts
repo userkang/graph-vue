@@ -15,14 +15,15 @@ export default class Store extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
   false
 > {
-  readonly itemMap: Record<string, Item> = {}
-  readonly node_ports = new ManyToOne<Port, Node>()
-  readonly node_nodes = new ManyToOne<Node, Node>()
-  readonly fromPort_edges = new ManyToOne<Edge, Port>()
-  readonly toPort_edges = new ManyToOne<Edge, Port>()
-  readonly viewMap = new Map<Item, nodeView | edgeView>()
+  itemMap: Record<string, Item> = {}
+  node_ports = new ManyToOne<Port, Node>()
+  node_nodes = new ManyToOne<Node, Node>()
+  fromPort_edges = new ManyToOne<Edge, Port>()
+  toPort_edges = new ManyToOne<Edge, Port>()
+  viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
+    this.reset()
   }
 
   private getItemMap(): Record<string, Item>
@@ -149,5 +150,14 @@ export default class Store extends EventEmitter<
     delete this.itemMap[id]
     this.emit('remove', item)
     return item
+  }
+
+  reset() {
+    this.itemMap = {}
+    this.node_ports = new ManyToOne<Port, Node>()
+    this.node_nodes = new ManyToOne<Node, Node>()
+    this.fromPort_edges = new ManyToOne<Edge, Port>()
+    this.toPort_edges = new ManyToOne<Edge, Port>()
+    this.viewMap = new Map<Item, nodeView | edgeView>()
   }
 }

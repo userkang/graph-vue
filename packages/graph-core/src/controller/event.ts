@@ -41,6 +41,7 @@ const DATACHANGE = [
 export default class EventController {
   private $graph: Graph
   $svg: SVGSVGElement
+  readonly resizeObserver: ResizeObserver
   eventQueue: { [key: string]: any } = []
   preItemType = 'svg'
   currentItemType = 'svg'
@@ -58,6 +59,9 @@ export default class EventController {
     } else {
       throw new ReferenceError(`找不到svg`)
     }
+    this.resizeObserver = new ResizeObserver(
+      this.$graph.resize.bind(this.$graph)
+    )
     this.addBehavior()
     this.defaultEmit()
     this.initEvent()
@@ -75,10 +79,8 @@ export default class EventController {
         addEventListener(window, eventType, this.handleExtendEvents.bind(this))
       )
     })
-
-    this.eventQueue.push(
-      addEventListener(window, 'resize', this.$graph.resize.bind(this.$graph))
-    )
+    this.$svg.parentElement &&
+      this.resizeObserver.observe(this.$svg.parentElement)
   }
 
   addBehavior(action?: string[]) {
@@ -215,7 +217,8 @@ export default class EventController {
     })
     this.eventQueue = []
     this.behaveInstance = []
-
+    this.$svg.parentElement &&
+      this.resizeObserver.unobserve(this.$svg.parentElement)
     this.$graph.off()
   }
 }

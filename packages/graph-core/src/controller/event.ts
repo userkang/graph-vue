@@ -79,8 +79,8 @@ export default class EventController {
         addEventListener(window, eventType, this.handleExtendEvents.bind(this))
       )
     })
-    this.$svg.parentElement &&
-      this.resizeObserver.observe(this.$svg.parentElement)
+
+    this.resizeObserver.observe(this.$graph.container)
   }
 
   addBehavior(action?: string[]) {
@@ -217,8 +217,7 @@ export default class EventController {
     })
     this.eventQueue = []
     this.behaveInstance = []
-    this.$svg.parentElement &&
-      this.resizeObserver.unobserve(this.$svg.parentElement)
+    this.resizeObserver.unobserve(this.$graph.container)
     this.$graph.off()
   }
 }

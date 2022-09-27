@@ -32,6 +32,7 @@ export default class ViewController {
   private $graph: Graph
   private readonly $store: Store
   public $svg!: SVGElement
+  readonly resizeObserver: ResizeObserver
 
   // 画布宽高信息
   public svgInfo = {
@@ -56,6 +57,10 @@ export default class ViewController {
     this.$graph = useGraph()
     this.$store = useGraph().store
     this.$svg = this.$graph.getContainer().querySelector('svg') as SVGElement
+    this.resizeObserver = new ResizeObserver(
+      this.$graph.resize.bind(this.$graph)
+    )
+    this.resizeObserver.observe(this.$graph.container)
     this.resize()
   }
 
@@ -300,6 +305,7 @@ export default class ViewController {
   }
 
   destroy() {
+    this.resizeObserver.disconnect()
     ;(this.$svg as SVGElement | null) = null
   }
 }

@@ -111,9 +111,7 @@ export default class GraphVue extends Vue {
       return {}
     }
   })
-  defaultNode!: INodeModel
-
-  resizeObserver: ResizeObserver
+  defaultNode!: INodeModel 
 
   nodes: INode[] = []
   edges: IEdge[] = []
@@ -142,10 +140,7 @@ export default class GraphVue extends Vue {
     })
     this.graph = graph
 
-    this.initCustomHooks()
-    const resizeObserver = new ResizeObserver(graph.resize.bind(graph))
-    resizeObserver.observe(graph.container)
-    this.resizeObserver = resizeObserver
+    this.initCustomHooks() 
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
@@ -227,8 +222,7 @@ export default class GraphVue extends Vue {
     })
   }
 
-  beforeDestroy() {
-    this.resizeObserver?.unobserve(this.graph.container)
+  beforeDestroy() { 
     this.graph.destroy()
   }
 }

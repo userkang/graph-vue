@@ -57,7 +57,7 @@ export default class EventController {
       this.$svg = svg
     } else {
       throw new ReferenceError(`找不到svg`)
-    }
+    } 
     this.addBehavior()
     this.defaultEmit()
     this.initEvent()
@@ -75,10 +75,6 @@ export default class EventController {
         addEventListener(window, eventType, this.handleExtendEvents.bind(this))
       )
     })
-
-    this.eventQueue.push(
-      addEventListener(window, 'resize', this.$graph.resize.bind(this.$graph))
-    )
   }
 
   addBehavior(action?: string[]) {
@@ -214,8 +210,7 @@ export default class EventController {
       item.remove()
     })
     this.eventQueue = []
-    this.behaveInstance = []
-
+    this.behaveInstance = [] 
     this.$graph.off()
   }
 }

@@ -1,4 +1,3 @@
-import Graph from '../controller/graph'
 import {
   EdgeInfo,
   IDirection,

@@ -4,7 +4,7 @@ import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
-import { IDataModel, IEdge } from '../types'
+import { IDataModel, IEdge, INode } from '../types'
 import { ManyToOne } from '../util/many-to-one'
 import edgeView from '../view/edge'
 import nodeView from '../view/node'
@@ -16,6 +16,7 @@ export default class Store extends EventEmitter<
   false
 > {
   itemMap: Record<string, Item> = {}
+  item: Array<INode | IEdge> = []
   node_ports = new ManyToOne<Port, Node>()
   node_nodes = new ManyToOne<Node, Node>()
   fromPort_edges = new ManyToOne<Edge, Port>()
@@ -44,6 +45,10 @@ export default class Store extends EventEmitter<
     }
   }
 
+  private insert(item: INode | IEdge) {
+    // 按照zindex插入元素
+  }
+
   add(item: Item) {
     if (this.itemMap[item.id] === item) {
       return
@@ -51,6 +56,14 @@ export default class Store extends EventEmitter<
     const prev = this.itemMap[item.id]
     this.itemMap[item.id] = item
     this.emit('add', item, prev)
+
+    if (item instanceof Node || item instanceof Edge) {
+      this.item.push(item)
+      // this.insert(item)
+      item.on('zIndex:change', i => {
+        this.insert(item)
+      })
+    }
   }
 
   find(id: itemId): Item | undefined
@@ -149,11 +162,18 @@ export default class Store extends EventEmitter<
     }
     delete this.itemMap[id]
     this.emit('remove', item)
+
+    if (item instanceof Node || item instanceof Edge) {
+      const index = this.item.indexOf(item)
+      this.item.splice(index, 1)
+    }
+
     return item
   }
 
   reset() {
     this.itemMap = {}
+    this.item = []
     this.node_ports = new ManyToOne<Port, Node>()
     this.node_nodes = new ManyToOne<Node, Node>()
     this.fromPort_edges = new ManyToOne<Edge, Port>()

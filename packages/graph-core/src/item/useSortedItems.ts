@@ -7,6 +7,11 @@ const getItemZindex = (item?: Node | Edge) => (item ? item.zIndex || 0 : 0)
 export const useSortedItems = () => {
   const list: Array<Node | Edge> = []
 
+  const setItemIndex = (item: Node | Edge, from: number, to: number) => {
+    list.splice(to, 0, item)
+    from > 0 && list.splice(from, 1)
+  }
+
   const moveItem = (item: Item) => {
     if (!(item instanceof Node) && !(item instanceof Edge)) {
       return
@@ -26,8 +31,7 @@ export const useSortedItems = () => {
           break
         }
       }
-      list.splice(i, 0, item)
-      prevIndex > -1 && list.splice(prevIndex, 1)
+      setItemIndex(item, prevIndex, i)
     } else if (
       list[prevIndex - 1] &&
       zIndex <= getItemZindex(list[prevIndex - 1])
@@ -43,8 +47,7 @@ export const useSortedItems = () => {
           break
         }
       }
-      prevIndex > -1 && list.splice(prevIndex, 1)
-      list.splice(i + 1, 0, item)
+      setItemIndex(item, prevIndex, i)
     }
   }
 
@@ -62,7 +65,7 @@ export const useSortedItems = () => {
     if (!(item instanceof Node) && !(item instanceof Edge)) {
       return
     }
-    item instanceof Node ? list.push(item) : list.unshift(item)
+    list.push(item)
     moveItem(item)
     item.on('change', onZIndexChange)
   }

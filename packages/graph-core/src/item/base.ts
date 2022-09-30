@@ -66,12 +66,11 @@ export default class Base<
   }
 
   public setZIndex(value: number) {
-    const prevZIndex = this.model.zIndex
     if (this.model.zIndex) {
       ;(this.model as any).zIndex = value
     }
     this.set('zIndex', value)
-    this.emit('change', this, 'zIndex', prevZIndex)
+    this.emit('change', this, 'zIndex')
   }
 
   public setState<K extends keyof States>(state: K) {

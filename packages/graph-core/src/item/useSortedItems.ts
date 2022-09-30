@@ -2,14 +2,7 @@ import Node from './node'
 import Edge from './edge'
 import { Item } from '../types/type'
 
-const getItemZindex = (item: Node | Edge) =>
-  item instanceof Node
-    ? item.zIndex
-    : Math.max(
-        item.zIndex || 0,
-        item.fromNode.zIndex || 0,
-        item.toNode.zIndex || 0
-      )
+const getItemZindex = (item?: Node | Edge) => (item ? item.zIndex || 0 : 0)
 
 export const useSortedItems = () => {
   const list: Array<Node | Edge> = []
@@ -19,7 +12,7 @@ export const useSortedItems = () => {
       return
     }
     const prevIndex = list.indexOf(item)
-    const zIndex = getItemZindex(item)
+    const zIndex = item.zIndex || 0
 
     if (list[prevIndex + 1] && zIndex >= getItemZindex(list[prevIndex + 1])) {
       // 向右移动

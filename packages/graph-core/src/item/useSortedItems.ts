@@ -8,8 +8,13 @@ export const useSortedItems = () => {
   const list: Array<Node | Edge> = []
 
   const setItemIndex = (item: Node | Edge, from: number, to: number) => {
-    list.splice(to, 0, item)
-    from > 0 && list.splice(from, 1)
+    if (to > from) {
+      from > 0 && list.splice(from, 1)
+      list.splice(to + 1, 0, item)
+    } else if (to < from) {
+      from > 0 && list.splice(from, 1)
+      list.splice(to, 0, item)
+    }
   }
 
   const moveItem = (item: Item) => {

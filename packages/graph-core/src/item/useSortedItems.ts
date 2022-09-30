@@ -20,36 +20,37 @@ export const useSortedItems = () => {
     }
     const prevIndex = list.indexOf(item)
     const zIndex = getItemZindex(item)
+
     if (list[prevIndex + 1] && zIndex >= getItemZindex(list[prevIndex + 1])) {
-      console.log('right')
       // 向右移动
       let i = prevIndex + 1
       for (; i < list.length; i++) {
         const rightZindex = getItemZindex(list[i])
-        if (zIndex < rightZindex) {
-          break
-        } else if (zIndex === rightZindex && item instanceof Edge) {
+        if (
+          zIndex < rightZindex ||
+          (zIndex === rightZindex && item instanceof Edge)
+        ) {
           break
         }
       }
       list.splice(i, 0, item)
-      list.splice(prevIndex, 1)
+      prevIndex > -1 && list.splice(prevIndex, 1)
     } else if (
       list[prevIndex - 1] &&
       zIndex <= getItemZindex(list[prevIndex - 1])
     ) {
       // 向左移动
-      console.log('left')
       let i = prevIndex - 1
       for (; i >= 0; i--) {
         const leftZindex = getItemZindex(list[i])
-        if (zIndex > leftZindex) {
-          break
-        } else if (zIndex === leftZindex && item instanceof Node) {
+        if (
+          zIndex > leftZindex ||
+          (zIndex === leftZindex && item instanceof Node)
+        ) {
           break
         }
       }
-      list.splice(prevIndex, 1)
+      prevIndex > -1 && list.splice(prevIndex, 1)
       list.splice(i + 1, 0, item)
     }
   }
@@ -79,7 +80,7 @@ export const useSortedItems = () => {
     }
     item.off('change', onZIndexChange)
     const index = list.indexOf(item)
-    list.splice(index, 1)
+    index > -1 && list.splice(index, 1)
   }
 
   const clean = () => {

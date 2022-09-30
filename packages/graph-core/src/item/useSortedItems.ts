@@ -10,10 +10,10 @@ export const useSortedItems = () => {
   const setItemIndex = (item: Node | Edge, from: number, to: number) => {
     if (to > from) {
       from > 0 && list.splice(from, 1)
-      list.splice(to + 1, 0, item)
+      list.splice(Math.min(to + 1, list.length), 0, item)
     } else if (to < from) {
       from > 0 && list.splice(from, 1)
-      list.splice(to, 0, item)
+      list.splice(Math.max(to, 0), 0, item)
     }
   }
 
@@ -29,13 +29,16 @@ export const useSortedItems = () => {
       let i = prevIndex + 1
       for (; i < list.length; i++) {
         const rightZindex = getItemZindex(list[i])
-        if (
-          zIndex < rightZindex ||
-          (zIndex === rightZindex && item instanceof Edge)
+        if (zIndex < rightZindex) {
+          break
+        } else if (
+          zIndex === rightZindex &&
+          (item instanceof Edge || list[i] instanceof Node)
         ) {
           break
         }
       }
+      console.log('right', item.id, item.zIndex)
       setItemIndex(item, prevIndex, i)
     } else if (
       list[prevIndex - 1] &&
@@ -45,14 +48,18 @@ export const useSortedItems = () => {
       let i = prevIndex - 1
       for (; i >= 0; i--) {
         const leftZindex = getItemZindex(list[i])
-        if (
-          zIndex > leftZindex ||
-          (zIndex === leftZindex && item instanceof Node)
+        console.warn(item instanceof Node, list[i] instanceof Edge)
+        if (zIndex > leftZindex) {
+          break
+        } else if (
+          zIndex === leftZindex &&
+          (item instanceof Node || list[i] instanceof Edge)
         ) {
           break
         }
       }
-      setItemIndex(item, prevIndex, i)
+      console.log('left', item.id, item.zIndex, prevIndex, i)
+      setItemIndex(item, prevIndex, i + 1)
     }
   }
 
@@ -72,6 +79,8 @@ export const useSortedItems = () => {
     }
     list.push(item)
     moveItem(item)
+
+    console.log(list.map(item => `${item.id}:${item.zIndex}`).join('; '))
     item.on('change', onZIndexChange)
   }
 

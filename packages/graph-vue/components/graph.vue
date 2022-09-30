@@ -20,12 +20,12 @@
         }"
         v-if="graph"
       >
-        <g v-for="item in items" :key="item.id">
-          <EdgeWrapper v-if="isEdge(item)" :edge="item">
+        <template v-for="item in items">
+          <EdgeWrapper v-if="isEdge(item)" :key="item.id" :edge="item">
             <slot v-if="$scopedSlots.edge" name="edge" :edge="item"></slot>
             <Edge v-else :edge="item" :graph="graph" />
           </EdgeWrapper>
-          <NodeWrapper v-if="isNode(item)" :node="item">
+          <NodeWrapper v-if="isNode(item)" :key="item.id" :node="item">
             <slot v-if="$scopedSlots.node" name="node" :node="item"></slot>
             <Node v-else :node="item" />
 
@@ -34,7 +34,7 @@
               <Port v-else :port="port" />
             </template>
           </NodeWrapper>
-        </g>
+        </template>
         <NewEdge>
           <slot name="newEdge"></slot>
         </NewEdge>
@@ -119,7 +119,7 @@ export default class GraphVue extends Vue {
 
   nodes: INode[] = []
   edges: IEdge[] = []
-  items: Array<INode | IEdge> = []
+  items: ReadonlyArray<INode | IEdge> = []
 
   transform = {
     scale: 1,

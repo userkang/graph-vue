@@ -184,8 +184,8 @@ export default class Graph extends EventEmitter {
     return this.itemController.getNodes()
   }
 
-  getSortedItem(): Array<INode | IEdge> {
-    return this.itemController.getSortedItem()
+  getSortedItem(): ReadonlyArray<INode | IEdge> {
+    return this.store.items
   }
 
   findNode(id: string | number): INode | undefined {

@@ -8,6 +8,7 @@ import { IDataModel, IEdge, INode } from '../types'
 import { ManyToOne } from '../util/many-to-one'
 import edgeView from '../view/edge'
 import nodeView from '../view/node'
+import { useSortedItems } from '../item/useSortedItems'
 
 const EVENT_TYPES = ['add', 'remove'] as const
 
@@ -15,8 +16,9 @@ export default class Store extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
   false
 > {
+  private sorted: ReturnType<typeof useSortedItems>
+  items: ReturnType<typeof useSortedItems>['items']
   itemMap: Record<string, Item> = {}
-  item: Array<INode | IEdge> = []
   node_ports = new ManyToOne<Port, Node>()
   node_nodes = new ManyToOne<Node, Node>()
   fromPort_edges = new ManyToOne<Edge, Port>()
@@ -24,6 +26,8 @@ export default class Store extends EventEmitter<
   viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
+    this.sorted = useSortedItems()
+    this.items = this.sorted.items
     this.reset()
   }
 
@@ -45,25 +49,20 @@ export default class Store extends EventEmitter<
     }
   }
 
-  private insert(item: INode | IEdge) {
-    // 按照zindex插入元素
-  }
-
   add(item: Item) {
     if (this.itemMap[item.id] === item) {
       return
     }
     const prev = this.itemMap[item.id]
     this.itemMap[item.id] = item
-    this.emit('add', item, prev)
-
-    if (item instanceof Node || item instanceof Edge) {
-      this.item.push(item)
-      // this.insert(item)
-      item.on('zIndex:change', i => {
-        this.insert(item)
-      })
+    if (!prev) {
+      this.sorted.add(item)
+    } else if (prev !== item) {
+      this.sorted.remove(prev)
+      this.sorted.add(item)
     }
+
+    this.emit('add', item, prev)
   }
 
   find(id: itemId): Item | undefined
@@ -161,19 +160,15 @@ export default class Store extends EventEmitter<
       return
     }
     delete this.itemMap[id]
+    this.sorted.remove(item)
+
     this.emit('remove', item)
-
-    if (item instanceof Node || item instanceof Edge) {
-      const index = this.item.indexOf(item)
-      this.item.splice(index, 1)
-    }
-
     return item
   }
 
   reset() {
     this.itemMap = {}
-    this.item = []
+    this.sorted.clean()
     this.node_ports = new ManyToOne<Port, Node>()
     this.node_nodes = new ManyToOne<Node, Node>()
     this.fromPort_edges = new ManyToOne<Edge, Port>()

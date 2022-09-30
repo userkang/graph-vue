@@ -141,7 +141,7 @@ export default class ItemController extends EventEmitter<
   }
 
   getSortedItem() {
-    return this.$store.items
+    return this.$store.sortedItems
   }
 
   refreshNode(id: string): void {

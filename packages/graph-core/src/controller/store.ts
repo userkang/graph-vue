@@ -17,7 +17,7 @@ export default class Store extends EventEmitter<
   false
 > {
   private sorted: ReturnType<typeof useSortedItems>
-  items: ReturnType<typeof useSortedItems>['items']
+  sortedItems: ReturnType<typeof useSortedItems>['items']
   itemMap: Record<string, Item> = {}
   node_ports = new ManyToOne<Port, Node>()
   node_nodes = new ManyToOne<Node, Node>()
@@ -27,7 +27,7 @@ export default class Store extends EventEmitter<
   constructor() {
     super()
     this.sorted = useSortedItems()
-    this.items = this.sorted.items
+    this.sortedItems = this.sorted.items
     this.reset()
   }
 

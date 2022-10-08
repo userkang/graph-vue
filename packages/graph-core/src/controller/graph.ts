@@ -185,7 +185,7 @@ export default class Graph extends EventEmitter {
   }
 
   getSortedItem(): ReadonlyArray<INode | IEdge> {
-    return this.store.sortedItems
+    return Object.freeze(Array.from(this.store.sortedItems))
   }
 
   findNode(id: string | number): INode | undefined {

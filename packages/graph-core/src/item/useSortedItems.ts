@@ -17,50 +17,93 @@ export const useSortedItems = () => {
     }
   }
 
+  // const computeIndex = (item: Node|Edge) => {
+  //   let left = 0;
+  //   let right = list.length - 1
+  //   const zIndexes = list.map(
+  //     t => getItemZindex(t) + (t instanceof Edge ? -0.5 : 0)
+  //   )
+  //   const prevIndex = list.indexOf(item)
+  //   const targetZindex = item.zIndex || 0
+  //   if(prevIndex === -1) {
+  //     let left = prevIndex + 1
+  //     let right = list.length - 1
+  //     if (targetZindex < zIndexes[left]) {
+  //       setItemIndex(item, prevIndex, left - 1)
+  //     } else if (targetZindex >= zIndexes[right]) {
+  //       setItemIndex(item, prevIndex, right + 1)
+  //     } else {
+  //       while (left < right - 1) {
+  //         const mid = Math.trunc((left + right) / 2)
+  //         const midZindex = zIndexes[mid]
+  //         if (midZindex <= targetZindex) {
+  //           left = mid
+  //         } else {
+  //           right = mid
+  //         }
+  //       }
+  //   }
+
+  // }
+
   const moveItem = (item: Item) => {
     if (!(item instanceof Node) && !(item instanceof Edge)) {
       return
     }
+    const zIndexes = list.map(
+      t => getItemZindex(t) + (t instanceof Edge ? -0.5 : 0)
+    )
     const prevIndex = list.indexOf(item)
     const zIndex = item.zIndex || 0
 
     if (list[prevIndex + 1] && zIndex >= getItemZindex(list[prevIndex + 1])) {
-      // 向右移动
-      let i = prevIndex + 1
-      for (; i < list.length; i++) {
-        const rightZindex = getItemZindex(list[i])
-        if (zIndex < rightZindex) {
-          break
-        } else if (
-          zIndex === rightZindex &&
-          (item instanceof Edge || list[i] instanceof Node)
-        ) {
-          break
+      let left = prevIndex + 1
+      let right = list.length - 1
+      if (zIndex < zIndexes[left]) {
+        setItemIndex(item, prevIndex, left - 1)
+      } else if (zIndex >= zIndexes[right]) {
+        setItemIndex(item, prevIndex, right + 1)
+      } else {
+        while (left < right - 1) {
+          const mid = Math.trunc((left + right) / 2)
+          const midZindex = zIndexes[mid]
+          if (midZindex <= zIndex) {
+            left = mid
+          } else {
+            right = mid
+          }
         }
+        setItemIndex(item, prevIndex, right)
       }
-      console.log('right', item.id, item.zIndex)
-      setItemIndex(item, prevIndex, i)
+      // 向右移动
     } else if (
       list[prevIndex - 1] &&
       zIndex <= getItemZindex(list[prevIndex - 1])
     ) {
       // 向左移动
-      let i = prevIndex - 1
-      for (; i >= 0; i--) {
-        const leftZindex = getItemZindex(list[i])
-        console.warn(item instanceof Node, list[i] instanceof Edge)
-        if (zIndex > leftZindex) {
-          break
-        } else if (
-          zIndex === leftZindex &&
-          (item instanceof Node || list[i] instanceof Edge)
-        ) {
-          break
+      let left = 0
+      let right = prevIndex - 1
+      if (zIndex < zIndexes[left]) {
+        setItemIndex(item, prevIndex, left - 1)
+        console.log('left')
+      } else if (zIndex >= zIndexes[right]) {
+        setItemIndex(item, prevIndex, right + 1)
+      } else {
+        while (left < right - 1) {
+          const mid = Math.trunc((left + right) / 2)
+          const midZindex = zIndexes[mid]
+          if (midZindex <= zIndex) {
+            left = mid
+          } else {
+            right = mid
+          }
         }
+        setItemIndex(item, prevIndex, right)
       }
-      console.log('left', item.id, item.zIndex, prevIndex, i)
-      setItemIndex(item, prevIndex, i + 1)
     }
+    console.log(list.map(
+      t => getItemZindex(t) + (t instanceof Edge ? -0.5 : 0)
+    ))
   }
 
   const onZIndexChange = (item: Item, key: string) => {

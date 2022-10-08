@@ -70,9 +70,12 @@ export const useSortedItems = () => {
     if (!(item instanceof Node) && !(item instanceof Edge)) {
       return
     }
-    item.off('change', onZIndexChange)
     const index = list.indexOf(item)
-    index > -1 && list.splice(index, 1)
+    if (index === -1) {
+      return
+    }
+    item.off('change', onZIndexChange)
+    list.splice(index, 1)
   }
 
   return {

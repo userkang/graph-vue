@@ -4,10 +4,11 @@ import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
-import { IDataModel, IEdge } from '../types'
+import { IDataModel, IEdge, INode } from '../types'
 import { ManyToOne } from '../util/many-to-one'
 import edgeView from '../view/edge'
 import nodeView from '../view/node'
+import { useSortedItems } from '../item/useSortedItems'
 
 const EVENT_TYPES = ['add', 'remove'] as const
 
@@ -15,6 +16,8 @@ export default class Store extends EventEmitter<
   valuesType<typeof EVENT_TYPES>,
   false
 > {
+  private sorted: ReturnType<typeof useSortedItems>
+  sortedItems: ReturnType<typeof useSortedItems>['items']
   itemMap: Record<string, Item> = {}
   node_ports = new ManyToOne<Port, Node>()
   node_nodes = new ManyToOne<Node, Node>()
@@ -23,6 +26,8 @@ export default class Store extends EventEmitter<
   viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
+    this.sorted = useSortedItems()
+    this.sortedItems = this.sorted.items
     this.reset()
   }
 
@@ -50,6 +55,13 @@ export default class Store extends EventEmitter<
     }
     const prev = this.itemMap[item.id]
     this.itemMap[item.id] = item
+    if (!prev) {
+      this.sorted.add(item)
+    } else if (prev !== item) {
+      this.sorted.remove(prev)
+      this.sorted.add(item)
+    }
+
     this.emit('add', item, prev)
   }
 
@@ -148,12 +160,15 @@ export default class Store extends EventEmitter<
       return
     }
     delete this.itemMap[id]
+    this.sorted.remove(item)
+
     this.emit('remove', item)
     return item
   }
 
   reset() {
     this.itemMap = {}
+    this.sorted.clean()
     this.node_ports = new ManyToOne<Port, Node>()
     this.node_nodes = new ManyToOne<Node, Node>()
     this.fromPort_edges = new ManyToOne<Edge, Port>()

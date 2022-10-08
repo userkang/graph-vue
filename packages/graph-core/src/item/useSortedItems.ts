@@ -75,14 +75,9 @@ export const useSortedItems = () => {
     index > -1 && list.splice(index, 1)
   }
 
-  const clean = () => {
-    list.forEach(item => remove(item))
-  }
-
   return {
     items: list,
     add,
-    remove,
-    clean
+    remove
   }
 }

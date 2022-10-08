@@ -8,21 +8,20 @@ export const useSortedItems = () => {
   const list: Array<Node | Edge> = []
 
   const moveItem = (target: Node | Edge) => {
-    const zIndexes = list.map(
-      t => getItemZindex(t) + (t instanceof Edge ? -0.5 : 0)
-    )
+    const getLocalZindex = (t: Node | Edge) =>
+      getItemZindex(t) + (t instanceof Edge ? -0.5 : 0)
     const prevIndex = list.indexOf(target)
-    const targetZindex = target.zIndex || 0
+    const targetZindex = getLocalZindex(target)
 
-    const computeIndex = (left: number, right: number) => {
-      if (targetZindex < zIndexes[left]) {
-        return [left - 1, left]
-      } else if (targetZindex >= zIndexes[right]) {
-        return [right, right + 1]
+    const getNextIndex = (left: number, right: number): number => {
+      if (targetZindex < getLocalZindex(list[left])) {
+        return left
+      } else if (targetZindex >= getLocalZindex(list[right])) {
+        return right + 1
       } else {
         while (left < right - 1) {
           const mid = Math.trunc((left + right) / 2)
-          const midZindex = zIndexes[mid]
+          const midZindex = getLocalZindex(list[mid])
           if (midZindex <= targetZindex) {
             left = mid
           } else {
@@ -30,22 +29,22 @@ export const useSortedItems = () => {
           }
         }
       }
-      return [left, right]
+      return right
     }
 
     if (prevIndex === -1) {
-      const [left, right] = computeIndex(0, list.length - 1)
-      list.splice(right, 0, target)
-    } else if (targetZindex < zIndexes[prevIndex - 1]) {
+      const nextIndex = getNextIndex(0, list.length - 1)
+      list.splice(nextIndex, 0, target)
+    } else if (targetZindex < getLocalZindex(list[prevIndex - 1])) {
       // 向左
-      const [left, right] = computeIndex(0, prevIndex - 1)
+      const nextIndex = getNextIndex(0, prevIndex - 1)
       list.splice(prevIndex, 1)
-      list.splice(right, 0, target)
-    } else if (targetZindex > zIndexes[prevIndex + 1]) {
+      list.splice(nextIndex, 0, target)
+    } else if (targetZindex > getLocalZindex(list[prevIndex + 1])) {
       // 向右
-      const [left, right] = computeIndex(prevIndex + 1, list.length - 1)
+      const nextIndex = getNextIndex(prevIndex + 1, list.length - 1)
       list.splice(prevIndex, 1)
-      list.splice(right, 0, target)
+      list.splice(nextIndex, 0, target)
     }
   }
 
@@ -64,8 +63,6 @@ export const useSortedItems = () => {
       return
     }
     moveItem(item)
-
-    console.log(list.map(item => `${item.id}:${item.zIndex}`).join('; '))
     item.on('change', onZIndexChange)
   }
 

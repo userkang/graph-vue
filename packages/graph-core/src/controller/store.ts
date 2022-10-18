@@ -8,7 +8,7 @@ import { IDataModel, IEdge, INode } from '../types'
 import { ManyToOne } from '../util/many-to-one'
 import edgeView from '../view/edge'
 import nodeView from '../view/node'
-import { useSortedItems } from '../item/useSortedItems'
+import { useSortedItems } from '../util/useSortedItems'
 
 const EVENT_TYPES = ['add', 'remove'] as const
 

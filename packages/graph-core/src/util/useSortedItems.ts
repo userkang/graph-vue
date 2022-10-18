@@ -1,5 +1,5 @@
-import Node from './node'
-import Edge from './edge'
+import Node from '../item/node'
+import Edge from '../item/edge'
 import { Item } from '../types/type'
 
 const getItemZindex = (item?: Node | Edge) => (item ? item.zIndex || 0 : 0)

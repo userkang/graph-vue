@@ -1,6 +1,6 @@
 import Graph from './controller/graph'
 import Node from './item/node'
-import Edge from './item/node'
+import Edge from './item/edge'
 import Port from './item/port'
 import Behavior from './behavior/base'
 

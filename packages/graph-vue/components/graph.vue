@@ -20,19 +20,21 @@
         }"
         v-if="graph"
       >
-        <EdgeWrapper v-for="edge in edges" :key="edge.id" :edge="edge">
-          <slot v-if="$scopedSlots.edge" name="edge" :edge="edge"></slot>
-          <Edge v-else :edge="edge" :graph="graph" />
-        </EdgeWrapper>
-        <NodeWrapper v-for="node in nodes" :key="node.id" :node="node">
-          <slot v-if="$scopedSlots.node" name="node" :node="node"></slot>
-          <Node v-else :node="node" />
+        <template v-for="item in items">
+          <EdgeWrapper v-if="isEdge(item)" :key="item.id" :edge="item">
+            <slot v-if="$scopedSlots.edge" name="edge" :edge="item"></slot>
+            <Edge v-else :edge="item" :graph="graph" />
+          </EdgeWrapper>
+          <NodeWrapper v-if="isNode(item)" :key="item.id" :node="item">
+            <slot v-if="$scopedSlots.node" name="node" :node="item"></slot>
+            <Node v-else :node="item" />
 
-          <template #port="{ port }">
-            <slot v-if="$scopedSlots.port" name="port" :port="port"></slot>
-            <Port v-else :port="port" />
-          </template>
-        </NodeWrapper>
+            <template #port="{ port }">
+              <slot v-if="$scopedSlots.port" name="port" :port="port"></slot>
+              <Port v-else :port="port" />
+            </template>
+          </NodeWrapper>
+        </template>
         <NewEdge>
           <slot name="newEdge"></slot>
         </NewEdge>
@@ -69,7 +71,9 @@ import {
   ILayout,
   INode,
   IDagreLayout,
-  INodeModel
+  INodeModel,
+  Node as GraphNode,
+  Edge as GraphEdge
 } from '@datafe/graph-core'
 
 @Component({
@@ -115,6 +119,7 @@ export default class GraphVue extends Vue {
 
   nodes: INode[] = []
   edges: IEdge[] = []
+  items: ReadonlyArray<INode | IEdge> = []
 
   transform = {
     scale: 1,
@@ -122,6 +127,14 @@ export default class GraphVue extends Vue {
     translateY: 0
   }
   brushPath = ''
+
+  isEdge(item: INode | IEdge) {
+    return item instanceof GraphEdge
+  }
+
+  isNode(item: INode | IEdge) {
+    return item instanceof GraphNode
+  }
 
   handleDrop(e: DragEvent) {
     this.$emit('drop', e)
@@ -180,8 +193,7 @@ export default class GraphVue extends Vue {
   }
 
   refreshGraph() {
-    this.nodes = this.graph.getNodes()
-    this.edges = this.graph.getEdges()
+    this.items = this.graph.getSortedItem()
   }
 
   aftertranslate(x: number, y: number) {

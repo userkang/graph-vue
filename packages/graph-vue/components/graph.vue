@@ -115,7 +115,7 @@ export default class GraphVue extends Vue {
       return {}
     }
   })
-  defaultNode!: INodeModel
+  defaultNode!: INodeModel 
 
   nodes: INode[] = []
   edges: IEdge[] = []
@@ -145,14 +145,15 @@ export default class GraphVue extends Vue {
   }
 
   init() {
-    this.graph = new Graph({
+    const graph = new Graph({
       container: this.$refs.svg as HTMLElement,
       direction: (this.layout.options as IDagreLayout)?.rankdir || 'TB',
       action: this.action,
       defaultNode: this.defaultNode
     })
+    this.graph = graph
 
-    this.initCustomHooks()
+    this.initCustomHooks() 
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
@@ -233,7 +234,7 @@ export default class GraphVue extends Vue {
     })
   }
 
-  beforeDestroy() {
+  beforeDestroy() { 
     this.graph.destroy()
   }
 }

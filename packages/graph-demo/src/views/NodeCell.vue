@@ -59,6 +59,18 @@ const action = [
 const nodeCellMock = {
   nodes: [
     {
+      id: '4',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
+      id: '5',
+      label: 'parent',
+      type: 'group',
+      collapsed: false
+    },
+    {
       id: '1',
       label: 'children',
       parentId: '4'
@@ -72,18 +84,6 @@ const nodeCellMock = {
       id: '3',
       label: 'children',
       parentId: '5'
-    },
-    {
-      id: '4',
-      label: 'parent',
-      type: 'group',
-      collapsed: false
-    },
-    {
-      id: '5',
-      label: 'parent',
-      type: 'group',
-      collapsed: false
     },
     {
       id: '6',

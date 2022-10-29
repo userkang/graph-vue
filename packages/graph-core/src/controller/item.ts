@@ -137,9 +137,7 @@ export default class ItemController extends EventEmitter<
   }
 
   getNodes() {
-    return this.$store
-      .getNodes()
-      .sort((a, b) => (a.zIndex || 0) - (b.zIndex || 0))
+    return this.$store.getNodes()
   }
 
   refreshNode(id: string): void {

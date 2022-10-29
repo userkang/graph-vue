@@ -191,8 +191,8 @@ export default class ViewController {
     let [minX, minY, maxX, maxY] = [
       startNode.x,
       startNode.y,
-      startNode.x,
-      startNode.y
+      startNode.x + startNode.width,
+      startNode.y + startNode.height
     ]
     for (let i = filterNodes.length - 1; i > 0; i--) {
       const node = filterNodes[i]

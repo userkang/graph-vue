@@ -5,16 +5,32 @@
       :action="action"
       @init="initGraph"
       :layout="layoutOptions"
+      :defaultNode="nodeSize"
     >
       <template #node="{ node }">
         <div v-if="node.model.type === 'group'" class="group-node">
-          <button v-if="node.model.collapsed" @click="showChildren(node)">
-            展开
-          </button>
-          <button v-else @click="hideChildren(node)">隐藏</button>
+          <div class="group-node-title">
+            <div>{{ node.model.label }}</div>
+            <div>
+              <div
+                class="group-node-icon"
+                v-if="node.model.collapsed"
+                @click="showChildren(node)"
+              >
+                +
+              </div>
+              <div class="group-node-icon" v-else @click="hideChildren(node)">
+                -
+              </div>
+            </div>
+          </div>
         </div>
         <div v-else class="normal-node">
-          {{ node.model.label }}
+          <div class="normal-node-left"></div>
+          <div class="normal-node-right">
+            <div class="normal-node-label">{{ node.model.label }}</div>
+            <div class="normal-node-desc">{{ node.model.desc }}</div>
+          </div>
         </div>
       </template>
 
@@ -37,12 +53,14 @@ import {
   GraphVue,
   Graph,
   INode,
-  IEdge
+  IEdge,
+  ILayout
 } from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
 
-const groupPadding = 25
+const groupPadding = 20
+const groupPaddingTop = 40
 
 const action = [
   'drag-blank',
@@ -59,46 +77,45 @@ const action = [
 const nodeCellMock = {
   nodes: [
     {
+      id: '6',
+      label: 'dim_sc_grid_ext',
+      desc: '供应链_网格化_维度扩展表'
+    },
+    {
       id: '4',
-      label: 'parent4',
+      label: '节点组1',
       type: 'group',
       collapsed: false
     },
     {
       id: '5',
-      label: 'parent5',
+      label: '节点组2',
       type: 'group',
       collapsed: false
     },
     {
       id: '1',
-      label: 'children1',
-      parentId: '4',
+      label: 'dim_sc_grid_ext',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '4'
     },
     {
       id: '2',
-      label: 'children2',
+      label: 'dim_sc_grid_ext2',
+      desc: '供应链_网格化_维度扩展表',
       parentId: '5'
     },
     {
       id: '3',
-      label: 'children3',
-      parentId: '5',
-      zIndex: -1
-    },
-    {
-      id: '6',
-      label: 'start'
+      label: 'dim_sc_grid_ext3',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '5'
     }
   ],
   edges: [
     {
-      fromNodeId: '4',
-      toNodeId: '5'
-    },
-    {
-      fromNodeId: '2',
-      toNodeId: '3'
+      fromNodeId: '6',
+      toNodeId: '4'
     },
     {
       fromNodeId: '6',
@@ -122,7 +139,11 @@ export default class NodeCell extends Vue {
   graphState = GraphStore.state
   nodeEditedDom: HTMLElement | null = null
   isEditText = false
-  layoutOptions = { options: { rankdir: 'LR', ranksep: 20, nodesep: 10 } }
+  layoutOptions: ILayout = { options: { rankdir: 'LR', ranksep: 100 } }
+  nodeSize = {
+    width: 200,
+    height: 56
+  }
 
   get action() {
     return action
@@ -132,19 +153,13 @@ export default class NodeCell extends Vue {
     this.graph.stackStart()
     const children = node.getChildren()
 
-    node.update({
-      width: 180,
-      height: 40
-    })
+    node.update(this.nodeSize)
 
     children.forEach(child => {
       child.hide()
     })
 
-    node.update({
-      width: 180,
-      height: 40
-    })
+    node.update(this.nodeSize)
     node.model.collapsed = true
 
     this.layout(false)
@@ -236,7 +251,10 @@ export default class NodeCell extends Vue {
         // 对子节点布局。默认布局不能满足需求，需要获取实例自定义布局位置
         const dagre = this.graph.layout(
           {
-            data: { nodes: children, edges: Object.values(childrenEdges) }
+            data: { nodes: children, edges: Object.values(childrenEdges) },
+            options: {
+              nodesep: 20
+            }
           },
           stack
         )
@@ -262,7 +280,10 @@ export default class NodeCell extends Vue {
     // 对根节点进行布局
     this.graph.layout(
       {
-        data: { nodes: rootNodes, edges: Object.values(edges) }
+        data: { nodes: rootNodes, edges: Object.values(edges) },
+        options: {
+          nodesep: 30
+        }
       },
       stack
     )
@@ -275,7 +296,7 @@ export default class NodeCell extends Vue {
         children.forEach((node: INode) => {
           const posX = item.x + node.x + groupPadding
           const posY = item.y + node.y + groupPadding
-          node.updatePosition(posX, posY)
+          node.updatePosition(posX, posY + groupPaddingTop)
         })
       }
     })
@@ -286,9 +307,9 @@ export default class NodeCell extends Vue {
     const bbox = this.graph.getNodesBBox(children)
     node.update({
       width: bbox.width + 2 * groupPadding,
-      height: bbox.height + 2 * groupPadding,
+      height: bbox.height + 2 * groupPadding + groupPaddingTop,
       x: bbox.left - groupPadding,
-      y: bbox.top - groupPadding
+      y: bbox.top - groupPadding - groupPaddingTop
     })
   }
 }
@@ -298,16 +319,78 @@ export default class NodeCell extends Vue {
 .container {
   width: 100%;
   height: 100%;
+  background: #f4f5f7;
 }
 .group-node,
 .normal-node {
   width: 100%;
   height: 100%;
-  background: #eee;
-  border: 2px solid #ddd;
+}
+.normal-node {
+  width: 100%;
+  height: 100%;
+  background: #fff;
+  border-radius: 6px;
+  font-family: PingFangSC-Medium;
+  font-size: 14px;
+  color: #111925;
+  letter-spacing: 0;
+  line-height: 22px;
+  font-weight: 500;
+  box-shadow: 0 2px 6px 0 rgba(17, 25, 37, 0.03);
+  display: flex;
+  box-sizing: border-box;
+  .normal-node-left {
+    width: 6px;
+    border-top-left-radius: 6px;
+    border-bottom-left-radius: 6px;
+    height: 100%;
+    background: #347bed;
+  }
+  .normal-node-right {
+    padding: 0 15px;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .normal-node-desc {
+    font-family: PingFangSC-Regular;
+    font-size: 12px;
+    color: rgba(17, 25, 37, 0.65);
+    line-height: 20px;
+    font-weight: 400;
+  }
 }
 .group-node {
-  background: rgba(134, 244, 106, 0.654);
+  background: rgba(52, 123, 237, 0.1);
+  border: 1px solid #347bed;
+  border-radius: 10px;
   transition: all 0.2s linear;
+  .group-node-title {
+    height: 36px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    background: rgba(52, 123, 237, 0.1);
+    border-top-left-radius: 9px;
+    border-top-right-radius: 9px;
+    font-family: PingFangSC-Medium;
+    font-size: 14px;
+    color: #111925;
+    letter-spacing: 0;
+    line-height: 22px;
+    font-weight: 500;
+  }
+  .group-node-icon {
+    height: 100%;
+    width: 40px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: -4px -20px 0 0;
+    font-size: 20px;
+    cursor: pointer;;
+  }
 }
 </style>

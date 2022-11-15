@@ -137,8 +137,6 @@ export default class NodeCell extends Vue {
   graph!: Graph
   dataMock = nodeCellMock
   graphState = GraphStore.state
-  nodeEditedDom: HTMLElement | null = null
-  isEditText = false
   layoutOptions: ILayout = { options: { rankdir: 'LR', ranksep: 100 } }
   nodeSize = {
     width: 200,

@@ -94,8 +94,8 @@ export type itemClass<T extends Item> = new (...args: any[]) => T
 
 export type valuesType<T> = T extends readonly (infer U)[] ? U : never
 
-export interface MembersToSingleEvent<M, S> {
+export interface ManyToOneEvent<M, S> {
   type: 'add' | 'remove'
   member: M
-  single: S
+  one: S
 }

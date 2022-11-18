@@ -1,7 +1,7 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
-import { BaseCfg, IEdgeCfg, MembersToSingleEvent } from '../types/type'
+import { BaseCfg, IEdgeCfg, ManyToOneEvent } from '../types/type'
 import Store from '../controller/store'
 
 interface ItemMap {
@@ -55,7 +55,7 @@ export default class Edge extends Base<
     this.toNode.addEdge(this)
     this.$store.fromPort_edges.on(
       'change',
-      (e: MembersToSingleEvent<Edge, IPort>) => {
+      (e: ManyToOneEvent<Edge, IPort>) => {
         if (e.member !== this) {
           return
         }

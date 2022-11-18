@@ -38,7 +38,7 @@ export class MembersToSingle<M, S> extends EventEmitter<
     this.onAdded(member, single)
   }
 
-  getMembers(item: S): M[] | void {
+  getMembers(item: S): M[] {
     const members = this.indexedMap.get(item)
     return members ? Array.from(members) : []
   }

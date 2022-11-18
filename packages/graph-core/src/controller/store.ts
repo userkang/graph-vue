@@ -4,8 +4,8 @@ import Port from '../item/port'
 import EventEmitter from '../util/event-emitter'
 import { itemId, Item, itemClass, valuesType } from '../types/type'
 import { isKeyof } from '../util/utils'
-import { IDataModel, IEdge, INode } from '../types'
-import { ManyToOne } from '../util/many-to-one'
+import { IDataModel, IEdge } from '../types'
+import { MembersToSingle } from '../util/members-to-single'
 import edgeView from '../view/edge'
 import nodeView from '../view/node'
 import { useSortedItems } from '../util/useSortedItems'
@@ -19,10 +19,10 @@ export default class Store extends EventEmitter<
   private sorted: ReturnType<typeof useSortedItems>
   sortedItems: ReturnType<typeof useSortedItems>['items']
   itemMap: Record<string, Item> = {}
-  node_ports = new ManyToOne<Port, Node>()
-  node_nodes = new ManyToOne<Node, Node>()
-  fromPort_edges = new ManyToOne<Edge, Port>()
-  toPort_edges = new ManyToOne<Edge, Port>()
+  node_ports = new MembersToSingle<Port, Node>()
+  node_nodes = new MembersToSingle<Node, Node>()
+  fromPort_edges = new MembersToSingle<Edge, Port>()
+  toPort_edges = new MembersToSingle<Edge, Port>()
   viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
@@ -169,10 +169,10 @@ export default class Store extends EventEmitter<
   reset() {
     this.itemMap = {}
     this.sorted.items.forEach(item => this.sorted.remove(item))
-    this.node_ports = new ManyToOne<Port, Node>()
-    this.node_nodes = new ManyToOne<Node, Node>()
-    this.fromPort_edges = new ManyToOne<Edge, Port>()
-    this.toPort_edges = new ManyToOne<Edge, Port>()
+    this.node_ports = new MembersToSingle<Port, Node>()
+    this.node_nodes = new MembersToSingle<Node, Node>()
+    this.fromPort_edges = new MembersToSingle<Edge, Port>()
+    this.toPort_edges = new MembersToSingle<Edge, Port>()
     this.viewMap = new Map<Item, nodeView | edgeView>()
   }
 }

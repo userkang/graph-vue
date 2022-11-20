@@ -72,6 +72,12 @@ export default class ComponentPanel extends Vue {
     },
     {
       id: getRandomId(),
+      type: 'multiNodeCell',
+      desc: '节点多层嵌套',
+      img: demoTree
+    },
+    {
+      id: getRandomId(),
       type: demoTypes.CIRCLE_LAYOUT,
       desc: '圆形布局',
       img: demoCircle

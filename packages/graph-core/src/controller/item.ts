@@ -115,13 +115,29 @@ export default class ItemController extends EventEmitter<
 
   private loadNodes(models: INodeModel[]) {
     models.map(model => this.addNode(model))
-    this.getNodes().forEach(node => (node.zIndex = 1))
     this.getNodes().forEach(node => {
       const parent = this.findNode(node.model.parentId)
       if (parent) {
         parent.addChild(node)
-        node.zIndex = parent.zIndex + 1
       }
+    })
+
+    const rootNodes = this.getNodes().filter(node => !node.model.parentId)
+
+    rootNodes.forEach(node => {
+      let index = 0
+      const setZIndex = (node: Node) => {
+        node.setZIndex(index++)
+        const children = node.getChildren()
+        if (children) {
+          children.forEach(child => {
+            setZIndex(child)
+            child.setZIndex(node.zIndex + 1)
+          })
+        }
+      }
+
+      setZIndex(node)
     })
   }
 

@@ -37,10 +37,10 @@ export class ManyToOne<M, O> extends EventEmitter<
   find(item: O): M[] | void
   find(item: M): O | void
   find(item: O | M): M[] | O | void {
-    const one = this.primaryMap.get(item as M)
-    if (one) {
-      return one
-    }
+    // const one = this.primaryMap.get(item as M)
+    // if (one) {
+    //   return one
+    // }
     const setMany = this.indexedMap.get(item as O)
     if (setMany) {
       return Array.from(setMany)

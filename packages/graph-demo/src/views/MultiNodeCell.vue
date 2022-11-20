@@ -213,6 +213,8 @@ export default class NodeCell extends Vue {
         this.resizeGroup(node)
       }
     })
+
+    this.graph.fitCenter()
   }
 
   resizeGroup(node: INode) {

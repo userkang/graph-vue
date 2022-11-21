@@ -14,17 +14,17 @@ export class ManyToOne<M, O> extends EventEmitter<
   }
 
   private onAdded(member: M, one: O): void {
-    const memberSet: Set<M> = this.indexedMap.get(one) || new Set<M>()
-    memberSet.add(member)
-    this.indexedMap.set(one, memberSet)
+    const manySet: Set<M> = this.indexedMap.get(one) || new Set<M>()
+    manySet.add(member)
+    this.indexedMap.set(one, manySet)
     this.emit('change', <ManyToOneEvent<M, O>>{ type: 'add', member, one })
   }
 
   private onRemove(member: M, one: O): void {
-    const memberSet = this.indexedMap.get(one)
-    if (memberSet) {
-      memberSet.delete(member)
-      memberSet.size === 0 && this.indexedMap.delete(one)
+    const manySet = this.indexedMap.get(one)
+    if (manySet) {
+      manySet.delete(member)
+      manySet.size === 0 && this.indexedMap.delete(one)
       this.emit('change', <ManyToOneEvent<M, O>>{
         type: 'remove',
         member,
@@ -39,8 +39,8 @@ export class ManyToOne<M, O> extends EventEmitter<
   }
 
   getMany(item: O): M[] {
-    const members = this.indexedMap.get(item)
-    return members ? Array.from(members) : []
+    const many = this.indexedMap.get(item)
+    return many ? Array.from(many) : []
   }
 
   getOne(item: M): O | void {
@@ -57,8 +57,8 @@ export class ManyToOne<M, O> extends EventEmitter<
       this.onRemove(item as M, one)
       return
     }
-    const members = this.getMany(item as O)
-    members?.forEach(m => {
+    const many = this.getMany(item as O)
+    many?.forEach(m => {
       this.primaryMap.delete(m)
       this.onRemove(m, item as O)
     })

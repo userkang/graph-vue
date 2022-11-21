@@ -33,17 +33,17 @@ export class ManyToOne<M, O> extends EventEmitter<
     }
   }
 
-  addMember(member: M, one: O): void {
+  add(member: M, one: O): void {
     this.primaryMap.set(member, one)
     this.onAdded(member, one)
   }
 
-  getMembers(item: O): M[] {
+  getMany(item: O): M[] {
     const members = this.indexedMap.get(item)
     return members ? Array.from(members) : []
   }
 
-  getSingle(item: M): O | void {
+  getOne(item: M): O | void {
     const one = this.primaryMap.get(item as M)
     return one ? one : void 0
   }
@@ -51,13 +51,13 @@ export class ManyToOne<M, O> extends EventEmitter<
   remove(item: O): void
   remove(item: M): void
   remove(item: O | M): void {
-    const one = this.getSingle(item as M)
+    const one = this.getOne(item as M)
     if (one) {
       this.primaryMap.delete(item as M)
       this.onRemove(item as M, one)
       return
     }
-    const members = this.getMembers(item as O)
+    const members = this.getMany(item as O)
     members?.forEach(m => {
       this.primaryMap.delete(m)
       this.onRemove(m, item as O)

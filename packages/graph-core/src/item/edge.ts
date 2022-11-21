@@ -107,12 +107,12 @@ export default class Edge extends Base<
     const fromPort = this.matchPort('out')
     fromPort.setState('linked')
     this._itemMap.fromPort = fromPort
-    this.$store.fromPort_edges.addMember(this, fromPort)
+    this.$store.fromPort_edges.add(this, fromPort)
 
     const toPort = this.matchPort('in')
     toPort.setState('linked')
     this._itemMap.toPort = toPort
-    this.$store.toPort_edges.addMember(this, toPort)
+    this.$store.toPort_edges.add(this, toPort)
   }
 
   public update(model?: IEdgeModel) {

@@ -120,7 +120,7 @@ export default class ItemController extends EventEmitter<
     })
     while (parents.length) {
       const parent = parents[0]
-      const children = this.$store.node_nodes.getMembers(parent)
+      const children = this.$store.node_nodes.getMany(parent)
       if (children?.length) {
         children.forEach(child => child.setZIndex(parent.zIndex + 1))
         parents.push(...children)

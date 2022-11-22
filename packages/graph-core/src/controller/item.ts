@@ -115,9 +115,7 @@ export default class ItemController extends EventEmitter<
 
   private initNodesZIndex() {
     const parents = this.getNodes().filter(node => !node.model.parentId)
-    parents.forEach(node => {
-      node.setZIndex(node.model.zIndex || 0)
-    })
+
     while (parents.length) {
       const parent = parents[0]
       const children = parent.getChildren()

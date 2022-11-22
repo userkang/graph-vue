@@ -56,7 +56,7 @@ export default class Edge extends Base<
     this.$store.fromPort_edges.on(
       'change',
       (e: ManyToOneEvent<Edge, IPort>) => {
-        if (e.member !== this) {
+        if (e.many !== this) {
           return
         }
         this.emit('change', this)

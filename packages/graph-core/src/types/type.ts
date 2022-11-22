@@ -96,6 +96,6 @@ export type valuesType<T> = T extends readonly (infer U)[] ? U : never
 
 export interface ManyToOneEvent<M, S> {
   type: 'add' | 'remove'
-  member: M
+  many: M
   one: S
 }

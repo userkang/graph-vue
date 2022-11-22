@@ -13,29 +13,29 @@ export class ManyToOne<M, O> extends EventEmitter<
     super()
   }
 
-  private onAdded(member: M, one: O): void {
+  private onAdded(many: M, one: O): void {
     const manySet: Set<M> = this.indexedMap.get(one) || new Set<M>()
-    manySet.add(member)
+    manySet.add(many)
     this.indexedMap.set(one, manySet)
-    this.emit('change', <ManyToOneEvent<M, O>>{ type: 'add', member, one })
+    this.emit('change', <ManyToOneEvent<M, O>>{ type: 'add', many, one })
   }
 
-  private onRemove(member: M, one: O): void {
+  private onRemove(many: M, one: O): void {
     const manySet = this.indexedMap.get(one)
     if (manySet) {
-      manySet.delete(member)
+      manySet.delete(many)
       manySet.size === 0 && this.indexedMap.delete(one)
       this.emit('change', <ManyToOneEvent<M, O>>{
         type: 'remove',
-        member,
+        many,
         one
       })
     }
   }
 
-  add(member: M, one: O): void {
-    this.primaryMap.set(member, one)
-    this.onAdded(member, one)
+  add(many: M, one: O): void {
+    this.primaryMap.set(many, one)
+    this.onAdded(many, one)
   }
 
   getMany(item: O): M[] {

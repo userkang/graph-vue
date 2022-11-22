@@ -14,18 +14,22 @@ export class ManyToOne<M, O> extends EventEmitter<
   }
 
   private onAdded(many: M, one: O): void {
-    const setMany: Set<M> = this.indexedMap.get(one) || new Set<M>()
-    setMany.add(many)
-    this.indexedMap.set(one, setMany)
+    const manySet: Set<M> = this.indexedMap.get(one) || new Set<M>()
+    manySet.add(many)
+    this.indexedMap.set(one, manySet)
     this.emit('change', <ManyToOneEvent<M, O>>{ type: 'add', many, one })
   }
 
   private onRemove(many: M, one: O): void {
-    const setMany = this.indexedMap.get(one)
-    if (setMany) {
-      setMany.delete(many)
-      setMany.size === 0 && this.indexedMap.delete(one)
-      this.emit('change', <ManyToOneEvent<M, O>>{ type: 'remove', many, one })
+    const manySet = this.indexedMap.get(one)
+    if (manySet) {
+      manySet.delete(many)
+      manySet.size === 0 && this.indexedMap.delete(one)
+      this.emit('change', <ManyToOneEvent<M, O>>{
+        type: 'remove',
+        many,
+        one
+      })
     }
   }
 
@@ -34,30 +38,27 @@ export class ManyToOne<M, O> extends EventEmitter<
     this.onAdded(many, one)
   }
 
-  find(item: O): M[] | void
-  find(item: M): O | void
-  find(item: O | M): M[] | O | void {
-    // const one = this.primaryMap.get(item as M)
-    // if (one) {
-    //   return one
-    // }
-    const setMany = this.indexedMap.get(item as O)
-    if (setMany) {
-      return Array.from(setMany)
-    }
+  getMany(item: O): M[] {
+    const many = this.indexedMap.get(item)
+    return many ? Array.from(many) : []
+  }
+
+  getOne(item: M): O | void {
+    const one = this.primaryMap.get(item as M)
+    return one ? one : void 0
   }
 
   remove(item: O): void
   remove(item: M): void
   remove(item: O | M): void {
-    const one = this.find(item as M)
+    const one = this.getOne(item as M)
     if (one) {
       this.primaryMap.delete(item as M)
       this.onRemove(item as M, one)
       return
     }
-    const manys = this.find(item as O)
-    manys?.forEach(m => {
+    const many = this.getMany(item as O)
+    many?.forEach(m => {
       this.primaryMap.delete(m)
       this.onRemove(m, item as O)
     })

@@ -167,17 +167,27 @@ export default class NodeCell extends Vue {
 
   showChildren(node: INode) {
     let children = node.getChildren()
+    node.model.collapsed = false
 
     while (children.length) {
       children.forEach(child => {
         children = child.getChildren()
-        child.show()
+        const parent = child.getParent()
+        if (!parent.model.collapsed) {
+          child.show()
+        }
       })
     }
 
-    node.model.collapsed = false
-
     this.resizeGroup(node)
+
+    // 父级嵌套需要重新 resize
+    let parent = node.getParent()
+
+    while (parent) {
+      this.resizeGroup(parent)
+      parent = parent.getParent()
+    }
   }
 
   initGraph(graph: Graph) {
@@ -216,6 +226,8 @@ export default class NodeCell extends Vue {
 
     this.graph.fitCenter()
   }
+
+  layout() {}
 
   resizeGroup(node: INode) {
     const children = node.getChildren()

@@ -77,7 +77,7 @@ const nodeCellMock = {
       id: '1',
       label: '1',
       desc: '供应链_网格化_维度扩展表',
-      parentId: '2'
+      parentId: '4'
     },
     {
       id: '6',
@@ -85,40 +85,41 @@ const nodeCellMock = {
       desc: '供应链_网格化_维度扩展表',
       parentId: '3'
     },
-
     {
       id: '2',
       label: '2',
-      desc: '供应链_网格化_维度扩展表',
-      // parentId: '3',
-      type: 'group'
+      desc: '供应链_网格化_维度扩展表'
     },
     {
       id: '3',
       label: '3',
       desc: '供应链_网格化_维度扩展表',
       type: 'group'
+    },
+    {
+      id: '4',
+      label: '4',
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group'
+    },
+    {
+      id: '5',
+      label: '5',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '4'
     }
-    // {
-    //   id: '4',
-    //   label: '4',
-    //   desc: '供应链_网格化_维度扩展表',
-    //   type: 'group'
-    // },
-    // {
-    //   id: '5',
-    //   label: '5',
-    //   desc: '供应链_网格化_维度扩展表',
-    //   parentId: '4'
-    // }
   ],
   edges: [
-    // {
-    //   fromNodeId: '1',
-    //   toNodeId: '5'
-    // },
+    {
+      fromNodeId: '1',
+      toNodeId: '5'
+    },
     {
       fromNodeId: '6',
+      toNodeId: '1'
+    },
+    {
+      fromNodeId: '2',
       toNodeId: '1'
     }
   ]
@@ -137,7 +138,7 @@ export default class NodeCell extends Vue {
   graph!: Graph
   dataMock = nodeCellMock
   graphState = GraphStore.state
-  layoutOptions: ILayout = { options: { ranksep: 80 } }
+  layoutOptions: ILayout = { options: {} }
   nodeSize = {
     width: 200,
     height: 56
@@ -196,13 +197,8 @@ export default class NodeCell extends Vue {
     this.graph = graph
 
     this.initEvent()
-
-    this.$nextTick(() => {
-      const rootNodes = this.graph
-        .getNodes()
-        .filter(item => !item.model.parentId)
-      this.initGroups(rootNodes)
-    })
+    this.layout()
+    this.graph.fitCenter()
   }
 
   initEvent() {
@@ -219,56 +215,18 @@ export default class NodeCell extends Vue {
   }
 
   initGroups(nodes: INode[]) {
-    this.layout()
-
     nodes.forEach(node => {
       if (node.getChildren().length && !node.model.collapsed) {
         this.initGroups(node.getChildren())
         this.resizeGroup(node)
       }
     })
-
-    this.layout()
-    this.graph.fitCenter()
   }
 
   layout(stack = false) {
     // 获取根节点
     const rootNodes = this.graph.getNodes().filter(item => !item.model.parentId)
-
     this.layoutCellNode(rootNodes)
-
-    return
-    // 布局后，再更新下group节点的大小
-    rootNodes.forEach(item => {
-      if (item.getChildren().length && !item.model.collapsed) {
-        this.resizeGroup(item)
-      }
-    })
-
-    // 对根节点进行布局
-    this.graph.layout(
-      {
-        data: { nodes: rootNodes, edges: Object.values(edges) },
-        options: {
-          nodesep: 30
-        }
-      },
-      stack
-    )
-
-    rootNodes.forEach(item => {
-      const children = item.getChildren()
-
-      if (children.length) {
-        // 通过布局实例返回的坐标点，自定义布局位置。
-        children.forEach((node: INode) => {
-          const posX = item.x + node.x + groupPadding
-          const posY = item.y + node.y + groupPadding
-          node.updatePosition(posX, posY + groupPaddingTop)
-        })
-      }
-    })
   }
 
   layoutCellNode(nodes: INode[]) {
@@ -282,6 +240,7 @@ export default class NodeCell extends Vue {
     nodes.forEach(node => {
       this.layoutCellNode(node.getChildren())
 
+      // 将下级传上来的边进行合并
       if (this.outterEdges[node.id]) {
         this.outterEdges[node.id].forEach(outterEdge => {
           childrenEdges[outterEdge.id] = {
@@ -299,25 +258,32 @@ export default class NodeCell extends Vue {
           childrenId.includes(edge.toNodeId)
         ) {
           childrenEdges[edge.id] = edge
-        }
+        } else if (
+          !childrenId.includes(edge.fromNodeId) ||
+          !childrenId.includes(edge.toNodeId)
+        ) {
+          let toNodeId = edge.model._toNodeId || edge.toNodeId
+          let fromNodeId = edge.model._fromNodeId || edge.fromNodeId
+          const parent = node.getParent()
 
-        let toNodeId = edge.model._toNodeId || edge.toNodeId
-        let fromNodeId = edge.model._fromNodeId || edge.fromNodeId
-        const parent = node.getParent()
+          if (parent) {
+            // 如果该边的 fromNode 和 toNode 都不是同级节点，就进行上报
+            if (!childrenId.includes(edge.toNodeId)) {
+              fromNodeId = parent.id
+            }
+            if (!childrenId.includes(edge.fromNodeId)) {
+              toNodeId = parent.id
+            }
 
-        if (!childrenId.includes(edge.toNodeId)) {
-          fromNodeId = parent.id
-        }
-        if (!childrenId.includes(edge.fromNodeId)) {
-          toNodeId = parent.id
-        }
+            edge.model._fromNodeId = fromNodeId
+            edge.model._toNodeId = toNodeId
 
-        edge.model._fromNodeId = fromNodeId
-        edge.model._toNodeId = toNodeId
-        if (this.outterEdges[parent.id]) {
-          this.outterEdges[parent.id].push(edge)
-        } else {
-          this.outterEdges[parent.id] = [edge]
+            if (this.outterEdges[parent.id]) {
+              this.outterEdges[parent.id].push(edge)
+            } else {
+              this.outterEdges[parent.id] = [edge]
+            }
+          }
         }
       })
     })
@@ -328,7 +294,7 @@ export default class NodeCell extends Vue {
         {
           data: { nodes: nodes, edges: Object.values(childrenEdges) },
           options: {
-            nodesep: 30
+            ranksep: 30
           }
         },
         false
@@ -336,11 +302,27 @@ export default class NodeCell extends Vue {
 
       // 通过布局实例返回的坐标点，自定义布局位置。
       dagre.nodes().forEach((v: string) => {
-        const childNode = this.graph.findNode(v) as INode
+        const node = this.graph.findNode(v) as INode
         const { x, y } = dagre.node(v)
-        const posX = x - childNode.width / 2
-        const posY = y - childNode.height / 2
-        childNode.updatePosition(posX, posY)
+        const posX = x - node.width / 2
+        const posY = y - node.height / 2
+        this.moveChildren(node, posX - node.x, posY - node.y)
+        node.updatePosition(posX, posY)
+      })
+
+      // 同级节点布局完后，resize父级group
+      this.resizeGroup(nodes[0].getParent())
+    }
+  }
+
+  moveChildren(node: INode, moveX: number, moveY: number) {
+    let children = node.getChildren()
+    while (children.length) {
+      children.forEach(child => {
+        children = child.getChildren()
+        const posX = child.x + node.x + moveX + groupPadding
+        const posY = child.y + node.y + moveY + groupPadding
+        child.updatePosition(posX, posY + groupPaddingTop)
       })
     }
   }

@@ -94,7 +94,10 @@ export interface IDataStack {
 export interface ILayout {
   type?: string
   options?: IDagreLayout | ICircleLayout
-  data?: { nodes: INode[]; edges: IEdge[] }
+  data?: {
+    nodes: INode[]
+    edges: Array<IEdge | { fromNodeId: string; toNodeId: string }>
+  }
 }
 
 export interface IDagreLayout {

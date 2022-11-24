@@ -59,8 +59,10 @@ export default class DragNode extends Base {
         const posY = item.y + this.moveY / zoom
         item.updatePosition(posX, posY)
 
-        if (item.getChildren().length) {
-          item.getChildren().forEach(child => {
+        let children = item.getChildren()
+        while (children.length) {
+          children.forEach(child => {
+            children = child.getChildren()
             const childPosX = child.x + this.moveX / zoom
             const childposY = child.y + this.moveY / zoom
             child.updatePosition(childPosX, childposY)

@@ -83,14 +83,14 @@ const nodeCellMock = {
       id: '6',
       label: '6',
       desc: '供应链_网格化_维度扩展表',
-      parentId: '2'
+      parentId: '3'
     },
 
     {
       id: '2',
       label: '2',
       desc: '供应链_网格化_维度扩展表',
-      parentId: '3',
+      // parentId: '3',
       type: 'group'
     },
     {
@@ -98,25 +98,25 @@ const nodeCellMock = {
       label: '3',
       desc: '供应链_网格化_维度扩展表',
       type: 'group'
-    },
-    {
-      id: '4',
-      label: '4',
-      desc: '供应链_网格化_维度扩展表',
-      type: 'group'
-    },
-    {
-      id: '5',
-      label: '5',
-      desc: '供应链_网格化_维度扩展表',
-      parentId: '4'
     }
+    // {
+    //   id: '4',
+    //   label: '4',
+    //   desc: '供应链_网格化_维度扩展表',
+    //   type: 'group'
+    // },
+    // {
+    //   id: '5',
+    //   label: '5',
+    //   desc: '供应链_网格化_维度扩展表',
+    //   parentId: '4'
+    // }
   ],
   edges: [
-    {
-      fromNodeId: '1',
-      toNodeId: '5'
-    },
+    // {
+    //   fromNodeId: '1',
+    //   toNodeId: '5'
+    // },
     {
       fromNodeId: '6',
       toNodeId: '1'
@@ -137,11 +137,12 @@ export default class NodeCell extends Vue {
   graph!: Graph
   dataMock = nodeCellMock
   graphState = GraphStore.state
-  layoutOptions: ILayout = { options: { rankdir: 'TB', ranksep: 80 } }
+  layoutOptions: ILayout = { options: { ranksep: 80 } }
   nodeSize = {
     width: 200,
     height: 56
   }
+  outterEdges: Record<string, IEdge[]> = {}
 
   get action() {
     return action
@@ -195,6 +196,7 @@ export default class NodeCell extends Vue {
     this.graph = graph
 
     this.initEvent()
+
     this.$nextTick(() => {
       const rootNodes = this.graph
         .getNodes()
@@ -217,6 +219,8 @@ export default class NodeCell extends Vue {
   }
 
   initGroups(nodes: INode[]) {
+    this.layout()
+
     nodes.forEach(node => {
       if (node.getChildren().length && !node.model.collapsed) {
         this.initGroups(node.getChildren())
@@ -224,12 +228,128 @@ export default class NodeCell extends Vue {
       }
     })
 
+    this.layout()
     this.graph.fitCenter()
   }
 
-  layout() {}
+  layout(stack = false) {
+    // 获取根节点
+    const rootNodes = this.graph.getNodes().filter(item => !item.model.parentId)
+
+    this.layoutCellNode(rootNodes)
+
+    return
+    // 布局后，再更新下group节点的大小
+    rootNodes.forEach(item => {
+      if (item.getChildren().length && !item.model.collapsed) {
+        this.resizeGroup(item)
+      }
+    })
+
+    // 对根节点进行布局
+    this.graph.layout(
+      {
+        data: { nodes: rootNodes, edges: Object.values(edges) },
+        options: {
+          nodesep: 30
+        }
+      },
+      stack
+    )
+
+    rootNodes.forEach(item => {
+      const children = item.getChildren()
+
+      if (children.length) {
+        // 通过布局实例返回的坐标点，自定义布局位置。
+        children.forEach((node: INode) => {
+          const posX = item.x + node.x + groupPadding
+          const posY = item.y + node.y + groupPadding
+          node.updatePosition(posX, posY + groupPaddingTop)
+        })
+      }
+    })
+  }
+
+  layoutCellNode(nodes: INode[]) {
+    const childrenEdges: Record<
+      string,
+      IEdge | { fromNodeId: string; toNodeId: string }
+    > = {}
+    const childrenId = nodes.map(node => node.id)
+
+    // 处理组内节点布局
+    nodes.forEach(node => {
+      this.layoutCellNode(node.getChildren())
+
+      if (this.outterEdges[node.id]) {
+        this.outterEdges[node.id].forEach(outterEdge => {
+          childrenEdges[outterEdge.id] = {
+            fromNodeId: outterEdge.model._fromNodeId,
+            toNodeId: outterEdge.model._toNodeId
+          }
+        })
+      }
+
+      // 收集所有子节点的边
+      node.getEdges().forEach(edge => {
+        if (
+          !childrenEdges[edge.id] &&
+          childrenId.includes(edge.fromNodeId) &&
+          childrenId.includes(edge.toNodeId)
+        ) {
+          childrenEdges[edge.id] = edge
+        }
+
+        let toNodeId = edge.model._toNodeId || edge.toNodeId
+        let fromNodeId = edge.model._fromNodeId || edge.fromNodeId
+        const parent = node.getParent()
+
+        if (!childrenId.includes(edge.toNodeId)) {
+          fromNodeId = parent.id
+        }
+        if (!childrenId.includes(edge.fromNodeId)) {
+          toNodeId = parent.id
+        }
+
+        edge.model._fromNodeId = fromNodeId
+        edge.model._toNodeId = toNodeId
+        if (this.outterEdges[parent.id]) {
+          this.outterEdges[parent.id].push(edge)
+        } else {
+          this.outterEdges[parent.id] = [edge]
+        }
+      })
+    })
+
+    // 对子节点布局。默认布局不能满足需求，需要获取实例自定义布局位置
+    if (nodes.length) {
+      const dagre = this.graph.layout(
+        {
+          data: { nodes: nodes, edges: Object.values(childrenEdges) },
+          options: {
+            nodesep: 30
+          }
+        },
+        false
+      )
+
+      // 通过布局实例返回的坐标点，自定义布局位置。
+      dagre.nodes().forEach((v: string) => {
+        const childNode = this.graph.findNode(v) as INode
+        const { x, y } = dagre.node(v)
+        const posX = x - childNode.width / 2
+        const posY = y - childNode.height / 2
+        childNode.updatePosition(posX, posY)
+      })
+    }
+  }
 
   resizeGroup(node: INode) {
+    if (!node) {
+      return
+    }
+
     const children = node.getChildren()
     const bbox = this.graph.getNodesBBox(children)
     node.update({

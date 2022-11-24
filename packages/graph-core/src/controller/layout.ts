@@ -76,7 +76,7 @@ export default class LayoutController extends EventEmitter<
     })
 
     edges.forEach(item => {
-      this.dagre.setEdge(item.fromNode.id, item.toNode.id)
+      this.dagre.setEdge(item.fromNodeId, item.toNodeId)
     })
     dagre.layout(this.dagre)
 

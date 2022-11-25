@@ -75,7 +75,10 @@ export default class BrushSelect extends Base {
       endY: rightBottom.y
     }
 
-    const nodes = this.graph.getNodes()
+    // 仅允许没有子节点的节点被选中
+    const nodes = this.graph
+      .getNodes()
+      .filter(item => !item.getChildren().length)
 
     this.afterSelectedNodes = nodes.filter(item => {
       return this.checkNodeRange(item, range)

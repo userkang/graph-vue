@@ -108,7 +108,6 @@ export interface IDagreLayout {
   ranksep?: number
   marginx?: number
   marginy?: number
-  group?: boolean
   groupPadding?: number[]
 }
 

@@ -279,6 +279,10 @@ export default class Graph extends EventEmitter {
   fitView() {
     return this.viewController.fitView()
   }
+
+  fitTo(x: number = 0, y: number = 0) {
+    return this.viewController.fitTo(x, y)
+  }
   /**
    * 加载数据
    */

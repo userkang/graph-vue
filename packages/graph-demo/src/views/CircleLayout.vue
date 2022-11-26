@@ -15,6 +15,7 @@
             'content-visibility': 'auto',
             'border-color': node.hasState('selected') ? '#606be1' : '#DEDFEC'
           }"
+          @dblclick="handleDBclick(node)"
         >
           <div class="left" :class="[isLeaf(node.model) ? 'leaf' : '']"></div>
           <div class="right">
@@ -71,7 +72,7 @@ import ComponentListStore from '@/stores/component-list'
     ConfigPanel
   }
 })
-export default class Tree extends Vue {
+export default class CircleLayout extends Vue {
   graphConfigState = GraphConfigStore.state
   componentState = ComponentListStore.state
   graphState = GraphStore.state
@@ -193,6 +194,12 @@ export default class Tree extends Vue {
       options,
       type: 'circle'
     })
+  }
+
+  handleDBclick(node: INode) {
+    const x = node.x + node.width / 2
+    const y = node.y + node.height / 2
+    this.graph.fitTo(x, y)
   }
 
   async created() {

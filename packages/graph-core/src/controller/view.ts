@@ -230,6 +230,12 @@ export default class ViewController {
     this.translateTo(width / 2, height / 2)
   }
 
+  fitTo(x: number = 0, y: number = 0) {
+    this.updateSvgInfo()
+    const { width, height } = this.svgInfo
+    this.translateTo(width / 2 - x, height / 2 - y)
+  }
+
   private translateX(x: number) {
     // 结果正确前提是 transformOrigin:center ，transformOrigin是以svgInfo为基准
     let nextTranslateX = this.transform.translateX + x

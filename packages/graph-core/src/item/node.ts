@@ -233,8 +233,6 @@ export default class Node extends Base<
       this.emit('change', this, 'size')
     }
 
-    Object.assign(this.model, model)
-
     this.updatePorts()
 
     this.getEdges().forEach(edge => {

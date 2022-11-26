@@ -11,7 +11,6 @@ import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
 import EventEmitter from '../util/event-emitter'
 import { valuesType, IVirtualEdge } from '../types/type'
-import Edge from '../item/edge'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -93,18 +92,15 @@ export default class LayoutController extends EventEmitter<
     })
     dagre.layout(this.dagre)
 
-    const stackNode: INodeModel[] = []
-
-    const { left, top } = this.$graph.getNodesBBox(nodes)
+    const svgInfo = this.$graph.getSvgInfo()
+    const group = this.dagre.graph()
     this.dagre.nodes().forEach((id: string) => {
       const node = graph.findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-      const posX = x + left - node.width / 2
-      const posY = y + top - node.height / 2
-
-      stackNode.push({ ...node.model })
+      const posX = x - node.width / 2 + svgInfo.width / 2 - group.width / 2
+      const posY = y - node.height / 2 + svgInfo.height / 2 - group.height / 2
       node.updatePosition(posX, posY)
     })
     return this.dagre

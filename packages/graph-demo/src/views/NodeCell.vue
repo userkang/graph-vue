@@ -36,9 +36,6 @@
 
       <template #port></template>
       <ToolBox />
-      <button style="position: absolute; left: 10px; top: 10px" @click="layout">
-        整理
-      </button>
     </GraphVue>
   </div>
 </template>

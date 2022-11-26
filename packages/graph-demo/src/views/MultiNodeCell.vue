@@ -55,6 +55,7 @@ import {
 } from '@datafe/graph-vue'
 
 import GraphStore from '@/stores/graph'
+import dataMock from './data'
 
 const groupPadding = 10
 const groupPaddingTop = 24
@@ -68,8 +69,6 @@ const action = [
   'brush-select',
   'wheel-move'
 ]
-
-// const nodeCellMock = () => data
 
 const nodeCellMock = {
   nodes: [
@@ -88,25 +87,40 @@ const nodeCellMock = {
     {
       id: '2',
       label: '2',
-      desc: '供应链_网格化_维度扩展表'
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group'
     },
     {
       id: '3',
       label: '3',
       desc: '供应链_网格化_维度扩展表',
-      type: 'group'
+      type: 'group',
+      parentId: '2'
     },
     {
       id: '4',
       label: '4',
       desc: '供应链_网格化_维度扩展表',
-      type: 'group'
+      type: 'group',
+      parentId: '7'
     },
     {
       id: '5',
       label: '5',
       desc: '供应链_网格化_维度扩展表',
       parentId: '4'
+    },
+    {
+      id: '7',
+      label: '7',
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group'
+    },
+    {
+      id: '8',
+      label: '8',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '7'
     }
   ],
   edges: [
@@ -117,13 +131,11 @@ const nodeCellMock = {
     {
       fromNodeId: '6',
       toNodeId: '1'
-    },
-    {
-      fromNodeId: '2',
-      toNodeId: '1'
     }
   ]
 }
+
+// const nodeCellMock = dataMock
 
 @Component({
   components: {
@@ -158,10 +170,12 @@ export default class NodeCell extends Vue {
     node.update(this.nodeSize)
 
     while (children.length) {
-      children.forEach(child => {
-        children = child.getChildren()
+      const child = children.pop()
+      if (child) {
         child.hide()
-      })
+        const next = child.getChildren()
+        children.push(...next)
+      }
     }
 
     node.model.collapsed = true
@@ -174,13 +188,15 @@ export default class NodeCell extends Vue {
     node.model.collapsed = false
 
     while (children.length) {
-      children.forEach(child => {
-        children = child.getChildren()
+      const child = children.pop()
+      if (child) {
         const parent = child.getParent()
         if (!parent.model.collapsed) {
           child.show()
         }
-      })
+        const next = child.getChildren()
+        children.push(...next)
+      }
     }
 
     this.resizeGroup(node)

@@ -10,7 +10,8 @@ import {
 import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
 import EventEmitter from '../util/event-emitter'
-import { valuesType } from '../types/type'
+import { valuesType, IVirtualEdge } from '../types/type'
+import Edge from '../item/edge'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -27,7 +28,7 @@ export default class LayoutController extends EventEmitter<
   private $graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}
-  private outterEdges: Record<string, IEdge[]> = {}
+  private outterEdges: Record<string, Array<IEdge | IVirtualEdge>> = {}
   private groupPadding = [50, 20, 20, 20]
 
   constructor() {
@@ -111,6 +112,7 @@ export default class LayoutController extends EventEmitter<
 
   groupLayout(cfg: ILayout) {
     Object.assign(this.options, cfg.options)
+    this.outterEdges = {}
 
     const nodes = cfg.data?.nodes || this.$graph.getNodes()
 
@@ -120,28 +122,31 @@ export default class LayoutController extends EventEmitter<
   }
 
   layoutCellNode(nodes: INode[]) {
-    const childrenEdges: Record<
-      string,
-      IEdge | { fromNodeId: string; toNodeId: string }
-    > = {}
+    const childrenEdges: Record<string, IEdge | IVirtualEdge> = {}
     const childrenId = nodes.map(node => node.id)
-
     // 处理组内节点布局
     nodes.forEach(node => {
       this.layoutCellNode(node.getChildren())
 
       // 将下级传上来的边进行合并
+      const outterEdges: Record<string, IEdge | IVirtualEdge> = {}
       if (this.outterEdges[node.id]) {
         this.outterEdges[node.id].forEach(outterEdge => {
-          childrenEdges[outterEdge.id] = {
+          outterEdges[outterEdge.id] = {
+            id: outterEdge.id,
             fromNodeId: outterEdge.model._fromNodeId,
-            toNodeId: outterEdge.model._toNodeId
+            toNodeId: outterEdge.model._toNodeId,
+            model: {
+              _fromNodeId: outterEdge.model._fromNodeId,
+              _toNodeId: outterEdge.model._toNodeId
+            }
           }
         })
       }
+      const mergeEdges = [...node.getEdges(), ...Object.values(outterEdges)]
 
       // 收集所有子节点的边
-      node.getEdges().forEach(edge => {
+      mergeEdges.forEach(edge => {
         if (
           !childrenEdges[edge.id] &&
           childrenId.includes(edge.fromNodeId) &&
@@ -154,6 +159,9 @@ export default class LayoutController extends EventEmitter<
         ) {
           let toNodeId = edge.model._toNodeId || edge.toNodeId
           let fromNodeId = edge.model._fromNodeId || edge.fromNodeId
+
+          // virtualEdge 用来向上传递边参数，realEdge 用来跨节点传递参数，因此两者都得修改
+          const realEdge = this.$graph.findEdge(edge.id)
           const parent = node.getParent()
 
           if (parent) {
@@ -165,6 +173,10 @@ export default class LayoutController extends EventEmitter<
               toNodeId = parent.id
             }
 
+            if (realEdge) {
+              realEdge.model._fromNodeId = fromNodeId
+              realEdge.model._toNodeId = toNodeId
+            }
             edge.model._fromNodeId = fromNodeId
             edge.model._toNodeId = toNodeId
 
@@ -199,11 +211,13 @@ export default class LayoutController extends EventEmitter<
       // 通过布局实例返回的坐标点，自定义布局位置。
       this.dagre.nodes().forEach((v: string) => {
         const node = this.$graph.findNode(v) as INode
-        const { x, y } = this.dagre.node(v)
-        const posX = x - node.width / 2
-        const posY = y - node.height / 2
-        this.moveChildren(node, posX - node.x, posY - node.y)
-        node.updatePosition(posX, posY)
+        if (this.dagre.node(v)) {
+          const { x, y } = this.dagre.node(v)
+          const posX = x - node.width / 2
+          const posY = y - node.height / 2
+          this.moveChildren(node, posX - node.x, posY - node.y)
+          node.updatePosition(posX, posY)
+        }
       })
 
       // 同级节点布局完后，resize父级group
@@ -215,12 +229,14 @@ export default class LayoutController extends EventEmitter<
     let children = node.getChildren()
 
     while (children.length) {
-      children.forEach(child => {
-        children = child.getChildren()
+      const child = children.shift()
+      if (child) {
         const posX = child.x + node.x + moveX + this.groupPadding[3]
         const posY = child.y + node.y + moveY + this.groupPadding[0]
         child.updatePosition(posX, posY)
-      })
+        const next = child.getChildren()
+        children.push(...next)
+      }
     }
   }
 

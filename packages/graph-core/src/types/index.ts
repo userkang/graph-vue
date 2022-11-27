@@ -108,6 +108,7 @@ export interface IDagreLayout {
   ranksep?: number
   marginx?: number
   marginy?: number
+  groupPadding?: number[]
 }
 
 export interface ICircleLayout {

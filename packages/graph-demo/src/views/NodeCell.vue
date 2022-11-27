@@ -36,9 +36,6 @@
 
       <template #port></template>
       <ToolBox />
-      <button style="position: absolute; left: 10px; top: 10px" @click="layout">
-        整理
-      </button>
     </GraphVue>
   </div>
 </template>
@@ -72,8 +69,6 @@ const action = [
   'wheel-move'
 ]
 
-// const nodeCellMock = () => data
-
 const nodeCellMock = {
   nodes: [
     {
@@ -85,7 +80,7 @@ const nodeCellMock = {
       id: '4',
       label: '节点组1',
       type: 'group',
-      collapsed: false
+      collapsed: true
     },
     {
       id: '5',
@@ -160,8 +155,7 @@ export default class NodeCell extends Vue {
     node.update(this.nodeSize)
     node.model.collapsed = true
 
-    this.layout(false)
-
+    this.graph.layout()
     this.graph.stackEnd()
   }
 
@@ -173,7 +167,8 @@ export default class NodeCell extends Vue {
     node.model.collapsed = false
 
     this.resizeGroup(node)
-    this.layout(false)
+
+    this.graph.layout()
   }
 
   initGraph(graph: Graph) {
@@ -183,6 +178,7 @@ export default class NodeCell extends Vue {
     this.initEvent()
     this.$nextTick(() => {
       this.initGroups()
+      this.graph.layout()
     })
   }
 
@@ -198,104 +194,13 @@ export default class NodeCell extends Vue {
   }
 
   initGroups() {
-    this.layout(false)
-
     const groups = this.graph
       .getNodes()
       .filter(item => item.model.type === 'group')
 
     groups.forEach(group => {
       if (group.model.collapsed) {
-        const children = group.getChildren()
-        children
-        children.forEach(child => {
-          child.hide()
-        })
-      }
-    })
-
-    this.layout(false)
-  }
-
-  layout(stack = true) {
-    // 获取根节点
-    const rootNodes = this.graph.getNodes().filter(item => !item.model.parentId)
-    const edges: Record<string, IEdge> = {}
-
-    // 收集根节点相关的边
-    rootNodes.forEach(item => {
-      item.getEdges().forEach(edge => {
-        if (!edges[edge.id]) {
-          edges[edge.id] = edge
-        }
-      })
-    })
-
-    // 处理根节点下子节点布局
-    rootNodes.forEach(item => {
-      const childrenEdges: Record<string, IEdge> = {}
-      const children = item.getChildren()
-
-      if (children.length) {
-        // 收集所有子节点的边
-        children.forEach(child => {
-          child.getEdges().forEach(edge => {
-            if (!childrenEdges[edge.id]) {
-              childrenEdges[edge.id] = edge
-            }
-          })
-        })
-
-        // 对子节点布局。默认布局不能满足需求，需要获取实例自定义布局位置
-        const dagre = this.graph.layout(
-          {
-            data: { nodes: children, edges: Object.values(childrenEdges) },
-            options: {
-              nodesep: 20
-            }
-          },
-          stack
-        )
-
-        // 通过布局实例返回的坐标点，自定义布局位置。
-        dagre.nodes().forEach((v: string) => {
-          const childNode = this.graph.findNode(v) as INode
-          const { x, y } = dagre.node(v)
-          const posX = x - childNode.width / 2
-          const posY = y - childNode.height / 2
-          childNode.updatePosition(posX, posY)
-        })
-      }
-    })
-
-    // 布局后，再更新下group节点的大小
-    rootNodes.forEach(item => {
-      if (item.getChildren().length && !item.model.collapsed) {
-        this.resizeGroup(item)
-      }
-    })
-
-    // 对根节点进行布局
-    this.graph.layout(
-      {
-        data: { nodes: rootNodes, edges: Object.values(edges) },
-        options: {
-          nodesep: 30
-        }
-      },
-      stack
-    )
-
-    rootNodes.forEach(item => {
-      const children = item.getChildren()
-
-      if (children.length) {
-        // 通过布局实例返回的坐标点，自定义布局位置。
-        children.forEach((node: INode) => {
-          const posX = item.x + node.x + groupPadding
-          const posY = item.y + node.y + groupPadding
-          node.updatePosition(posX, posY + groupPaddingTop)
-        })
+        this.hideChildren(group)
       }
     })
   }
@@ -388,7 +293,7 @@ export default class NodeCell extends Vue {
     align-items: center;
     margin: -4px -20px 0 0;
     font-size: 20px;
-    cursor: pointer;;
+    cursor: pointer;
   }
 }
 </style>

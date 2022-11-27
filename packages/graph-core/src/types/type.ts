@@ -99,3 +99,10 @@ export interface ManyToOneEvent<M, O> {
   many: M
   one: O
 }
+
+export interface IVirtualEdge {
+  id: string
+  fromNodeId: string
+  toNodeId: string
+  model: { _fromNodeId: string; _toNodeId: string }
+}

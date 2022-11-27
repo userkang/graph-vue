@@ -98,8 +98,6 @@ export default class DAG extends Vue {
     this.graphState.graph = graph
     this.graph = graph
     this.initEvent()
-
-    this.graph.layout()
   }
 
   initEvent() {

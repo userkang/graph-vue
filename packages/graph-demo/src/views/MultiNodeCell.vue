@@ -53,9 +53,7 @@ import {
   IEdge,
   ILayout
 } from '@datafe/graph-vue'
-
 import GraphStore from '@/stores/graph'
-import dataMock from './data'
 
 const groupPadding = 10
 const groupPaddingTop = 24
@@ -135,8 +133,6 @@ const nodeCellMock = {
   ]
 }
 
-// const nodeCellMock = dataMock
-
 @Component({
   components: {
     GraphVue,
@@ -165,7 +161,7 @@ export default class NodeCell extends Vue {
 
   hideChildren(node: INode) {
     this.graph.stackStart()
-    let children = node.getChildren()
+    const children = node.getChildren()
 
     node.update(this.nodeSize)
 
@@ -184,7 +180,7 @@ export default class NodeCell extends Vue {
   }
 
   showChildren(node: INode) {
-    let children = node.getChildren()
+    const children = node.getChildren()
     node.model.collapsed = false
 
     while (children.length) {

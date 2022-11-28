@@ -23,7 +23,6 @@ module.exports = {
     indent: 'off',
     semicolon: 'off',
     'prettier/prettier': 'off',
-    'vue/no-v-html': 'warn',
     'no-useless-escape': 'off',
     'prefer-const': 'warn',
     'no-extra-boolean-cast': 'off',

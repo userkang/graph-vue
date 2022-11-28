@@ -155,10 +155,7 @@ export default class GraphVue extends Vue {
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
-    const autoLayout = this.graph.getNodes().every(node => {
-      return !Number.isFinite(node.model.x) && !Number.isFinite(node.model.y)
-    })
-    if (this.layout && !autoLayout) {
+    if (this.layout) {
       this.graph.layout(this.layout)
     }
 

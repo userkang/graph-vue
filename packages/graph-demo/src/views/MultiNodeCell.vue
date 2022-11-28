@@ -161,7 +161,7 @@ export default class NodeCell extends Vue {
 
   hideChildren(node: INode) {
     this.graph.stackStart()
-    let children = node.getChildren()
+    const children = node.getChildren()
 
     node.update(this.nodeSize)
 
@@ -180,7 +180,7 @@ export default class NodeCell extends Vue {
   }
 
   showChildren(node: INode) {
-    let children = node.getChildren()
+    const children = node.getChildren()
     node.model.collapsed = false
 
     while (children.length) {

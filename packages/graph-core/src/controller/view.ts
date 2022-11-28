@@ -1,4 +1,4 @@
-import { IEdge, INode } from '../types'
+import { INode } from '../types'
 import {
   isFullScreen,
   requestFullScreen,

@@ -3,8 +3,7 @@ import {
   IDagreLayout,
   IEdge,
   ILayout,
-  INode,
-  INodeModel
+  INode
 } from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
@@ -222,7 +221,7 @@ export default class LayoutController extends EventEmitter<
   }
 
   moveChildren(node: INode, moveX: number, moveY: number) {
-    let children = node.getChildren()
+    const children = node.getChildren()
 
     while (children.length) {
       const child = children.shift()

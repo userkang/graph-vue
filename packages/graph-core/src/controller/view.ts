@@ -230,12 +230,12 @@ export default class ViewController {
     this.translateTo(width / 2, height / 2)
   }
 
-  fitTo(x1: number = 0, y1: number = 0) {
+  fitTo(x: number = 0, y: number = 0) {
     this.updateSvgInfo()
     const svgCenterX = this.svgInfo.width / 2
     const svgCenterY = this.svgInfo.height / 2
-    const dx = -this.transform.translateX + svgCenterX - x1
-    const dy = -this.transform.translateY + svgCenterY - y1
+    const dx = -this.transform.translateX + svgCenterX - x
+    const dy = -this.transform.translateY + svgCenterY - y
     this.translateBy(dx, dy)
   }
 

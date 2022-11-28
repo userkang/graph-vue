@@ -53,9 +53,7 @@ import {
   IEdge,
   ILayout
 } from '@datafe/graph-vue'
-
 import GraphStore from '@/stores/graph'
-import dataMock from './data'
 
 const groupPadding = 10
 const groupPaddingTop = 24
@@ -134,8 +132,6 @@ const nodeCellMock = {
     }
   ]
 }
-
-// const nodeCellMock = dataMock
 
 @Component({
   components: {

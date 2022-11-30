@@ -104,9 +104,7 @@ export default class GraphVue extends Vue {
   data!: IDataModel
 
   @Prop({
-    default: () => {
-      return { options: { type: 'dagre', rankdir: 'TB' } }
-    }
+    default: null
   })
   layout!: ILayout
 
@@ -115,7 +113,7 @@ export default class GraphVue extends Vue {
       return {}
     }
   })
-  defaultNode!: INodeModel 
+  defaultNode!: INodeModel
 
   nodes: INode[] = []
   edges: IEdge[] = []
@@ -147,13 +145,13 @@ export default class GraphVue extends Vue {
   init() {
     const graph = new Graph({
       container: this.$refs.svg as HTMLElement,
-      direction: (this.layout.options as IDagreLayout)?.rankdir || 'TB',
+      direction: (this.layout?.options as IDagreLayout)?.rankdir || 'TB',
       action: this.action,
       defaultNode: this.defaultNode
     })
     this.graph = graph
 
-    this.initCustomHooks() 
+    this.initCustomHooks()
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
 
@@ -227,14 +225,14 @@ export default class GraphVue extends Vue {
   }
 
   @Watch('layout.options.rankdir')
-  handelRankdirChange(v: string, prev: string) {
+  handelRankdirChange() {
     this.graph.layout(this.layout, false)
     this.graph.getNodes().forEach(node => {
       node.updatePorts(this.graph.get('direction'))
     })
   }
 
-  beforeDestroy() { 
+  beforeDestroy() {
     this.graph.destroy()
   }
 }

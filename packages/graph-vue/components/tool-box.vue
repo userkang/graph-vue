@@ -137,11 +137,11 @@ export default class ToolBox extends Vue {
 <style lang="scss">
 @font-face {
   font-family: 'iconfont'; /* Project id 1805014 */
-  src: url('//at.alicdn.com/t/font_1805014_zl1br4yo4kd.woff2?t=1640674182064')
+  src: url('../assets/iconfont.woff2')
       format('woff2'),
-    url('//at.alicdn.com/t/font_1805014_zl1br4yo4kd.woff?t=1640674182064')
+    url('../assets/iconfont.woff')
       format('woff'),
-    url('//at.alicdn.com/t/font_1805014_zl1br4yo4kd.ttf?t=1640674182064')
+    url('../assets/iconfont.ttf')
       format('truetype');
 }
 .iconfont {

@@ -32,6 +32,15 @@ export default new Router({
       component: NodeCell
     },
     {
+      path: '/multiNodeCell',
+      name: 'multiNodeCell',
+      component: () =>
+        import(
+          /* webpackChunkName: "CircleLayout"*/
+          '../views/MultiNodeCell.vue'
+        )
+    },
+    {
       path: '/circleLayout',
       name: 'circleLayout',
       component: () =>

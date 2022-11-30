@@ -113,16 +113,30 @@ export default class ItemController extends EventEmitter<
     return item
   }
 
+  private initNodesZIndex() {
+    const parents = this.getNodes().filter(node => !node.model.parentId)
+
+    while (parents.length) {
+      const parent = parents[0]
+      const children = parent.getChildren()
+      if (children?.length) {
+        children.forEach(child => child.setZIndex(parent.zIndex + 1))
+        parents.push(...children)
+      }
+      parents.splice(0, 1)
+    }
+  }
+
   private loadNodes(models: INodeModel[]) {
     models.map(model => this.addNode(model))
-    this.getNodes().forEach(node => (node.zIndex = 1))
-    this.getNodes().forEach(node => {
+    const nodes = this.getNodes()
+    nodes.forEach(node => {
       const parent = this.findNode(node.model.parentId)
       if (parent) {
         parent.addChild(node)
-        node.zIndex = parent.zIndex + 1
       }
     })
+    this.initNodesZIndex()
   }
 
   private loadEdges(group: IEdgeModel[]) {

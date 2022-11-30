@@ -53,11 +53,10 @@ import {
   IEdge,
   ILayout
 } from '@datafe/graph-vue'
-
 import GraphStore from '@/stores/graph'
 
-const groupPadding = 20
-const groupPaddingTop = 40
+const groupPadding = 10
+const groupPaddingTop = 24
 
 const action = [
   'drag-blank',
@@ -72,49 +71,64 @@ const action = [
 const nodeCellMock = {
   nodes: [
     {
-      id: '6',
-      label: 'dim_sc_grid_ext',
-      desc: '供应链_网格化_维度扩展表'
-    },
-    {
-      id: '4',
-      label: '节点组1',
-      type: 'group',
-      collapsed: true
-    },
-    {
-      id: '5',
-      label: '节点组2',
-      type: 'group',
-      collapsed: false
-    },
-    {
       id: '1',
-      label: 'dim_sc_grid_ext',
+      label: '1',
       desc: '供应链_网格化_维度扩展表',
       parentId: '4'
     },
     {
-      id: '2',
-      label: 'dim_sc_grid_ext2',
+      id: '6',
+      label: '6',
       desc: '供应链_网格化_维度扩展表',
-      parentId: '5'
+      parentId: '3'
+    },
+    {
+      id: '2',
+      label: '2',
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group'
     },
     {
       id: '3',
-      label: 'dim_sc_grid_ext3',
+      label: '3',
       desc: '供应链_网格化_维度扩展表',
-      parentId: '5'
+      type: 'group',
+      parentId: '2'
+    },
+    {
+      id: '4',
+      label: '4',
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group',
+      parentId: '7'
+    },
+    {
+      id: '5',
+      label: '5',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '4'
+    },
+    {
+      id: '7',
+      label: '7',
+      desc: '供应链_网格化_维度扩展表',
+      type: 'group'
+    },
+    {
+      id: '8',
+      label: '8',
+      desc: '供应链_网格化_维度扩展表',
+      parentId: '7'
     }
   ],
   edges: [
     {
-      fromNodeId: '6',
-      toNodeId: '4'
+      fromNodeId: '1',
+      toNodeId: '5'
     },
     {
       fromNodeId: '6',
-      toNodeId: '5'
+      toNodeId: '1'
     }
   ]
 }
@@ -132,11 +146,14 @@ export default class NodeCell extends Vue {
   graph!: Graph
   dataMock = nodeCellMock
   graphState = GraphStore.state
-  layoutOptions: ILayout = { options: { rankdir: 'LR', ranksep: 100 } }
+  layoutOptions: ILayout = {
+    options: { groupPadding: [34, 10, 10, 10] }
+  }
   nodeSize = {
     width: 200,
     height: 56
   }
+  outterEdges: Record<string, IEdge[]> = {}
 
   get action() {
     return action
@@ -148,27 +165,45 @@ export default class NodeCell extends Vue {
 
     node.update(this.nodeSize)
 
-    children.forEach(child => {
-      child.hide()
-    })
+    while (children.length) {
+      const child = children.pop()
+      if (child) {
+        child.hide()
+        const next = child.getChildren()
+        children.push(...next)
+      }
+    }
 
-    node.update(this.nodeSize)
     node.model.collapsed = true
 
-    this.graph.layout()
     this.graph.stackEnd()
   }
 
   showChildren(node: INode) {
     const children = node.getChildren()
-    children.forEach(child => {
-      child.show()
-    })
     node.model.collapsed = false
+
+    while (children.length) {
+      const child = children.pop()
+      if (child) {
+        const parent = child.getParent()
+        if (!parent.model.collapsed) {
+          child.show()
+        }
+        const next = child.getChildren()
+        children.push(...next)
+      }
+    }
 
     this.resizeGroup(node)
 
-    this.graph.layout()
+    // 父级嵌套需要重新 resize
+    let parent = node.getParent()
+
+    while (parent) {
+      this.resizeGroup(parent)
+      parent = parent.getParent()
+    }
   }
 
   initGraph(graph: Graph) {
@@ -176,10 +211,6 @@ export default class NodeCell extends Vue {
     this.graph = graph
 
     this.initEvent()
-    this.$nextTick(() => {
-      this.initGroups()
-      this.graph.layout()
-    })
   }
 
   initEvent() {
@@ -187,25 +218,19 @@ export default class NodeCell extends Vue {
   }
 
   handleNodeMoving(node: INode) {
-    const parent = node.getParent()
-    if (parent) {
+    let parent = node.getParent()
+
+    while (parent) {
       this.resizeGroup(parent)
+      parent = parent.getParent()
     }
   }
 
-  initGroups() {
-    const groups = this.graph
-      .getNodes()
-      .filter(item => item.model.type === 'group')
-
-    groups.forEach(group => {
-      if (group.model.collapsed) {
-        this.hideChildren(group)
-      }
-    })
-  }
-
   resizeGroup(node: INode) {
+    if (!node) {
+      return
+    }
+
     const children = node.getChildren()
     const bbox = this.graph.getNodesBBox(children)
     node.update({
@@ -270,7 +295,7 @@ export default class NodeCell extends Vue {
   border-radius: 10px;
   transition: all 0.2s linear;
   .group-node-title {
-    height: 36px;
+    height: 24px;
     display: flex;
     justify-content: space-between;
     align-items: center;

@@ -59,12 +59,17 @@ export default class DragNode extends Base {
         const posY = item.y + this.moveY / zoom
         item.updatePosition(posX, posY)
 
-        if (item.getChildren().length) {
-          item.getChildren().forEach(child => {
+        // 如果有子节点，子节点也要跟着移动
+        let children = item.getChildren()
+        while (children.length) {
+          const child = children.shift()
+          if (child) {
             const childPosX = child.x + this.moveX / zoom
             const childposY = child.y + this.moveY / zoom
             child.updatePosition(childPosX, childposY)
-          })
+            const next = child.getChildren()
+            children.push(...next)
+          }
         }
 
         this.graph.emit('node:moving', item)

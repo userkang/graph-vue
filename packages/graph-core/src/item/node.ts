@@ -74,7 +74,7 @@ export default class Node extends Base<
   }
 
   public get ports(): IPort[] {
-    return this.$store.node_ports.find(this) || []
+    return this.$store.node_ports.getMany(this) || []
   }
 
   public getEdges(): IEdge[] {
@@ -121,7 +121,7 @@ export default class Node extends Base<
   }
 
   public getChildren(): INode[] {
-    return this.$store.node_nodes.find(this) || []
+    return this.$store.node_nodes.getMany(this) || []
   }
 
   public addChild(node: INode) {
@@ -233,8 +233,6 @@ export default class Node extends Base<
       this.emit('change', this, 'size')
     }
 
-    Object.assign(this.model, model)
-
     this.updatePorts()
 
     this.getEdges().forEach(edge => {
@@ -278,7 +276,7 @@ export default class Node extends Base<
     for (let i = 0; i < ids.length; i++) {
       const portId = ids[i]
       const port = this.$store.findPort(portId)
-      if (!port || this.$store.node_ports.find(port) !== this) {
+      if (!port || this.$store.node_ports.getOne(port) !== this) {
         continue
       }
       port.off('change', this.onPortChange)

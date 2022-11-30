@@ -1,15 +1,15 @@
 import {
   ICircleLayout,
   IDagreLayout,
+  IEdge,
   ILayout,
-  INode,
-  INodeModel
+  INode
 } from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
 import EventEmitter from '../util/event-emitter'
-import { valuesType } from '../types/type'
+import { valuesType, IVirtualEdge } from '../types/type'
 
 const getDTheta = (nodesLength: number) => {
   const sweep = 2 * Math.PI - (2 * Math.PI) / nodesLength
@@ -26,6 +26,8 @@ export default class LayoutController extends EventEmitter<
   private $graph: Graph
   private dagre: any = null
   private options: IDagreLayout | ICircleLayout = {}
+  private outterEdges: Record<string, Array<IEdge | IVirtualEdge>> = {}
+  private groupPadding = [50, 20, 20, 20]
 
   constructor() {
     super()
@@ -50,9 +52,18 @@ export default class LayoutController extends EventEmitter<
   }
 
   layout = (cfg: ILayout = {}) => {
+    const hasGroup = this.$graph.getNodes().find(node => node.model.parentId)
+
     let res
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)
+    } else if (hasGroup) {
+      const groupPadding = (cfg.options as IDagreLayout)?.groupPadding
+      if (groupPadding) {
+        this.groupPadding =
+          (cfg.options as IDagreLayout)?.groupPadding || this.groupPadding
+      }
+      res = this.groupLayout(cfg)
     } else {
       res = this.dagreLayout(cfg)
     }
@@ -76,25 +87,169 @@ export default class LayoutController extends EventEmitter<
     })
 
     edges.forEach(item => {
-      this.dagre.setEdge(item.fromNode.id, item.toNode.id)
+      this.dagre.setEdge(item.fromNodeId, item.toNodeId)
     })
     dagre.layout(this.dagre)
 
-    const stackNode: INodeModel[] = []
-
-    const { left, top } = this.$graph.getNodesBBox(nodes)
+    const svgInfo = this.$graph.getSvgInfo()
+    const group = this.dagre.graph()
     this.dagre.nodes().forEach((id: string) => {
       const node = graph.findNode(id) as INode
       const { x, y } = this.dagre.node(id)
 
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
-      const posX = x + left - node.width / 2
-      const posY = y + top - node.height / 2
-
-      stackNode.push({ ...node.model })
+      const posX = x - node.width / 2 + svgInfo.width / 2 - group.width / 2
+      const posY = y - node.height / 2 + svgInfo.height / 2 - group.height / 2
       node.updatePosition(posX, posY)
     })
     return this.dagre
+  }
+
+  groupLayout(cfg: ILayout) {
+    Object.assign(this.options, cfg.options)
+    this.outterEdges = {}
+
+    const nodes = cfg.data?.nodes || this.$graph.getNodes()
+
+    // 获取根节点
+    const rootNodes = nodes.filter(item => !item.model.parentId)
+    this.layoutCellNode(rootNodes)
+  }
+
+  layoutCellNode(nodes: INode[]) {
+    const childrenEdges: Record<string, IEdge | IVirtualEdge> = {}
+    const childrenId = nodes.map(node => node.id)
+    // 处理组内节点布局
+    nodes.forEach(node => {
+      this.layoutCellNode(node.getChildren())
+
+      // 将下级传上来的边进行合并
+      const outterEdges: Record<string, IEdge | IVirtualEdge> = {}
+      if (this.outterEdges[node.id]) {
+        this.outterEdges[node.id].forEach(outterEdge => {
+          outterEdges[outterEdge.id] = {
+            id: outterEdge.id,
+            fromNodeId: outterEdge.model._fromNodeId,
+            toNodeId: outterEdge.model._toNodeId,
+            model: {
+              _fromNodeId: outterEdge.model._fromNodeId,
+              _toNodeId: outterEdge.model._toNodeId
+            }
+          }
+        })
+      }
+      const mergeEdges = [...node.getEdges(), ...Object.values(outterEdges)]
+
+      // 收集所有子节点的边
+      mergeEdges.forEach(edge => {
+        if (
+          !childrenEdges[edge.id] &&
+          childrenId.includes(edge.fromNodeId) &&
+          childrenId.includes(edge.toNodeId)
+        ) {
+          childrenEdges[edge.id] = edge
+        } else if (
+          !childrenId.includes(edge.fromNodeId) ||
+          !childrenId.includes(edge.toNodeId)
+        ) {
+          let toNodeId = edge.model._toNodeId || edge.toNodeId
+          let fromNodeId = edge.model._fromNodeId || edge.fromNodeId
+
+          // virtualEdge 用来向上传递边参数，realEdge 用来跨节点传递参数，因此两者都得修改
+          const realEdge = this.$graph.findEdge(edge.id)
+          const parent = node.getParent()
+
+          if (parent) {
+            // 如果该边的 fromNode 和 toNode 都不是同级节点，就进行上报
+            if (!childrenId.includes(edge.toNodeId)) {
+              fromNodeId = parent.id
+            }
+            if (!childrenId.includes(edge.fromNodeId)) {
+              toNodeId = parent.id
+            }
+
+            if (realEdge) {
+              realEdge.model._fromNodeId = fromNodeId
+              realEdge.model._toNodeId = toNodeId
+            }
+            edge.model._fromNodeId = fromNodeId
+            edge.model._toNodeId = toNodeId
+
+            if (this.outterEdges[parent.id]) {
+              this.outterEdges[parent.id].push(edge)
+            } else {
+              this.outterEdges[parent.id] = [edge]
+            }
+          }
+        }
+      })
+    })
+
+    // 对子节点布局。默认布局不能满足需求，需要获取实例自定义布局位置
+    if (nodes.length) {
+      this.initDagre(this.options as IDagreLayout)
+
+      nodes.forEach(item => {
+        this.dagre.setNode(item.id, {
+          label: '',
+          width: item.width,
+          height: item.height
+        })
+      })
+
+      const edges = Object.values(childrenEdges)
+      edges.forEach(item => {
+        this.dagre.setEdge(item.fromNodeId, item.toNodeId)
+      })
+      dagre.layout(this.dagre)
+
+      // 通过布局实例返回的坐标点，自定义布局位置。
+      this.dagre.nodes().forEach((v: string) => {
+        const node = this.$graph.findNode(v) as INode
+        if (this.dagre.node(v)) {
+          const { x, y } = this.dagre.node(v)
+          const posX = x - node.width / 2
+          const posY = y - node.height / 2
+          this.moveChildren(node, posX - node.x, posY - node.y)
+          node.updatePosition(posX, posY)
+        }
+      })
+
+      // 同级节点布局完后，resize父级group
+      this.resizeGroup(nodes[0].getParent())
+    }
+  }
+
+  moveChildren(node: INode, moveX: number, moveY: number) {
+    const children = node.getChildren()
+
+    while (children.length) {
+      const child = children.shift()
+      if (child) {
+        const posX = child.x + node.x + moveX + this.groupPadding[3]
+        const posY = child.y + node.y + moveY + this.groupPadding[0]
+        child.updatePosition(posX, posY)
+        const next = child.getChildren()
+        children.push(...next)
+      }
+    }
+  }
+
+  resizeGroup(node: INode) {
+    if (!node) {
+      return
+    }
+
+    const children = node.getChildren().filter(item => !item.hasState('hide'))
+    if (children.length) {
+      const bbox = this.$graph.getNodesBBox(children)
+      node.update({
+        width: bbox.width + this.groupPadding[3] + this.groupPadding[1],
+        height: bbox.height + this.groupPadding[0] + this.groupPadding[2],
+        x: bbox.left - this.groupPadding[3],
+        y: bbox.top - this.groupPadding[0]
+      })
+    }
   }
 
   circleLayout(cfg: ILayout) {

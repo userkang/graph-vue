@@ -78,9 +78,15 @@ export const useSortedItems = () => {
     list.splice(index, 1)
   }
 
+  const clean = () => {
+    const items = list.splice(0, list.length)
+    items.forEach(item => item.off('change', onZIndexChange))
+  }
+
   return {
     items: list,
     add,
-    remove
+    remove,
+    clean
   }
 }

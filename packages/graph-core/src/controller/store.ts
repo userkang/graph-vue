@@ -168,7 +168,7 @@ export default class Store extends EventEmitter<
 
   reset() {
     this.itemMap = {}
-    this.sorted.items.forEach(item => this.sorted.remove(item))
+    this.sorted.clean()
     this.node_ports = new ManyToOne<Port, Node>()
     this.node_nodes = new ManyToOne<Node, Node>()
     this.fromPort_edges = new ManyToOne<Edge, Port>()

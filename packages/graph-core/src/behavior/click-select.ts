@@ -14,17 +14,29 @@ export default class ClickSelect extends Base {
     this.addEvent('blank:click', this.clickBlank)
   }
 
-  clickNode({ target }: IGraphEvent) {
-    const selectedNodes = this.graph.findNodeByState('selected')
-    const hasSelected = selectedNodes.findIndex(item => item.id === target?.id)
-    if (hasSelected > -1) {
-      return
-    }
+  clickNode({ target, e }: IGraphEvent) {
+    if (e.shiftKey) {
+      this.resetEdgeSelect()
+      if(!target || target.hasState('locked')) {
+        return
+      }
+      target.hasState('selected')
+      ? target.clearState('selected')
+      : target.setState('selected')
+    } else {
+      const selectedNodes = this.graph.findNodeByState('selected')
+      const hasSelected = selectedNodes.findIndex(
+        item => item.id === target?.id
+      )
+      if (hasSelected > -1) {
+        return
+      }
 
-    this.resetEdgeSelect()
-    selectedNodes.forEach(item => item.clearState('selected'))
-    if (target && !target.hasState('locked')) {
-      target.setState('selected')
+      this.resetEdgeSelect()
+      selectedNodes.forEach(item => item.clearState('selected'))
+      if (target && !target.hasState('locked')) {
+        target.setState('selected')
+      }
     }
   }
 

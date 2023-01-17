@@ -134,7 +134,7 @@ export default class ToolBox extends Vue {
 }
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 @font-face {
   font-family: 'iconfont'; /* Project id 1805014 */
   src: url('../assets/iconfont.woff2')
@@ -144,7 +144,7 @@ export default class ToolBox extends Vue {
     url('../assets/iconfont.ttf')
       format('truetype');
 }
-.iconfont {
+.graph-vue-tool-box-item {
   font-family: 'iconfont' !important;
   font-size: 16px;
   font-style: normal;

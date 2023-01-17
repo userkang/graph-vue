@@ -4,49 +4,49 @@
       title="撤销"
       id="undo"
       :class="{ 'graph-vue-tool-box-disable': !undoEnable }"
-      class="graph-vue-tool-box-item iconfont iconundo"
+      class="graph-vue-tool-box-item iconundo"
     ></li>
     <li
       title="回撤"
       id="redo"
       :class="{ 'graph-vue-tool-box-disable': !redoEnable }"
-      class="graph-vue-tool-box-item iconfont iconredo"
+      class="graph-vue-tool-box-item iconredo"
     ></li>
     <li
       title="放大"
       id="expand"
-      class="graph-vue-tool-box-item iconfont iconfangdasuoxiao_X"
+      class="graph-vue-tool-box-item iconfangdasuoxiao_X"
     ></li>
     <li
       title="缩小"
       id="shrink"
-      class="graph-vue-tool-box-item iconfont iconfangdasuoxiao_Y"
+      class="graph-vue-tool-box-item iconfangdasuoxiao_Y"
     ></li>
     <li
       title="实际尺寸"
       id="reset"
-      class="graph-vue-tool-box-item iconfont iconshijichicun"
+      class="graph-vue-tool-box-item iconshijichicun"
     ></li>
     <li
       title="框选"
       id="select"
       :class="{ 'graph-vue-tool-box-select': isBrushing }"
-      class="graph-vue-tool-box-item iconfont iconkuangxuan"
+      class="graph-vue-tool-box-item iconkuangxuan"
     ></li>
     <li
       title="全屏"
       id="fullScreen"
-      class="graph-vue-tool-box-item iconfont iconquanping2"
+      class="graph-vue-tool-box-item iconquanping2"
     ></li>
     <li
       title="自动布局"
       id="layout"
-      class="graph-vue-tool-box-item iconfont iconzidongpaiban"
+      class="graph-vue-tool-box-item iconzidongpaiban"
     ></li>
     <li
       title="适应画布"
       id="fitView"
-      class="graph-vue-tool-box-item iconfont iconshiyinghuabu"
+      class="graph-vue-tool-box-item iconshiyinghuabu"
     ></li>
   </div>
 </template>
@@ -136,16 +136,13 @@ export default class ToolBox extends Vue {
 
 <style lang="scss" scoped>
 @font-face {
-  font-family: 'iconfont'; /* Project id 1805014 */
-  src: url('../assets/iconfont.woff2')
-      format('woff2'),
-    url('../assets/iconfont.woff')
-      format('woff'),
-    url('../assets/iconfont.ttf')
-      format('truetype');
+  font-family: 'graph-vue-iconfont'; /* Project id 1805014 */
+  src: url('../assets/iconfont.woff2') format('woff2'),
+    url('../assets/iconfont.woff') format('woff'),
+    url('../assets/iconfont.ttf') format('truetype');
 }
 .graph-vue-tool-box-item {
-  font-family: 'iconfont' !important;
+  font-family: 'graph-vue-iconfont' !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;

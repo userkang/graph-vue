@@ -339,6 +339,10 @@ export default class Graph extends EventEmitter {
     return this.stackController.redoStack
   }
 
+  clearStack() {
+    return this.stackController.clearStack()
+  }
+
   detectDirectedCycle() {
     return detectDirectedCycle(this.getDataModel())
   }

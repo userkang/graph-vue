@@ -66,6 +66,7 @@ export default class Stack {
   public clearStack() {
     this.undoStack = []
     this.redoStack = []
+    this.$graph.emit('stackchange')
   }
 
   private pushStack(doType: doType, stackData: IStack) {

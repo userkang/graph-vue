@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { IPort } from '@datafe/graph-core'
+import { IPort } from 'graph-logic'
 
 @Component
 export default class Port extends Vue {

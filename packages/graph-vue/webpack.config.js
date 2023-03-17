@@ -63,7 +63,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      // '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
+      // 'graph-logic': path.resolve(__dirname, '../graph-core/src')
     }
   },
   externals: {

@@ -32,13 +32,6 @@
     chalk "^2.0.0"
     js-tokens "^4.0.0"
 
-"@datafe/graph-core@1.0.8":
-  version "1.0.8"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-1.0.8.tgz#a2184d4b0d25ef8ea51cb7a786888a17edd13fbf"
-  integrity sha1-ohhNSw0l746lHLenhoiKF+3RP78=
-  dependencies:
-    dagre "0.8.5"
-
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.6"
   resolved "http://r.npm.sankuai.com/@discoveryjs/json-ext/download/@discoveryjs/json-ext-0.5.6.tgz#d5e0706cf8c6acd8c6032f8d54070af261bbbb2f"
@@ -3526,6 +3519,13 @@ graceful-fs@^4.1.6:
   version "4.2.10"
   resolved "http://r.npm.sankuai.com/graceful-fs/download/graceful-fs-4.2.10.tgz#147d3a006da4ca3ce14728c7aefc287c367d7a6c"
   integrity sha1-FH06AG2kyjzhRyjHrvwofDZ9emw=
+
+graph-logic@1.0.8:
+  version "1.0.8"
+  resolved "https://registry.npmjs.org/graph-logic/-/graph-logic-1.0.8.tgz#6a9e837bf831c010f2dcae24f3b9c7968a5310d9"
+  integrity sha512-aGdaY+upYvzs+BCB10mTdqxvE/p+79cDtKe9WftHQnv44iN3khKQNaLuwtTELUhjK3KRZJXeSxYEj5cADcA0IA==
+  dependencies:
+    dagre "0.8.5"
 
 graphlib@^2.1.8:
   version "2.1.8"

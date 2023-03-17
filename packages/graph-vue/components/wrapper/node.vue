@@ -19,7 +19,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INode } from '@datafe/graph-core'
+import { INode } from 'graph-logic'
 import Port from './port.vue'
 
 @Component({

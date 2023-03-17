@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
-import { IEdge } from '@datafe/graph-core'
+import { IEdge } from 'graph-logic'
 
 @Component
 export default class EdgeWrapper extends Vue {

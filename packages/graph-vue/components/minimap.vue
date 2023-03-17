@@ -32,7 +32,7 @@
 </template>
 <script lang="ts">
 import { Vue, Component, Prop, InjectReactive } from 'vue-property-decorator'
-import { Graph } from '@datafe/graph-core'
+import { Graph } from 'graph-logic'
 
 const generateCursor = (cursor: string) => {
   const styleElement = document.createElement('style')

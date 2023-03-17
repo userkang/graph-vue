@@ -53,7 +53,7 @@
 
 <script lang="ts">
 import { Vue, Component, InjectReactive } from 'vue-property-decorator'
-import { Graph } from '@datafe/graph-core'
+import { Graph } from 'graph-logic'
 
 @Component
 export default class ToolBox extends Vue {

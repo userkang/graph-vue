@@ -1,6 +1,6 @@
 {
   "name": "graph-vue",
-  "version": "0.2.9",
+  "version": "0.2.11",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix",
@@ -22,7 +22,7 @@
     "vue": "2.6.12"
   },
   "dependencies": {
-    "@graph/core": "1.0.8"
+    "graph-logic": "1.0.8"
   },
   "devDependencies": {
     "@types/webpack-env": "^1.16.3",

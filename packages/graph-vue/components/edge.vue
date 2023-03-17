@@ -19,7 +19,7 @@
 <script lang="ts">
 import { Vue, Component, Prop } from 'vue-property-decorator'
 import { calculateCurve } from '../utils/calculateCurve'
-import { Graph, IEdge } from '@datafe/graph-core'
+import { Graph, IEdge } from 'graph-logic'
 
 @Component
 export default class Edge extends Vue {

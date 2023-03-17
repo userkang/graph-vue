@@ -7,7 +7,7 @@ const components = { GraphVue, ToolBox, Menu, MiniMap }
 
 export { GraphVue, ToolBox, Menu, MiniMap }
 
-export * from '@datafe/graph-core'
+export * from 'graph-logic'
 
 export default {
   install(Vue) {

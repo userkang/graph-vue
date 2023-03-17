@@ -74,7 +74,7 @@ import {
   INodeModel,
   Node as GraphNode,
   Edge as GraphEdge
-} from '@datafe/graph-core'
+} from 'graph-logic'
 
 @Component({
   components: {

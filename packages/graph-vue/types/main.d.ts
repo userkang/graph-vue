@@ -4,5 +4,5 @@ import Menu from '../components/menu.vue'
 import MiniMap from '../components/minimap.vue'
 
 export { GraphVue, ToolBox, Menu, MiniMap }
-export * from '@datafe/graph-core'
+export * from 'graph-logic'
 export declare function install(vue: any): void

@@ -3,12 +3,6 @@
     <div class="container">
       <div class="top-panel">
         <div class="name">graph-demo</div>
-        <a
-          href="https://km.sankuai.com/page/505696797"
-          target="_blank"
-          class="link"
-          >用户文档</a
-        >
       </div>
       <div class="main-wrap">
         <TemplatePanel />

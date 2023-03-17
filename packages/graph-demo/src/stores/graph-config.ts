@@ -1,4 +1,4 @@
-import { IDataModel, ITreeDataModel } from '@datafe/graph-core'
+import { IDataModel, ITreeDataModel } from 'graph-logic'
 
 interface GraphConfigState {
   layout: {

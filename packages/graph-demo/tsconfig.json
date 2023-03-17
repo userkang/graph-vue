@@ -18,7 +18,7 @@
     "paths": {
       "@/*": ["src/*"],
       "@datafe/graph-vue": ["../../packages/graph-vue"],
-      "@datafe/graph-core": ["../../packages/graph-core/src/index.ts"]
+      "graph-logic": ["../../packages/graph-core/src/index.ts"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },

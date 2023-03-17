@@ -1,5 +1,5 @@
 import GraphConfigStore from './graph-config'
-import { Graph as GraphType } from '@datafe/graph-core'
+import { Graph as GraphType } from 'graph-logic'
 import { dagMock, treeMock, mindMapMock } from '@/mock/graph'
 
 class Graph {

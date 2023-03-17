@@ -24,7 +24,7 @@ module.exports = {
       alias: {
         // https://github.com/LinusBorg/portal-vue/issues/201
         vue$: path.resolve(__dirname, 'node_modules/vue/dist/vue.esm.js'),
-        '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src'),
+        'graph-logic': path.resolve(__dirname, '../graph-core/src'),
         '@datafe/graph-vue': path.resolve(__dirname, '../graph-vue/main.ts')
       }
     },

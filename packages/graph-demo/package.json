@@ -9,8 +9,7 @@
     "test": "echo test"
   },
   "dependencies": {
-    "@datafe/graph-vue": "0.2.9-beta.0.1",
-    "@ss/mtd-vue": "^0.3.28",
+    "graph-vue": "0.2.11",
     "axios": "^0.18.0",
     "core-js": "^2.6.11",
     "monaco-editor": "0.21.2",

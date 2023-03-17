@@ -1,10 +1,14 @@
 {
-  "name": "@datafe/graph-vue",
+  "name": "graph-vue",
   "version": "0.2.9",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix",
     "pub": "yarn && yarn build && mnpm publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/userkang/graph-vue.git"
   },
   "main": "lib/main.js",
   "types": "types/main.d.ts",
@@ -18,7 +22,7 @@
     "vue": "2.6.12"
   },
   "dependencies": {
-    "@datafe/graph-core": "1.0.8"
+    "@graph/core": "1.0.8"
   },
   "devDependencies": {
     "@types/webpack-env": "^1.16.3",

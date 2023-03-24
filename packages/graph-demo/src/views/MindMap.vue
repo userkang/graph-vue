@@ -36,13 +36,8 @@
                 !node.model.isCollapsed &&
                 !isEditText
               "
-            >
-              <mtd-icon
-                name="mtdicon mtdicon-nosign"
-                style="transform: rotate(-45deg)"
-                @click="hideNode(node)"
-              ></mtd-icon>
-            </div>
+              @mousedown="hideNode(node)"
+            ></div>
             <div
               class="show-icon"
               v-if="
@@ -50,7 +45,7 @@
                 node.model.isCollapsed &&
                 !isEditText
               "
-              @click="showNode(node)"
+              @mousedown="showNode(node)"
             >
               {{ node.getAllTargetNodes().length }}
             </div>
@@ -144,18 +139,18 @@ export default class MindMap extends Vue {
   }
 
   showNode(node: INode) {
-    node.update({ isCollapsed: false })
+    node.model.isCollapsed = false
     node.getAllTargetNodes().forEach(item => {
-      item.update({ isCollapsed: false })
+      node.model.isCollapsed = false
       item.show()
     })
     this.graph.layout()
   }
 
   hideNode(node: INode) {
-    node.update({ isCollapsed: true })
+    node.model.isCollapsed = true
     node.getAllTargetNodes().forEach(item => {
-      item.update({ isCollapsed: true })
+      node.model.isCollapsed = true
       item.hide()
     })
   }
@@ -227,10 +222,7 @@ export default class MindMap extends Vue {
     e.preventDefault()
     this.isEditText = false
     const content = e.target?.innerText.replace(/<br\/?>/gi, '\n').trim()
-
-    node.update({
-      label: content
-    })
+    node.model.label = content
     this.$nextTick(() => {
       const height = this.nodeEditedDom?.getBoundingClientRect().height
       node.update({
@@ -273,7 +265,7 @@ export default class MindMap extends Vue {
 .mindmap-template {
   width: 100%;
   height: 100%;
-  background: #333;
+  background: #f4f5f7;
 }
 .node-container {
   display: flex;
@@ -305,6 +297,7 @@ export default class MindMap extends Vue {
   border-radius: 50%;
   font-size: 17px;
   pointer-events: visible;
+  border: 1px solid #ccc;
 }
 .show-icon {
   display: flex;
@@ -314,10 +307,10 @@ export default class MindMap extends Vue {
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  color: white;
-  border: 1px solid white;
+  color: #aaa;
+  border: 1px solid #ccc;
   background-color: transparent;
-  font-size: 14px;
+  font-size: 12px;
 }
 .text-container {
   background-color: #333;
@@ -351,22 +344,22 @@ export default class MindMap extends Vue {
     justify-content: center;
   }
   .node-text {
-    outline: #63bcef solid 3px;
+    outline: #63bcef solid 2px;
     outline-offset: 2px;
   }
 }
 .node-text-selected {
-  outline: rgb(16, 76, 229) solid 3px !important;
+  outline: #2a98d7 solid 2px !important;
   outline-offset: 2px;
 }
 .node-text-edited {
-  outline: #033e92 solid 3px !important;
+  outline: #2a98d7 solid 2px !important;
   outline-offset: 2px;
   background: white;
   color: #333;
 }
 .graph-custom-edge {
-  stroke: rgb(235, 226, 224);
+  stroke: #d1d1dd;
   fill: none;
   &:hover {
     stroke: rgb(0, 195, 255);

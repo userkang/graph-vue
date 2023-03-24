@@ -141,7 +141,7 @@ export default class MindMap extends Vue {
   showNode(node: INode) {
     node.model.isCollapsed = false
     node.getAllTargetNodes().forEach(item => {
-      node.model.isCollapsed = false
+      item.model.isCollapsed = false
       item.show()
     })
     this.graph.layout()
@@ -150,7 +150,7 @@ export default class MindMap extends Vue {
   hideNode(node: INode) {
     node.model.isCollapsed = true
     node.getAllTargetNodes().forEach(item => {
-      node.model.isCollapsed = true
+      item.model.isCollapsed = true
       item.hide()
     })
   }
@@ -253,7 +253,7 @@ export default class MindMap extends Vue {
   path(edge: IEdge) {
     const { x: x1, y: y1 } = edge.fromPort
     const { x: x2, y: y2 } = edge.toPort
-    const xc = (x1 - x2) / 3
+    const xc = (x1 - x2) / 3 - 4
     return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc
     } ${y2} L ${x2} ${y2}`
@@ -337,6 +337,7 @@ export default class MindMap extends Vue {
   word-break: break-all;
   word-wrap: break-word;
   white-space: pre-line;
+  box-sizing: border-box;
 }
 .node-container:hover {
   .hide-icon {

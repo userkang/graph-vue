@@ -9,8 +9,8 @@
     "sourceMap": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["packages/graph-demo/src/*", "packages/graph-core/src/*"],
-      "graph-logic": ["packages/graph-core/src/index.ts"],
+      "@/*": ["packages/graph-demo/src/*", "packages/graph-logic/src/*"],
+      "graph-logic": ["packages/graph-logic/src/index.ts"],
       "@datafe/graph-vue": ["packages/graph-vue"]
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]

@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "install": "yarn --cwd packages/graph-demo --cwd packages/graph-core  --cwd packages/graph-vue",
+    "install": "yarn --cwd packages/graph-demo --cwd packages/graph-logic  --cwd packages/graph-vue",
     "start": "yarn --cwd packages/graph-demo start",
     "build": "yarn --cwd packages/graph-demo && export NODE_ENV=production && vue-cli-service build",
     "docs:build": "yarn --cwd packages/docs typedoc",

@@ -144,9 +144,9 @@ export default class ItemController extends EventEmitter<
   }
 
   private clear() {
-    this.$store.getNodes().forEach(item => item.off())
-    this.$store.getEdges().forEach(item => item.off())
-    this.$store.getPorts().forEach(item => item.off())
+    this.$store.getNodes().forEach(item => item.remove())
+    this.$store.getEdges().forEach(item => item.remove())
+    this.$store.getPorts().forEach(item => item.remove())
     this.$store.reset()
   }
 

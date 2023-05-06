@@ -154,12 +154,20 @@ export default class GraphVue extends Vue {
     this.initCustomHooks()
 
     this.graph.data(JSON.parse(JSON.stringify(this.data)))
-
-    if (this.layout) {
-      this.graph.layout(this.layout)
-    }
+    this.checkAutoLayout()
 
     this.$emit('init', this.graph)
+  }
+
+  checkAutoLayout() {
+    const { options } = this.layout || {}
+    const hasOtherProps =
+      options !== undefined &&
+      Object.keys(options).some(key => key !== 'rankdir' && options[key])
+
+    if (hasOtherProps) {
+      this.graph.layout(this.layout)
+    }
   }
 
   initCustomHooks() {

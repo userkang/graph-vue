@@ -108,6 +108,7 @@ export default class Port extends Base<
     this.set('x', cfg.x)
     this.set('y', cfg.y)
     this.set('type', model.type)
+    this.set('position', model.position)
   }
 
   private onNodeChange = (target: INode, type: string, data?: any) => {

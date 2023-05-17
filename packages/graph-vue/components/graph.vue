@@ -46,14 +46,7 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  Vue,
-  Component,
-  Prop,
-  Watch,
-  ProvideReactive
-} from 'vue-property-decorator'
+<script>
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import PortWrapper from './wrapper/port.vue'
@@ -66,16 +59,155 @@ import { isEqualWith } from 'lodash'
 
 import {
   Graph,
-  IDataModel,
-  IEdge,
-  ILayout,
-  INode,
-  IDagreLayout,
-  INodeModel,
+  // IDataModel,
+  // IEdge,
+  // ILayout,
+  // INode,
+  // IDagreLayout,
+  // INodeModel,
   Node as GraphNode,
   Edge as GraphEdge
 } from '@datafe/graph-core'
 
+export default {
+  components: {
+    NodeWrapper,
+    EdgeWrapper,
+    PortWrapper,
+    Edge,
+    Node,
+    Port,
+    Arrow,
+    NewEdge
+  },
+  props: ['action', 'data', 'layout', 'defaultNode'],
+  provide: {
+    graph: null
+  },
+  data() {
+    return {
+      graph: null,
+      nodes: [],
+      edges: [],
+      items: [],
+      transform: {
+        scale: 1,
+        translateX: 0,
+        translateY: 0
+      },
+      brushPath: ''
+    }
+  },
+  watch: {
+    data(val, prev) {
+      if (isEqualWith(val, prev)) return
+      const data = JSON.parse(JSON.stringify(val))
+      this.graph.data(data)
+    },
+    action(val, prev) {
+      if (isEqualWith(val, prev)) return
+      this.graph.removeAction()
+      this.graph.addAction(val)
+    },
+
+    handleLayout: {
+      handler(val, prev) {
+        if (isEqualWith(val, prev)) return
+        this.graph.layout(val, false)
+      },
+      deep: true
+    },
+    'layout.options.rankdir'() {
+      this.graph.layout(this.layout, false)
+      this.graph.getNodes().forEach(node => {
+        node.updatePorts(this.graph.get('direction'))
+      })
+    }
+  },
+  methods: {
+    isEdge(item) {
+      return item instanceof GraphEdge
+    },
+    isNode(item) {
+      return item instanceof GraphNode
+    },
+    handleDrop(e) {
+      this.$emit('drop', e)
+    },
+    init() {
+      const graph = new Graph({
+        container: this.$refs.svg,
+        direction: this.layout.options.rankdir || 'TB',
+        action: this.action,
+        defaultNode: this.defaultNode
+      })
+      this.graph = graph
+      console.log(this.graph)
+      this.initCustomHooks()
+
+      this.graph.data(JSON.parse(JSON.stringify(this.data)))
+      this.checkAutoLayout()
+
+      this.$emit('init', this.graph)
+    },
+    checkAutoLayout() {
+      const { options } = this.layout || {}
+      const hasOtherProps =
+        options !== undefined &&
+        Object.keys(options).some(key => key !== 'rankdir' && options[key])
+
+      if (hasOtherProps) {
+        this.graph.layout(this.layout)
+      }
+    },
+    initCustomHooks() {
+      const hooks = [
+        'node:added',
+        'edge:added',
+        'node:click',
+        'edge:click',
+        'node:change',
+        'edge:change',
+        'port:change',
+        'port:added',
+        'port:deleted'
+      ]
+
+      hooks.forEach(hook => {
+        this.graph.on(hook, (...args) => {
+          this.$emit(hook, ...args)
+        })
+      })
+
+      this.graph.on('datachange', this.refreshGraph)
+      this.graph.on('translate', this.aftertranslate)
+      this.graph.on('zoom', this.afterzoom)
+      this.graph.on('brushing', this.brushing)
+    },
+    brushing(path) {
+      this.brushPath = path
+    },
+    refreshGraph() {
+      this.items = this.graph.getSortedItem()
+    },
+    aftertranslate(x, y) {
+      this.transform.translateX = x
+      this.transform.translateY = y
+    },
+    afterzoom(zoom) {
+      this.transform.scale = zoom
+    }
+  },
+
+  mounted() {
+    this.init()
+  },
+  beforeDestroy() {
+    this.graph.destroy()
+  }
+}
+
+/**
 @Component({
   components: {
     NodeWrapper,
@@ -244,6 +376,7 @@ export default class GraphVue extends Vue {
     this.graph.destroy()
   }
 }
+*/
 </script>
 
 <style lang="scss">

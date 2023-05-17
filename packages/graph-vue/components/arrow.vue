@@ -15,11 +15,8 @@
   </defs>
 </template>
 
-<script lang="ts">
-import { Vue, Component } from 'vue-property-decorator'
-
-@Component
-export default class Arrow extends Vue {}
+<script>
+export default  {}
 </script>
 
 <style lang="scss">

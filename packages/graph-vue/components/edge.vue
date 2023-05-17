@@ -16,40 +16,33 @@
   </g>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
+<script>
 import { calculateCurve } from '../utils/calculateCurve'
-import { Graph, IEdge } from '@datafe/graph-core'
 
-@Component
-export default class Edge extends Vue {
-  @Prop({
-    required: true
-  })
-  edge!: IEdge
+export default {
+  props: ['edge', 'graph'],
+  data() {
+    return {
+      activeEdgeId: ''
+    }
+  },
+  computed: {
+    path() {
+      const { fromPort, toPort } = this.edge
+      const direction = this.graph.get('direction')
+      const x2 = toPort.x
+      const y2 = toPort.y
 
-  @Prop({
-    required: true
-  })
-  graph!: Graph
-
-  activeEdgeId = ''
-
-  get path() {
-    const { fromPort, toPort } = this.edge
-    const direction = this.graph.get('direction')
-    const x2 = toPort.x
-    const y2 = toPort.y
-
-    return calculateCurve(
-      {
-        x1: fromPort.x,
-        y1: fromPort.y,
-        x2,
-        y2
-      },
-      direction
-    )
+      return calculateCurve(
+        {
+          x1: fromPort.x,
+          y1: fromPort.y,
+          x2,
+          y2
+        },
+        direction
+      )
+    }
   }
 }
 </script>

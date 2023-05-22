@@ -47,6 +47,7 @@
 </template>
 
 <script>
+import { defineComponent, onBeforeUnmount, onMounted, getCurrentInstance } from 'vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import Node from './node.vue'
@@ -55,14 +56,9 @@ import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
 import { isEqualWith } from 'lodash'
+import { Graph, Node as GraphNode, Edge as GraphEdge } from '@datafe/graph-core'
 
-import {
-  Graph,
-  Node as GraphNode,
-  Edge as GraphEdge
-} from '@datafe/graph-core'
-
-export default {
+export default defineComponent({
   components: {
     NodeWrapper,
     EdgeWrapper,
@@ -185,14 +181,24 @@ export default {
       this.transform.scale = zoom
     }
   },
+  setup() {
+    onMounted(() => {
+      const instance = getCurrentInstance().proxy
+      instance.init()
+    })
 
-  mounted() {
-    this.init()
+    onBeforeUnmount(() => {
+      const instance = getCurrentInstance().proxy
+      instance.graph.destroy()
+    })
   },
-  beforeDestroy() {
-    this.graph.destroy()
-  }
-}
+  // mounted() {
+  //   this.init()
+  // },
+  // beforeDestroy() {
+  //   this.graph.destroy()
+  // }
+})
 </script>
 
 <style lang="scss">

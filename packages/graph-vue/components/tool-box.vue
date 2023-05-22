@@ -52,7 +52,13 @@
 </template>
 
 <script>
-export default {
+import {
+  defineComponent,
+  getCurrentInstance,
+  onMounted
+} from 'vue-demi'
+
+export default defineComponent({
   data() {
     return {
       isBrushing: false,
@@ -116,20 +122,38 @@ export default {
       this.graph.set('brushing', this.isBrushing)
     }
   },
-  mounted() {
-    this.graph.on('stackchange', () => {
-      this.undoEnable = this.graph.getUndoStack().length > 0
-      this.redoEnable = this.graph.getRedoStack().length > 0
-    })
+  setup() {
+    onMounted(() => {
+      const instance = getCurrentInstance().proxy
 
-    this.graph.on('mouseup', () => {
-      if (this.graph.get('brushing')) {
-        this.graph.set('brushing', false)
-        this.isBrushing = false
-      }
+      instance.graph.on('stackchange', () => {
+        instance.undoEnable = instance.graph.getUndoStack().length > 0
+        instance.redoEnable = instance.graph.getRedoStack().length > 0
+
+        instance.graph.on('mouseup', () => {
+          if (instance.graph.get('brushing')) {
+            instance.graph.set('brushing', false)
+            instance.isBrushing = false
+          }
+        })
+      })
     })
   }
-}
+
+  // mounted() {
+  //   this.graph.on('stackchange', () => {
+  //     this.undoEnable = this.graph.getUndoStack().length > 0
+  //     this.redoEnable = this.graph.getRedoStack().length > 0
+  //   })
+
+  //   this.graph.on('mouseup', () => {
+  //     if (this.graph.get('brushing')) {
+  //       this.graph.set('brushing', false)
+  //       this.isBrushing = false
+  //     }
+  //   })
+  // }
+})
 </script>
 
 <style lang="scss" scoped>

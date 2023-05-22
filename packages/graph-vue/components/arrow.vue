@@ -16,7 +16,9 @@
 </template>
 
 <script>
-export default  {}
+import { defineComponent } from 'vue-demi'
+
+export default defineComponent({})
 </script>
 
 <style lang="scss">

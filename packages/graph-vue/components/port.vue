@@ -11,7 +11,14 @@
 </template>
 
 <script>
-export default {
+import {
+  defineComponent,
+  getCurrentInstance,
+  onBeforeUnmount,
+  onBeforeMount
+} from 'vue-demi'
+
+export default defineComponent({
   props: ['port'],
   data() {
     return {
@@ -21,20 +28,32 @@ export default {
       linked: false
     }
   },
-  created() {
-    this.refreshPort()
-    this.port.on('change', this.refreshPort)
-  },
-  beforeDestroy() {
-    this.port.off('change', this.refreshPort)
-  },
+  // created() {
+  //   this.refreshPort()
+  //   this.port.on('change', this.refreshPort)
+  // },
+  // beforeDestroy() {
+  //   this.port.off('change', this.refreshPort)
+  // },
   methods: {
     refreshPort() {
       this.enable = this.port.hasState('enable')
       this.linked = !this.enable && this.port.hasState('linked')
     }
+  },
+  setup() {
+    const instance = getCurrentInstance().proxy
+
+    onBeforeMount(() => {
+      instance.refreshPort()
+      instance.port.on('change', instance.refreshPort)
+    })
+
+    onBeforeUnmount(() => {
+      instance.port.off('change', instance.refreshPort)
+    })
   }
-}
+})
 </script>
 
 <style lang="scss">

@@ -11,7 +11,14 @@
 </template>
 
 <script>
-export default {
+import {
+  defineComponent,
+  onMounted,
+  onBeforeUnmount,
+  getCurrentInstance
+} from 'vue-demi'
+
+export default defineComponent({
   props: ['value'],
   data() {
     return {
@@ -45,15 +52,28 @@ export default {
       }
     }
   },
-  mounted() {
-    document.addEventListener('contextmenu', this.showMenu)
-    document.addEventListener('click', this.hiddenMenu)
-  },
-  beforeDestroy() {
-    document.removeEventListener('contextmenu', this.showMenu)
-    document.removeEventListener('click', this.hiddenMenu)
+  setup() {
+    onMounted(() => {
+      const instance = getCurrentInstance().proxy
+      document.addEventListener('contextmenu', instance.showMenu)
+      document.addEventListener('click', instance.hiddenMenu)
+    })
+
+    onBeforeUnmount(() => {
+      const instance = getCurrentInstance().proxy
+      document.removeEventListener('contextmenu', instance.showMenu)
+      document.removeEventListener('click', instance.hiddenMenu)
+    })
   }
-}
+  // mounted() {
+  //   document.addEventListener('contextmenu', this.showMenu)
+  //   document.addEventListener('click', this.hiddenMenu)
+  // },
+  // beforeDestroy() {
+  //   document.removeEventListener('contextmenu', this.showMenu)
+  //   document.removeEventListener('click', this.hiddenMenu)
+  // }
+})
 </script>
 
 <style lang="scss">

@@ -5,7 +5,9 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue-demi'
+
+export default defineComponent({
   props: ['edge']
-}
+})
 </script>

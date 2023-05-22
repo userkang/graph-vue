@@ -8,9 +8,10 @@
 </template>
 
 <script>
-export default {
+import { defineComponent } from 'vue-demi'
+export default defineComponent({
   props: ['node']
-}
+})
 </script>
 
 <style lang="scss">

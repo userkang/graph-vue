@@ -17,9 +17,10 @@
 </template>
 
 <script>
+import { defineComponent } from 'vue-demi'
 import { calculateCurve } from '../utils/calculateCurve'
 
-export default {
+export default defineComponent({
   props: ['edge', 'graph'],
   data() {
     return {
@@ -44,7 +45,7 @@ export default {
       )
     }
   }
-}
+})
 </script>
 
 <style lang="scss">

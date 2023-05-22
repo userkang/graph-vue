@@ -49,7 +49,6 @@
 <script>
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
-import PortWrapper from './wrapper/port.vue'
 import Node from './node.vue'
 import Edge from './edge.vue'
 import Port from './port.vue'
@@ -59,12 +58,6 @@ import { isEqualWith } from 'lodash'
 
 import {
   Graph,
-  // IDataModel,
-  // IEdge,
-  // ILayout,
-  // INode,
-  // IDagreLayout,
-  // INodeModel,
   Node as GraphNode,
   Edge as GraphEdge
 } from '@datafe/graph-core'
@@ -73,7 +66,6 @@ export default {
   components: {
     NodeWrapper,
     EdgeWrapper,
-    PortWrapper,
     Edge,
     Node,
     Port,
@@ -81,9 +73,6 @@ export default {
     NewEdge
   },
   props: ['action', 'data', 'layout', 'defaultNode'],
-  provide: {
-    graph: null
-  },
   data() {
     return {
       graph: null,
@@ -109,7 +98,6 @@ export default {
       this.graph.removeAction()
       this.graph.addAction(val)
     },
-
     handleLayout: {
       handler(val, prev) {
         if (isEqualWith(val, prev)) return
@@ -142,7 +130,6 @@ export default {
         defaultNode: this.defaultNode
       })
       this.graph = graph
-      console.log(this.graph)
       this.initCustomHooks()
 
       this.graph.data(JSON.parse(JSON.stringify(this.data)))
@@ -206,177 +193,6 @@ export default {
     this.graph.destroy()
   }
 }
-
-/**
-@Component({
-  components: {
-    NodeWrapper,
-    EdgeWrapper,
-    PortWrapper,
-    Edge,
-    Node,
-    Port,
-    Arrow,
-    NewEdge
-  }
-})
-export default class GraphVue extends Vue {
-  @ProvideReactive()
-  graph: Graph = null as any
-
-  @Prop({ default: () => [], type: Array })
-  action!: string[]
-
-  @Prop({
-    default: () => {
-      return { nodes: [], edges: [] }
-    },
-    type: Object
-  })
-  data!: IDataModel
-
-  @Prop({
-    default: null
-  })
-  layout!: ILayout
-
-  @Prop({
-    default: () => {
-      return {}
-    }
-  })
-  defaultNode!: INodeModel
-
-  nodes: INode[] = []
-  edges: IEdge[] = []
-  items: ReadonlyArray<INode | IEdge> = []
-
-  transform = {
-    scale: 1,
-    translateX: 0,
-    translateY: 0
-  }
-  brushPath = ''
-
-  isEdge(item: INode | IEdge) {
-    return item instanceof GraphEdge
-  }
-
-  isNode(item: INode | IEdge) {
-    return item instanceof GraphNode
-  }
-
-  handleDrop(e: DragEvent) {
-    this.$emit('drop', e)
-  }
-
-  mounted() {
-    this.init()
-  }
-
-  init() {
-    const graph = new Graph({
-      container: this.$refs.svg as HTMLElement,
-      direction: (this.layout?.options as IDagreLayout)?.rankdir || 'TB',
-      action: this.action,
-      defaultNode: this.defaultNode
-    })
-    this.graph = graph
-
-    this.initCustomHooks()
-
-    this.graph.data(JSON.parse(JSON.stringify(this.data)))
-    this.checkAutoLayout()
-
-    this.$emit('init', this.graph)
-  }
-
-  checkAutoLayout() {
-    const { options } = this.layout || {}
-    const hasOtherProps =
-      options !== undefined &&
-      Object.keys(options).some(key => key !== 'rankdir' && options[key])
-
-    if (hasOtherProps) {
-      this.graph.layout(this.layout)
-    }
-  }
-
-  initCustomHooks() {
-    const hooks = [
-      'node:added',
-      'edge:added',
-      'node:click',
-      'edge:click',
-      'node:change',
-      'edge:change',
-      'port:change',
-      'port:added',
-      'port:deleted'
-    ]
-
-    hooks.forEach(hook => {
-      this.graph.on(hook, (...args) => {
-        this.$emit(hook, ...args)
-      })
-    })
-
-    this.graph.on('datachange', this.refreshGraph)
-    this.graph.on('translate', this.aftertranslate)
-    this.graph.on('zoom', this.afterzoom)
-    this.graph.on('brushing', this.brushing)
-  }
-
-  brushing(path: string) {
-    this.brushPath = path
-  }
-
-  refreshGraph() {
-    this.items = this.graph.getSortedItem()
-  }
-
-  aftertranslate(x: number, y: number) {
-    this.transform.translateX = x
-    this.transform.translateY = y
-  }
-
-  afterzoom(zoom: number) {
-    this.transform.scale = zoom
-  }
-
-  @Watch('data')
-  dataChange(val: IDataModel, prev) {
-    if (isEqualWith(val, prev)) return
-    const data = JSON.parse(JSON.stringify(val))
-    this.graph.data(data)
-  }
-
-  @Watch('action')
-  handelAction(v: string[], prev) {
-    if (isEqualWith(v, prev)) return
-    this.graph.removeAction()
-    this.graph.addAction(v)
-  }
-
-  @Watch('layout', { deep: true })
-  handelRankdir(v: ILayout, prev: ILayout) {
-    if (isEqualWith(v, prev)) return
-    this.graph.layout(v, false)
-  }
-
-  @Watch('layout.options.rankdir')
-  handelRankdirChange() {
-    this.graph.layout(this.layout, false)
-    this.graph.getNodes().forEach(node => {
-      node.updatePorts(this.graph.get('direction'))
-    })
-  }
-
-  beforeDestroy() {
-    this.graph.destroy()
-  }
-}
-*/
 </script>
 
 <style lang="scss">

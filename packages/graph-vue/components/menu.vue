@@ -65,14 +65,6 @@ export default defineComponent({
       document.removeEventListener('click', instance.hiddenMenu)
     })
   }
-  // mounted() {
-  //   document.addEventListener('contextmenu', this.showMenu)
-  //   document.addEventListener('click', this.hiddenMenu)
-  // },
-  // beforeDestroy() {
-  //   document.removeEventListener('contextmenu', this.showMenu)
-  //   document.removeEventListener('click', this.hiddenMenu)
-  // }
 })
 </script>
 

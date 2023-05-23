@@ -28,13 +28,6 @@ export default defineComponent({
       linked: false
     }
   },
-  // created() {
-  //   this.refreshPort()
-  //   this.port.on('change', this.refreshPort)
-  // },
-  // beforeDestroy() {
-  //   this.port.off('change', this.refreshPort)
-  // },
   methods: {
     refreshPort() {
       this.enable = this.port.hasState('enable')

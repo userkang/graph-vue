@@ -9,6 +9,7 @@
 
 <script>
 import { defineComponent } from 'vue-demi'
+
 export default defineComponent({
   props: ['node']
 })

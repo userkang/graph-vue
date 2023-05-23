@@ -233,12 +233,6 @@ export default defineComponent({
       }
     })
   }
-  // mounted() {
-  //   if (this.graph) {
-  //     this.onGraphChange()
-  //     this.listenGraphChange()
-  //   }
-  // }
 })
 </script>
 

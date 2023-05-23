@@ -52,11 +52,7 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  getCurrentInstance,
-  onMounted
-} from 'vue-demi'
+import { defineComponent, getCurrentInstance, onMounted } from 'vue-demi'
 
 export default defineComponent({
   data() {
@@ -139,20 +135,6 @@ export default defineComponent({
       })
     })
   }
-
-  // mounted() {
-  //   this.graph.on('stackchange', () => {
-  //     this.undoEnable = this.graph.getUndoStack().length > 0
-  //     this.redoEnable = this.graph.getRedoStack().length > 0
-  //   })
-
-  //   this.graph.on('mouseup', () => {
-  //     if (this.graph.get('brushing')) {
-  //       this.graph.set('brushing', false)
-  //       this.isBrushing = false
-  //     }
-  //   })
-  // }
 })
 </script>
 

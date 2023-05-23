@@ -47,7 +47,12 @@
 </template>
 
 <script>
-import { defineComponent, onBeforeUnmount, onMounted, getCurrentInstance } from 'vue-demi'
+import {
+  defineComponent,
+  onBeforeUnmount,
+  onMounted,
+  getCurrentInstance
+} from 'vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import Node from './node.vue'
@@ -68,7 +73,18 @@ export default defineComponent({
     Arrow,
     NewEdge
   },
-  props: ['action', 'data', 'layout', 'defaultNode'],
+  props: {
+    action: {
+      type: Array,
+      default: () => []
+    },
+    data: {
+      type: Object,
+      default: () => {
+        return { nodes: [], edges: [] }
+      }
+    }
+  },
   data() {
     return {
       graph: null,
@@ -121,7 +137,9 @@ export default defineComponent({
     init() {
       const graph = new Graph({
         container: this.$refs.svg,
-        direction: this.layout.options.rankdir || 'TB',
+        direction:
+          (this.layout && this.layout.options && this.layout.options.rankdir) ||
+          'TB',
         action: this.action,
         defaultNode: this.defaultNode
       })
@@ -191,13 +209,7 @@ export default defineComponent({
       const instance = getCurrentInstance().proxy
       instance.graph.destroy()
     })
-  },
-  // mounted() {
-  //   this.init()
-  // },
-  // beforeDestroy() {
-  //   this.graph.destroy()
-  // }
+  }
 })
 </script>
 

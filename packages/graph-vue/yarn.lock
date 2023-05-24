@@ -8790,10 +8790,21 @@ vue-hot-reload-api@^2.3.0:
   resolved "http://r.npm.sankuai.com/vue-hot-reload-api/download/vue-hot-reload-api-2.3.4.tgz#532955cc1eb208a3d990b3a9f9a70574657e08f2"
   integrity sha1-UylVzB6yCKPZkLOp+acFdGV+CPI=
 
-vue-loader@^15.7.0, vue-loader@^15.9.8:
+vue-loader@^15.7.0:
   version "15.9.8"
   resolved "http://r.npm.sankuai.com/vue-loader/download/vue-loader-15.9.8.tgz#4b0f602afaf66a996be1e534fb9609dc4ab10e61"
   integrity sha1-Sw9gKvr2aplr4eU0+5YJ3EqxDmE=
+  dependencies:
+    "@vue/component-compiler-utils" "^3.1.0"
+    hash-sum "^1.0.2"
+    loader-utils "^1.1.0"
+    vue-hot-reload-api "^2.3.0"
+    vue-style-loader "^4.1.0"
+
+vue-loader@^15.9.8:
+  version "15.10.1"
+  resolved "http://r.npm.sankuai.com/vue-loader/download/vue-loader-15.10.1.tgz#c451c4cd05a911aae7b5dbbbc09fb913fb3cca18"
+  integrity sha1-xFHEzQWpEarntdu7wJ+5E/s8yhg=
   dependencies:
     "@vue/component-compiler-utils" "^3.1.0"
     hash-sum "^1.0.2"

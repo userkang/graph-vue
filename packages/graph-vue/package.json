@@ -2,7 +2,7 @@
   "name": "@datafe/graph-vue",
   "version": "0.2.12-beta0.4",
   "scripts": {
-    "build": "webpack --config webpack.config.js",
+    "build": "vue-demi-switch 2 && webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix",
     "pub": "yarn && yarn build && mnpm publish"
   },
@@ -61,7 +61,7 @@
   "gitHooks": {
     "pre-commit": "lint-staged"
   },
-  "browserlist": [
+  "browserslist": [
     "> 1%",
     "last 2 versions"
   ],

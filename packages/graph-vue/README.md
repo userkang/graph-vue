@@ -1,6 +1,6 @@
 # 机器学习平台画布组件演示
 ### 介绍
-该 demo 基于@vue/cli搭建，项目使用vue全家桶开发，同时还包括typescript，
+graph-vue vue2 库。
 
 
 ### 如何运行

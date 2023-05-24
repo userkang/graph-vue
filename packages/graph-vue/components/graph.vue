@@ -22,15 +22,15 @@
       >
         <template v-for="item in items">
           <EdgeWrapper v-if="isEdge(item)" :key="item.id" :edge="item">
-            <slot v-if="$scopedSlots.edge" name="edge" :edge="item"></slot>
+            <slot v-if="hasSlots.edge" name="edge" :edge="item"></slot>
             <Edge v-else :edge="item" :graph="graph" />
           </EdgeWrapper>
           <NodeWrapper v-if="isNode(item)" :key="item.id" :node="item">
-            <slot v-if="$scopedSlots.node" name="node" :node="item"></slot>
+            <slot v-if="hasSlots.node" name="node" :node="item"></slot>
             <Node v-else :node="item" />
 
             <template #port="{ port }">
-              <slot v-if="$scopedSlots.port" name="port" :port="port"></slot>
+              <slot v-if="hasSlots.port" name="port" :port="port"></slot>
               <Port v-else :port="port" />
             </template>
           </NodeWrapper>
@@ -51,7 +51,8 @@ import {
   defineComponent,
   onBeforeUnmount,
   onMounted,
-  getCurrentInstance
+  getCurrentInstance,
+  useSlots
 } from 'vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
@@ -83,6 +84,14 @@ export default defineComponent({
       default: () => {
         return { nodes: [], edges: [] }
       }
+    },
+    layout: {
+      type: Object,
+      default: null
+    },
+    defaultNode: {
+      type: Object,
+      default: () => {}
     }
   },
   data() {
@@ -110,7 +119,7 @@ export default defineComponent({
       this.graph.removeAction()
       this.graph.addAction(val)
     },
-    handleLayout: {
+    layout: {
       handler(val, prev) {
         if (isEqualWith(val, prev)) return
         this.graph.layout(val, false)
@@ -200,6 +209,8 @@ export default defineComponent({
     }
   },
   setup() {
+    const hasSlots = useSlots()
+
     onMounted(() => {
       const instance = getCurrentInstance().proxy
       instance.init()
@@ -209,6 +220,8 @@ export default defineComponent({
       const instance = getCurrentInstance().proxy
       instance.graph.destroy()
     })
+
+    return { hasSlots }
   }
 })
 </script>

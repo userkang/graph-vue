@@ -8,7 +8,7 @@ module.exports = {
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录
-    library: 'graph-vue3', // 包名
+    library: 'graph-vue', // 包名
     libraryTarget: 'umd'
   },
   module: {

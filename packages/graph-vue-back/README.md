@@ -1,6 +1,6 @@
 # 机器学习平台画布组件演示
 ### 介绍
-graph-vue的 vue3 版本。
+graph-vue vue2 库。
 
 
 ### 如何运行

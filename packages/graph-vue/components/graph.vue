@@ -61,7 +61,7 @@ import Edge from './edge.vue'
 import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
-import { isEqualWith } from 'lodash'
+import { isEqualWith } from '../utils/isEqualWith'
 import { Graph, Node as GraphNode, Edge as GraphEdge } from '@datafe/graph-core'
 
 export default defineComponent({

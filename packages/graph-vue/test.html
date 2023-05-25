@@ -3,10 +3,23 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Vue2 Test</title>
-  <script src="https://unpkg.com/vue@2.6.12"></script>
-  <!-- <script src="https://unpkg.com/vue"></script> -->
-  <script src="./lib/main.js"></script>
+  <title>Vue3 Test</title>
+  <!-- <script src="https://unpkg.com/vue@2.6.12"></script> -->
+  <script src="https://unpkg.com/vue"></script>
+  <script src="./vue3/lib/main.js"></script>
+  <style>
+    html,
+    body,
+    #app {
+      padding: 0;
+      margin: 0;
+      height: 100%
+    }
+    .graph-custom-edge {
+      stroke: #aaa;
+      stroke-width: 1px;
+    }
+  </style>
 </head>
 
 <body>
@@ -14,9 +27,8 @@
 
   <script>
     window.onload = function () {
-      const GraphVue = window['graph-vue'].GraphVue
-
       function Vue2() {
+        const GraphVue = window['graph-vue'].GraphVue
         Vue.component('GraphVue', GraphVue)
         new Vue({
           render: h => h(App)
@@ -25,6 +37,7 @@
       }
 
       function Vue3() {
+        const GraphVue = window['graph-vue3'].GraphVue
         const { createApp, ref } = Vue;
         const app = createApp(App);
         app.component('GraphVue', GraphVue)
@@ -33,20 +46,84 @@
       }
 
       const App = {
+        data() {
+          return {
+            graph: null,
+            dataMock: {
+              nodes: [
+                {
+                  label: '拖动添加组件',
+                  id: 'node1',
+                },
+                {
+                  label: '拖动插槽连线',
+                  id: 'node2'
+                },
+                {
+                  label: '右键可删除',
+                  id: 'node3'
+                }
+              ],
+              edges: [
+                {
+                  fromNodeId: 'node1',
+                  toNodeId: 'node2',
+                  id: 'edge1'
+                },
+                {
+                  fromNodeId: 'node1',
+                  toNodeId: 'node3',
+                  id: 'edge2'
+                }
+              ]
+            },
+            action: [
+              'drag-blank',
+              'drag-node',
+              'click-select',
+              'create-edge',
+              'wheel-move',
+              'wheel-zoom',
+              'brush-select',
+            ],
+            layout: {
+              options: {
+                rankdir: 'LR'
+              }
+            }
+          }
+        },
         methods: {
           initGraph(graph) {
-            console.log(graph)
+            this.graph = graph
+          },
+          path(edge) {
+            // 直边
+            const { x: x1, y: y1 } = edge.fromPort
+            const { x: x2, y: y2 } = edge.toPort
+            return `M ${x1} ${y1} L ${x2} ${y2}`
           }
         },
         template: `
-        <div>
-          <GraphVue @init="initGraph"/>
-        </div>
+          <GraphVue
+            :data="dataMock"
+            :action="action"
+            :layout="layout"
+            @init="initGraph"
+          >
+            <template #edge="{ edge }">
+              <path 
+                class="graph-custom-edge"
+                :marker-end="'url(#arrow)'" 
+                :d="path(edge)">
+              </path>
+            </template>
+            <template #port></template>
+          </GraphVue>
       `,
       };
 
-      Vue2()
-
+      Vue3()
     }
   </script>
 </body>

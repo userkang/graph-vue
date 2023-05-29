@@ -32,15 +32,13 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, getCurrentInstance } from 'vue-demi'
-
 const generateCursor = cursor => {
   const styleElement = document.createElement('style')
   styleElement.innerHTML = `body *{cursor: ${cursor} !important;}`
   return styleElement
 }
 
-export default defineComponent({
+export default {
   props: {
     theme: {
       type: Array,
@@ -224,16 +222,13 @@ export default defineComponent({
       }
     }
   },
-  setup() {
-    onMounted(() => {
-      const instance = getCurrentInstance().proxy
-      if (instance.graph) {
-        instance.onGraphChange()
-        instance.listenGraphChange()
-      }
-    })
+  mounted() {
+    if (this.graph) {
+      this.onGraphChange()
+      this.listenGraphChange()
+    }
   }
-})
+}
 </script>
 
 <style lang="scss">

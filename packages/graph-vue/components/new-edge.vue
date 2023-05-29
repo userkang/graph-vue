@@ -10,10 +10,9 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, getCurrentInstance } from 'vue-demi'
 import { calculateCurve } from '../utils/calculateCurve'
 
-export default defineComponent({
+export default {
   data() {
     return {
       path: ''
@@ -51,13 +50,10 @@ export default defineComponent({
       }
     }
   },
-  setup() {
-    onMounted(() => {
-      const instance = getCurrentInstance().proxy
-      instance.graph.on('edge:connecting', instance.handlePath)
-    })
+  mounted() {
+    this.graph.on('edge:connecting', this.handlePath)
   }
-})
+}
 </script>
 
 <style lang="scss">

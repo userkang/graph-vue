@@ -52,9 +52,7 @@
 </template>
 
 <script>
-import { defineComponent, getCurrentInstance, onMounted } from 'vue-demi'
-
-export default defineComponent({
+export default {
   data() {
     return {
       isBrushing: false,
@@ -118,24 +116,20 @@ export default defineComponent({
       this.graph.set('brushing', this.isBrushing)
     }
   },
-  setup() {
-    onMounted(() => {
-      const instance = getCurrentInstance().proxy
+  mounted() {
+    this.graph.on('stackchange', () => {
+      this.undoEnable = this.graph.getUndoStack().length > 0
+      this.redoEnable = this.graph.getRedoStack().length > 0
 
-      instance.graph.on('stackchange', () => {
-        instance.undoEnable = instance.graph.getUndoStack().length > 0
-        instance.redoEnable = instance.graph.getRedoStack().length > 0
-
-        instance.graph.on('mouseup', () => {
-          if (instance.graph.get('brushing')) {
-            instance.graph.set('brushing', false)
-            instance.isBrushing = false
+      this.graph.on('mouseup', () => {
+          if (this.graph.get('brushing')) {
+            this.graph.set('brushing', false)
+            this.isBrushing = false
           }
         })
       })
-    })
   }
-})
+}
 </script>
 
 <style lang="scss" scoped>

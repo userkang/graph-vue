@@ -48,10 +48,6 @@
 
 <script>
 import {
-  defineComponent,
-  onBeforeUnmount,
-  onMounted,
-  getCurrentInstance,
   useSlots
 } from 'vue-demi'
 import NodeWrapper from './wrapper/node.vue'
@@ -64,7 +60,8 @@ import Arrow from './arrow.vue'
 import { isEqualWith } from '../utils/isEqualWith'
 import { Graph, Node as GraphNode, Edge as GraphEdge } from '@datafe/graph-core'
 
-export default defineComponent({
+export default {
+  name: 'GraphVue',
   components: {
     NodeWrapper,
     EdgeWrapper,
@@ -208,22 +205,17 @@ export default defineComponent({
       this.transform.scale = zoom
     }
   },
+  mounted() {
+    this.init()
+  },
+  beforeDestroy() {
+    this.graph.destroy()
+  },
   setup() {
     const hasSlots = useSlots()
-
-    onMounted(() => {
-      const instance = getCurrentInstance().proxy
-      instance.init()
-    })
-
-    onBeforeUnmount(() => {
-      const instance = getCurrentInstance().proxy
-      instance.graph.destroy()
-    })
-
     return { hasSlots }
   }
-})
+}
 </script>
 
 <style lang="scss">

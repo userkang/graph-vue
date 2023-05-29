@@ -18,11 +18,10 @@
 </template>
 
 <script>
-import { defineComponent } from 'vue-demi'
 import PortWrapper from './port.vue'
 
-export default defineComponent({
+export default {
   components: { PortWrapper },
   props: ['node']
-})
+}
 </script>

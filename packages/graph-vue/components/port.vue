@@ -11,14 +11,7 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  getCurrentInstance,
-  onBeforeUnmount,
-  onBeforeMount
-} from 'vue-demi'
-
-export default defineComponent({
+export default {
   props: ['port'],
   data() {
     return {
@@ -34,19 +27,15 @@ export default defineComponent({
       this.linked = !this.enable && this.port.hasState('linked')
     }
   },
-  setup() {
-    const instance = getCurrentInstance().proxy
-
-    onBeforeMount(() => {
-      instance.refreshPort()
-      instance.port.on('change', instance.refreshPort)
-    })
-
-    onBeforeUnmount(() => {
-      instance.port.off('change', instance.refreshPort)
-    })
+  created() {
+    this.refreshPort()
+    this.port.on('change', this.refreshPort)
+  },
+  beforeDestroy() {
+    console.log(22333)
+    this.port.off('change', this.refreshPort)
   }
-})
+}
 </script>
 
 <style lang="scss">

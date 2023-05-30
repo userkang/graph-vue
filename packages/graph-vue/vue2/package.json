@@ -1,18 +1,20 @@
 {
   "name": "@datafe/graph-vue",
-  "version": "0.2.12-beta0.4",
+  "version": "0.2.12",
   "scripts": {
     "build": "webpack --config webpack.config.js",
+    "build:es": "tsc --outDir lib",
     "lint": "vue-cli-service lint --no-fix",
-    "pub": "yarn && yarn build && mnpm publish"
+    "pub": "yarn && yarn build && mnpm publish",
+    "build:esm": "babel src --out-dir dist --copy-files"
   },
   "main": "lib/main.js",
-  "types": "types/main.d.ts",
+  "types": "lib/main.d.ts",
   "files": [
     "lib",
-    "../components",
-    "../types",
-    "../utils"
+    "components",
+    "main.d.ts",
+    "utils"
   ],
   "peerDependencies": {
     "@vue/composition-api": "^1.0.0-rc.1",
@@ -28,17 +30,20 @@
     "vue-demi": "^0.14.5"
   },
   "devDependencies": {
+    "@babel/cli": "^7.21.5",
+    "@babel/core": "^7.21.8",
+    "@babel/preset-env": "^7.21.5",
     "@types/webpack-env": "^1.16.3",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "@vue/cli-plugin-eslint": "~4.5.0",
     "@vue/cli-plugin-typescript": "^3.0.0",
     "@vue/cli-service": "^3.0.0",
+    "@vue/composition-api": "^1.7.1",
     "@vue/eslint-config-prettier": "^6.0.0",
     "@vue/eslint-config-typescript": "^7.0.0",
-    "babel-core": "^6.26.3",
-    "babel-loader": "^7.1.2",
-    "babel-preset-env": "^1.7.0",
+    "babel-loader": "^8.1.2",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^5.0.1",
     "eslint": "^6.7.2",
     "eslint-plugin-prettier": "^3.3.1",
@@ -50,13 +55,13 @@
     "ts-loader": "8.2.0",
     "tslib": "^2.3.1",
     "typescript": "^4.4.5",
+    "url-loader": "^4.1.1",
     "vue": "2.6.12",
-    "@vue/composition-api": "^1.0.0-rc.1",
     "vue-loader": "^15.9.8",
     "vue-template-compiler": "2.6.12",
-    "webpack": "^4.41.4",
+    "webpack": "^5.81.4",
     "webpack-bundle-analyzer": "^3.0.3",
-    "webpack-cli": "^4.1.0"
+    "webpack-cli": "^4.7.0"
   },
   "gitHooks": {
     "pre-commit": "lint-staged"

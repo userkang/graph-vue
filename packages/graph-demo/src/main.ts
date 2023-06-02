@@ -5,6 +5,9 @@ import './assets/css/normalize.scss'
 import './assets/css/variable.scss'
 import '@ss/mtd-vue/lib/theme2/index.css'
 
+import G from '@datafe/graph-vue'
+console.log(G)
+
 // 引入组件库
 import MTD from '@ss/mtd-vue'
 

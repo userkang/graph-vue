@@ -6,7 +6,7 @@
   <title>Vue3 Test</title>
   <!-- <script src="https://unpkg.com/vue@2.6.12"></script> -->
   <script src="https://unpkg.com/vue"></script>
-  <script src="./vue3/lib/main.js"></script>
+  <script src="./lib/main.js"></script>
   <style>
     html,
     body,
@@ -37,7 +37,7 @@
       }
 
       function Vue3() {
-        const GraphVue = window['graph-vue3'].GraphVue
+        const GraphVue = window['graph-vue'].GraphVue
         const { createApp, ref } = Vue;
         const app = createApp(App);
         app.component('GraphVue', GraphVue)

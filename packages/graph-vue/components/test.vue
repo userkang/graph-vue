@@ -6,7 +6,9 @@
 </template>
 
 <script>
-export default {
+// import { defineComponent } from 'vue-demi'
+
+export default{
   data() {
     return {
       title: 'Hello World!',

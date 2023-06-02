@@ -49,7 +49,7 @@
 <script>
 import {
   useSlots
-} from 'vue-demi'
+} from '@datafe/vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import Node from './node.vue'

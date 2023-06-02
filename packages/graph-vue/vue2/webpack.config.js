@@ -3,13 +3,36 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
+    // 'index.cjs': {
+    //   import: '../main.ts',
+    //   library: {
+    //     type: 'commonjs2'
+    //   }
+    // },
+    // 'index.esm': {
+    //   import: '../main.ts',
+    //   library: {
+    //     type: 'module'
+    //   }
+    // },
+    // 'index.umd': {
+    //   import: '../main.ts',
+    //   library: {
+    //     type: 'umd2'
+    //   }
+    // }
     main: path.resolve(__dirname, '../main.ts')
   },
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录
     library: 'graph-vue', // 包名
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    clean: true,
+  },
+  // experiments: { outputModule: true },
+  optimization: {
+    minimize: false
   },
   module: {
     rules: [
@@ -27,6 +50,9 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        },
         exclude: /node_modules/
       },
       {

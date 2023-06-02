@@ -1001,6 +1001,11 @@
   dependencies:
     dagre "0.8.5"
 
+"@datafe/vue-demi@^0.14.5":
+  version "0.14.5"
+  resolved "http://r.npm.sankuai.com/@datafe/vue-demi/download/@datafe/vue-demi-0.14.5.tgz#0f166d1439d3cf432d3613b5ad88067e8e4cec0e"
+  integrity sha1-DxZtFDnTz0MtNhO1rYgGfo5M7A4=
+
 "@discoveryjs/json-ext@^0.5.0":
   version "0.5.7"
   resolved "http://r.npm.sankuai.com/@discoveryjs/json-ext/download/@discoveryjs/json-ext-0.5.7.tgz#1d572bfbbe14b7704e0ba0f39b74815b84870d70"
@@ -9933,11 +9938,6 @@ vm-browserify@^1.0.1:
   version "1.1.2"
   resolved "http://r.npm.sankuai.com/vm-browserify/download/vm-browserify-1.1.2.tgz#78641c488b8e6ca91a75f511e7a3b32a86e5dda0"
   integrity sha1-eGQcSIuObKkadfUR56OzKobl3aA=
-
-vue-demi@^0.14.5:
-  version "0.14.5"
-  resolved "http://r.npm.sankuai.com/vue-demi/download/vue-demi-0.14.5.tgz#676d0463d1a1266d5ab5cba932e043d8f5f2fbd9"
-  integrity sha1-Z20EY9GhJm1atcupMuBD2PXy+9k=
 
 vue-eslint-parser@^7.0.0:
   version "7.11.0"

@@ -3,13 +3,16 @@ const { VueLoaderPlugin } = require('vue-loader')
 
 module.exports = {
   entry: {
-    main: path.resolve(__dirname, '../main.ts')
+    main: path.resolve(__dirname, './main.ts')
   },
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录
-    library: 'graph-vue3', // 包名
+    library: 'graph-vue', // 包名
     libraryTarget: 'umd'
+  },
+  optimization: {
+    minimize: false
   },
   module: {
     rules: [
@@ -43,10 +46,18 @@ module.exports = {
         }
       },
       {
-        test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
+        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
         use: [
           {
-            loader: 'url-loader?limit=100000&mimetype=application/font-woff'
+            loader: 'url-loader?limit=10000&mimetype=application/font-woff'
+          }
+        ]
+      },
+      {
+        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        use: [
+          {
+            loader: 'file-loader'
           }
         ]
       }
@@ -55,12 +66,7 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      // '@datafe/graph-core': path.resolve(__dirname, '../../graph-core/src'),
-      '@datafe/graph-core': path.resolve(
-        __dirname,
-        './node_modules/@datafe/graph-core'
-      ),
-      'vue-demi': path.resolve(__dirname, './node_modules/vue-demi')
+      // '@datafe/graph-core': path.resolve(__dirname, '../graph-core/src')
     }
   },
   externals: {

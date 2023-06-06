@@ -22,6 +22,5 @@
     },
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
-  "include": ["*.d.ts", "src"],
-  "exclude": ["../../graph-vue/lib/main.js"]
+  "include": ["*.d.ts", "src"]
 }

@@ -1,26 +1,9 @@
 const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    // 'index.cjs': {
-    //   import: '../main.ts',
-    //   library: {
-    //     type: 'commonjs2'
-    //   }
-    // },
-    // 'index.esm': {
-    //   import: '../main.ts',
-    //   library: {
-    //     type: 'module'
-    //   }
-    // },
-    // 'index.umd': {
-    //   import: '../main.ts',
-    //   library: {
-    //     type: 'umd2'
-    //   }
-    // }
     main: path.resolve(__dirname, '../main.ts')
   },
   mode: 'production',
@@ -28,11 +11,10 @@ module.exports = {
     path: path.resolve(__dirname, 'lib'), // 出口目录
     library: 'graph-vue', // 包名
     libraryTarget: 'umd',
-    clean: true,
+    clean: true
   },
-  // experiments: { outputModule: true },
   optimization: {
-    minimize: false
+    minimize: true
   },
   module: {
     rules: [
@@ -81,12 +63,14 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      // '@datafe/graph-core': path.resolve(__dirname, '../../graph-core/src'),
       '@datafe/graph-core': path.resolve(
         __dirname,
         './node_modules/@datafe/graph-core'
       ),
-      'vue-demi': path.resolve(__dirname, './node_modules/vue-demi')
+      '@datafe/vue-demi': path.resolve(
+        __dirname,
+        './node_modules/@datafe/vue-demi'
+      )
     }
   },
   externals: {
@@ -97,5 +81,14 @@ module.exports = {
       amd: 'vue'
     }
   },
-  plugins: [new VueLoaderPlugin()]
+  plugins: [
+    new VueLoaderPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: '../components', to: 'components' },
+        { from: '../types/main.d.ts', to: 'types/main.d.ts' },
+        { from: '../utils', to: 'utils' }
+      ]
+    })
+  ]
 }

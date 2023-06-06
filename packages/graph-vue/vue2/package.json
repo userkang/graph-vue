@@ -1,20 +1,15 @@
 {
   "name": "@datafe/graph-vue",
-  "version": "0.2.12",
+  "version": "0.3.0-beta0.1",
   "scripts": {
     "build": "webpack --config webpack.config.js",
-    "build:es": "tsc --outDir lib",
     "lint": "vue-cli-service lint --no-fix",
-    "pub": "yarn && yarn build && mnpm publish",
-    "build:esm": "babel src --out-dir dist --copy-files"
+    "pub": "yarn && yarn build && mnpm publish"
   },
   "main": "lib/main.js",
-  "types": "lib/main.d.ts",
+  "types": "lib/types/main.d.ts",
   "files": [
-    "lib",
-    "components",
-    "main.d.ts",
-    "utils"
+    "lib"
   ],
   "peerDependencies": {
     "@vue/composition-api": "^1.0.0-rc.1",

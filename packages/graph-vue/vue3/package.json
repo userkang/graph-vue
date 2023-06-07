@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-vue3",
-  "version": "0.3.0-beta0.1",
+  "version": "0.3.0",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix",

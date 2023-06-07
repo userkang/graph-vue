@@ -47,9 +47,7 @@
 </template>
 
 <script>
-import {
-  useSlots
-} from '@datafe/vue-demi'
+import { useSlots, isVue2 } from '@datafe/vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
 import Node from './node.vue'
@@ -102,7 +100,8 @@ export default {
         translateX: 0,
         translateY: 0
       },
-      brushPath: ''
+      brushPath: '',
+      hasSlots: null
     }
   },
   watch: {
@@ -206,14 +205,16 @@ export default {
     }
   },
   mounted() {
+    if (isVue2) {
+      this.hasSlots = this.$scopedSlots
+    } else {
+      this.hasSlots = useSlots()
+    }
+
     this.init()
   },
   beforeDestroy() {
     this.graph.destroy()
-  },
-  setup() {
-    const hasSlots = useSlots()
-    return { hasSlots }
   }
 }
 </script>

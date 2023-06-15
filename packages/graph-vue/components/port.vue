@@ -32,7 +32,6 @@ export default {
     this.port.on('change', this.refreshPort)
   },
   beforeDestroy() {
-    console.log(22333)
     this.port.off('change', this.refreshPort)
   }
 }

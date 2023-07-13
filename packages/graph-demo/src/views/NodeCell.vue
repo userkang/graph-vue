@@ -50,7 +50,6 @@ import {
   GraphVue,
   Graph,
   INode,
-  IEdge,
   ILayout
 } from '@datafe/graph-vue'
 

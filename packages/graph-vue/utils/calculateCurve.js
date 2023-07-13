@@ -4,10 +4,7 @@
  * @param direction 图的方向：TB（自上而下）LR（从左到右）
  * @param showArrow 是否需要显示箭头，不需要箭头边的路径上不会预留箭头的offset
  */
-export const calculateCurve = (
-  position: { x1: number; y1: number; x2: number; y2: number },
-  direction = 'TB'
-) => {
+export const calculateCurve = (position, direction = 'TB') => {
   const { x1, y1, x2, y2 } = position
 
   if (direction === 'LR') {

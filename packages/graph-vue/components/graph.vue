@@ -22,15 +22,15 @@
       >
         <template v-for="item in items">
           <EdgeWrapper v-if="isEdge(item)" :key="item.id" :edge="item">
-            <slot v-if="$scopedSlots.edge" name="edge" :edge="item"></slot>
+            <slot v-if="hasSlots.edge" name="edge" :edge="item"></slot>
             <Edge v-else :edge="item" :graph="graph" />
           </EdgeWrapper>
           <NodeWrapper v-if="isNode(item)" :key="item.id" :node="item">
-            <slot v-if="$scopedSlots.node" name="node" :node="item"></slot>
+            <slot v-if="hasSlots.node" name="node" :node="item"></slot>
             <Node v-else :node="item" />
 
             <template #port="{ port }">
-              <slot v-if="$scopedSlots.port" name="port" :port="port"></slot>
+              <slot v-if="hasSlots.port" name="port" :port="port"></slot>
               <Port v-else :port="port" />
             </template>
           </NodeWrapper>
@@ -46,200 +46,173 @@
   </div>
 </template>
 
-<script lang="ts">
-import {
-  Vue,
-  Component,
-  Prop,
-  Watch,
-  ProvideReactive
-} from 'vue-property-decorator'
+<script>
+import { useSlots, isVue2 } from '@datafe/vue-demi'
 import NodeWrapper from './wrapper/node.vue'
 import EdgeWrapper from './wrapper/edge.vue'
-import PortWrapper from './wrapper/port.vue'
 import Node from './node.vue'
 import Edge from './edge.vue'
 import Port from './port.vue'
 import NewEdge from './new-edge.vue'
 import Arrow from './arrow.vue'
-import { isEqualWith } from 'lodash'
+import { isEqualWith } from '../utils/isEqualWith'
+import { Graph, Node as GraphNode, Edge as GraphEdge } from '@datafe/graph-core'
 
-import {
-  Graph,
-  IDataModel,
-  IEdge,
-  ILayout,
-  INode,
-  IDagreLayout,
-  INodeModel,
-  Node as GraphNode,
-  Edge as GraphEdge
-} from '@datafe/graph-core'
-
-@Component({
+export default {
+  name: 'GraphVue',
   components: {
     NodeWrapper,
     EdgeWrapper,
-    PortWrapper,
     Edge,
     Node,
     Port,
     Arrow,
     NewEdge
-  }
-})
-export default class GraphVue extends Vue {
-  @ProvideReactive()
-  graph: Graph = null as any
-
-  @Prop({ default: () => [], type: Array })
-  action!: string[]
-
-  @Prop({
-    default: () => {
-      return { nodes: [], edges: [] }
+  },
+  props: {
+    action: {
+      type: Array,
+      default: () => []
     },
-    type: Object
-  })
-  data!: IDataModel
-
-  @Prop({
-    default: null
-  })
-  layout!: ILayout
-
-  @Prop({
-    default: () => {
-      return {}
+    data: {
+      type: Object,
+      default: () => {
+        return { nodes: [], edges: [] }
+      }
+    },
+    layout: {
+      type: Object,
+      default: null
+    },
+    defaultNode: {
+      type: Object,
+      default: () => {}
     }
-  })
-  defaultNode!: INodeModel
-
-  nodes: INode[] = []
-  edges: IEdge[] = []
-  items: ReadonlyArray<INode | IEdge> = []
-
-  transform = {
-    scale: 1,
-    translateX: 0,
-    translateY: 0
-  }
-  brushPath = ''
-
-  isEdge(item: INode | IEdge) {
-    return item instanceof GraphEdge
-  }
-
-  isNode(item: INode | IEdge) {
-    return item instanceof GraphNode
-  }
-
-  handleDrop(e: DragEvent) {
-    this.$emit('drop', e)
-  }
-
-  mounted() {
-    this.init()
-  }
-
-  init() {
-    const graph = new Graph({
-      container: this.$refs.svg as HTMLElement,
-      direction: (this.layout?.options as IDagreLayout)?.rankdir || 'TB',
-      action: this.action,
-      defaultNode: this.defaultNode
-    })
-    this.graph = graph
-
-    this.initCustomHooks()
-
-    this.graph.data(JSON.parse(JSON.stringify(this.data)))
-    this.checkAutoLayout()
-
-    this.$emit('init', this.graph)
-  }
-
-  checkAutoLayout() {
-    const { options } = this.layout || {}
-    const hasOtherProps =
-      options !== undefined &&
-      Object.keys(options).some(key => key !== 'rankdir' && options[key])
-
-    if (hasOtherProps) {
-      this.graph.layout(this.layout)
+  },
+  data() {
+    return {
+      graph: null,
+      nodes: [],
+      edges: [],
+      items: [],
+      transform: {
+        scale: 1,
+        translateX: 0,
+        translateY: 0
+      },
+      brushPath: '',
+      hasSlots: null
     }
-  }
-
-  initCustomHooks() {
-    const hooks = [
-      'node:added',
-      'edge:added',
-      'node:click',
-      'edge:click',
-      'node:change',
-      'edge:change',
-      'port:change',
-      'port:added',
-      'port:deleted'
-    ]
-
-    hooks.forEach(hook => {
-      this.graph.on(hook, (...args) => {
-        this.$emit(hook, ...args)
+  },
+  watch: {
+    data(val, prev) {
+      if (isEqualWith(val, prev)) return
+      const data = JSON.parse(JSON.stringify(val))
+      this.graph.data(data)
+    },
+    action(val, prev) {
+      if (isEqualWith(val, prev)) return
+      this.graph.removeAction()
+      this.graph.addAction(val)
+    },
+    layout: {
+      handler(val, prev) {
+        if (isEqualWith(val, prev)) return
+        this.graph.layout(val, false)
+      },
+      deep: true
+    },
+    'layout.options.rankdir'() {
+      this.graph.layout(this.layout, false)
+      this.graph.getNodes().forEach(node => {
+        node.updatePorts(this.graph.get('direction'))
       })
-    })
+    }
+  },
+  methods: {
+    isEdge(item) {
+      return item instanceof GraphEdge
+    },
+    isNode(item) {
+      return item instanceof GraphNode
+    },
+    handleDrop(e) {
+      this.$emit('drop', e)
+    },
+    init() {
+      const graph = new Graph({
+        container: this.$refs.svg,
+        direction:
+          (this.layout && this.layout.options && this.layout.options.rankdir) ||
+          'TB',
+        action: this.action,
+        defaultNode: this.defaultNode
+      })
+      this.graph = graph
+      this.initCustomHooks()
 
-    this.graph.on('datachange', this.refreshGraph)
-    this.graph.on('translate', this.aftertranslate)
-    this.graph.on('zoom', this.afterzoom)
-    this.graph.on('brushing', this.brushing)
-  }
+      this.graph.data(JSON.parse(JSON.stringify(this.data)))
+      this.checkAutoLayout()
 
-  brushing(path: string) {
-    this.brushPath = path
-  }
+      this.$emit('init', this.graph)
+    },
+    checkAutoLayout() {
+      const { options } = this.layout || {}
+      const hasOtherProps =
+        options !== undefined &&
+        Object.keys(options).some(key => key !== 'rankdir' && options[key])
 
-  refreshGraph() {
-    this.items = this.graph.getSortedItem()
-  }
+      if (hasOtherProps) {
+        this.graph.layout(this.layout)
+      }
+    },
+    initCustomHooks() {
+      const hooks = [
+        'node:added',
+        'edge:added',
+        'node:click',
+        'edge:click',
+        'node:change',
+        'edge:change',
+        'port:change',
+        'port:added',
+        'port:deleted'
+      ]
 
-  aftertranslate(x: number, y: number) {
-    this.transform.translateX = x
-    this.transform.translateY = y
-  }
+      hooks.forEach(hook => {
+        this.graph.on(hook, (...args) => {
+          this.$emit(hook, ...args)
+        })
+      })
 
-  afterzoom(zoom: number) {
-    this.transform.scale = zoom
-  }
+      this.graph.on('datachange', this.refreshGraph)
+      this.graph.on('translate', this.aftertranslate)
+      this.graph.on('zoom', this.afterzoom)
+      this.graph.on('brushing', this.brushing)
+    },
+    brushing(path) {
+      this.brushPath = path
+    },
+    refreshGraph() {
+      this.items = this.graph.getSortedItem()
+    },
+    aftertranslate(x, y) {
+      this.transform.translateX = x
+      this.transform.translateY = y
+    },
+    afterzoom(zoom) {
+      this.transform.scale = zoom
+    }
+  },
+  mounted() {
+    if (isVue2) {
+      this.hasSlots = this.$scopedSlots
+    } else {
+      this.hasSlots = useSlots()
+    }
 
-  @Watch('data')
-  dataChange(val: IDataModel, prev) {
-    if (isEqualWith(val, prev)) return
-    const data = JSON.parse(JSON.stringify(val))
-    this.graph.data(data)
-  }
-
-  @Watch('action')
-  handelAction(v: string[], prev) {
-    if (isEqualWith(v, prev)) return
-    this.graph.removeAction()
-    this.graph.addAction(v)
-  }
-
-  @Watch('layout', { deep: true })
-  handelRankdir(v: ILayout, prev: ILayout) {
-    if (isEqualWith(v, prev)) return
-    this.graph.layout(v, false)
-  }
-
-  @Watch('layout.options.rankdir')
-  handelRankdirChange() {
-    this.graph.layout(this.layout, false)
-    this.graph.getNodes().forEach(node => {
-      node.updatePorts(this.graph.get('direction'))
-    })
-  }
-
+    this.init()
+  },
   beforeDestroy() {
     this.graph.destroy()
   }

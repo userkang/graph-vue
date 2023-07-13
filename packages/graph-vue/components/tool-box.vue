@@ -51,85 +51,83 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, InjectReactive } from 'vue-property-decorator'
-import { Graph } from '@datafe/graph-core'
-
-@Component
-export default class ToolBox extends Vue {
-  @InjectReactive()
-  graph!: Graph
-
-  isBrushing = false
-  undoEnable = false
-  redoEnable = false
-
-  handleChange(e: MouseEvent) {
-    if (!this.graph) {
-      return
+<script>
+export default {
+  data() {
+    return {
+      isBrushing: false,
+      undoEnable: false,
+      redoEnable: false
     }
-    const id = (e.target as HTMLElement).id
-    switch (id) {
-      case 'undo':
-        this.graph.undo()
-        break
-      case 'redo':
-        this.graph.redo()
-        break
-      case 'expand':
-        this.expand()
-        break
-      case 'shrink':
-        this.shrink()
-        break
-      case 'reset':
-        this.reset()
-        break
-      case 'select':
-        this.brushSelect()
-        break
-      case 'fullScreen':
-        this.graph.fullScreen()
-        break
-      case 'layout':
-        this.graph.layout()
-        break
-      case 'fitView':
-        this.graph.fitView()
-        break
+  },
+  computed: {
+    graph() {
+      return this.$parent.graph
     }
-  }
-
-  expand() {
-    this.graph.zoom(this.graph.getZoom() + 0.1)
-  }
-
-  shrink() {
-    this.graph.zoom(this.graph.getZoom() - 0.1)
-  }
-
-  reset() {
-    this.graph.zoom(1)
-  }
-
-  brushSelect() {
-    // 通过设置 brushing 属性，避免 brush-select 和 drag-blank 行为拖动事件的冲突问题。
-    this.isBrushing = !this.graph.get('brushing')
-    this.graph.set('brushing', this.isBrushing)
-  }
-
+  },
+  methods: {
+    handleChange(e) {
+      if (!this.graph) {
+        return
+      }
+      const id = e.target.id
+      switch (id) {
+        case 'undo':
+          this.graph.undo()
+          break
+        case 'redo':
+          this.graph.redo()
+          break
+        case 'expand':
+          this.expand()
+          break
+        case 'shrink':
+          this.shrink()
+          break
+        case 'reset':
+          this.reset()
+          break
+        case 'select':
+          this.brushSelect()
+          break
+        case 'fullScreen':
+          this.graph.fullScreen()
+          break
+        case 'layout':
+          this.graph.layout()
+          break
+        case 'fitView':
+          this.graph.fitView()
+          break
+      }
+    },
+    expand() {
+      this.graph.zoom(this.graph.getZoom() + 0.1)
+    },
+    shrink() {
+      this.graph.zoom(this.graph.getZoom() - 0.1)
+    },
+    reset() {
+      this.graph.zoom(1)
+    },
+    brushSelect() {
+      // 通过设置 brushing 属性，避免 brush-select 和 drag-blank 行为拖动事件的冲突问题。
+      this.isBrushing = !this.graph.get('brushing')
+      this.graph.set('brushing', this.isBrushing)
+    }
+  },
   mounted() {
     this.graph.on('stackchange', () => {
       this.undoEnable = this.graph.getUndoStack().length > 0
       this.redoEnable = this.graph.getRedoStack().length > 0
-    })
 
-    this.graph.on('mouseup', () => {
-      if (this.graph.get('brushing')) {
-        this.graph.set('brushing', false)
-        this.isBrushing = false
-      }
-    })
+      this.graph.on('mouseup', () => {
+          if (this.graph.get('brushing')) {
+            this.graph.set('brushing', false)
+            this.isBrushing = false
+          }
+        })
+      })
   }
 }
 </script>

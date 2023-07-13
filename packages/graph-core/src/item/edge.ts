@@ -44,6 +44,7 @@ export default class Edge extends Base<
     }
 
     this.set('cfg', cfg)
+    this.set('zIndex', model.zIndex || 0)
 
     this.fromNodeId = fromNode.id
     this.toNodeId = toNode.id

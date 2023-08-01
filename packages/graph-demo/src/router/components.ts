@@ -21,3 +21,9 @@ export const NodeCell = () =>
     /* webpackChunkName: "nodeCell"*/
     '../views/NodeCell.vue'
   )
+
+export const MindLayout = () =>
+  import(
+    /* webpackChunkName: "nodeCell"*/
+    '../views/MindLayout.vue'
+  )

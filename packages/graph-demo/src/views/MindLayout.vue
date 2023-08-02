@@ -1,11 +1,6 @@
 <template>
   <div class="container">
-    <GraphVue
-      :action="action"
-      :layout="layoutOptions"
-      @init="initGraph"
-      :defaultNode="nodeSize"
-    >
+    <GraphVue :action="action" @init="initGraph" :defaultNode="nodeSize">
       <template #node="{ node }">
         <div
           v-if="node.model.type === 'group'"
@@ -141,7 +136,6 @@ export default class MindLayout extends Vue {
   graph!: Graph
   dataMock = nodeCellMock
   graphState = GraphStore.state
-  layoutOptions: ILayout = { options: { rankdir: 'LR' } }
   nodeSize = {
     width: 200,
     height: 56
@@ -159,7 +153,14 @@ export default class MindLayout extends Vue {
     this.fixEdge()
 
     this.graph.data(this.dataMock)
+    this.mindlayout()
 
+    this.graph.fitView()
+
+    this.initEvent()
+  }
+
+  mindlayout() {
     const mainNode = this.graph
       .getNodes()
       .find(item => item.model.position === 'center') as any
@@ -221,10 +222,6 @@ export default class MindLayout extends Vue {
       const node = this.graph.findNode(item.id)
       node && node.updatePosition(node.x + offset.x, node.y + offset.y)
     })
-
-    this.graph.fitView()
-
-    this.initEvent()
   }
 
   fixPort() {
@@ -238,6 +235,13 @@ export default class MindLayout extends Vue {
         item.ports = [
           { id: `${item.id}_port_left`, type: 'out', position: 'left' },
           { id: `${item.id}_port_right`, type: 'in', position: 'right' }
+        ]
+      }
+      // 位于左侧节点需要将port位置左右交换
+      if (item.position === 'right') {
+        item.ports = [
+          { id: `${item.id}_port_left`, type: 'in', position: 'left' },
+          { id: `${item.id}_port_right`, type: 'out', position: 'right' }
         ]
       }
       // 主节点下子节点需要左右都有输出port

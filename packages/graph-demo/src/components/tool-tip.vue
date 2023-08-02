@@ -119,6 +119,9 @@ export default class ToolTip extends Vue {
 <style scoped lang="scss">
 .tooltip-wrap {
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 100%;
 }

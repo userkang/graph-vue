@@ -1,14 +1,22 @@
 <template>
   <div class="container">
     <GraphVue
-      :data="dataMock"
       :action="action"
       :layout="layoutOptions"
       @init="initGraph"
       :defaultNode="nodeSize"
     >
       <template #node="{ node }">
-        <div class="normal-node">
+        <div
+          v-if="node.model.type === 'group'"
+          class="group-node"
+          :class="{ red: node.model.position === 'center' }"
+        >
+          <div class="group-node-title">
+            <div>{{ node.model.label }} {{ node.id }}</div>
+          </div>
+        </div>
+        <div v-else class="normal-node">
           <div class="normal-node-left"></div>
           <div class="normal-node-right">
             <div class="normal-node-label">{{ node.model.label }}</div>
@@ -42,6 +50,7 @@ import {
   INode,
   ILayout
 } from '@datafe/graph-vue'
+import { nodes, edges } from './data'
 
 import GraphStore from '@/stores/graph'
 
@@ -58,51 +67,67 @@ const action = [
   'wheel-move'
 ]
 
-const nodeCellMock = {
-  nodes: [
-    {
-      id: '1',
-      label: 'main',
-      desc: '节点组1',
-      ports: [
-        { id: '1_port_left', type: 'out', position: 'left' },
-        { id: '1_port_right', type: 'out', position: 'right' }
-      ]
-    },
-    {
-      id: '2',
-      label: '节点组2',
-      type: 'left',
-      ports: [
-        { id: '2_port_left', type: 'out', position: 'left' },
-        { id: '2_port_right', type: 'in', position: 'right' }
-      ]
-    },
-    {
-      id: '3',
-      label: '节点组3',
-      type: 'right'
-    },
-    {
-      id: '4',
-      label: '节点组4',
-      type: 'right'
-    }
-  ],
-  edges: [
-    {
-      fromPortId: '1_port_left',
-      toNodeId: '2'
-    },
-    {
-      fromPortId: '1_port_right',
-      toNodeId: '3'
-    },
-    {
-      fromNodeId: '3',
-      toNodeId: '4'
-    }
-  ]
+const nodeCellMock: any = {
+  nodes: nodes,
+  edges: edges
+  // nodes: [
+  //   {
+  //     id: '10',
+  //     label: 'main',
+  //     desc: '节点组1',
+  //     type: 'group',
+  //     position: 'center'
+  //   },
+  //   {
+  //     id: '1',
+  //     label: 'main',
+  //     desc: '节点组1',
+  //     parentId: '10'
+  //   },
+  //   {
+  //     id: '2',
+  //     label: '节点组2',
+  //     position: 'left',
+  //     parentId: '12'
+  //   },
+  //   {
+  //     id: '12',
+  //     type: 'group',
+  //     label: '节点组12',
+  //     position: 'left'
+  //   },
+  //   {
+  //     id: '3',
+  //     label: '节点组3',
+  //     position: 'right'
+  //   },
+  //   {
+  //     id: '4',
+  //     label: '节点组4',
+  //     position: 'right',
+  //     parentId: '11'
+  //   },
+  //   {
+  //     id: '11',
+  //     label: '节点组11',
+  //     type: 'group',
+  //     position: 'right'
+  //   }
+  // ],
+  // edges: [
+  //   {
+  //     fromNodeId: '1',
+  //     toNodeId: '2'
+  //   },
+  //   {
+  //     fromNodeId: '1',
+  //     toNodeId: '3'
+  //   },
+  //   {
+  //     fromNodeId: '3',
+  //     toNodeId: '4'
+  //   }
+  // ]
 }
 
 @Component({
@@ -130,38 +155,44 @@ export default class MindLayout extends Vue {
     this.graphState.graph = graph
     this.graph = graph
 
-    const mainNode = this.graph.findNode('1') as any
-    const leftNodes = this.graph.findNode('2')
+    this.fixPort()
+    this.fixEdge()
+
+    this.graph.data(this.dataMock)
+
+    const mainNode = this.graph
+      .getNodes()
+      .find(item => item.model.position === 'center') as any
+
+    const leftNodes = this.graph
+      .getNodes()
+      .filter(item => item.model.position === 'left')
     const rightNodes = this.graph
       .getNodes()
-      .filter(item => item.model.type === 'right')
+      .filter(item => item.model.position === 'right')
+
+    const childNodes = mainNode.getChildren()
 
     this.graph.layout({
       options: {
-        rankdir: 'LR'
+        rankdir: 'LR',
+        ranksep: 100
       },
       data: {
-        nodes: [mainNode, ...rightNodes],
-        edges: [
-          {
-            fromNodeId: '1',
-            toNodeId: '3'
-          },
-          {
-            fromNodeId: '3',
-            toNodeId: '4'
-          }
-        ]
+        nodes: [mainNode, ...childNodes, ...rightNodes],
+        edges: []
       }
     })
+
     const mainInfo = {
       id: mainNode?.id,
       x: mainNode?.x,
       y: mainNode?.y
     }
+
     const nodes = [] as any
     this.graph.getNodes().forEach(item => {
-      if (item.model.type === 'right') {
+      if (item.model.position === 'right') {
         nodes.push({
           id: item?.id,
           x: item?.x,
@@ -172,16 +203,12 @@ export default class MindLayout extends Vue {
 
     this.graph.layout({
       options: {
-        rankdir: 'RL'
+        rankdir: 'RL',
+        ranksep: 100
       },
       data: {
-        nodes: [mainNode, leftNodes],
-        edges: [
-          {
-            fromNodeId: '1',
-            toNodeId: '2'
-          }
-        ]
+        nodes: [mainNode, ...childNodes, ...leftNodes],
+        edges: []
       }
     })
 
@@ -195,9 +222,55 @@ export default class MindLayout extends Vue {
       node && node.updatePosition(node.x + offset.x, node.y + offset.y)
     })
 
-    this.graph.fitCenter()
+    this.graph.fitView()
 
     this.initEvent()
+  }
+
+  fixPort() {
+    const mainNode = this.dataMock.nodes.find(
+      item => item.position === 'center'
+    )
+
+    this.dataMock.nodes = this.dataMock.nodes.map(item => {
+      // 位于左侧节点需要将port位置左右交换
+      if (item.position === 'left') {
+        item.ports = [
+          { id: `${item.id}_port_left`, type: 'out', position: 'left' },
+          { id: `${item.id}_port_right`, type: 'in', position: 'right' }
+        ]
+      }
+      // 主节点下子节点需要左右都有输出port
+      if (item.parentId === mainNode.id) {
+        item.ports = [
+          { id: `${item.id}_port_left`, type: 'out', position: 'left' },
+          { id: `${item.id}_port_right`, type: 'out', position: 'right' }
+        ]
+      }
+
+      return item
+    })
+  }
+
+  fixEdge() {
+    const mainNode = this.dataMock.nodes.find(
+      item => item.position === 'center'
+    )
+
+    const childNodesId = this.dataMock.nodes
+      .filter(item => item.parentId === mainNode.id)
+      .map(item => item.id)
+
+    this.dataMock.edges = this.dataMock.edges.map(item => {
+      if (childNodesId.includes(item.fromNodeId)) {
+        const toNode = this.dataMock.nodes.find(
+          node => node.id === item.toNodeId
+        )
+        item.fromPortId = `${item.fromNodeId}_port_${toNode.position}`
+      }
+
+      return item
+    })
   }
 
   initEvent() {
@@ -216,6 +289,14 @@ export default class MindLayout extends Vue {
     const { x: x1, y: y1 } = edge.fromPort
     const { x: x2, y: y2 } = edge.toPort
     const radius = 8
+
+    // const v = (Math.abs(x2 - x1) / 3) * 2
+    // const d = v < 20 ? 20 : v
+    // const qx1 = x1 + d
+    // const qy1 = y1
+    // const qx2 = x2 - d
+    // const qy2 = y2
+    // return `M ${x1} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2}`
 
     const xc = (x2 - x1) / 2
     let xRadius = x1 < x2 ? radius : -radius
@@ -338,5 +419,8 @@ export default class MindLayout extends Vue {
 ::v-deep .graph-vue-arrow {
   fill: #999;
   stroke: #999;
+}
+.red {
+  background: #2d72d263;
 }
 </style>

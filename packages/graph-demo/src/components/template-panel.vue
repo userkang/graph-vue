@@ -11,7 +11,8 @@
       >
         <ToolTip :message="item.desc" placement="right">
           <div class="demo-item-wrap">
-            <img class="image" :src="item.img" />
+            <!-- <img class="image" :src="item.img" /> -->
+            {{ item.desc }}
           </div>
         </ToolTip>
       </li>
@@ -48,25 +49,25 @@ export default class ComponentPanel extends Vue {
   demoTemplates = [
     {
       id: getRandomId(),
-      type: demoTypes.DEFAULT,
+      type: 'dag',
       desc: 'dag 图',
       img: demoDefault
     },
     {
       id: getRandomId(),
-      type: demoTypes.TREE,
+      type: 'tree',
       desc: '树型结构',
       img: demoTree
     },
     {
       id: getRandomId(),
-      type: demoTypes.MINDMAP,
+      type: 'mindMap',
       desc: '思维导图',
       img: demoTree
     },
     {
       id: getRandomId(),
-      type: demoTypes.NODEGROUP,
+      type: 'nodeCell',
       desc: '节点组',
       img: demoTree
     },
@@ -78,14 +79,20 @@ export default class ComponentPanel extends Vue {
     },
     {
       id: getRandomId(),
-      type: demoTypes.CIRCLE_LAYOUT,
+      type: 'circleLayout',
       desc: '圆形布局',
       img: demoCircle
     },
-     {
+    {
       id: getRandomId(),
-      type: demoTypes.NODEPORT,
+      type: 'nodePort',
       desc: '节点port',
+      img: demoCircle
+    },
+    {
+      id: getRandomId(),
+      type: 'mindLayout',
+      desc: 'mindMap布局',
       img: demoCircle
     }
   ]
@@ -145,24 +152,23 @@ export default class ComponentPanel extends Vue {
 }
 .demo {
   width: 100%;
-  &-item {
+  overflow: auto;
+  height: calc(100% - 30px);
+  padding-bottom: 40px;
+  .demo-item {
     position: relative;
-    margin-top: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
-    height: 100px;
-    margin-left: 10%;
+    height: 40px;
     overflow: hidden;
     box-sizing: border-box;
-    &-wrap {
+    color: #fff;
+    cursor: pointer;
+    .demo-wrap {
       position: relative;
       width: 100%;
       height: 100%;
       transition: all 0.5s;
       box-sizing: border-box;
-      &:hover {
+      demo:hover {
         transform: scale(1.1);
       }
       .image {
@@ -172,7 +178,7 @@ export default class ComponentPanel extends Vue {
     }
   }
   .selected {
-    border: 1px solid #4e73ff;
+    background: #484848;
   }
 }
 </style>

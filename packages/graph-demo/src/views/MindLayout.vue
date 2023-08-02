@@ -50,7 +50,7 @@ import {
   INode,
   ILayout
 } from '@datafe/graph-vue'
-import { nodes, edges } from './data'
+import { nodes, edges } from '@/mock/mindLayout'
 
 import GraphStore from '@/stores/graph'
 

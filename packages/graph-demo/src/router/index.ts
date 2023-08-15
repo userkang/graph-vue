@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 
-import { DAG, Tree, MindMap, NodeCell } from './components'
+import { DAG, Tree, MindMap, NodeCell, MindLayout } from './components'
 
 Vue.use(Router)
 
@@ -57,6 +57,11 @@ export default new Router({
           /* webpackChunkName: "NodePort"*/
           '../views/NodePort.vue'
         )
+    },
+    {
+      path: '/mindLayout',
+      name: 'mindLayout',
+      component: MindLayout
     }
   ]
 })

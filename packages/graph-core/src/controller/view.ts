@@ -302,15 +302,15 @@ export default class ViewController {
   }
 
   resize() {
-    const width = this.svgInfo.width
-    const height = this.svgInfo.height
+    // const width = this.svgInfo.width
+    // const height = this.svgInfo.height
     this.updateSvgInfo()
-    if (width && height) {
-      const x = ((this.svgInfo.width - width) * this.transform.scale) / 2
-      const y = ((this.svgInfo.height - height) * this.transform.scale) / 2
-      this.translateBy(x, y)
-      this.caculateOffset()
-    }
+    // if (width && height) {
+    //   const x = ((this.svgInfo.width - width) * this.transform.scale) / 2
+    //   const y = ((this.svgInfo.height - height) * this.transform.scale) / 2
+    //   this.translateBy(x, y)
+    //   this.caculateOffset()
+    // }
   }
 
   destroy() {

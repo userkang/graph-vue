@@ -1,6 +1,6 @@
 {
   "name": "@datafe/graph-vue",
-  "version": "0.3.2-beta01",
+  "version": "0.3.2-beta02",
   "scripts": {
     "build": "webpack --config webpack.config.js",
     "lint": "vue-cli-service lint --no-fix",
@@ -12,16 +12,10 @@
     "lib"
   ],
   "peerDependencies": {
-    "@vue/composition-api": "^1.0.0-rc.1",
-    "vue": "^2.0.0 || >=3.0.0"
-  },
-  "peerDependenciesMeta": {
-    "@vue/composition-api": {
-      "optional": true
-    }
+    "vue": "^2.0.0"
   },
   "dependencies": {
-    "@datafe/graph-core": "1.0.12-beta01",
+    "@datafe/graph-core": "1.0.12-beta02",
     "@datafe/vue-demi": "^0.14.5"
   },
   "devDependencies": {

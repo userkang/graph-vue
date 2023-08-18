@@ -957,10 +957,10 @@
     "@babel/helper-validator-identifier" "^7.19.1"
     to-fast-properties "^2.0.0"
 
-"@datafe/graph-core@1.0.12-beta01":
-  version "1.0.12-beta01"
-  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-1.0.12-beta01.tgz#1bd0b5b4ecf7c4e385586be3f81f82b225de3a5d"
-  integrity sha1-G9C1tOz3xOOFWGvj+B+CsiXeOl0=
+"@datafe/graph-core@1.0.12-beta03":
+  version "1.0.12-beta03"
+  resolved "http://r.npm.sankuai.com/@datafe/graph-core/download/@datafe/graph-core-1.0.12-beta03.tgz#8b7365cc1bc79144875cff468b1fb0630f25ecb6"
+  integrity sha1-i3NlzBvHkUSHXP9Gix+wYw8l7LY=
   dependencies:
     dagre "0.8.5"
 

@@ -191,6 +191,12 @@ export default class ItemController extends EventEmitter<
     const node = new Node(model, nodeCfg)
     this.$store.add(node)
 
+    // 判断是否有 parentId
+    if (model.parentId) {
+      const parentNode = graph.findNode(model.parentId)
+      parentNode && parentNode.addChild(node)
+    }
+
     node.on('change', (node: INode, type: string) =>
       this.emit('node:change', node, type)
     )

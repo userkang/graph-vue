@@ -42,8 +42,7 @@ import {
   MiniMap,
   GraphVue,
   Graph,
-  INode,
-  ILayout
+  INode
 } from '@datafe/graph-vue'
 import { nodes, edges } from '@/mock/mindLayout'
 
@@ -303,8 +302,8 @@ export default class MindLayout extends Vue {
     // return `M ${x1} ${y1} C ${qx1} ${qy1} ${qx2} ${qy2} ${x2} ${y2}`
 
     const xc = (x2 - x1) / 2
-    let xRadius = x1 < x2 ? radius : -radius
-    let yRadius =
+    const xRadius = x1 < x2 ? radius : -radius
+    const yRadius =
       Math.abs(y2 - y1) < 2 * radius
         ? (y2 - y1) / 2
         : y2 > y1

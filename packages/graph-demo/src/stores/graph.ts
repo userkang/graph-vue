@@ -1,6 +1,6 @@
 import GraphConfigStore from './graph-config'
 import { Graph as GraphType } from '@datafe/graph-core'
-import { dagMock, treeMock, mindMapMock } from '@/mock/graph'
+import { dagMock, treeMock } from '@/mock/graph'
 
 class Graph {
   public state = {

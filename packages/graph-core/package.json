@@ -1,18 +1,18 @@
 {
   "name": "@datafe/graph-core",
-  "version": "1.0.14-beta01",
+  "version": "1.0.14-beta02",
   "main": "dist/core.min.js",
   "types": "dist/src/index.d.ts",
   "files": [
-    "dist",
-    "patches"
+    "dist"
   ],
   "scripts": {
     "tsc": "tsc",
-    "build": "yarn prepare && yarn tsc && webpack --config webpack.config.js --mode production",
+    "build": "yarn patch-package && yarn tsc && webpack --config webpack.config.js --mode production",
     "patch": "npm version patch",
     "pub": "yarn && yarn build && mnpm publish",
-    "prepare": "patch-package"
+    "patch-package": "patch-package",
+    "postinstall": "if [ -d \"./patches\" ]; then patch-package; fi"
   },
   "dependencies": {
     "dagre": "0.8.5"

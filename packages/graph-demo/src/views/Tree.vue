@@ -6,6 +6,7 @@
       :action="action"
       :layout="layout"
       @init="initGraph"
+      virtual
     >
       <template #node="{ node }">
         <div
@@ -33,7 +34,7 @@
 
       <template #port> </template>
 
-      <MiniMap />
+      <MiniMap sample />
       <ToolBox />
       <Menu class="menu" v-model="menuShow">
         <li @click="deleteItem">删除</li>

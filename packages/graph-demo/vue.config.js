@@ -39,28 +39,11 @@ module.exports = {
         ...extraAlias
       }
     },
-    plugins: [
-      new HtmlWebpackPlugin({
-        filename: 'index.html',
-        template: htmlPath,
-        inject: true,
-        publicPath: '',
-        minify: {
-          removeComments: true,
-          collapseWhitespace: true,
-          removeAttributeQuotes: true
-          // more options:
-          // https://github.com/kangax/html-minifier#options-quick-reference
-        },
-        // necessary to consistently work with multiple chunks via CommonsChunkPlugin
-        chunksSortMode: 'dependency'
-      })
-    ]
+    plugins: []
   },
   devServer: {
     open: true,
     port: 9000,
-    hot: true,
-    disableHostCheck: true
+    hot: true
   }
 }

@@ -43,6 +43,10 @@ export default {
     theme: {
       type: Array,
       default: () => [255, 255, 255]
+    },
+    sample: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -141,10 +145,25 @@ export default {
         return
       }
       this.canGraphChage = false
+      const g = this.graph.getContainer().querySelector('g')
+      const bboxs = this.nodesRect
       window.requestAnimationFrame(() => {
-        const g = this.graph.getContainer().querySelector('g')
         if (g) {
-          this.svgHTML = g.innerHTML
+          if (this.sample) {
+            const rectDom = document.createElementNS(
+              'http://www.w3.org/2000/svg',
+              'rect'
+            )
+            rectDom.setAttribute('width', bboxs.width)
+            rectDom.setAttribute('height', bboxs.height)
+            rectDom.setAttribute(
+              'transform',
+              `translate(${bboxs.left}, ${bboxs.top})`
+            )
+            this.svgHTML = rectDom.outerHTML
+          } else {
+            this.svgHTML = g.innerHTML
+          }
         }
         this.canGraphChage = true
       })

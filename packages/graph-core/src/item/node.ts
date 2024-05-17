@@ -198,10 +198,15 @@ export default class Node extends Base<
     this.edgeIdSet.delete(id)
   }
 
-  public updatePosition(x: number, y: number) {
+  public updatePosition(
+    x: number,
+    y: number,
+    options: { emit: boolean } = { emit: true }
+  ) {
     // 记录移动距离
     const moveX = x - this.x
     const moveY = y - this.y
+
     // 节点位置更新
     this.set('x', x)
     this.set('y', y)
@@ -211,7 +216,7 @@ export default class Node extends Base<
       this.model.y = y
     }
 
-    this.emit('change', this, 'position', { moveX, moveY })
+    options.emit && this.emit('change', this, 'position', { moveX, moveY })
   }
 
   /**

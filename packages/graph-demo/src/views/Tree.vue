@@ -41,7 +41,7 @@
         <li @click="deleteItem">删除</li>
       </Menu>
     </GraphVue>
-    <ConfigPanel />
+    <!-- <ConfigPanel /> -->
   </div>
 </template>
 

@@ -48,7 +48,7 @@ const nodeCellMock = {
     {
       id: '1',
       label: '1',
-      ports: [{ position: 'right', type: 'in' }, { position: 'top' }]
+      ports: [{ id: '1-1', position: 'right', type: 'in' }, { position: 'top' }]
     },
     {
       id: '2',
@@ -58,7 +58,7 @@ const nodeCellMock = {
   ],
   edges: [
     {
-      fromNodeId: '1',
+      fromPortId: '1-1',
       toNodeId: '2'
     }
   ]

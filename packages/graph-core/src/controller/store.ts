@@ -137,9 +137,8 @@ export default class Store extends EventEmitter<
   }
 
   findNodeByPort = (portId: itemId) => {
-    return this.getNodes().find(node =>
-      node.ports.find(port => port.id === portId)
-    )
+    const nodeId = this.findPort(portId)?.nodeId
+    return (nodeId && this.findNode(nodeId)) || void 0
   }
 
   getDataModel = (): IDataModel => {

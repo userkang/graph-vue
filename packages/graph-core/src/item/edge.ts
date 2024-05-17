@@ -54,15 +54,6 @@ export default class Edge extends Base<
     // 将边与其对应节点关联
     this.fromNode.addEdge(this)
     this.toNode.addEdge(this)
-    this.$store.fromPort_edges.on(
-      'change',
-      (e: ManyToOneEvent<Edge, IPort>) => {
-        if (e.many !== this) {
-          return
-        }
-        this.emit('change', this)
-      }
-    )
   }
 
   public get cfg() {
@@ -106,14 +97,14 @@ export default class Edge extends Base<
 
   public setPoint() {
     const fromPort = this.matchPort('out')
-    fromPort.setState('linked')
+    fromPort.setState('linked', { emit: false })
     this._itemMap.fromPort = fromPort
-    this.$store.fromPort_edges.add(this, fromPort)
+    // this.$store.fromPort_edges.add(this, fromPort)
 
     const toPort = this.matchPort('in')
-    toPort.setState('linked')
+    toPort.setState('linked', { emit: false })
     this._itemMap.toPort = toPort
-    this.$store.toPort_edges.add(this, toPort)
+    // this.$store.toPort_edges.add(this, toPort)
   }
 
   public update(model?: IEdgeModel) {
@@ -126,6 +117,7 @@ export default class Edge extends Base<
       Object.assign(this.model, model)
     }
     this.setPoint()
+    this.emit('change', this, 'model')
   }
 
   public refresh() {

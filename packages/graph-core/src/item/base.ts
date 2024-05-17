@@ -65,20 +65,30 @@ export default class Base<
     this.set('zIndex', value)
   }
 
-  public setZIndex(value: number) {
+  public setZIndex(
+    value: number,
+    options: {
+      emit: boolean
+    } = { emit: true }
+  ) {
     if (this.model.zIndex) {
       ;(this.model as any).zIndex = value
     }
     this.set('zIndex', value)
-    this.emit('change', this, 'zIndex')
+    options.emit && this.emit('change', this, 'zIndex')
   }
 
-  public setState<K extends keyof States>(state: K) {
+  public setState<K extends keyof States>(
+    state: K,
+    options: {
+      emit: boolean
+    } = { emit: true }
+  ) {
     if (this.hasState(state)) {
       return
     }
     this.getStates()[state] = true
-    this.emit('change', this, state)
+    options.emit && this.emit('change', this, state)
   }
 
   public hasState<K extends keyof States>(state: K): States[K] {

@@ -41,6 +41,7 @@ export default class Node extends Element {
   initHook() {
     this.addEvent('node:moving', this.updatePath)
     this.addEvent('node:moved', this.updatePath)
+    this.addEvent('datachange', this.setPath)
     this.addEvent('layout', this.setPath)
     this.addEvent('edge:change:selected', this.updateSelect)
   }

@@ -90,7 +90,7 @@ export default class NodeCell extends Vue {
   }
 
   path(edge: IEdge) {
-    return `M ${edge.fromPort.x} ${edge.fromPort.y} L ${edge.toPort.x} ${edge.toPort.y}`
+    return `M ${edge.source.x} ${edge.source.y} L ${edge.target.x} ${edge.target.y}`
   }
 }
 </script>

@@ -62,7 +62,9 @@ export default class LayoutController extends EventEmitter<
 
     const nodes = cfg.data?.nodes || this.$graph.getNodes()
     nodes.forEach(node => {
-      node.updatePorts()
+      node.getEdges().forEach(edge => {
+        edge.updatePoint()
+      })
     })
     return res
   }

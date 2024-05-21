@@ -1,7 +1,7 @@
 import Base from './base'
 import { uniqueId } from '../util/utils'
 import { IEdgeModel, INode, IPort } from '../types'
-import { BaseCfg, IEdgeCfg, ManyToOneEvent } from '../types/type'
+import { BaseCfg, IEdgeCfg } from '../types/type'
 import Store from '../controller/store'
 
 interface ItemMap {
@@ -15,8 +15,8 @@ export default class Edge extends Base<
 > {
   private readonly _itemMap: ItemMap = {} as ItemMap
   $store: Store
-  fromNodeId: string
-  toNodeId: string
+  fromNodeId = ''
+  toNodeId = ''
   constructor(model: IEdgeModel, cfg: IEdgeCfg) {
     super(model)
     this.$store = cfg.store
@@ -24,18 +24,9 @@ export default class Edge extends Base<
     if (model.id !== undefined && this.$store.findEdge(model.id)) {
       throw new Error(`can't add edge, exist edge where id is ${model.id}`)
     }
-    const { fromPortId, toPortId, fromNodeId, toNodeId } = model
-    // 如果仅有 portId，自动补全 nodeId
-    const fromNode =
-      (fromNodeId !== undefined && this.$store.findNode(fromNodeId)) ||
-      (fromPortId !== undefined && this.$store.findNodeByPort(fromPortId))
-    const toNode =
-      (toNodeId !== undefined && this.$store.findNode(toNodeId)) ||
-      (toPortId !== undefined && this.$store.findNodeByPort(toPortId))
 
-    if (!fromNode || !toNode) {
-      throw new Error(`please check the edge from ${fromNodeId} to ${toNodeId}`)
-    }
+    this.set('cfg', cfg)
+    this.set('zIndex', model.zIndex || 0)
 
     if (!this.id) {
       const id = uniqueId('edge')
@@ -43,38 +34,39 @@ export default class Edge extends Base<
       this.model.id = this.id
     }
 
-    this.set('cfg', cfg)
-    this.set('zIndex', model.zIndex || 0)
+    const { source, target } = model
+    this.set('source', source || { x: 0, y: 0 })
+    this.set('target', target || { x: 0, y: 0 })
 
-    this.fromNodeId = fromNode.id
-    this.toNodeId = toNode.id
-
+    this.setNode()
     this.setPoint()
-
-    // 将边与其对应节点关联
-    this.fromNode.addEdge(this)
-    this.toNode.addEdge(this)
   }
 
   public get cfg() {
     return this.get('cfg')
   }
 
-  public get fromNode(): INode {
-    return this.$store.findNode(this.fromNodeId) as INode
+  public get fromNode(): INode | undefined {
+    return this.$store.findNode(this.fromNodeId)
   }
 
-  public get toNode(): INode {
-    return this.$store.findNode(this.toNodeId) as INode
+  public get toNode(): INode | undefined {
+    return this.$store.findNode(this.toNodeId)
+  }
+
+  public get source() {
+    return this.get('source')
+  }
+
+  public get target() {
+    return this.get('target')
   }
 
   public get fromPort() {
-    // return   this.$store.fromPort_edges.find(this) as IPort
     return this._itemMap.fromPort
   }
 
   public get toPort() {
-    // return   this.$store.toPort_edges.find(this) as IPort
     return this._itemMap.toPort
   }
 
@@ -84,27 +76,86 @@ export default class Edge extends Base<
         ? { portId: String(this.model.fromPortId), node: this.fromNode }
         : { portId: String(this.model.toPortId), node: this.toNode }
 
+    if (!payload.node) {
+      return
+    }
+
     const port =
       payload.node.ports.find(
         item =>
           !item.type ||
           (item.type === type &&
-            (!payload.node.id ||
+            (!payload.node?.id ||
               (payload.portId && item.id === payload.portId)))
       ) || (payload.node.ports.find(item => item.type === type) as IPort)
+
+    port.setState('linked', { emit: false })
+
     return port
   }
 
-  public setPoint() {
+  private setNode() {
+    const { fromPortId, toPortId, fromNodeId, toNodeId } = this.model
+    // 如果仅有 portId，自动补全 nodeId
+    const fromNode =
+      (fromNodeId !== undefined && this.$store.findNode(fromNodeId)) ||
+      (fromPortId !== undefined && this.$store.findNodeByPort(fromPortId))
+    const toNode =
+      (toNodeId !== undefined && this.$store.findNode(toNodeId)) ||
+      (toPortId !== undefined && this.$store.findNodeByPort(toPortId))
+
+    if (!fromNode || !toNode) {
+      return
+    }
+
+    this.fromNodeId = fromNode.id
+    this.toNodeId = toNode.id
+
+    // 将边与其对应节点关联
+    this.fromNode && this.fromNode.addEdge(this)
+    this.toNode && this.toNode.addEdge(this)
+
+    this.fromNode?.on('change', (e, type) => {
+      type === 'position' && this.updatePoint()
+    })
+    this.toNode?.on('change', (e, type) => {
+      type === 'position' && this.updatePoint()
+    })
+  }
+
+  public updatePoint() {
+    if (this.fromPort && this.fromNode) {
+      this.source.x = this.fromPort.x
+      this.source.y = this.fromPort.y
+    }
+    if (this.toPort && this.toNode) {
+      this.target.x = this.toPort.x
+      this.target.y = this.toPort.y
+    }
+  }
+
+  private setPoint() {
     const fromPort = this.matchPort('out')
-    fromPort.setState('linked', { emit: false })
-    this._itemMap.fromPort = fromPort
-    // this.$store.fromPort_edges.add(this, fromPort)
+    if (fromPort && this.fromNode) {
+      this._itemMap.fromPort = fromPort
+      if (!this.source.x) {
+        this.source.x = fromPort.x
+      }
+      if (!this.source.y) {
+        this.source.y = fromPort.y
+      }
+    }
 
     const toPort = this.matchPort('in')
-    toPort.setState('linked', { emit: false })
-    this._itemMap.toPort = toPort
-    // this.$store.toPort_edges.add(this, toPort)
+    if (toPort && this.toNode) {
+      this._itemMap.toPort = toPort
+      if (!this.target.x) {
+        this.target.x = toPort.x
+      }
+      if (!this.target.y) {
+        this.target.y = toPort.y
+      }
+    }
   }
 
   public update(model?: IEdgeModel) {
@@ -130,14 +181,20 @@ export default class Edge extends Base<
    */
   remove() {
     const { fromNode, toNode, fromPort, toPort } = this
-    fromNode.deleteEdge(this.id)
-    toNode.deleteEdge(this.id)
+    fromNode && fromNode.deleteEdge(this)
+    toNode && toNode.deleteEdge(this)
     // 如果边两端的 port 没有其他边连接，就清除该 port 的 linked 状态
-    if (!fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)) {
+    if (
+      fromNode &&
+      !fromNode.getEdges().find(item => item.fromPort.id === fromPort.id)
+    ) {
       fromPort.clearState('linked')
     }
 
-    if (!toNode.getEdges().find(item => item.toPort.id === toPort.id)) {
+    if (
+      toNode &&
+      !toNode.getEdges().find(item => item.toPort.id === toPort.id)
+    ) {
       toPort.clearState('linked')
     }
 

@@ -226,8 +226,8 @@ export default {
       }
       if (item instanceof GraphEdge) {
         return (
-          this.pointInCanvasView(item.fromPort.x, item.fromPort.y, 0, 0) ||
-          this.pointInCanvasView(item.toPort.x, item.toPort.y, 0, 0)
+          this.pointInCanvasView(item.source.x, item.source.y, 0, 0) ||
+          this.pointInCanvasView(item.target.x, item.target.y, 0, 0)
         )
       }
     },

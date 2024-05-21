@@ -47,7 +47,7 @@ export default class Node extends Element {
   }
 
   updatePath(moveNode: INode) {
-    if ([this.edge.fromNode.id, this.edge.toNode.id].includes(moveNode.id)) {
+    if ([this.edge.fromNode?.id, this.edge.toNode?.id].includes(moveNode.id)) {
       this.setPath()
     }
   }

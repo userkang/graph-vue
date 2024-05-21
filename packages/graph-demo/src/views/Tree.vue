@@ -115,8 +115,8 @@ export default class Tree extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromPort
-    const { x: x2, y: y2 } = edge.toPort
+    const { x: x1, y: y1 } = edge.source
+    const { x: x2, y: y2 } = edge.target
 
     if (['TB', 'BT'].includes(this.graph.get('direction'))) {
       const xc = (y2 - y1) / 2
@@ -138,10 +138,10 @@ export default class Tree extends Vue {
   }
 
   text(edge: IEdge) {
-    const { fromPort, toPort } = edge
+    const { source, target } = edge
     return {
-      x: (fromPort.x + toPort.x) / 2,
-      y: (fromPort.y + toPort.y) / 2
+      x: (source.x + target.x) / 2,
+      y: (source.y + target.y) / 2
     }
   }
 

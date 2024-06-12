@@ -7,16 +7,9 @@
   </div>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INode } from 'graph-logic'
-
-@Component
-export default class Node extends Vue {
-  @Prop({
-    required: true
-  })
-  node!: INode
+<script>
+export default {
+  props: ['node']
 }
 </script>
 

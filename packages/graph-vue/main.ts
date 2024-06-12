@@ -1,13 +1,7 @@
-import GraphVue from './components/graph.vue'
-import ToolBox from './components/tool-box.vue'
-import Menu from './components/menu.vue'
-import MiniMap from './components/minimap.vue'
-
-const components = { GraphVue, ToolBox, Menu, MiniMap }
-
-export { GraphVue, ToolBox, Menu, MiniMap }
+import * as components from './components/index'
 
 export * from 'graph-logic'
+export * from './components/index'
 
 export default {
   install(Vue) {

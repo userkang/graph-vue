@@ -41,12 +41,13 @@ export default class Node extends Element {
   initHook() {
     this.addEvent('node:moving', this.updatePath)
     this.addEvent('node:moved', this.updatePath)
+    this.addEvent('datachange', this.setPath)
     this.addEvent('layout', this.setPath)
     this.addEvent('edge:change:selected', this.updateSelect)
   }
 
   updatePath(moveNode: INode) {
-    if ([this.edge.fromNode.id, this.edge.toNode.id].includes(moveNode.id)) {
+    if ([this.edge.fromNode?.id, this.edge.toNode?.id].includes(moveNode.id)) {
       this.setPath()
     }
   }

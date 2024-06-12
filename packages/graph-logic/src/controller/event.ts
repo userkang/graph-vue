@@ -1,6 +1,7 @@
 import { addEventListener, getItemData, getItemType } from '../util/dom'
 import behaviors from '../behavior'
 import Graph, { useGraph } from './graph'
+import { IGraphEvent } from '../types'
 
 export const MOUSEEVENTS = [
   'mousedown',
@@ -42,8 +43,8 @@ export default class EventController {
   private $graph: Graph
   $svg: SVGSVGElement
   eventQueue: { [key: string]: any } = []
-  preItemType = 'svg'
-  currentItemType = 'svg'
+  preItem: IGraphEvent | null = null
+  currentItem: IGraphEvent | null = null
   behaveInstance: { [key: string]: any } = {}
 
   // 移动前的坐标
@@ -57,7 +58,7 @@ export default class EventController {
       this.$svg = svg
     } else {
       throw new ReferenceError(`找不到svg`)
-    } 
+    }
     this.addBehavior()
     this.defaultEmit()
     this.initEvent()
@@ -125,7 +126,7 @@ export default class EventController {
     }
 
     if (eventType === 'mousemove') {
-      this.handleMouseMove(e)
+      this.handleMouseMove()
     }
 
     if (eventType === 'mouseup') {
@@ -149,23 +150,24 @@ export default class EventController {
     const { x, y } = graph.getPointByClient(e.x, e.y)
 
     if (e.target === this.$svg) {
-      this.currentItemType = 'blank'
-      graph.emit(`blank:${eventType}`, { e, x, y })
+      this.currentItem = { e, x, y, target: undefined, data: { type: 'blank' } }
+      graph.emit(`blank:${eventType}`, this.currentItem)
     }
 
     const type = getItemType(e)
     if (type) {
-      this.currentItemType = type
       const data = getItemData(e)
       const target = this.findItem(type, data.id as string)
-      // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
-      graph.emit(`${this.currentItemType}:${eventType}`, {
+      this.currentItem = {
         e,
         x,
         y,
         data,
         target
-      })
+      }
+
+      // 具有 type 类型的元素，data 参数会带上其dom节点上的 graph-type 值。
+      graph.emit(`${type}:${eventType}`, this.currentItem)
     }
 
     graph.emit(eventType, e)
@@ -186,13 +188,16 @@ export default class EventController {
     this.$graph.emit(e.type, e)
   }
 
-  handleMouseMove(e: MouseEvent) {
-    if (this.preItemType !== this.currentItemType) {
-      this.$graph.emit(`${this.preItemType}.mouseleave`)
-      this.$graph.emit(`${this.currentItemType}.mouseenter`)
+  handleMouseMove() {
+    const preItemType = this.preItem?.data.type
+    const currentItemType = this.currentItem?.data.type
+
+    if (preItemType !== currentItemType) {
+      this.$graph.emit(`${preItemType}:mouseleave`, this.preItem)
+      this.$graph.emit(`${currentItemType}:mouseenter`, this.currentItem)
     }
 
-    this.preItemType = this.currentItemType
+    this.preItem = this.currentItem
   }
 
   /**
@@ -210,7 +215,7 @@ export default class EventController {
       item.remove()
     })
     this.eventQueue = []
-    this.behaveInstance = [] 
+    this.behaveInstance = []
     this.$graph.off()
   }
 }

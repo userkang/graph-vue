@@ -37,24 +37,24 @@ export default class Port extends Base<
     let y = 0
     switch (position) {
       case 'left':
-        x = rect.x
-        y = rect.y + rect.height * indexRatio
+        x = 0
+        y = rect.height * indexRatio
         break
       case 'right':
-        x = rect.x + rect.width
-        y = rect.y + rect.height * indexRatio
+        x = rect.width
+        y = rect.height * indexRatio
         break
       case 'top':
-        x = rect.x + rect.width * indexRatio
-        y = rect.y
+        x = rect.width * indexRatio
+        y = 0
         break
       case 'bottom':
-        x = rect.x + rect.width * indexRatio
-        y = rect.y + rect.height
+        x = rect.width * indexRatio
+        y = rect.height
         break
       case 'center':
-        x = rect.x + rect.width / 2
-        y = rect.y + rect.height / 2
+        x = rect.width / 2
+        y = rect.height / 2
         break
     }
 
@@ -105,23 +105,32 @@ export default class Port extends Base<
       this.model.id = this.id
     }
     this.$store = cfg.store
-    this.set('x', cfg.x)
-    this.set('y', cfg.y)
+    this.set('offsetX', cfg.x)
+    this.set('offsetY', cfg.y)
     this.set('type', model.type)
-  }
-
-  private onNodeChange = (target: INode, type: string, data?: any) => {
-    if (type === 'position') {
-      this.update(this.x + data.moveX, this.y + data.moveY)
-    }
+    this.set('position', model.position)
   }
 
   public get x(): number {
-    return this.get('x')
+    const node = Port.containerMap.get(this)
+    return this.get('offsetX') + (node?.x || 0)
   }
 
   public get y(): number {
-    return this.get('y')
+    const node = Port.containerMap.get(this)
+    return this.get('offsetY') + (node?.y || 0)
+  }
+
+  public get offsetX(): number {
+    return this.get('offsetX')
+  }
+
+  public get offsetY(): number {
+    return this.get('offsetY')
+  }
+
+  public get index(): number {
+    return this.get('index')
   }
 
   public get type(): string {
@@ -129,8 +138,8 @@ export default class Port extends Base<
   }
 
   public get nodeId(): string | undefined {
-    const container = Port.containerMap.get(this)
-    return container?.id
+    const node = Port.containerMap.get(this)
+    return node?.id
   }
 
   public get position(): IPosition | undefined {
@@ -138,22 +147,17 @@ export default class Port extends Base<
   }
 
   update(x: number, y: number) {
-    this.set('x', x)
-    this.set('y', y)
+    this.set('offsetX', x)
+    this.set('offsetY', y)
   }
 
-  setupNode(container: INode) {
+  linkNode(container: INode) {
     Port.containerMap.set(this, container)
-    container.on('change', this.onNodeChange)
   }
   /**
    *  关闭事件 => 删除关联Item => 移出store => 删除视图 => 抛出事件
    */
   remove() {
-    const container = Port.containerMap.get(this)
-    if (container) {
-      container.off('change', this.onNodeChange)
-    }
     Port.containerMap.delete(this)
 
     this.$store.remove(this.id, Port)

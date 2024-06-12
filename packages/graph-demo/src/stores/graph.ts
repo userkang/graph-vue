@@ -1,6 +1,6 @@
 import GraphConfigStore from './graph-config'
 import { Graph as GraphType } from 'graph-logic'
-import { dagMock, treeMock, mindMapMock } from '@/mock/graph'
+import { dagMock, treeMock } from '@/mock/graph'
 
 class Graph {
   public state = {
@@ -12,7 +12,7 @@ class Graph {
   }
 
   public getTreeData() {
-    GraphConfigStore.state.data = treeMock(5) as any
+    GraphConfigStore.state.data = treeMock(600) as any
   }
 }
 

@@ -1,10 +1,4 @@
-import {
-  ICircleLayout,
-  IDagreLayout,
-  IEdge,
-  ILayout,
-  INode
-} from '../types'
+import { ICircleLayout, IDagreLayout, IEdge, ILayout, INode } from '../types'
 // https://github.com/dagrejs/dagre/wiki
 import dagre from 'dagre'
 import Graph, { useGraph } from './graph'
@@ -58,16 +52,20 @@ export default class LayoutController extends EventEmitter<
     if (cfg.type === 'circle') {
       res = this.circleLayout(cfg)
     } else if (hasGroup) {
-      const groupPadding = (cfg.options as IDagreLayout)?.groupPadding
-      if (groupPadding) {
-        this.groupPadding =
-          (cfg.options as IDagreLayout)?.groupPadding || this.groupPadding
-      }
+      this.groupPadding =
+        (cfg.options as IDagreLayout)?.groupPadding || this.groupPadding
       res = this.groupLayout(cfg)
     } else {
       res = this.dagreLayout(cfg)
     }
     this.emit('layout')
+
+    const nodes = cfg.data?.nodes || this.$graph.getNodes()
+    nodes.forEach(node => {
+      node.getEdges().forEach(edge => {
+        edge.updatePoint()
+      })
+    })
     return res
   }
 
@@ -100,7 +98,7 @@ export default class LayoutController extends EventEmitter<
       // 输出的 x,y 坐标是节点中心点坐标， 需要修改为左上角坐标
       const posX = x - node.width / 2 + svgInfo.width / 2 - group.width / 2
       const posY = y - node.height / 2 + svgInfo.height / 2 - group.height / 2
-      node.updatePosition(posX, posY)
+      node.updatePosition(posX, posY, { emit: false })
     })
     return this.dagre
   }
@@ -211,7 +209,7 @@ export default class LayoutController extends EventEmitter<
           const posX = x - node.width / 2
           const posY = y - node.height / 2
           this.moveChildren(node, posX - node.x, posY - node.y)
-          node.updatePosition(posX, posY)
+          node.updatePosition(posX, posY, { emit: false })
         }
       })
 
@@ -228,7 +226,7 @@ export default class LayoutController extends EventEmitter<
       if (child) {
         const posX = child.x + node.x + moveX + this.groupPadding[3]
         const posY = child.y + node.y + moveY + this.groupPadding[0]
-        child.updatePosition(posX, posY)
+        child.updatePosition(posX, posY, { emit: false })
         const next = child.getChildren()
         children.push(...next)
       }
@@ -274,7 +272,7 @@ export default class LayoutController extends EventEmitter<
       const theta = i * dTheta + (options.startAngle || 0)
       const posX = radius * Math.cos(theta)
       const posY = radius * Math.sin(theta)
-      node.updatePosition(posX, posY)
+      node.updatePosition(posX, posY, { emit: false })
     }
   }
 

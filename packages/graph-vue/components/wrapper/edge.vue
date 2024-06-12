@@ -4,15 +4,8 @@
   </g>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { IEdge } from 'graph-logic'
-
-@Component
-export default class EdgeWrapper extends Vue {
-  @Prop({
-    required: true
-  })
-  edge!: IEdge
+<script>
+export default {
+  props: ['edge']
 }
 </script>

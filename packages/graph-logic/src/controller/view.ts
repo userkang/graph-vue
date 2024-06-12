@@ -188,25 +188,38 @@ export default class ViewController {
 
   getNodesBBox(value?: INode[]) {
     const nodes = value || this.$graph.getNodes()
-    const filterNodes = nodes.filter(item => !item.hasState('hide'))
-    if (!filterNodes.length) {
+    const initialBBox = {
+      left: Infinity,
+      top: Infinity,
+      right: -Infinity,
+      bottom: -Infinity
+    }
+
+    const bbox = nodes.reduce((acc, node) => {
+      if (node.hasState('hide')) return acc // 跳过隐藏的节点
+      const left = node.x
+      const top = node.y
+      const right = node.x + node.width
+      const bottom = node.y + node.height
+      return {
+        left: Math.min(acc.left, left),
+        top: Math.min(acc.top, top),
+        right: Math.max(acc.right, right),
+        bottom: Math.max(acc.bottom, bottom)
+      }
+    }, initialBBox)
+
+    // 如果没有节点或所有节点都隐藏，则返回空的边界盒
+    if (bbox.left === Infinity) {
       return { left: 0, top: 0, width: 0, height: 0 }
     }
-    const startNode = filterNodes[0]
-    let [minX, minY, maxX, maxY] = [
-      startNode.x,
-      startNode.y,
-      startNode.x + startNode.width,
-      startNode.y + startNode.height
-    ]
-    for (let i = filterNodes.length - 1; i > 0; i--) {
-      const node = filterNodes[i]
-      minX = Math.min(minX, node.x)
-      minY = Math.min(minY, node.y)
-      maxX = Math.max(maxX, node.x + node.width)
-      maxY = Math.max(maxY, node.y + node.height)
+
+    return {
+      left: bbox.left,
+      top: bbox.top,
+      width: bbox.right - bbox.left,
+      height: bbox.bottom - bbox.top
     }
-    return { left: minX, top: minY, width: maxX - minX, height: maxY - minY }
   }
 
   caculateOffset() {
@@ -239,12 +252,13 @@ export default class ViewController {
     this.translateBy(dx, dy)
   }
 
-  private translateX(x: number) {
-    // 结果正确前提是 transformOrigin:center ，transformOrigin是以svgInfo为基准
+  private translateWithBound(x: number, y: number) {
     let nextTranslateX = this.transform.translateX + x
+    let nextTranslateY = this.transform.translateY + y
     const svgCenterX = this.svgInfo.width / 2
+    const svgCenterY = this.svgInfo.height / 2
     const leftPart = svgCenterX - this.nodesBox.left
-    // svgCenterX * (1 +- 1/this.transform.scale) - this.nodesBox.left
+    const topPart = svgCenterY - this.nodesBox.top
     if (nextTranslateX < 0) {
       const minTranslateX =
         leftPart -
@@ -257,13 +271,6 @@ export default class ViewController {
         leftPart + svgCenterX / this.transform.scale - this.translatePadding
       nextTranslateX = Math.min(nextTranslateX, maxTranslateX)
     }
-    this.transform.translateX = nextTranslateX
-  }
-
-  private translateY(y: number) {
-    let nextTranslateY = this.transform.translateY + y
-    const svgCenterY = this.svgInfo.height / 2
-    const topPart = svgCenterY - this.nodesBox.top
     if (nextTranslateY < 0) {
       const minTranslateY =
         topPart -
@@ -276,12 +283,12 @@ export default class ViewController {
         topPart + svgCenterY / this.transform.scale - this.translatePadding
       nextTranslateY = Math.min(nextTranslateY, maxTranslateY)
     }
+    this.transform.translateX = nextTranslateX
     this.transform.translateY = nextTranslateY
   }
 
   public translateBy(x: number, y: number) {
-    this.translateX(x)
-    this.translateY(y)
+    this.translateWithBound(x, y)
     this.$graph.emit(
       'translate',
       this.transform.translateX,

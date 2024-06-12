@@ -16,7 +16,6 @@ export default class Node extends Base<
   INodeModel,
   Required<INodeCfg> & BaseCfg
 > {
-  readonly edgeIdSet = new Set<itemId>()
   $store: Store
   constructor(model: INodeModel, cfg: INodeCfg) {
     super(model)
@@ -78,16 +77,15 @@ export default class Node extends Base<
   }
 
   public getEdges(): IEdge[] {
-    const edgeMap = this.$store.getEdgeMap()
-    return Array.from(this.edgeIdSet).map(itemId => edgeMap[itemId])
+    return this.$store.node_edges.getMany(this) || []
   }
 
   public getInEdges(): IEdge[] {
-    return this.getEdges().filter(edge => edge.toNode.id === this.id)
+    return this.getEdges().filter(edge => edge.toNode?.id === this.id)
   }
 
   public getOutEdges(): IEdge[] {
-    return this.getEdges().filter(edge => edge.fromNode.id === this.id)
+    return this.getEdges().filter(edge => edge.fromNode?.id === this.id)
   }
 
   public lock() {
@@ -112,11 +110,9 @@ export default class Node extends Base<
     })
   }
 
-  public deleteChild(id: string) {
-    const childNodes = this.getChildren()
-    const index = childNodes.findIndex(item => item.id === id)
-    if (index > -1) {
-      this.getChildren().splice(index, 1)
+  public deleteChild(node: INode) {
+    if (node) {
+      this.$store.node_nodes.remove(node)
     }
   }
 
@@ -137,7 +133,7 @@ export default class Node extends Base<
   public getSourceNodes(): INode[] {
     const nodes: INode[] = []
     this.getInEdges().forEach(edge => {
-      nodes.push(edge.fromNode)
+      edge.fromNode && nodes.push(edge.fromNode)
     })
     return nodes
   }
@@ -145,7 +141,7 @@ export default class Node extends Base<
   public getTargetNodes() {
     const nodes: INode[] = []
     this.getOutEdges().forEach(edge => {
-      nodes.push(edge.toNode)
+      edge.toNode && nodes.push(edge.toNode)
     })
 
     return nodes
@@ -191,17 +187,18 @@ export default class Node extends Base<
 
   public addEdge(edge: IEdge) {
     this.$store.add(edge)
-    this.edgeIdSet.add(edge.id)
+    this.$store.node_edges.add(edge, this)
   }
 
-  public deleteEdge(id: string) {
-    this.edgeIdSet.delete(id)
+  public deleteEdge(edge: IEdge) {
+    this.$store.node_edges.remove(edge)
   }
 
-  public updatePosition(x: number, y: number) {
-    // 记录移动距离
-    const moveX = x - this.x
-    const moveY = y - this.y
+  public updatePosition(
+    x: number,
+    y: number,
+    options: { emit: boolean } = { emit: true }
+  ) {
     // 节点位置更新
     this.set('x', x)
     this.set('y', y)
@@ -211,7 +208,7 @@ export default class Node extends Base<
       this.model.y = y
     }
 
-    this.emit('change', this, 'position', { moveX, moveY })
+    options.emit && this.emit('change', this, 'position')
   }
 
   /**
@@ -264,7 +261,7 @@ export default class Node extends Base<
       this.$store.add(port)
       this.$store.node_ports.add(port, this)
 
-      port.setupNode(this)
+      port.linkNode(this)
       port.on('change', this.onPortChange)
       return port
     })
@@ -316,6 +313,9 @@ export default class Node extends Base<
     items.forEach(item => item.remove())
 
     this.$store.remove(this.id, Node)
+    this.$store.node_ports.remove(this)
+    this.$store.node_edges.remove(this)
+    this.$store.node_nodes.remove(this)
 
     this.emit('removed', this)
     this.off()

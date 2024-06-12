@@ -144,9 +144,6 @@ export default class ItemController extends EventEmitter<
   }
 
   private clear() {
-    this.$store.getNodes().forEach(item => item.off())
-    this.$store.getEdges().forEach(item => item.off())
-    this.$store.getPorts().forEach(item => item.off())
     this.$store.reset()
   }
 
@@ -169,7 +166,6 @@ export default class ItemController extends EventEmitter<
       return console.warn(`can't update node where id is '${id}'`)
     }
     node.update(model)
-    this.emit('node:change', node)
   }
 
   addNode = (item: INodeModel): INode | undefined => {
@@ -190,6 +186,12 @@ export default class ItemController extends EventEmitter<
     }
     const node = new Node(model, nodeCfg)
     this.$store.add(node)
+
+    // 判断是否有 parentId
+    if (model.parentId) {
+      const parentNode = graph.findNode(model.parentId)
+      parentNode && parentNode.addChild(node)
+    }
 
     node.on('change', (node: INode, type: string) =>
       this.emit('node:change', node, type)
@@ -215,7 +217,6 @@ export default class ItemController extends EventEmitter<
       return console.warn(`can't update edge where id is '${id}'`)
     }
     edge.update(model)
-    this.emit('edge:change', edge)
   }
 
   deleteNode = (id: itemId) => {

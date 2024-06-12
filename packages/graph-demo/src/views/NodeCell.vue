@@ -36,6 +36,9 @@
 
       <template #port></template>
       <ToolBox />
+      <Menu v-model="showMenu" class="menu">
+        <li @click="deleteItem">删除</li>
+      </Menu>
     </GraphVue>
   </div>
 </template>
@@ -47,10 +50,10 @@ import ConfigPanel from '@/components/config-panel.vue'
 import {
   ToolBox,
   MiniMap,
+  Menu,
   GraphVue,
   Graph,
   INode,
-  IEdge,
   ILayout
 } from '@datafe/graph-vue'
 
@@ -125,7 +128,8 @@ const nodeCellMock = {
     ToolBox,
     MiniMap,
     ComponentPanel,
-    ConfigPanel
+    ConfigPanel,
+    Menu
   }
 })
 export default class NodeCell extends Vue {
@@ -137,6 +141,8 @@ export default class NodeCell extends Vue {
     width: 200,
     height: 56
   }
+  activeId = ''
+  showMenu = false
 
   get action() {
     return action
@@ -184,6 +190,7 @@ export default class NodeCell extends Vue {
 
   initEvent() {
     this.graph.on('node:moving', this.handleNodeMoving)
+    this.graph.on('node:contextmenu', this.handleNodeContextMenu)
   }
 
   handleNodeMoving(node: INode) {
@@ -214,6 +221,19 @@ export default class NodeCell extends Vue {
       x: bbox.left - groupPadding,
       y: bbox.top - groupPadding - groupPaddingTop
     })
+  }
+
+  deleteItem() {
+    if (this.activeId) {
+      this.graph.deleteNode(this.activeId)
+    }
+  }
+
+  handleNodeContextMenu({ target }: { target: INode }) {
+    if (target.model.type !== 'group') {
+      this.showMenu = true
+      this.activeId = target.id
+    }
   }
 }
 </script>
@@ -294,6 +314,18 @@ export default class NodeCell extends Vue {
     margin: -4px -20px 0 0;
     font-size: 20px;
     cursor: pointer;
+  }
+}
+.menu li {
+  height: 30px;
+  line-height: 30px;
+  padding-left: 20px;
+  color: #666;
+  font-size: 12px;
+  cursor: pointer;
+  &:hover {
+    color: #333;
+    background: #dbdef3;
   }
 }
 </style>

@@ -1,6 +1,9 @@
 <template>
-  <g v-if="!node.hasState('hide')">
-    <g :transform="`translate(${node.x}, ${node.y})`">
+  <g
+    v-if="!node.hasState('hide')"
+    :transform="`translate(${node.x}, ${node.y})`"
+  >
+    <g>
       <foreignObject
         overflow="visible"
         :width="node.width"
@@ -11,26 +14,17 @@
         <slot></slot>
       </foreignObject>
     </g>
-    <Port v-for="port in node.ports" :key="port.id" :port="port">
+    <PortWrapper v-for="port in node.ports" :key="port.id" :port="port">
       <slot name="port" :port="port"></slot>
-    </Port>
+    </PortWrapper>
   </g>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { INode } from 'graph-logic'
-import Port from './port.vue'
+<script>
+import PortWrapper from './port.vue'
 
-@Component({
-  components: {
-    Port
-  }
-})
-export default class NodeWrapper extends Vue {
-  @Prop({
-    required: true
-  })
-  node!: INode
+export default {
+  components: { PortWrapper },
+  props: ['node']
 }
 </script>

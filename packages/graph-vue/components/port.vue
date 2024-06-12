@@ -10,30 +10,27 @@
   ></circle>
 </template>
 
-<script lang="ts">
-import { Vue, Component, Prop } from 'vue-property-decorator'
-import { IPort } from 'graph-logic'
-
-@Component
-export default class Port extends Vue {
-  @Prop({
-    required: true
-  })
-  port!: IPort
-
-  circleR = 4
-  highlightCircleR = 6
-  enable = false
-  linked = false
-  
-  refreshPort() {
-    this.enable = this.port.hasState('enable')
-    this.linked = !this.enable && this.port.hasState('linked')
-  }
+<script>
+export default {
+  props: ['port'],
+  data() {
+    return {
+      circleR: 4,
+      highlightCircleR: 6,
+      enable: false,
+      linked: false
+    }
+  },
+  methods: {
+    refreshPort() {
+      this.enable = this.port.hasState('enable')
+      this.linked = !this.enable && this.port.hasState('linked')
+    }
+  },
   created() {
     this.refreshPort()
     this.port.on('change', this.refreshPort)
-  }
+  },
   beforeDestroy() {
     this.port.off('change', this.refreshPort)
   }

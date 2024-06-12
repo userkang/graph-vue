@@ -251,8 +251,8 @@ export default class MindMap extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromPort
-    const { x: x2, y: y2 } = edge.toPort
+    const { x: x1, y: y1 } = edge.source
+    const { x: x2, y: y2 } = edge.target
     const xc = (x1 - x2) / 3 - 4
     return `M ${x1} ${y1} L ${x1 - xc} ${y1}  L ${
       x1 - 2 * xc

@@ -21,8 +21,7 @@ export default class Store extends EventEmitter<
   itemMap: Record<string, Item> = {}
   node_ports = new ManyToOne<Port, Node>()
   node_nodes = new ManyToOne<Node, Node>()
-  fromPort_edges = new ManyToOne<Edge, Port>()
-  toPort_edges = new ManyToOne<Edge, Port>()
+  node_edges = new ManyToOne<Edge, Node>()
   viewMap = new Map<Item, nodeView | edgeView>()
   constructor() {
     super()
@@ -137,9 +136,8 @@ export default class Store extends EventEmitter<
   }
 
   findNodeByPort = (portId: itemId) => {
-    return this.getNodes().find(node =>
-      node.ports.find(port => port.id === portId)
-    )
+    const nodeId = this.findPort(portId)?.nodeId
+    return (nodeId && this.findNode(nodeId)) || void 0
   }
 
   getDataModel = (): IDataModel => {
@@ -171,8 +169,7 @@ export default class Store extends EventEmitter<
     this.sorted.clean()
     this.node_ports = new ManyToOne<Port, Node>()
     this.node_nodes = new ManyToOne<Node, Node>()
-    this.fromPort_edges = new ManyToOne<Edge, Port>()
-    this.toPort_edges = new ManyToOne<Edge, Port>()
+    this.node_edges = new ManyToOne<Edge, Node>()
     this.viewMap = new Map<Item, nodeView | edgeView>()
   }
 }

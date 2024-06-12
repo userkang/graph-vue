@@ -1,15 +1,20 @@
 const path = require('path')
 const { VueLoaderPlugin } = require('vue-loader')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 module.exports = {
   entry: {
-    main: path.resolve(__dirname, './main.ts')
+    main: path.resolve(__dirname, '../main.ts')
   },
   mode: 'production',
   output: {
     path: path.resolve(__dirname, 'lib'), // 出口目录
     library: 'graph-vue', // 包名
-    libraryTarget: 'umd'
+    libraryTarget: 'umd',
+    clean: true
+  },
+  optimization: {
+    minimize: true
   },
   module: {
     rules: [
@@ -27,6 +32,9 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
+        options: {
+          presets: ['@babel/preset-env']
+        },
         exclude: /node_modules/
       },
       {
@@ -43,18 +51,10 @@ module.exports = {
         }
       },
       {
-        test: /\.woff(2)?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+        test: /\.(woff|woff2|eot|ttf|otf|svg)$/,
         use: [
           {
-            loader: 'url-loader?limit=10000&mimetype=application/font-woff'
-          }
-        ]
-      },
-      {
-        test: /\.(ttf|eot|svg)(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-        use: [
-          {
-            loader: 'file-loader'
+            loader: 'url-loader?limit=100000&mimetype=application/font-woff'
           }
         ]
       }
@@ -63,7 +63,14 @@ module.exports = {
   resolve: {
     extensions: ['.js', '.ts', '.vue', '.json'],
     alias: {
-      'graph-logic': path.resolve(__dirname, '../graph-logic/src')
+      '@datafe/graph-core': path.resolve(
+        __dirname,
+        './node_modules/@datafe/graph-core'
+      ),
+      '@datafe/vue-demi': path.resolve(
+        __dirname,
+        './node_modules/@datafe/vue-demi'
+      )
     }
   },
   externals: {
@@ -74,5 +81,14 @@ module.exports = {
       amd: 'vue'
     }
   },
-  plugins: [new VueLoaderPlugin()]
+  plugins: [
+    new VueLoaderPlugin(),
+    new CopyWebpackPlugin({
+      patterns: [
+        { from: '../components', to: 'components' },
+        { from: '../types/main.d.ts', to: 'types/main.d.ts' },
+        { from: '../utils', to: 'utils' }
+      ]
+    })
+  ]
 }

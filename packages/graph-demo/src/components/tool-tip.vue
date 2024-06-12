@@ -141,6 +141,7 @@ $main-color: #575c95;
   display: none;
   opacity: 0;
   transition: all 0.5s;
+  line-height: 30px;
   &::after {
     position: absolute;
     content: '';

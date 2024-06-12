@@ -6,6 +6,7 @@
       :action="action"
       :layout="layout"
       @init="initGraph"
+      virtual
     >
       <template #node="{ node }">
         <div
@@ -33,21 +34,21 @@
 
       <template #port> </template>
 
-      <MiniMap />
+      <MiniMap sample />
       <ToolBox />
       <Menu class="menu" v-model="menuShow">
         <li @click="deleteItem">删除</li>
         <li @click="deleteItem">删除</li>
       </Menu>
     </GraphVue>
-    <ConfigPanel />
+    <!-- <ConfigPanel /> -->
   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
-import ConfigPanel from '@/components/config-panel.vue'
+// import ConfigPanel from '@/components/config-panel.vue'
 import {
   ToolBox,
   Menu,
@@ -71,7 +72,7 @@ import ComponentListStore from '@/stores/component-list'
     Menu,
     MiniMap,
     ComponentPanel,
-    ConfigPanel
+    // ConfigPanel
   }
 })
 export default class Tree extends Vue {
@@ -114,8 +115,8 @@ export default class Tree extends Vue {
   }
 
   path(edge: IEdge) {
-    const { x: x1, y: y1 } = edge.fromPort
-    const { x: x2, y: y2 } = edge.toPort
+    const { x: x1, y: y1 } = edge.source
+    const { x: x2, y: y2 } = edge.target
 
     if (['TB', 'BT'].includes(this.graph.get('direction'))) {
       const xc = (y2 - y1) / 2
@@ -137,10 +138,10 @@ export default class Tree extends Vue {
   }
 
   text(edge: IEdge) {
-    const { fromPort, toPort } = edge
+    const { source, target } = edge
     return {
-      x: (fromPort.x + toPort.x) / 2,
-      y: (fromPort.y + toPort.y) / 2
+      x: (source.x + target.x) / 2,
+      y: (source.y + target.y) / 2
     }
   }
 

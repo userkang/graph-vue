@@ -28,17 +28,15 @@ export default {
   },
   computed: {
     path() {
-      const { fromPort, toPort } = this.edge
+      const { source, target } = this.edge
       const direction = this.graph.get('direction')
-      const x2 = toPort.x
-      const y2 = toPort.y
 
       return calculateCurve(
         {
-          x1: fromPort.x,
-          y1: fromPort.y,
-          x2,
-          y2
+          x1: source.x,
+          y1: source.y,
+          x2: target.x,
+          y2: target.y
         },
         direction
       )

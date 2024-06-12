@@ -24,7 +24,7 @@ class GraphConfig {
       'drag-node',
       'click-select',
       'connect-edge',
-      // 'wheel-move',
+      'wheel-move',
       'wheel-zoom',
       'brush-select'
     ],

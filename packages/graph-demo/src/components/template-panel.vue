@@ -1,6 +1,6 @@
 <template>
   <div class="temp-panel">
-    <div class="title">模板</div>
+    <div class="title">示例</div>
     <ul class="demo">
       <li
         class="demo-item"
@@ -122,6 +122,9 @@ export default class ComponentPanel extends Vue {
   box-sizing: border-box;
   background: #333;
   border-right: 1px solid #222;
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
 }
 .title {
   font-size: 12px;
@@ -158,10 +161,9 @@ export default class ComponentPanel extends Vue {
   .demo-item {
     position: relative;
     height: 40px;
-    overflow: hidden;
-    box-sizing: border-box;
     color: #fff;
     cursor: pointer;
+    font-size: 14px;
     .demo-wrap {
       position: relative;
       width: 100%;

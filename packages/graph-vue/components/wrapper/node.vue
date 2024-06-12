@@ -1,6 +1,9 @@
 <template>
-  <g v-if="!node.hasState('hide')">
-    <g :transform="`translate(${node.x}, ${node.y})`">
+  <g
+    v-if="!node.hasState('hide')"
+    :transform="`translate(${node.x}, ${node.y})`"
+  >
+    <g>
       <foreignObject
         overflow="visible"
         :width="node.width"

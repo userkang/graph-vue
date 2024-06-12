@@ -289,8 +289,8 @@ export default class MindLayout extends Vue {
 
   path(edge) {
     // 直角边
-    const { x: x1, y: y1 } = edge.fromPort
-    const { x: x2, y: y2 } = edge.toPort
+    const { x: x1, y: y1 } = edge.source
+    const { x: x2, y: y2 } = edge.target
     const radius = 8
 
     // const v = (Math.abs(x2 - x1) / 3) * 2

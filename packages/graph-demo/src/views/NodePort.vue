@@ -48,7 +48,7 @@ const nodeCellMock = {
     {
       id: '1',
       label: '1',
-      ports: [{ position: 'right', type: 'in' }, { position: 'top' }]
+      ports: [{ id: '1-1', position: 'right', type: 'in' }, { position: 'top' }]
     },
     {
       id: '2',
@@ -58,7 +58,7 @@ const nodeCellMock = {
   ],
   edges: [
     {
-      fromNodeId: '1',
+      fromPortId: '1-1',
       toNodeId: '2'
     }
   ]
@@ -90,7 +90,7 @@ export default class NodeCell extends Vue {
   }
 
   path(edge: IEdge) {
-    return `M ${edge.fromPort.x} ${edge.fromPort.y} L ${edge.toPort.x} ${edge.toPort.y}`
+    return `M ${edge.source.x} ${edge.source.y} L ${edge.target.x} ${edge.target.y}`
   }
 }
 </script>

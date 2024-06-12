@@ -20,7 +20,7 @@
         }"
         v-if="graph"
       >
-        <template v-for="item in items">
+        <template v-for="item in filterItems">
           <EdgeWrapper v-if="isEdge(item)" :key="item.id" :edge="item">
             <slot v-if="hasSlots.edge" name="edge" :edge="item"></slot>
             <Edge v-else :edge="item" :graph="graph" />
@@ -87,6 +87,10 @@ export default {
     defaultNode: {
       type: Object,
       default: () => {}
+    },
+    virtual: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -95,6 +99,7 @@ export default {
       nodes: [],
       edges: [],
       items: [],
+      filterItems: [],
       transform: {
         scale: 1,
         translateX: 0,
@@ -199,9 +204,57 @@ export default {
     aftertranslate(x, y) {
       this.transform.translateX = x
       this.transform.translateY = y
+      if (this.items.length) {
+        this.handleFilter()
+      }
+    },
+    handleFilter() {
+      this.filterItems = this.virtual
+        ? this.items.filter(item => this.inCanvasView(item))
+        : this.items
+    },
+    inCanvasView(item) {
+      if (item instanceof GraphNode) {
+        const bbox = this.graph.getNodesBBox([item])
+        return this.pointInCanvasView(
+          bbox.left,
+          bbox.top,
+          bbox.width,
+          bbox.height
+        )
+      }
+      if (item instanceof GraphEdge) {
+        return (
+          this.pointInCanvasView(item.source.x, item.source.y, 0, 0) ||
+          this.pointInCanvasView(item.target.x, item.target.y, 0, 0)
+        )
+      }
+    },
+    pointInCanvasView(x, y, width, height) {
+      const { x: translateX, y: translateY } = this.graph.getTranslate()
+      const { offsetX, offsetY } = this.graph.viewController.transform
+      const scale = this.graph.getZoom()
+      const svgInfo = this.graph.getSvgInfo()
+      // 虚拟加载时，节点需要预留出padding空间，先留0
+      const padding = 0
+
+      const nodeX = translateX * scale - offsetX + x * scale
+      const nodeY = translateY * scale - offsetY + y * scale
+      const nodeWidth = width * scale
+      const nodeHeight = height * scale
+
+      return !(
+        nodeX + nodeWidth + padding < 0 ||
+        nodeY + nodeHeight + padding < 0 ||
+        nodeX - padding > svgInfo.width ||
+        nodeY - padding > svgInfo.height
+      )
     },
     afterzoom(zoom) {
       this.transform.scale = zoom
+      if (this.items.length) {
+        this.handleFilter()
+      }
     }
   },
   mounted() {

@@ -200,7 +200,6 @@ export default {
     },
     refreshGraph() {
       this.items = this.graph.getSortedItem()
-      this.handleFilter()
     },
     aftertranslate(x, y) {
       this.transform.translateX = x

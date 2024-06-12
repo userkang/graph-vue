@@ -48,7 +48,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator'
 import ComponentPanel from '@/components/component-panel.vue'
-import ConfigPanel from '@/components/config-panel.vue'
+// import ConfigPanel from '@/components/config-panel.vue'
 import {
   ToolBox,
   Menu,
@@ -72,7 +72,7 @@ import ComponentListStore from '@/stores/component-list'
     Menu,
     MiniMap,
     ComponentPanel,
-    ConfigPanel
+    // ConfigPanel
   }
 })
 export default class Tree extends Vue {
